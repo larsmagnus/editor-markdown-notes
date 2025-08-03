@@ -1,0 +1,26 @@
+{
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "semi": false,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "importOrder": [
+    "^(node:|fs|path|os|crypto|util|events|http|https|url|zlib)(/.*|$)",
+    "<THIRD_PARTY_MODULES>",
+    "^@/(.*)$",
+    "^\\.\\.(?!/?$)",
+    "^\\.\\./?$",
+    "^\\./(?=.*/)",
+    "^\\.(?!/?$)",
+    "^\\./?$"
+  ],
+  "overrides": [
+    {
+      "files": ["*.mdx", "*.md"],
+      "options": {
+        "printWidth": 80
+      }
+    }
+  ]
+}
