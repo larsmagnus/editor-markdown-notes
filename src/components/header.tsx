@@ -22,7 +22,7 @@ interface HeadingProps
 function Header({ level, className, children, ...props }: HeadingProps) {
   return createElement(
     `h${level}`,
-    { ...props, className: cn('font-serif', className) },
+    { ...props, className: cn('font-bold', className) },
     children
   )
 }

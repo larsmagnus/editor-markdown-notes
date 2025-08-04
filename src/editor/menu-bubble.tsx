@@ -53,7 +53,7 @@ export function MenuBubble() {
         duration: 50,
       }}
     >
-      <div className="flex items-center gap-1 p-1 bg-background border border-foreground/5 rounded-lg shadow-xs drop-shadow-lg">
+      <div className="flex items-center gap-1 p-1 bg-background border border-foreground/5 rounded-lg shadow-xs drop-shadow-lg w-[400px]">
         <Popover>
           <PopoverTrigger asChild>
             <Button type="button" variant="ghost" size="sm" title="Heading">
@@ -120,12 +120,12 @@ export function MenuBubble() {
               }}
             >
               <div className="space-y-2">
-                <Header level={4} className="font-bold leading-none">
+                <Header level={4} className="leading-none">
                   Link
                 </Header>
               </div>
               <div className="grid gap-2">
-                <div className="grid grid-cols-3 items-center gap-4">
+                <div className="flex items-center gap-4">
                   <Label htmlFor="url">URL</Label>
                   <Input
                     id="url"
