@@ -1,10 +1,11 @@
 {
   "name": "editor-markdown-notes",
-  "displayName": "editor-markdown-notes",
-  "description": "Advanced markdown editing and preview",
+  "displayName": "Markdown Editor Notes",
+  "description": "A powerful markdown editor with live preview, rich formatting tools, and seamless VSCode integration. Features TipTap-based WYSIWYG editing, theme support, and auto-save functionality.",
+  "publisher": "larsmagnus",
   "author": "Lars Magnus Klavenes <larsmagnus@gmail.com> (https://larsmagnus.co)",
   "license": "MIT",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "private": true,
   "repository": {
@@ -15,26 +16,83 @@
     "vscode": "^1.101.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Formatters",
+    "Notebooks"
   ],
-  "activationEvents": [],
-  "main": "./out/extension.js",
+  "keywords": [
+    "markdown",
+    "editor",
+    "preview",
+    "wysiwyg",
+    "tiptap",
+    "notes",
+    "writing",
+    "formatting"
+  ],
+  "icon": "public/icon-editor-markdown-notes.png",
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
+  "main": "./out/extension.cjs",
   "contributes": {
+    "customEditors": [
+      {
+        "viewType": "editor-markdown-notes.markdownEditor",
+        "displayName": "Editor Markdown Notes",
+        "selector": [
+          {
+            "filenamePattern": "*.md"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
     "commands": [
       {
-        "command": "editor-markdown-notes.helloWorld",
-        "title": "Hello World"
+        "command": "editor-markdown-notes.openMarkdownEditor",
+        "title": "Open with Editor Markdown Notes",
+        "category": "Markdown Editor"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "editor-markdown-notes.openMarkdownEditor",
+          "when": "resourceExtname == .md",
+          "group": "navigation@1"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "editor-markdown-notes.openMarkdownEditor",
+          "when": "resourceLangId == markdown",
+          "group": "1_open@1"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "editor-markdown-notes.openMarkdownEditor",
+          "when": "resourceLangId == markdown",
+          "group": "1_open"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "editor-markdown-notes.openMarkdownEditor",
+          "when": "resourceLangId == markdown || resourceExtname == .md"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "vscode:compile": "tsc -p ./tsconfig.extension.json && mv out/extension.js out/extension.cjs && mv out/extension.js.map out/extension.cjs.map",
+    "vscode:watch": "tsc -watch -p ./tsconfig.extension.json",
     "pretest": "pnpm run compile && pnpm run lint",
     "test": "vscode-test",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && pnpm vscode:compile",
     "typecheck": "tsc --noEmit",
     "lint": "pnpm typecheck && oxlint --fix && prettier . --write",
     "preview": "vite preview"
@@ -53,7 +111,7 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
     "globals": "^16.2.0",
-    "oxlint": "^1.3.0",
+    "oxlint": "^1.9.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.11",

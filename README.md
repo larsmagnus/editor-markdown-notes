@@ -47,7 +47,12 @@ Fixed issue #.
 
 Added features X, Y, and Z.
 
----
+## Testing the Extension
+
+1. Press F5 in VSCode to launch the Extension Development Host
+2. In the new window, open a `.md` file
+3. Right-click the file and select "Open with Markdown Editor"
+4. The custom React-based markdown editor should now load without errors
 
 ## Following extension guidelines
 
@@ -69,6 +74,8 @@ You can author your README using Visual Studio Code. Here are some useful editor
 - [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**
+
+---
 
 # React + TypeScript + Vite
 

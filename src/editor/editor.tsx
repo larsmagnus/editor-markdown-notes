@@ -17,6 +17,7 @@ import { useDebounceValue } from 'usehooks-ts'
 
 import { MenuBar } from '@/editor/menu-bar'
 import { MenuBubble } from '@/editor/menu-bubble'
+import { useVSCode } from '@/hooks/use-vscode'
 import { updateNotes } from '@/lib/update-notes'
 import { cn } from '@/lib/utils'
 
@@ -53,8 +54,9 @@ function Editor({
   ...props
 }: EditorProps) {
   const { className, ...restEditorContainer } = props || {}
+  const { isVSCodeContext, saveContent } = useVSCode()
 
-  const [debouncedValue, setValue] = useDebounceValue('', 600)
+  const [debouncedValue, setValue] = useDebounceValue('', 1000)
 
   const handleUpdate = (props: EditorEvents['update']) => {
     const markdown = props.editor?.storage?.markdown?.getMarkdown()
@@ -69,16 +71,38 @@ function Editor({
     // ...other options...
   })
 
+  // Handle manual save requests (e.g., from Cmd+S)
+  useEffect(() => {
+    if (!isVSCodeContext || !editor) return
+
+    const handleManualSave = () => {
+      const currentMarkdown = editor.storage?.markdown?.getMarkdown()
+      if (currentMarkdown) {
+        saveContent(currentMarkdown)
+      }
+    }
+
+    window.addEventListener('vscode-save-request', handleManualSave)
+    return () => {
+      window.removeEventListener('vscode-save-request', handleManualSave)
+    }
+  }, [editor, isVSCodeContext, saveContent])
+
   /**
-   * Save the markdown
-   * TODO: see if there's a better pattern for this
+   * Save the markdown - use VSCode API if in extension context, otherwise local file system
    */
   useEffect(() => {
     if (!debouncedValue) return
 
     async function saveMarkdown() {
       try {
-        await updateNotes(debouncedValue)
+        if (isVSCodeContext) {
+          // Save through VSCode API
+          saveContent(debouncedValue)
+        } else {
+          // Save to local file system (standalone mode)
+          await updateNotes(debouncedValue)
+        }
       } catch (error) {
         console.error('Error saving markdown:', error)
       } finally {
@@ -87,7 +111,7 @@ function Editor({
     }
 
     saveMarkdown()
-  }, [debouncedValue])
+  }, [debouncedValue, isVSCodeContext, saveContent])
 
   // Update content when prop changes
   useEffect(() => {
