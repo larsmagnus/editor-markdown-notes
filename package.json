@@ -4,7 +4,7 @@
   "description": "Advanced markdown editing and preview",
   "author": "Lars Magnus Klavenes <larsmagnus@gmail.com> (https://larsmagnus.co)",
   "license": "MIT",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "private": true,
   "repository": {
