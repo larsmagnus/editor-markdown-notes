@@ -1,3 +1,3 @@
 export async function updateNotes(body: string) {
-  console.log('Update notes', body)
+	console.log('Update notes', body)
 }

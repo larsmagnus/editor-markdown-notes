@@ -1,6 +1,6 @@
 # [CLAUDE.md](http://CLAUDE.md)
 
-# This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository
 
 ## Project Overview
 
@@ -34,6 +34,13 @@ The current state of the project is a scaffold, and it must be modified to:
 - `pnpm vscode:compile` - Compile TypeScript extension (`tsc -p ./`)
 - `pnpm vscode:watch` - Watch mode compilation for extension
 - `pnpm vscode:prepublish` - Prepare extension for publishing
+
+#### Testing the Extension
+
+1. Press F5 in VSCode to launch the Extension Development Host
+2. In the new window, open a `.md` file
+3. Right-click the file and select "Open with Markdown Editor"
+4. The custom React-based markdown editor should now load without errors
 
 ## Architecture
 

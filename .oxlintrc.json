@@ -1,8 +1,8 @@
 {
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["import", "react", "react-perf", "unicorn", "typescript", "oxc"],
-  "ignorePatterns": ["node_modules/", "public/"],
-  "rules": {
-    "consistent-type-specifier-style": "error"
-  }
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["import", "react", "react-perf", "unicorn", "typescript", "oxc"],
+	"ignorePatterns": ["node_modules/", "public/"],
+	"rules": {
+		"consistent-type-specifier-style": "error"
+	}
 }

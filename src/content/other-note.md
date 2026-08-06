@@ -52,6 +52,6 @@ Code block
 ```js
 // Code block with "js" language
 function helloWorld() {
-  console.log('Hello, world!')
+	console.log('Hello, world!')
 }
 ```

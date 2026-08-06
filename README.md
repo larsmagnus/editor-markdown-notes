@@ -1,148 +1,68 @@
-# editor-markdown-notes README
+# Markdown Editor Notes
 
-This is the README for your extension "editor-markdown-notes". After writing up a brief description, we recommend including the following sections.
+A VS Code custom editor that opens `.md` files in a WYSIWYG editor with live preview, built on [TipTap](https://tiptap.dev) and React.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- WYSIWYG markdown editing as a VS Code custom editor for `*.md`
+- Formatting toolbar plus a selection bubble menu (headings, text styles, colors, links)
+- Follows the active VS Code color theme
+- Auto-save with a 600ms debounce
+- Frontmatter-aware via `gray-matter`
 
-For example if there is an image subfolder under your extension project workspace:
+## Usage
 
-\!\[feature X\]\(images/feature-x.png\)
+Open the editor in any of these ways:
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- Right-click a `.md` file in the Explorer → **Open with Editor Markdown Notes**
+- Right-click inside an open markdown file → **Open with Editor Markdown Notes**
+- Command Palette → **Markdown Editor: Open with Editor Markdown Notes**
+- Right-click a `.md` file → **Open With…** → **Editor Markdown Notes**
+
+The default text editor is unchanged; this editor is registered with `priority: "option"`, so you opt in per file.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+VS Code `^1.101.0`.
 
-## Extension Settings
+## Install locally
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+The extension is not published to the Marketplace. To build a `.vsix` and install it into your local VS Code:
 
-For example:
+```sh
+pnpm install
+npx @vscode/vsce package --no-dependencies
+code --install-extension editor-markdown-notes-0.1.0.vsix
+```
 
-This extension contributes the following settings:
+Reload the window (Command Palette → **Developer: Reload Window**) after installing.
 
-- `myExtension.enable`: Enable/disable this extension.
-- `myExtension.thing`: Set to `blah` to do something.
+To uninstall: `code --uninstall-extension larsmagnus.editor-markdown-notes`.
 
-## Known Issues
+## Development
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+| Command             | Purpose                                       |
+| ------------------- | --------------------------------------------- |
+| `pnpm dev`          | Vite dev server for the React app standalone  |
+| `pnpm build`        | Build the web app and compile the extension   |
+| `pnpm vscode:watch` | Watch-mode compile of the extension host code |
+| `pnpm typecheck`    | TypeScript check, no emit                     |
+| `pnpm lint`         | Typecheck + `oxlint --fix` + `oxfmt`          |
+| `pnpm test`         | Run extension tests via `vscode-test`         |
 
-## Release Notes
+### Running from source
 
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
-## Testing the Extension
-
-1. Press F5 in VSCode to launch the Extension Development Host
+1. Press <kbd>F5</kbd> in VS Code to launch the Extension Development Host
 2. In the new window, open a `.md` file
-3. Right-click the file and select "Open with Markdown Editor"
-4. The custom React-based markdown editor should now load without errors
+3. Right-click the file and select **Open with Editor Markdown Notes**
 
-## Following extension guidelines
+## Architecture
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+- `src/extension.ts` — extension host entry, registers the custom editor and command; compiled to `out/extension.cjs`
+- `src/main.tsx` — React webview entry, bundled to `dist/` by Vite
+- `src/editor/` — TipTap editor, toolbar, and bubble menu
+- `src/components/` — Radix UI + shadcn/ui components
 
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+## License
 
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-- Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-- Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
-
----
-
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactDom from 'eslint-plugin-react-dom'
-import reactX from 'eslint-plugin-react-x'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+MIT — see [LICENSE](LICENSE).
