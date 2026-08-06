@@ -1,4 +1,4 @@
-# Markdown Editor Notes
+# Editor Markdown Notes
 
 A VS Code custom editor that opens `.md` files in a WYSIWYG editor with live preview, built on [TipTap](https://tiptap.dev) and React.
 
@@ -7,8 +7,9 @@ A VS Code custom editor that opens `.md` files in a WYSIWYG editor with live pre
 - WYSIWYG markdown editing as a VS Code custom editor for `*.md`
 - Formatting toolbar plus a selection bubble menu (headings, text styles, colors, links)
 - Follows the active VS Code color theme
-- Auto-save with a 600ms debounce
+- Auto-save with a 1000ms debounce
 - Frontmatter-aware via `gray-matter`
+- Toolbar toggles (raw markdown, full width, theme) persist across tabs and sessions
 
 ## Usage
 
@@ -16,10 +17,28 @@ Open the editor in any of these ways:
 
 - Right-click a `.md` file in the Explorer → **Open with Editor Markdown Notes**
 - Right-click inside an open markdown file → **Open with Editor Markdown Notes**
-- Command Palette → **Markdown Editor: Open with Editor Markdown Notes**
+- Command Palette → **Editor Markdown Notes: Open file**
 - Right-click a `.md` file → **Open With…** → **Editor Markdown Notes**
 
 The default text editor is unchanged; this editor is registered with `priority: "option"`, so you opt in per file.
+
+## Settings
+
+Available under Settings → Extensions → Editor Markdown Notes (or the cog on the extension page):
+
+| Setting                             | Default | Purpose                                                |
+| ----------------------------------- | ------- | ------------------------------------------------------ |
+| `editorMarkdownNotes.hideNav`       | `false` | Hide the editor's top navigation bar                   |
+| `editorMarkdownNotes.centerContent` | `false` | Center the content horizontally when full width is off |
+
+The toolbar toggles are also available from the command palette while the editor
+is focused, so they stay reachable with `hideNav` turned on:
+
+- **Editor Markdown Notes: Toggle raw markdown**
+- **Editor Markdown Notes: Toggle full width**
+- **Editor Markdown Notes: Select theme**
+
+All three are shared across open tabs and persist between sessions.
 
 ## Requirements
 
@@ -58,10 +77,11 @@ To uninstall: `code --uninstall-extension larsmagnus.editor-markdown-notes`.
 
 ## Architecture
 
-- `src/extension.ts` — extension host entry, registers the custom editor and command; compiled to `out/extension.cjs`
+- `src/extension.ts` — extension host entry, registers the custom editor and commands, owns settings and persisted view options; compiled to `out/extension.js`
+- `src/shared/messages.ts` — the host ↔ webview message contract, shared by both build graphs
 - `src/main.tsx` — React webview entry, bundled to `dist/` by Vite
 - `src/editor/` — TipTap editor, toolbar, and bubble menu
-- `src/components/` — Radix UI + shadcn/ui components
+- `src/components/` — Radix UI + shadcn/ui components, plus `nav.tsx` and `settings-provider.tsx`
 
 ## License
 
