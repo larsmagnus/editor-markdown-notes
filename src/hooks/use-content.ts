@@ -5,12 +5,12 @@ const markdownFiles = import.meta.glob<{ default: string }>('@/content/*.md', {
 	query: 'raw',
 })
 
-console.log('Got markdown files', markdownFiles)
 const rootPath = '/src/content/'
 
 function useContent({
 	defaultFileName = 'notes.md',
-}: PropsWithChildren<{ defaultFileName?: string }>) {
+	enabled = true,
+}: PropsWithChildren<{ defaultFileName?: string; enabled?: boolean }>) {
 	const [files, setFiles] = useState<
 		{ value: string; label: string; content: string }[]
 	>([])
@@ -18,6 +18,8 @@ function useContent({
 	const [content, setContent] = useState('')
 
 	useEffect(() => {
+		if (!enabled) return
+
 		async function getAllFiles() {
 			const rawFiles = await Promise.all(
 				Object.entries(markdownFiles).map(async ([path, promise]) => {
@@ -34,13 +36,13 @@ function useContent({
 		}
 
 		getAllFiles()
-	}, [defaultFileName])
+	}, [defaultFileName, enabled])
 
 	useEffect(() => {
+		if (!enabled) return
+
 		async function getContent() {
 			const path = `/src/content/${fileName}`
-
-			console.log('getting content')
 
 			if (markdownFiles[path]) {
 				const fileContent = await markdownFiles[path]()
@@ -52,7 +54,7 @@ function useContent({
 			}
 		}
 		getContent()
-	}, [fileName])
+	}, [fileName, enabled])
 
 	return { fileName, setFileName, content, files }
 }
