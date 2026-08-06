@@ -34,7 +34,7 @@
 	"activationEvents": [
 		"onLanguage:markdown"
 	],
-	"main": "./out/extension.cjs",
+	"main": "./out/extension.js",
 	"contributes": {
 		"customEditors": [
 			{
@@ -87,8 +87,10 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "pnpm run build",
-		"vscode:compile": "tsc -p ./tsconfig.extension.json && mv out/extension.js out/extension.cjs && mv out/extension.js.map out/extension.cjs.map",
-		"vscode:watch": "tsc -watch -p ./tsconfig.extension.json",
+		"vscode:sentinel": "mkdir -p out && echo '{\"type\":\"commonjs\"}' > out/package.json",
+		"vscode:compile": "tsc -p ./tsconfig.extension.json && pnpm vscode:sentinel",
+		"vscode:watch": "pnpm vscode:sentinel && tsc -watch -p ./tsconfig.extension.json",
+		"watch": "pnpm vscode:watch",
 		"pretest": "pnpm run compile && pnpm run lint",
 		"test": "vscode-test",
 		"dev": "vite",
