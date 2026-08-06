@@ -3,6 +3,16 @@
 	"plugins": ["import", "react", "react-perf", "unicorn", "typescript", "oxc"],
 	"ignorePatterns": ["node_modules/", "public/"],
 	"rules": {
-		"consistent-type-specifier-style": "error"
-	}
+		"consistent-type-specifier-style": "error",
+		"react/rules-of-hooks": "error",
+		"react/only-export-components": ["warn", { "allowConstantExport": true }]
+	},
+	"overrides": [
+		{
+			"files": ["src/components/ui/**"],
+			"rules": {
+				"react/only-export-components": "off"
+			}
+		}
+	]
 }
