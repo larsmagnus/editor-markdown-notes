@@ -55,3 +55,27 @@ function helloWorld() {
 	console.log('Hello, world!')
 }
 ```
+
+Table
+
+| Feature   | Status      | Notes                                     |
+| --------- | ----------- | ----------------------------------------- |
+| Tables    | **Shipped** | Cells keep `inline code` and marks        |
+| Task list | **Shipped** | Checkboxes round-trip their checked state |
+| Footnotes | Missing     | See [the docs](https://example.com)       |
+
+Table with column alignment (the alignment is dropped on load - see CLAUDE.md)
+
+| Left | Centered | Right |
+| :--- | :------: | ----: |
+| a    |    b     |     c |
+| dd   |    ee    |    ff |
+
+Image
+
+![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)
+
+Link
+
+An inline [link to example.com](https://example.com), and a bare autolink:
+https://example.com
