@@ -5,7 +5,7 @@
 	"publisher": "larsmagnus",
 	"author": "Lars Magnus Klavenes <larsmagnus@gmail.com> (https://larsmagnus.co)",
 	"license": "MIT",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"type": "module",
 	"private": true,
 	"repository": {
@@ -48,11 +48,45 @@
 				"priority": "option"
 			}
 		],
+		"configuration": {
+			"title": "Editor Markdown Notes",
+			"properties": {
+				"editorMarkdownNotes.centerContent": {
+					"type": "boolean",
+					"default": false,
+					"description": "Center the editor content horizontally when full width is off."
+				},
+				"editorMarkdownNotes.hideNav": {
+					"type": "boolean",
+					"default": false,
+					"description": "Hide the editor's top navigation bar. The raw, full width and theme toggles remain available from the command palette."
+				}
+			}
+		},
 		"commands": [
 			{
+				"command": "editor-markdown-notes.openFile",
+				"title": "Open file",
+				"category": "Editor Markdown Notes"
+			},
+			{
 				"command": "editor-markdown-notes.openMarkdownEditor",
-				"title": "Open with Editor Markdown Notes",
-				"category": "Markdown Editor"
+				"title": "Open with Editor Markdown Notes"
+			},
+			{
+				"command": "editor-markdown-notes.toggleRaw",
+				"title": "Toggle raw markdown",
+				"category": "Editor Markdown Notes"
+			},
+			{
+				"command": "editor-markdown-notes.toggleFullWidth",
+				"title": "Toggle full width",
+				"category": "Editor Markdown Notes"
+			},
+			{
+				"command": "editor-markdown-notes.selectTheme",
+				"title": "Select theme",
+				"category": "Editor Markdown Notes"
 			}
 		],
 		"menus": {
@@ -79,8 +113,24 @@
 			],
 			"commandPalette": [
 				{
-					"command": "editor-markdown-notes.openMarkdownEditor",
+					"command": "editor-markdown-notes.openFile",
 					"when": "resourceLangId == markdown || resourceExtname == .md"
+				},
+				{
+					"command": "editor-markdown-notes.openMarkdownEditor",
+					"when": "false"
+				},
+				{
+					"command": "editor-markdown-notes.toggleRaw",
+					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+				},
+				{
+					"command": "editor-markdown-notes.toggleFullWidth",
+					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+				},
+				{
+					"command": "editor-markdown-notes.selectTheme",
+					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
 				}
 			]
 		}
