@@ -95,7 +95,7 @@
 		"test": "vscode-test",
 		"dev": "vite",
 		"build": "tsc -b && vite build && pnpm vscode:compile",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc -b --noEmit && tsc -p ./tsconfig.extension.json --noEmit",
 		"lint": "pnpm typecheck && oxlint --fix && oxfmt",
 		"preview": "vite preview"
 	},
