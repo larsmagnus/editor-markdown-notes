@@ -1,21 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
 
-declare global {
-	interface Window {
-		vscode?: {
-			postMessage: (message: any) => void
-			getState: () => any
-			setState: (state: any) => void
-		}
-		initialContent?: string
-		fileName?: string
-	}
-}
+import type { Config, WebviewToHost } from '@/shared/messages'
 
 interface VSCodeAPI {
-	postMessage: (message: any) => void
-	getState: () => any
-	setState: (state: any) => void
+	postMessage: (message: WebviewToHost) => void
+	getState: () => unknown
+	setState: (state: unknown) => void
+}
+
+declare global {
+	interface Window {
+		vscode?: VSCodeAPI
+		initialContent?: string
+		fileName?: string
+		initialConfig?: Config
+	}
 }
 
 export function useVSCode() {
