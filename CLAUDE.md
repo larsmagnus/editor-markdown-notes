@@ -58,7 +58,9 @@ Vitest takes `src/**/*.test.{ts,tsx}` except `src/test/**`. Keep webview tests o
 
 `src/editor/markdown-round-trip.test.ts` builds a headless editor from the same exported `extensions`, so it documents exactly what survives a save. Read it before changing the schema.
 
-Not supported: table column alignment, merged/multi-block cells (they fall back to raw HTML), syntax highlighting, footnotes, underline/highlight/sub/sup, and YAML frontmatter (which the editor mangles).
+Table cells hold inline content directly rather than TipTap's default `block+`, so nothing is wrapped in a paragraph. That means `extensions.ts` also carries its own table serializer - the one in `tiptap-markdown` reaches for the paragraph that no longer exists.
+
+Not supported: table column alignment, merged cells (they fall back to raw HTML), syntax highlighting, footnotes, underline/highlight/sub/sup, and YAML frontmatter (which the editor mangles).
 
 #### Content Management
 

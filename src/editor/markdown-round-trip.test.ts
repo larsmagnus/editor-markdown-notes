@@ -48,6 +48,26 @@ describe('tables', () => {
 		expect(roundTrip(markdown)).toBe(markdown)
 	})
 
+	it('keeps empty cells', () => {
+		const markdown = [
+			'| Feature | Owner |',
+			'| --- | --- |',
+			'| Tables |  |',
+		].join('\n')
+
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
+	it('falls back to HTML for merged cells, which GFM cannot express', () => {
+		const merged =
+			'<table><tbody><tr><th colspan="2">Merged</th></tr><tr><td>a</td><td>b</td></tr></tbody></table>'
+
+		const result = roundTrip(merged)
+
+		expect(result).toContain('colspan="2"')
+		expect(result).toContain('Merged')
+	})
+
 	it('keeps a header-only table', () => {
 		const markdown = ['| Name | Owner |', '| --- | --- |'].join('\n')
 

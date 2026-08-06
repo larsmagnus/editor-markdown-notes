@@ -27,6 +27,22 @@ describe('Editor', () => {
 		expect(screen.getByRole('cell', { name: 'Q2 2025' })).toBeInTheDocument()
 	})
 
+	it('puts cell content straight into the cell, not into a paragraph', async () => {
+		const content = [
+			'| Quarter | Revenue |',
+			'| --- | --- |',
+			'| Q1 2025 | **1.2M** |',
+		].join('\n')
+
+		render(<Editor content={content} />)
+
+		const table = await screen.findByRole('table')
+		expect(table.querySelector('p')).toBeNull()
+		expect(screen.getByRole('cell', { name: '1.2M' })).toContainHTML(
+			'<strong>1.2M</strong>'
+		)
+	})
+
 	it('renders a task list as checkboxes with their checked state', async () => {
 		const content = ['- [x] Ship table support', '- [ ] Ship footnotes'].join(
 			'\n'

@@ -20,7 +20,7 @@ This is another note.
 
 _Italic text_
 
-**_Bold and italic text_**
+_**Bold and italic text**_
 
 ~~Strikethrough~~
 
@@ -67,15 +67,12 @@ Table
 Table with column alignment (the alignment is dropped on load - see CLAUDE.md)
 
 | Left | Centered | Right |
-| :--- | :------: | ----: |
-| a    |    b     |     c |
-| dd   |    ee    |    ff |
+| ---- | -------- | ----- |
+| a    | b        | c     |
+| dd   | ee       | ff    |
 
 Image
 
 ![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)
 
-Link
-
-An inline [link to example.com](https://example.com), and a bare autolink:
-https://example.com
+An inline [link to example.com](https://example.com), and a bare autolink: <https://example.com>

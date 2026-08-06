@@ -73,7 +73,5 @@ Image
 
 ![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)
 
-Link
-
 An inline [link to example.com](https://example.com), and a bare autolink:
 https://example.com
