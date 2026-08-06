@@ -140,6 +140,7 @@
 		"vscode:sentinel": "mkdir -p out && echo '{\"type\":\"commonjs\"}' > out/package.json",
 		"vscode:compile": "tsc -p ./tsconfig.extension.json && pnpm vscode:sentinel",
 		"vscode:watch": "pnpm vscode:sentinel && tsc -watch -p ./tsconfig.extension.json",
+		"vscode:install": "pnpm install && npx @vscode/vsce package --no-dependencies && code --install-extension editor-markdown-notes-0.1.0.vsix",
 		"watch": "pnpm vscode:watch",
 		"pretest": "pnpm run build && pnpm run lint",
 		"test": "vscode-test",

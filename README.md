@@ -49,9 +49,7 @@ VS Code `^1.101.0`.
 The extension is not published to the Marketplace. To build a `.vsix` and install it into your local VS Code:
 
 ```sh
-pnpm install
-npx @vscode/vsce package --no-dependencies
-code --install-extension editor-markdown-notes-0.1.0.vsix
+pnpm vscode:install
 ```
 
 Reload the window (Command Palette → **Developer: Reload Window**) after installing.
