@@ -121,6 +121,51 @@
 	.ProseMirror {
 		@apply static!;
 	}
+
+	/*
+	 * ProseMirror table plumbing. Typography styles the table itself, but the
+	 * fixed layout, cell borders and cell-selection overlay are ours to provide.
+	 */
+	.ProseMirror table {
+		@apply w-full table-fixed border-collapse overflow-hidden;
+	}
+
+	.ProseMirror th,
+	.ProseMirror td {
+		@apply relative border border-border px-3 py-2 align-top;
+	}
+
+	.ProseMirror th {
+		@apply bg-muted text-left font-bold;
+	}
+
+	.ProseMirror .selectedCell::after {
+		@apply pointer-events-none absolute inset-0 z-10 bg-accent/50 content-[''];
+	}
+
+	/*
+	 * TaskItem renders a real checkbox, so the list marker has to go. Nested
+	 * lists keep their padding - that indent is the only thing showing depth.
+	 */
+	.ProseMirror ul[data-type='taskList'] {
+		@apply list-none pl-0;
+	}
+
+	.ProseMirror ul[data-type='taskList'] ul[data-type='taskList'] {
+		@apply pl-6;
+	}
+
+	.ProseMirror ul[data-type='taskList'] li {
+		@apply flex items-start gap-2;
+	}
+
+	.ProseMirror ul[data-type='taskList'] li > label {
+		@apply mt-1 shrink-0;
+	}
+
+	.ProseMirror ul[data-type='taskList'] li > div {
+		@apply min-w-0 flex-1;
+	}
 }
 
 @layer base {
