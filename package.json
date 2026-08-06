@@ -141,7 +141,7 @@
 		"vscode:compile": "tsc -p ./tsconfig.extension.json && pnpm vscode:sentinel",
 		"vscode:watch": "pnpm vscode:sentinel && tsc -watch -p ./tsconfig.extension.json",
 		"watch": "pnpm vscode:watch",
-		"pretest": "pnpm run compile && pnpm run lint",
+		"pretest": "pnpm run build && pnpm run lint",
 		"test": "vscode-test",
 		"dev": "vite",
 		"build": "tsc -b && vite build && pnpm vscode:compile",
