@@ -22,8 +22,13 @@ This is a VSCode extension for editing markdown in an live preview powered by a 
 
 - `pnpm lint` - Run full linting pipeline: `pnpm typecheck && oxlint --fix && oxfmt`
 - `pnpm typecheck` - TypeScript type checking without emitting files
-- `pnpm test` - Run VSCode extension tests
+- `pnpm test` - Run every suite (`test:unit` then `test:extension`)
+- `pnpm test:unit` - Run the Vitest webview tests (happy-dom + Testing Library)
+- `pnpm test:watch` - Vitest in watch mode
+- `pnpm test:extension` - Run the VSCode extension tests via `@vscode/test-electron`
 - `pnpm pretest` - Prepare for testing (compile + lint)
+
+Vitest takes `src/**/*.test.{ts,tsx}` except `src/test/**`. Keep webview tests out of `src/test/` - it's compiled by `tsconfig.extension.json`, which has no DOM lib.
 
 ### VSCode Extension
 
@@ -45,8 +50,15 @@ This is a VSCode extension for editing markdown in an live preview powered by a 
 #### Editor System (`src/editor/`)
 
 - `editor.tsx` - Main TipTap-based markdown editor with auto-save functionality
+- `extensions.ts` - The TipTap schema (single source of truth, shared with the tests)
 - `menu-bar.tsx` & `menu-bubble.tsx` - Editor toolbars and formatting controls
 - `button-*.tsx` - Specialized formatting buttons (color, heading, style)
+
+**A `tiptap-markdown` serializer only activates when a TipTap extension of the matching name is registered.** Otherwise markdown-it parses the feature into HTML, the schema drops it, and auto-save writes the loss to disk. Registering the node is the whole fix - the serializers already ship with `tiptap-markdown`. Individual workarounds (tight task lists, inline images, strict linkify) are commented where they're configured.
+
+`src/editor/markdown-round-trip.test.ts` builds a headless editor from the same exported `extensions`, so it documents exactly what survives a save. Read it before changing the schema.
+
+Not supported: table column alignment, merged/multi-block cells (they fall back to raw HTML), syntax highlighting, footnotes, underline/highlight/sub/sup, and YAML frontmatter (which the editor mangles).
 
 #### Content Management
 
