@@ -203,9 +203,9 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         <div id="root"></div>
         <script nonce="${nonce}">
             window.vscode = acquireVsCodeApi();
-            window.initialContent = ${JSON.stringify(document.getText())};
-            window.fileName = ${JSON.stringify(path.basename(document.fileName))};
-            window.initialConfig = ${JSON.stringify(this.getConfig())};
+            window.initialContent = ${toScriptLiteral(document.getText())};
+            window.fileName = ${toScriptLiteral(path.basename(document.fileName))};
+            window.initialConfig = ${toScriptLiteral(this.getConfig())};
         </script>
         <script type="module" crossorigin src="${jsUri}" nonce="${nonce}"></script>
     </body>
@@ -330,6 +330,16 @@ export function activate(context: vscode.ExtensionContext) {
 			selectTheme
 		)
 	)
+}
+
+/**
+ * Serialises a value for embedding in an inline `<script>`. `JSON.stringify`
+ * leaves `<` untouched, so a markdown file containing the literal `</script>`
+ * — very common when documenting HTML — would otherwise close the block early
+ * and load the editor blank.
+ */
+function toScriptLiteral(value: unknown): string {
+	return JSON.stringify(value).replace(/</g, '\\u003c')
 }
 
 function getNonce() {
