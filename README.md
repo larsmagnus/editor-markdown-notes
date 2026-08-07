@@ -14,6 +14,8 @@ A VS Code markdown WYSIWYG editor with live preview, built on [TipTap](https://t
 
 - WYSIWYG markdown editing as a VS Code custom editor for `*.md`
 - Formatting toolbar plus a selection bubble menu (headings, text styles, colors, links)
+- Tables, task lists and images render inline; YAML frontmatter is edited as raw text in its own panel, kept out of the document
+- Mermaid diagrams render for fenced ` ```mermaid ` code blocks
 - Follows the active VS Code color theme
 - Writing checks in a sidebar: passive voice, simpler words, weak words, hard-to-read sentences
 - Toolbar toggles (raw markdown, full width, text tools, theme) persist across tabs and sessions
@@ -60,6 +62,18 @@ is focused, so they stay reachable with `hideNav` turned on:
 - **Editor Markdown Notes: Select theme**
 
 All four are shared across open tabs and persist between sessions.
+
+## Commands
+
+| Command                                    | Title                           | Purpose                                                     |
+| ------------------------------------------ | ------------------------------- | ----------------------------------------------------------- |
+| `editor-markdown-notes.openFile`           | Open file                       | Pick a markdown file and open it with this editor           |
+| `editor-markdown-notes.openMarkdownEditor` | Open with Editor Markdown Notes | Open the active/selected `.md` file with this editor        |
+| `editor-markdown-notes.toggleRaw`          | Toggle raw markdown             | Switch between the WYSIWYG editor and the raw markdown text |
+| `editor-markdown-notes.toggleFullWidth`    | Toggle full width               | Toggle whether the content fills the available width        |
+| `editor-markdown-notes.toggleTextTools`    | Toggle text tools               | Show or hide the writing-checks sidebar                     |
+| `editor-markdown-notes.selectTheme`        | Select theme                    | Choose the editor color theme (dark, light, or system)      |
+| `editor-markdown-notes.showLogs`           | Show logs                       | Open the output channel used to debug a blank panel         |
 
 ## Text tools
 
