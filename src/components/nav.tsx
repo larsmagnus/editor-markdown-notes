@@ -24,7 +24,7 @@ function Nav({ files, fileName, setFileName }: NavProps) {
 	if (viewOptions.fullWidth) value.push('max-w-full')
 
 	return (
-		<nav className="sticky top-0 left-0 bg-background/20 backdrop-blur-md p-3 flex gap-2 items-center">
+		<nav className="sticky top-0 left-0 bg-background/20 backdrop-blur-md p-3 flex gap-2 items-center z-10">
 			{DevFileSelector && !isVSCodeContext && (
 				<Suspense fallback={null}>
 					<DevFileSelector
