@@ -2,6 +2,8 @@
 
 A VS Code custom editor that opens `.md` files in a WYSIWYG editor with live preview, built on [TipTap](https://tiptap.dev) and React.
 
+![A VSCode window editing markdown with Editor Markdown Notes](https://raw.githubusercontent.com/larsmagnus/editor-markdown-notes/main/public/screenshot-editor-markdown-notes.png)
+
 ## Features
 
 - WYSIWYG markdown editing as a VS Code custom editor for `*.md`
