@@ -22,6 +22,10 @@ This is a VSCode extension for editing markdown in an live preview powered by a 
 - `pnpm build` - Build the React app and compile the extension (`tsc -b && vite build && pnpm vscode:compile`)
 - `pnpm preview` - Preview built React app
 
+### Versioning
+
+`pnpm version minor` after a `feat` commit, `pnpm version patch` after `fix`/`perf`, `major` bumped manually for breaking changes only. Nothing for `chore`/`build`/`docs`/`test`/`refactor`. Log each bump in `CHANGELOG.md` under a matching `## [x.y.z]` heading.
+
 ### Quality & Testing
 
 - `pnpm lint` - Run full linting pipeline: `pnpm typecheck && oxlint --fix && oxfmt`
