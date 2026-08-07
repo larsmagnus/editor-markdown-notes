@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository
 
+## Maintaining this file
+
+Only add a line here if a future session couldn't cheaply rediscover it by reading the code, running `--help`, or checking `package.json` — a gotcha, a non-obvious constraint, or the reasoning behind a decision. A line that just restates a filename or a dependency list doesn't earn its place. Prefer deleting a stale line over leaving it.
+
 ## Project Overview
 
 This is a VSCode extension for editing markdown in an live preview powered by a React web application. Main project components include:
@@ -104,30 +108,10 @@ Contributed under the `editorMarkdownNotes` section in `package.json` (`contribu
 
 **Keep zod out of the extension host.** The `.vsix` is packaged with `--no-dependencies`, so `node_modules` is not shipped and anything `src/extension.ts` requires at runtime must be dependency-free. The host merges over `DEFAULT_SETTINGS` / `DEFAULT_VIEW_OPTIONS` instead.
 
-### Tech Stack
-
-- **Editor**: TipTap (ProseMirror-based) with markdown serialization
-- **UI**: React 19 + Radix UI + Tailwind CSS v4
-- **Build**: Vite for web app, TypeScript compiler for extension
-- **Styling**: Tailwind CSS with custom prose styling for markdown
-
-### Configuration Files
-
-- `vite.config.ts` - Vite configuration with React and Tailwind plugins
-- `tsconfig.json` - Project references to app and node configurations
-- `tailwind.config.ts` - Tailwind v4 configuration
-- `components.json` - shadcn/ui component configuration
-
 ### File Organization
 
 - `public/*.md` - Demo notes, one per image-resolution rule; kept out of the `.vsix` by `.vscodeignore`
-- `src/assets/` - Static assets
-- `public/` - Public web assets including extension icon
-- `out/` - Compiled VSCode extension output
 
 ## Important Notes
 
 - The editor auto-saves with 1000ms debounce using `useDebounceValue`
-- The app supports both raw text editing and rich WYSIWYG editing modes
-- Theme switching is integrated into the editor toolbar
-- All UI components follow the `@/` path alias pattern (`src/`)
