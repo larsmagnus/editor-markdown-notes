@@ -1,9 +1,13 @@
-# notes.md
+---
+name: Notes
+description: Frontmatter description
+model: sonnet
+color: cyan
+tools: Glob, Grep, Read, Bash, Write, Agent
+maxTurns: 30
+---
 
-The image near the bottom uses a path relative to this file. See `other-note.md`
-for the root-absolute form.
-
-# Heading 1
+# Notes
 
 ## Heading 2
 

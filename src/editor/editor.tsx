@@ -5,13 +5,15 @@ import {
 	EditorContext,
 	useEditor,
 } from '@tiptap/react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebounceValue } from 'usehooks-ts'
 
 import { extensions } from '@/editor/extensions'
+import { FrontmatterPanel } from '@/editor/frontmatter-panel'
 import { MenuBar } from '@/editor/menu-bar'
 import { MenuBubble } from '@/editor/menu-bubble'
 import { useVSCode } from '@/hooks/use-vscode'
+import { joinFrontmatter, splitFrontmatter } from '@/lib/frontmatter'
 import { updateNotes } from '@/lib/update-notes'
 import { cn } from '@/lib/utils'
 
@@ -32,14 +34,28 @@ function Editor({
 
 	const [debouncedValue, setValue] = useDebounceValue('', 1000)
 
+	// Frontmatter never enters the TipTap document (markdown-it has no concept
+	// of it, so it would parse as an `<hr>` plus headings). It's held here as
+	// raw text and stitched back onto the body markdown before saving.
+	const [frontmatter, setFrontmatter] = useState(
+		() => splitFrontmatter(content).frontmatter
+	)
+
 	const handleUpdate = (props: EditorEvents['update']) => {
 		const markdown = props.editor?.storage?.markdown?.getMarkdown()
-		setValue(markdown)
+		setValue(joinFrontmatter(frontmatter, markdown))
+	}
+
+	const handleFrontmatterChange = (nextFrontmatter: string) => {
+		setFrontmatter(nextFrontmatter)
+
+		const markdown = editor?.storage?.markdown?.getMarkdown() ?? ''
+		setValue(joinFrontmatter(nextFrontmatter, markdown))
 	}
 
 	const editor = useEditor({
 		extensions,
-		content,
+		content: splitFrontmatter(content).body,
 		onUpdate: handleUpdate,
 		autofocus: 'end',
 		// ...other options...
@@ -52,7 +68,7 @@ function Editor({
 		const handleManualSave = () => {
 			const currentMarkdown = editor.storage?.markdown?.getMarkdown()
 			if (currentMarkdown) {
-				saveContent(currentMarkdown)
+				saveContent(joinFrontmatter(frontmatter, currentMarkdown))
 			}
 		}
 
@@ -60,7 +76,7 @@ function Editor({
 		return () => {
 			window.removeEventListener('vscode-save-request', handleManualSave)
 		}
-	}, [editor, isVSCodeContext, saveContent])
+	}, [editor, isVSCodeContext, saveContent, frontmatter])
 
 	/**
 	 * Save the markdown - use VSCode API if in extension context, otherwise local file system
@@ -89,9 +105,16 @@ function Editor({
 
 	// Update content when prop changes
 	useEffect(() => {
-		if (editor && content !== undefined && editor.getHTML() !== content) {
-			editor.commands.setContent(content)
+		if (!editor || content === undefined) return
+
+		const { frontmatter: nextFrontmatter, body } = splitFrontmatter(content)
+		if (editor.getHTML() !== body) {
+			editor.commands.setContent(body)
 		}
+
+		setFrontmatter((prev) =>
+			nextFrontmatter !== prev ? nextFrontmatter : prev
+		)
 	}, [content, editor])
 
 	if (!editor) return null
@@ -100,6 +123,10 @@ function Editor({
 		<>
 			<EditorContext.Provider value={{ editor }}>
 				{showMenu ? <MenuBar /> : null}
+				<FrontmatterPanel
+					value={frontmatter}
+					onChange={handleFrontmatterChange}
+				/>
 				<EditorConsumer>
 					{({ editor: currentEditor }) => (
 						<EditorContent

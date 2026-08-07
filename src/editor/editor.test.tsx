@@ -3,6 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import Editor from '@/editor/editor'
+import { updateNotes } from '@/lib/update-notes'
+
+vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn() }))
 
 // Mermaid draws by measuring text, which happy-dom has no layout engine for.
 // Stubbing the library keeps these tests about what the editor does with a
@@ -210,5 +213,63 @@ describe('Editor', () => {
 			name: 'https://example.com',
 		})
 		expect(link).toHaveAttribute('href', 'https://example.com')
+	})
+
+	describe('frontmatter', () => {
+		const FRONTMATTER_NOTE = [
+			'---',
+			'title: Roadmap',
+			'status: draft',
+			'---',
+			'',
+			'# Roadmap',
+			'',
+			'Ship it.',
+		].join('\n')
+
+		it('keeps frontmatter keys out of the document body', async () => {
+			const { container } = render(<Editor content={FRONTMATTER_NOTE} />)
+
+			expect(
+				await screen.findByRole('heading', { name: 'Roadmap' })
+			).toBeInTheDocument()
+
+			const documentBody = container.querySelector('.ProseMirror')
+			expect(documentBody?.textContent).not.toMatch(/title:/)
+			expect(documentBody?.textContent).not.toMatch(/status:/)
+		})
+
+		it('shows the frontmatter panel with the raw frontmatter text', async () => {
+			render(<Editor content={FRONTMATTER_NOTE} />)
+
+			expect(await screen.findByLabelText('Frontmatter')).toHaveValue(
+				'title: Roadmap\nstatus: draft'
+			)
+		})
+
+		it('hides the frontmatter panel for a note without frontmatter', async () => {
+			render(<Editor content={'# Roadmap\n\nShip it.'} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			expect(screen.queryByLabelText('Frontmatter')).not.toBeInTheDocument()
+		})
+
+		it('saves edits to the panel with the frontmatter fences preserved', async () => {
+			render(<Editor content={FRONTMATTER_NOTE} />)
+
+			const panel = await screen.findByLabelText('Frontmatter')
+			await userEvent.type(panel, '\npriority: high')
+
+			await waitFor(
+				() => {
+					expect(updateNotes).toHaveBeenCalledWith(
+						expect.stringContaining(
+							'---\ntitle: Roadmap\nstatus: draft\npriority: high\n---'
+						)
+					)
+				},
+				{ timeout: 2000 }
+			)
+		})
 	})
 })

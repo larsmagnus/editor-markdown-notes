@@ -72,7 +72,9 @@ Mermaid diagrams are a rendering concern only. `codeBlock` is taken out of Start
 
 Images are rewritten at render only, by `src/lib/resolve-image-src.ts` - the node's `src` keeps the author's path, so saving never rewrites the file. The web app's root is `public/` and VSCode's is the workspace folder, so a root-absolute path needs an image at each; hence the duplicated `icon-editor-markdown-notes.png`.
 
-Not supported: table column alignment, merged cells (they fall back to raw HTML), syntax highlighting, footnotes, underline/highlight/sub/sup, and YAML frontmatter (which the editor mangles).
+Not supported: table column alignment, merged cells (they fall back to raw HTML), syntax highlighting, footnotes, underline/highlight/sub/sup.
+
+YAML frontmatter never reaches the TipTap document - `tiptap-markdown`/markdown-it has no concept of it and would parse the `---` fence as an `<hr>`. `src/lib/frontmatter.ts` strips it from the markdown before `setContent` and re-attaches it before saving; `src/editor/frontmatter-panel.tsx` edits it as raw text above the document.
 
 #### Content Management
 
