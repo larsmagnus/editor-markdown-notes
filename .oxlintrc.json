@@ -13,6 +13,15 @@
 			"rules": {
 				"react/only-export-components": "off"
 			}
+		},
+		{
+			// Vite resolves `?worker&inline` to a Worker constructor and
+			// `vite/client` types it, but oxlint's resolver reads the query as part
+			// of the path and reports a missing default export.
+			"files": ["src/lib/text-tools/analyze-client.ts"],
+			"rules": {
+				"import/default": "off"
+			}
 		}
 	]
 }

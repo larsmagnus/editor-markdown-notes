@@ -170,6 +170,21 @@
 	.ProseMirror ul[data-type='taskList'] li > div {
 		@apply min-w-0 flex-1;
 	}
+
+	/* Text tools findings. Underlines rather than background fills for the
+	   word-level rules, so several overlapping hits stay legible; the two
+	   readability tiers span whole sentences and tint instead. */
+	.ProseMirror .text-tools-issue--warning {
+		@apply underline decoration-sky-500 decoration-wavy underline-offset-4;
+	}
+
+	.ProseMirror .text-tools-issue--hard {
+		@apply bg-amber-500/15;
+	}
+
+	.ProseMirror .text-tools-issue--very-hard {
+		@apply bg-red-500/20;
+	}
 }
 
 @layer base {

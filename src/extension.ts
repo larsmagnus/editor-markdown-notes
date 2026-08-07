@@ -74,6 +74,10 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 				DEFAULT_SETTINGS.centerContent
 			),
 			hideNav: config.get<boolean>('hideNav', DEFAULT_SETTINGS.hideNav),
+			textToolsTargetAge: config.get<number>(
+				'textToolsTargetAge',
+				DEFAULT_SETTINGS.textToolsTargetAge
+			),
 		}
 	}
 
@@ -361,6 +365,12 @@ export function buildContentSecurityPolicy(
 		`style-src ${cspSource} 'unsafe-inline'`,
 		`font-src ${cspSource} data:`,
 		`connect-src ${cspSource}`,
+		// The text tools analyser runs in a worker. It cannot be loaded from
+		// `cspSource`: that host is a different origin from the webview document,
+		// and a worker must be same-origin. Vite inlines the worker and boots it
+		// from a blob URL, which inherits this document's origin - hence `blob:`
+		// rather than `${cspSource}`.
+		`worker-src blob:`,
 	].join('; ')
 }
 
@@ -483,6 +493,13 @@ export function activate(context: vscode.ExtensionContext) {
 			() =>
 				provider.updateViewOptions({
 					fullWidth: !provider.getViewOptions().fullWidth,
+				})
+		),
+		vscode.commands.registerCommand(
+			'editor-markdown-notes.toggleTextTools',
+			() =>
+				provider.updateViewOptions({
+					textTools: !provider.getViewOptions().textTools,
 				})
 		),
 		vscode.commands.registerCommand(

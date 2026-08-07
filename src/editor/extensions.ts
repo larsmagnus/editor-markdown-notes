@@ -23,6 +23,7 @@ import type { Node as ProseMirrorNode } from 'prosemirror-model'
 import { Markdown } from 'tiptap-markdown'
 
 import { CodeBlockView } from '@/editor/code-block-view'
+import { TextTools } from '@/editor/text-tools-extension'
 import { resolveImageSrc } from '@/lib/resolve-image-src'
 
 /**
@@ -222,4 +223,7 @@ export const extensions = [
 		linkify: true,
 	}),
 	StrictLinkify,
+	// Decorations only, and inert until the text tools panel feeds it issues.
+	// Registered unconditionally because the editor is built once.
+	TextTools,
 ]

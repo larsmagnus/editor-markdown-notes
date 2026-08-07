@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
-import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
+import {
+	DEFAULT_SETTINGS,
+	DEFAULT_VIEW_OPTIONS,
+	TEXT_TOOL_RULE_IDS,
+} from '@/shared/messages'
 
 /**
  * Runtime validation for everything the webview receives from outside itself:
@@ -49,13 +53,32 @@ export const viewOptionsSchema = z
 				"Let content fill the viewport, overriding the prose plugin's 65ch cap.",
 		}),
 		theme: themeSchema,
+		textTools: z.boolean().catch(DEFAULT_VIEW_OPTIONS.textTools).meta({
+			title: 'Text tools',
+			description:
+				'Show the writing-checks sidebar next to the document. Turning it on is what loads the retext bundle.',
+		}),
+		// Unknown ids are filtered out rather than failing the array, which a
+		// `z.enum` would do - a single stale id would then reset the whole
+		// selection to "everything on" instead of degrading to what still exists.
+		textToolRules: z
+			.array(z.string())
+			.transform((ids) =>
+				TEXT_TOOL_RULE_IDS.filter((ruleId) => ids.includes(ruleId))
+			)
+			.catch(DEFAULT_VIEW_OPTIONS.textToolRules)
+			.meta({
+				title: 'Text tool rules',
+				description:
+					'Which checks the sidebar runs. Normalised to the canonical rule order, with ids this build does not know dropped.',
+			}),
 	})
 	.catch(DEFAULT_VIEW_OPTIONS)
 	.meta({
 		id: 'ViewOptions',
 		title: 'View options',
 		description:
-			'User-toggleable view state. Persisted in the host\'s globalState and broadcast to every open editor tab, so it survives reloads and stays in sync across tabs. Also settable from the "Toggle raw markdown", "Toggle full width" and "Select theme" commands.',
+			'User-toggleable view state. Persisted in the host\'s globalState and broadcast to every open editor tab, so it survives reloads and stays in sync across tabs. Also settable from the "Toggle raw markdown", "Toggle full width", "Toggle text tools" and "Select theme" commands.',
 	})
 
 const extensionSettingsSchema = z
@@ -70,6 +93,17 @@ const extensionSettingsSchema = z
 			description:
 				'Hide the top navigation bar. The toggles remain reachable from the command palette. Maps to `editorMarkdownNotes.hideNav`.',
 		}),
+		textToolsTargetAge: z
+			.number()
+			.int()
+			.min(5)
+			.max(30)
+			.catch(DEFAULT_SETTINGS.textToolsTargetAge)
+			.meta({
+				title: 'Text tools target age',
+				description:
+					'Reading age the readability check scores against. Maps to `editorMarkdownNotes.textToolsTargetAge`.',
+			}),
 	})
 	.catch(DEFAULT_SETTINGS)
 	.meta({

@@ -1,4 +1,4 @@
-import { Eye, EyeClosed, Maximize2, Minimize2 } from 'lucide-react'
+import { Eye, EyeClosed, Maximize2, Minimize2, SpellCheck } from 'lucide-react'
 import { lazy, Suspense } from 'react'
 
 import type { DevFileSelectorProps } from '@/components/dev-file-selector'
@@ -19,9 +19,12 @@ type NavProps = {
 function Nav({ files, fileName, setFileName }: NavProps) {
 	const { viewOptions, setViewOptions, isVSCodeContext } = useSettings()
 
+	// `onValueChange` below rebuilds every key from this array, so a toggle
+	// missing from either side gets reset the next time any other one is used.
 	const value: string[] = []
 	if (viewOptions.raw) value.push('raw')
 	if (viewOptions.fullWidth) value.push('max-w-full')
+	if (viewOptions.textTools) value.push('text-tools')
 
 	return (
 		<nav className="sticky top-0 left-0 bg-background/20 backdrop-blur-md p-3 flex gap-2 items-center z-10">
@@ -42,6 +45,7 @@ function Nav({ files, fileName, setFileName }: NavProps) {
 					setViewOptions({
 						raw: values.includes('raw'),
 						fullWidth: values.includes('max-w-full'),
+						textTools: values.includes('text-tools'),
 					})
 				}
 			>
@@ -50,6 +54,9 @@ function Nav({ files, fileName, setFileName }: NavProps) {
 				</ToggleGroupItem>
 				<ToggleGroupItem value="max-w-full" aria-label="Toggle full width">
 					{viewOptions.fullWidth ? <Maximize2 /> : <Minimize2 />}
+				</ToggleGroupItem>
+				<ToggleGroupItem value="text-tools" aria-label="Toggle text tools">
+					<SpellCheck />
 				</ToggleGroupItem>
 			</ToggleGroup>
 

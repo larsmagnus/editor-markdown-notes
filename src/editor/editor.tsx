@@ -5,17 +5,25 @@ import {
 	EditorContext,
 	useEditor,
 } from '@tiptap/react'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useDebounceValue } from 'usehooks-ts'
 
 import { extensions } from '@/editor/extensions'
 import { FrontmatterPanel } from '@/editor/frontmatter-panel'
 import { MenuBar } from '@/editor/menu-bar'
 import { MenuBubble } from '@/editor/menu-bubble'
+import { useSettings } from '@/hooks/use-settings'
+import { useTextTools } from '@/hooks/use-text-tools'
 import { useVSCode } from '@/hooks/use-vscode'
 import { joinFrontmatter, splitFrontmatter } from '@/lib/frontmatter'
 import { updateNotes } from '@/lib/update-notes'
 import { cn } from '@/lib/utils'
+
+const TextToolsPanel = lazy(() =>
+	import('@/editor/text-tools-panel').then((module) => ({
+		default: module.TextToolsPanel,
+	}))
+)
 
 interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 	content: string
@@ -31,6 +39,7 @@ function Editor({
 }: EditorProps) {
 	const { className, ...restEditorContainer } = props || {}
 	const { isVSCodeContext, saveContent } = useVSCode()
+	const { viewOptions, setViewOptions, settings } = useSettings()
 
 	const [debouncedValue, setValue] = useDebounceValue('', 1000)
 
@@ -59,6 +68,13 @@ function Editor({
 		onUpdate: handleUpdate,
 		autofocus: 'end',
 		// ...other options...
+	})
+
+	const { analysis, isAnalyzing } = useTextTools({
+		editor,
+		enabled: viewOptions.textTools,
+		rules: viewOptions.textToolRules,
+		targetAge: settings.textToolsTargetAge,
 	})
 
 	// Handle manual save requests (e.g., from Cmd+S)
@@ -127,21 +143,37 @@ function Editor({
 					value={frontmatter}
 					onChange={handleFrontmatterChange}
 				/>
-				<EditorConsumer>
-					{({ editor: currentEditor }) => (
-						<EditorContent
-							editor={currentEditor}
-							spellCheck={false}
-							className={cn(
-								includeProseBaseClassNames &&
-									'prose dark:prose-invert prose-headings:font-bold prose-headings:text-black dark:prose-headings:text-white',
-								'prose-headings:first:mt-0 prose-p:first:mt-0',
-								className
-							)}
-							{...restEditorContainer}
-						/>
+				{/* The panel reads the editor off `EditorContext`, so it has to live
+				    in here rather than alongside the editor in `content.tsx`. */}
+				<div className="flex items-start gap-4">
+					<EditorConsumer>
+						{({ editor: currentEditor }) => (
+							<EditorContent
+								editor={currentEditor}
+								spellCheck={false}
+								className={cn(
+									includeProseBaseClassNames &&
+										'prose dark:prose-invert prose-headings:font-bold prose-headings:text-black dark:prose-headings:text-white',
+									'prose-headings:first:mt-0 prose-p:first:mt-0',
+									'min-w-0 flex-1',
+									className
+								)}
+								{...restEditorContainer}
+							/>
+						)}
+					</EditorConsumer>
+
+					{viewOptions.textTools && (
+						<Suspense fallback={null}>
+							<TextToolsPanel
+								analysis={analysis}
+								isAnalyzing={isAnalyzing}
+								rules={viewOptions.textToolRules}
+								setRules={(textToolRules) => setViewOptions({ textToolRules })}
+							/>
+						</Suspense>
 					)}
-				</EditorConsumer>
+				</div>
 				<div>
 					<MenuBubble />
 				</div>

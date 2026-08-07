@@ -15,7 +15,8 @@ A VS Code markdown WYSIWYG editor with live preview, built on [TipTap](https://t
 - WYSIWYG markdown editing as a VS Code custom editor for `*.md`
 - Formatting toolbar plus a selection bubble menu (headings, text styles, colors, links)
 - Follows the active VS Code color theme
-- Toolbar toggles (raw markdown, full width, theme) persist across tabs and sessions
+- Writing checks in a sidebar: passive voice, simpler words, weak words, hard-to-read sentences
+- Toolbar toggles (raw markdown, full width, text tools, theme) persist across tabs and sessions
 
 ## Usage
 
@@ -44,19 +45,41 @@ You can also set this without editing JSON directly: open a `.md` file, right-cl
 
 Available under Settings → Extensions → Editor Markdown Notes (or the cog on the extension page):
 
-| Setting                             | Default | Purpose                                                |
-| ----------------------------------- | ------- | ------------------------------------------------------ |
-| `editorMarkdownNotes.hideNav`       | `false` | Hide the editor's top navigation bar                   |
-| `editorMarkdownNotes.centerContent` | `false` | Center the content horizontally when full width is off |
+| Setting                                  | Default | Purpose                                                |
+| ---------------------------------------- | ------- | ------------------------------------------------------ |
+| `editorMarkdownNotes.hideNav`            | `false` | Hide the editor's top navigation bar                   |
+| `editorMarkdownNotes.centerContent`      | `false` | Center the content horizontally when full width is off |
+| `editorMarkdownNotes.textToolsTargetAge` | `16`    | Reading age the text tools score sentences against     |
 
 The toolbar toggles are also available from the command palette while the editor
 is focused, so they stay reachable with `hideNav` turned on:
 
 - **Editor Markdown Notes: Toggle raw markdown**
 - **Editor Markdown Notes: Toggle full width**
+- **Editor Markdown Notes: Toggle text tools**
 - **Editor Markdown Notes: Select theme**
 
-All three are shared across open tabs and persist between sessions.
+All four are shared across open tabs and persist between sessions.
+
+## Text tools
+
+The text tools sidebar checks the prose as you write, highlighting findings in
+the document and listing them alongside it. Click one to jump to it.
+
+| Check         | Flags                                                   |
+| ------------- | ------------------------------------------------------- |
+| Passive voice | Sentences where the subject receives the action         |
+| Simpler words | Long or formal words with plainer equivalents           |
+| Weak words    | Filler, hedges and vague intensifiers                   |
+| Hard to read  | Sentences above `textToolsTargetAge`, in two severities |
+
+Readability is scored by seven algorithms (Dale–Chall, Flesch, SMOG and others).
+A sentence too hard for the target age reads as _hard_; one still too hard six
+years later, _very hard_.
+
+Individual checks can be switched off in the panel, and the selection persists.
+Nothing is analysed — and none of the analysis code is even downloaded — until
+the panel is opened.
 
 ## Troubleshooting
 

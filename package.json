@@ -5,7 +5,7 @@
 	"publisher": "larsmagnus",
 	"author": "Lars Magnus Klavenes <larsmagnus@gmail.com> (https://larsmagnus.co)",
 	"license": "MIT",
-	"version": "0.13.1",
+	"version": "0.14.0",
 	"type": "module",
 	"private": true,
 	"repository": {
@@ -59,7 +59,14 @@
 				"editorMarkdownNotes.hideNav": {
 					"type": "boolean",
 					"default": false,
-					"description": "Hide the editor's top navigation bar. The raw, full width and theme toggles remain available from the command palette."
+					"description": "Hide the editor's top navigation bar. The raw, full width, text tools and theme toggles remain available from the command palette."
+				},
+				"editorMarkdownNotes.textToolsTargetAge": {
+					"type": "integer",
+					"default": 16,
+					"minimum": 5,
+					"maximum": 30,
+					"description": "Reading age the text tools score sentences against. A sentence too hard for this age reads as \"hard\"; one still too hard six years later, \"very hard\"."
 				}
 			}
 		},
@@ -81,6 +88,11 @@
 			{
 				"command": "editor-markdown-notes.toggleFullWidth",
 				"title": "Toggle full width",
+				"category": "Editor Markdown Notes"
+			},
+			{
+				"command": "editor-markdown-notes.toggleTextTools",
+				"title": "Toggle text tools",
 				"category": "Editor Markdown Notes"
 			},
 			{
@@ -134,6 +146,10 @@
 					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
 				},
 				{
+					"command": "editor-markdown-notes.toggleTextTools",
+					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+				},
+				{
 					"command": "editor-markdown-notes.selectTheme",
 					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
 				}
@@ -167,6 +183,7 @@
 		"@testing-library/react": "16.3.2",
 		"@testing-library/user-event": "14.6.3",
 		"@types/mocha": "10.0.10",
+		"@types/nlcst": "2.0.3",
 		"@types/node": "20.x",
 		"@types/react": "19.1.8",
 		"@types/react-dom": "19.1.6",
@@ -192,6 +209,7 @@
 		"@radix-ui/react-slot": "1.2.3",
 		"@radix-ui/react-toggle": "1.1.9",
 		"@radix-ui/react-toggle-group": "1.1.10",
+		"@tiptap/core": "2.23.0",
 		"@tiptap/extension-code-block": "2.23.0",
 		"@tiptap/extension-color": "2.23.0",
 		"@tiptap/extension-image": "2.23.0",
@@ -204,6 +222,7 @@
 		"@tiptap/extension-task-item": "2.23.0",
 		"@tiptap/extension-task-list": "2.23.0",
 		"@tiptap/extension-text-style": "2.23.0",
+		"@tiptap/pm": "2.23.0",
 		"@tiptap/react": "2.23.0",
 		"@tiptap/starter-kit": "2.23.0",
 		"class-variance-authority": "0.7.1",
@@ -215,9 +234,18 @@
 		"prosemirror-model": "1.25.11",
 		"react": "19.1.0",
 		"react-dom": "19.1.0",
+		"retext-english": "5.0.0",
+		"retext-intensify": "7.0.0",
+		"retext-passive": "5.0.0",
+		"retext-readability": "8.0.0",
+		"retext-simplify": "8.0.0",
 		"tailwind-merge": "3.3.1",
 		"tiptap-markdown": "0.8.10",
+		"unified": "11.0.5",
+		"unist-util-visit": "5.1.0",
 		"usehooks-ts": "3.1.1",
+		"vfile": "6.0.3",
+		"vfile-message": "4.0.3",
 		"zod": "4.4.3"
 	}
 }

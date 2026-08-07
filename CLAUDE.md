@@ -79,6 +79,18 @@ Not supported: table column alignment, merged cells (they fall back to raw HTML)
 
 YAML frontmatter never reaches the TipTap document - `tiptap-markdown`/markdown-it has no concept of it and would parse the `---` fence as an `<hr>`. `src/lib/frontmatter.ts` strips it from the markdown before `setContent` and re-attaches it before saving; `src/editor/frontmatter-panel.tsx` edits it as raw text above the document.
 
+#### Text tools (`src/lib/text-tools/`)
+
+The retext writing checks. React owns the pipeline and the `textTools` extension only draws decorations it is handed, because `useEditor` builds the editor once - a conditional extension list would tear it down on every toggle.
+
+**The worker has to be `?worker&inline`.** A plain `new Worker(new URL(…))` gets a URL relative to the entry chunk, which under a webview resolves to the `vscode-cdn.net` resource host - a different origin from the `vscode-webview://` document, and a worker must be same-origin. Inlining boots it from a blob URL instead, which inherits the document's origin; that blob is why `buildContentSecurityPolicy` carries `worker-src blob:`. Dropping that directive fails only at runtime and only once the panel is opened, so `src/test/extension.test.ts` opens a note with the tools on and asserts the log channel stays quiet.
+
+`run-pipeline.ts` holds every retext import and is the only thing the worker pulls in, which is what keeps the ~44kB gzipped stack in its own chunk. Nothing on the main thread may import it - `analyze-client.ts` is the boundary, and it is only ever reached through `await import()`.
+
+Two readability passes, not one: `unified` _merges_ the options of a plugin used twice on the same processor, so the two severity tiers need a processor each over one shared parse. The tiers are set six years apart because the seven algorithms bucket coarsely - at four years they flag an identical set and separate nothing.
+
+Adding a rule means four places after the id in `src/shared/messages.ts`: its label in `RULES` (`rules.ts`), its plugin in `RULE_PLUGINS` and its message `source` in `RULE_SOURCES` (`run-pipeline.ts`), and a test. All three maps are `Record<TextToolRuleId, …>` so none compiles until updated - `RULE_SOURCES` in particular is declared id-to-source and reversed at runtime, because keyed the other way a missing entry typechecks and the rule silently reports nothing.
+
 #### Content Management
 
 - `src/hooks/use-content.ts` - Fetches the standalone web app's demo notes from `public/`. They sit there so their images are reachable by URL; `import.meta.glob` cannot see into `public/`, hence the hardcoded file list
@@ -90,7 +102,7 @@ YAML frontmatter never reaches the TipTap document - `tiptap-markdown`/markdown-
 - Built with Radix UI primitives and shadcn/ui patterns
 - `dev-file-selector.tsx` - File selector dropdown, dev-only
 - `content.tsx` - The editor surface: picks the content source (VSCode vs. local), renders the nav and either the raw `<pre>` or the TipTap editor
-- `nav.tsx` - Top toolbar (file selector, raw/full-width toggles, theme toggle)
+- `nav.tsx` - Top toolbar (file selector, raw/full-width/text-tools toggles, theme toggle). The `ToggleGroup`'s `onValueChange` rebuilds every key from the selected array, so a new toggle must be added to both the `value` list and the patch or it gets clobbered
 - `settings-provider.tsx` - Single source of truth for `viewOptions` (user toggles) and `settings` (VSCode configuration). In VSCode it seeds from `window.initialConfig`, posts `setViewOptions` to the host, and re-renders on `config` broadcasts; standalone it falls back to `localStorage`.
 - `theme-provider.tsx` & `theme-toggle.tsx` - Dark/light theme system; the theme lives in `viewOptions`, so it persists alongside the other toggles
 - `ui/` - Reusable UI components following shadcn/ui conventions
@@ -101,7 +113,7 @@ YAML frontmatter never reaches the TipTap document - `tiptap-markdown`/markdown-
 
 #### Extension Settings
 
-Contributed under the `editorMarkdownNotes` section in `package.json` (`contributes.configuration`, which is also what surfaces the cog → Settings entry on the extension page). Persisted view options live in `context.globalState` under `editorMarkdownNotes.viewOptions` and are broadcast to every open webview panel, so tabs stay in sync. The `toggleRaw` / `toggleFullWidth` / `selectTheme` commands drive the same state from the command palette, gated on `activeCustomEditorId`.
+Contributed under the `editorMarkdownNotes` section in `package.json` (`contributes.configuration`, which is also what surfaces the cog → Settings entry on the extension page). Persisted view options live in `context.globalState` under `editorMarkdownNotes.viewOptions` and are broadcast to every open webview panel, so tabs stay in sync. The `toggleRaw` / `toggleFullWidth` / `toggleTextTools` / `selectTheme` commands drive the same state from the command palette, gated on `activeCustomEditorId`.
 
 #### Bundle chunks
 

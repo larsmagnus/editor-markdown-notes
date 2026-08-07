@@ -6,26 +6,57 @@
 
 export type Theme = 'dark' | 'light' | 'system'
 
+/**
+ * The writing checks the text tools panel can run. Adding one here is the first
+ * of three steps - `RULES` in `src/lib/text-tools/rules.ts` carries its label,
+ * and `RULE_PLUGINS` in `src/lib/text-tools/run-pipeline.ts` the retext plugin
+ * behind it. Both are keyed by this union, so neither compiles until updated.
+ *
+ * These ids are persisted in the host's `globalState`, so renaming one silently
+ * drops that rule from a user's saved selection.
+ */
+export const TEXT_TOOL_RULE_IDS = [
+	'passive',
+	'simplify',
+	'intensify',
+	'readability',
+] as const
+
+export type TextToolRuleId = (typeof TEXT_TOOL_RULE_IDS)[number]
+
 export type ViewOptions = {
 	raw: boolean
 	fullWidth: boolean
 	theme: Theme
+	/** Whether the text tools sidebar is open. */
+	textTools: boolean
+	/** Which checks that sidebar runs. */
+	textToolRules: TextToolRuleId[]
 }
 
 export type ExtensionSettings = {
 	centerContent: boolean
 	hideNav: boolean
+	/**
+	 * Reading age the readability check scores against. A sentence too hard for
+	 * this age reads as "hard"; one still too hard six years later, "very hard"
+	 * (see `VERY_HARD_AGE_OFFSET` for why six).
+	 */
+	textToolsTargetAge: number
 }
 
 export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
 	raw: false,
 	fullWidth: false,
 	theme: 'system',
+	textTools: false,
+	textToolRules: [...TEXT_TOOL_RULE_IDS],
 }
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {
 	centerContent: false,
 	hideNav: false,
+	textToolsTargetAge: 16,
 }
 
 /**

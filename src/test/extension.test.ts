@@ -115,6 +115,7 @@ suite('Editor Markdown Notes', () => {
 		for (const command of [
 			'editor-markdown-notes.toggleRaw',
 			'editor-markdown-notes.toggleFullWidth',
+			'editor-markdown-notes.toggleTextTools',
 			'editor-markdown-notes.selectTheme',
 		]) {
 			assert.ok(commands.includes(command), `${command} should be registered`)
@@ -151,11 +152,51 @@ suite('Editor Markdown Notes', () => {
 		}
 	})
 
+	// The analyser runs in a worker booted from a blob URL. If `worker-src` were
+	// missing from the CSP the panel would still render and only the checks would
+	// silently never appear - so the failure has to be caught here, where the log
+	// bridge forwards the CSP violation.
+	test('starts the text tools worker without a policy violation', async function () {
+		this.timeout(15_000)
+
+		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))
+		const file = vscode.Uri.file(path.join(directory, 'notes.md'))
+		await fs.writeFile(
+			file.fsPath,
+			'# Hello\n\nThe report was written by the committee, which will utilize it.\n'
+		)
+
+		await vscode.commands.executeCommand(
+			'editor-markdown-notes.toggleTextTools'
+		)
+
+		try {
+			await vscode.commands.executeCommand(
+				'editor-markdown-notes.openFile',
+				file
+			)
+
+			// Past the watchdog, and well past the 500ms analysis debounce, so the
+			// worker has had to start for real.
+			await new Promise((resolve) => setTimeout(resolve, 4000))
+
+			assert.deepStrictEqual(getWebviewProblems(), [])
+		} finally {
+			// Left on, the toggle would leak into every test that follows.
+			await vscode.commands.executeCommand(
+				'editor-markdown-notes.toggleTextTools'
+			)
+			await vscode.commands.executeCommand('workbench.action.closeAllEditors')
+			await fs.rm(directory, { recursive: true, force: true })
+		}
+	})
+
 	test('contributes the settings that put a Settings entry on the extension page', () => {
 		const config = vscode.workspace.getConfiguration('editorMarkdownNotes')
 
 		assert.strictEqual(config.get('hideNav'), false)
 		assert.strictEqual(config.get('centerContent'), false)
+		assert.strictEqual(config.get('textToolsTargetAge'), 16)
 	})
 
 	// Both directives fail silently: the diagram either never loads or draws
@@ -176,6 +217,21 @@ suite('Editor Markdown Notes', () => {
 		assert.ok(
 			directive('style-src').includes("'unsafe-inline'"),
 			'the styles mermaid embeds in its SVG should be allowed'
+		)
+	})
+
+	// `cspSource` would not do: it is a different origin from the webview
+	// document, and a worker has to be same-origin. The analyser is inlined and
+	// booted from a blob URL, which inherits this document's origin.
+	test('serves a policy the text tools worker can start under', () => {
+		const csp = buildContentSecurityPolicy('vscode-resource://test', 'abc123')
+
+		const workerSrc =
+			csp.split('; ').find((part) => part.startsWith('worker-src ')) ?? ''
+
+		assert.ok(
+			workerSrc.includes('blob:'),
+			'the inlined analysis worker should be allowed to start'
 		)
 	})
 
