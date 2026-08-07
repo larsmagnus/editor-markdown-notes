@@ -45,11 +45,11 @@ _**Bold and italic text**_
 - [x] Completed task
 - [ ] Incomplete task
 
-Horizontal break 👇
+## Horizontal break 👇
 
 ---
 
-Code block
+## Code block
 
 ```js
 // Code block with "js" language
@@ -58,7 +58,16 @@ function helloWorld() {
 }
 ```
 
-Table
+## Mermaid diagram
+
+```mermaid
+graph TD
+  A[Start] --> B{Decision}
+  B -->|Yes| C[Finish]
+  B -->|No| D[Alternate]
+```
+
+## Table
 
 | Feature   | Status      | Notes                                     |
 | --------- | ----------- | ----------------------------------------- |
@@ -66,15 +75,19 @@ Table
 | Task list | **Shipped** | Checkboxes round-trip their checked state |
 | Footnotes | Missing     | See [the docs](https://example.com)       |
 
-Table with column alignment (the alignment is dropped on load - see CLAUDE.md)
+## Table with column alignment
+
+(the alignment is dropped on load - see CLAUDE.md)
 
 | Left | Centered | Right |
 | ---- | -------- | ----- |
 | a    | b        | c     |
 | dd   | ee       | ff    |
 
-Image
+## Image
 
 ![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)
+
+## Links
 
 An inline [link to example.com](https://example.com), and a bare autolink: <https://example.com>

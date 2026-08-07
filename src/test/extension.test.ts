@@ -5,7 +5,11 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import { getDocumentResourceRoots, getImageBaseUris } from '../extension'
+import {
+	buildContentSecurityPolicy,
+	getDocumentResourceRoots,
+	getImageBaseUris,
+} from '../extension'
 import { resolveImageSrc } from '../lib/resolve-image-src'
 import { getWebviewProblems } from '../lib/webview-diagnostics'
 
@@ -152,6 +156,27 @@ suite('Editor Markdown Notes', () => {
 
 		assert.strictEqual(config.get('hideNav'), false)
 		assert.strictEqual(config.get('centerContent'), false)
+	})
+
+	// Both directives fail silently: the diagram either never loads or draws
+	// with no styling, and nothing is reported anywhere.
+	test('serves a policy a rendered mermaid diagram can load under', () => {
+		const csp = buildContentSecurityPolicy('vscode-resource://test', 'abc123')
+
+		const directive = (name: string) =>
+			csp.split('; ').find((part) => part.startsWith(`${name} `)) ?? ''
+
+		// Mermaid's diagram bundles are imported on demand, and the entry script's
+		// nonce does not reach them.
+		assert.ok(
+			directive('script-src').includes('vscode-resource://test'),
+			'dynamically imported chunks should be allowed to load'
+		)
+		// A rendered diagram carries its own <style> element inside the SVG.
+		assert.ok(
+			directive('style-src').includes("'unsafe-inline'"),
+			'the styles mermaid embeds in its SVG should be allowed'
+		)
 	})
 
 	test('toggling raw and full width persists across invocations', async () => {

@@ -201,10 +201,7 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- The nonce covers the inline bootstrap script below. It is not
-             inherited by imported modules, so the code-split chunks need
-             \`cspSource\` to be allowed as well. -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} https: data:; script-src 'nonce-${nonce}' ${webview.cspSource}; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource} data:; connect-src ${webview.cspSource};">
+        <meta http-equiv="Content-Security-Policy" content="${buildContentSecurityPolicy(webview.cspSource, nonce)}">
         <title>Editor Markdown Notes</title>
         ${cssUris.map((uri) => `<link rel="stylesheet" crossorigin href="${uri}">`).join('\n        ')}
         ${preloadUris.map((uri) => `<link rel="modulepreload" crossorigin href="${uri}" nonce="${nonce}">`).join('\n        ')}
@@ -341,6 +338,30 @@ function readEntryChunk(
 	collect(entry.imports)
 
 	return { file: entry.file, css, imports }
+}
+
+/**
+ * The policy the webview document runs under.
+ *
+ * Two directives are load-bearing beyond the obvious. `script-src` allows
+ * `cspSource` because the nonce on the entry script is not inherited by the
+ * modules it imports - that covers both the build's vendor chunks and the
+ * mermaid bundles, which are fetched on demand. `style-src` allows inline
+ * styles because a rendered mermaid diagram carries its own `<style>` element
+ * inside the SVG; without it the diagram loads but draws unstyled.
+ */
+export function buildContentSecurityPolicy(
+	cspSource: string,
+	nonce: string
+): string {
+	return [
+		`default-src 'none'`,
+		`img-src ${cspSource} https: data:`,
+		`script-src 'nonce-${nonce}' ${cspSource}`,
+		`style-src ${cspSource} 'unsafe-inline'`,
+		`font-src ${cspSource} data:`,
+		`connect-src ${cspSource}`,
+	].join('; ')
 }
 
 /**

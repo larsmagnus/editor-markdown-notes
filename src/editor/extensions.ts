@@ -1,3 +1,4 @@
+import CodeBlock from '@tiptap/extension-code-block'
 import { Color } from '@tiptap/extension-color'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
@@ -10,12 +11,18 @@ import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import TextStyle from '@tiptap/extension-text-style'
 import type { TextStyleOptions } from '@tiptap/extension-text-style'
-import { Extension, getHTMLFromFragment, mergeAttributes } from '@tiptap/react'
+import {
+	Extension,
+	getHTMLFromFragment,
+	mergeAttributes,
+	ReactNodeViewRenderer,
+} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 import { Markdown } from 'tiptap-markdown'
 
+import { CodeBlockView } from '@/editor/code-block-view'
 import { resolveImageSrc } from '@/lib/resolve-image-src'
 
 /**
@@ -163,6 +170,15 @@ export const extensions = [
 			keepMarks: true,
 			keepAttributes: false,
 		},
+		// Replaced below. StarterKit's copy cannot be extended in place, and two
+		// extensions of the same name cannot both be registered.
+		codeBlock: false,
+	}),
+	// The name stays `codeBlock`, which is what keeps `tiptap-markdown`'s fenced
+	// block serializer attached. The node view only changes how a block is drawn:
+	// a `mermaid` one renders its diagram, everything else stays a `<pre>`.
+	CodeBlock.extend({
+		addNodeView: () => ReactNodeViewRenderer(CodeBlockView),
 	}),
 	// Column resizing needs handle styling and a toolbar to be worth it - tables
 	// are edited in place instead, with Tab/Shift-Tab moving between cells.

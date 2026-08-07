@@ -245,4 +245,19 @@ describe('features that already worked keep working', () => {
 
 		expect(roundTrip(markdown)).toBe(markdown)
 	})
+
+	// The block renders as a diagram rather than as source, so a serializer that
+	// dropped it would look like a rendering bug right up until auto-save wrote
+	// the loss back to the file.
+	it('keeps a mermaid fence exactly as the author wrote it', () => {
+		const markdown = [
+			'```mermaid',
+			'graph TD',
+			'  A[Start] --> B{Decision}',
+			'  B -->|Yes| C[Finish]',
+			'```',
+		].join('\n')
+
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
 })
