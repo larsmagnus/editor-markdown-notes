@@ -19,6 +19,12 @@ import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
  *   first is silently dropped.
  */
 
+// Zod feature-detects its JIT-compiled parser by calling `new Function('')` in
+// a try/catch. The webview's CSP blocks that, so zod already falls back — but
+// the attempt still raises a `securitypolicyviolation` the host logs as an
+// error. Opting out up front keeps that channel meaningful.
+z.config({ jitless: true })
+
 export const themeSchema = z
 	.enum(['dark', 'light', 'system'])
 	.catch(DEFAULT_VIEW_OPTIONS.theme)
