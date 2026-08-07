@@ -29,3 +29,6 @@ dist-ssr
 
 # Downloaded VS Code builds used by `pnpm test`
 .vscode-test
+
+*storybook.log
+storybook-static
