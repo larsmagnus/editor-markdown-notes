@@ -2,6 +2,11 @@
 .vscode-test/**
 src/**
 out/test/**
+# Demo notes and the workspace-root copy of the icon they resolve to. Only
+# public/icon-editor-markdown-notes.png ships, as the extension's icon.
+public/*.md
+dist/*.md
+icon-editor-markdown-notes.png
 .gitignore
 .yarnrc
 vsc-extension-quickstart.md

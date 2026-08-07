@@ -60,11 +60,13 @@ Vitest takes `src/**/*.test.{ts,tsx}` except `src/test/**`. Keep webview tests o
 
 Table cells hold inline content directly rather than TipTap's default `block+`, so nothing is wrapped in a paragraph. That means `extensions.ts` also carries its own table serializer - the one in `tiptap-markdown` reaches for the paragraph that no longer exists.
 
+Images are rewritten at render only, by `src/lib/resolve-image-src.ts` - the node's `src` keeps the author's path, so saving never rewrites the file. The web app's root is `public/` and VSCode's is the workspace folder, so a root-absolute path needs an image at each; hence the duplicated `icon-editor-markdown-notes.png`.
+
 Not supported: table column alignment, merged cells (they fall back to raw HTML), syntax highlighting, footnotes, underline/highlight/sub/sup, and YAML frontmatter (which the editor mangles).
 
 #### Content Management
 
-- `src/hooks/use-content.ts` - Manages markdown file loading from `src/content/` using Vite's `import.meta.glob`
+- `src/hooks/use-content.ts` - Fetches the standalone web app's demo notes from `public/`. They sit there so their images are reachable by URL; `import.meta.glob` cannot see into `public/`, hence the hardcoded file list
 - `src/hooks/use-settings.ts` & `src/hooks/use-theme.ts` - React contexts and their accessor hooks, kept out of the provider files so each `.tsx` exports exactly one component
 - `src/lib/db.ts` - File system operations for markdown files with frontmatter support
 - `src/lib/update-notes.ts` - Handles saving markdown content
@@ -110,7 +112,7 @@ Contributed under the `editorMarkdownNotes` section in `package.json` (`contribu
 
 ### File Organization
 
-- `src/content/` - Markdown files loaded dynamically by the editor
+- `public/*.md` - Demo notes, one per image-resolution rule; kept out of the `.vsix` by `.vscodeignore`
 - `src/assets/` - Static assets
 - `public/` - Public web assets including extension icon
 - `out/` - Compiled VSCode extension output
@@ -118,7 +120,6 @@ Contributed under the `editorMarkdownNotes` section in `package.json` (`contribu
 ## Important Notes
 
 - The editor auto-saves with 1000ms debounce using `useDebounceValue`
-- Markdown files are loaded at build time using Vite's `import.meta.glob`
 - The app supports both raw text editing and rich WYSIWYG editing modes
 - Theme switching is integrated into the editor toolbar
 - All UI components follow the `@/` path alias pattern (`src/`)

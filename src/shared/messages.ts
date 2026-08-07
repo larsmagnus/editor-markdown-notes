@@ -38,6 +38,18 @@ export type Config = {
 	viewOptions: ViewOptions
 }
 
+/**
+ * Where the webview resolves image paths that are not already absolute URLs.
+ * Both are `vscode-resource` URIs - a webview page cannot load a plain file
+ * path, and its own origin is nothing the author's relative path can target.
+ */
+export type ImageBaseUris = {
+	/** The folder holding the open document, for `./x.png` and `x.png`. */
+	document: string
+	/** The workspace root, for `/x.png`. */
+	workspace: string
+}
+
 export type WebviewToHost =
 	| { type: 'save'; content: string }
 	| { type: 'getContent' }

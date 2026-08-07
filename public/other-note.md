@@ -1,6 +1,8 @@
 # other-note.md
 
-This is another note.
+The image near the bottom uses a root-absolute path. That root is the workspace
+folder in the extension and the site root in the web app, so the icon is kept in
+both places.
 
 # Heading 1
 

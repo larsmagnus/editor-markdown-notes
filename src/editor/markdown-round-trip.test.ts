@@ -23,6 +23,7 @@ function roundTrip(markdown: string): string {
 afterEach(() => {
 	editors.forEach((editor) => editor.destroy())
 	editors.length = 0
+	delete window.imageBaseUris
 })
 
 describe('tables', () => {
@@ -117,6 +118,18 @@ describe('images and links', () => {
 			'![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)'
 
 		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
+	it('keeps the authored image path even when rendering resolves it', () => {
+		window.imageBaseUris = {
+			document:
+				'https://file+.vscode-resource.vscode-cdn.net/Users/dev/notes/docs',
+			workspace: 'https://file+.vscode-resource.vscode-cdn.net/Users/dev/notes',
+		}
+
+		expect(roundTrip('![Architecture](./diagram.png)')).toBe(
+			'![Architecture](./diagram.png)'
+		)
 	})
 
 	it('keeps an image separate from the paragraph that follows it', () => {

@@ -1,14 +1,26 @@
 import type { PropsWithChildren } from 'react'
 import { useEffect, useState } from 'react'
 
-const markdownFiles = import.meta.glob<{ default: string }>('@/content/*.md', {
-	query: 'raw',
-})
+/**
+ * The demo notes live in `public/` so both surfaces can reach the images they
+ * reference: the web app serves that folder at the site root, and in the
+ * extension the paths resolve against the file on disk. `import.meta.glob`
+ * cannot see into `public/`, so the list is kept here and the files fetched.
+ */
+const NOTE_FILE_NAMES = ['notes.md', 'other-note.md']
 
-const rootPath = '/src/content/'
+async function fetchNote(fileName: string) {
+	const response = await fetch(`/${fileName}`)
+
+	// The dev server answers unknown paths with the SPA shell, so a 200 alone
+	// does not mean the note exists.
+	if (!response.ok) return `File "${fileName}" not found`
+
+	return response.text()
+}
 
 function useContent({
-	defaultFileName = 'notes.md',
+	defaultFileName = NOTE_FILE_NAMES[0],
 	enabled = true,
 }: PropsWithChildren<{ defaultFileName?: string; enabled?: boolean }>) {
 	const [files, setFiles] = useState<
@@ -22,37 +34,26 @@ function useContent({
 
 		async function getAllFiles() {
 			const rawFiles = await Promise.all(
-				Object.entries(markdownFiles).map(async ([path, promise]) => {
-					const fileContent = await promise()
-					return {
-						value: path.replaceAll(rootPath, ''),
-						label: path.replaceAll(rootPath, ''),
-						content: fileContent.default,
-					}
-				})
+				NOTE_FILE_NAMES.map(async (name) => ({
+					value: name,
+					label: name,
+					content: await fetchNote(name),
+				}))
 			)
 
 			setFiles(rawFiles)
 		}
 
 		getAllFiles()
-	}, [defaultFileName, enabled])
+	}, [enabled])
 
 	useEffect(() => {
 		if (!enabled) return
 
 		async function getContent() {
-			const path = `/src/content/${fileName}`
-
-			if (markdownFiles[path]) {
-				const fileContent = await markdownFiles[path]()
-				const content = fileContent.default ?? ''
-
-				setContent(content)
-			} else {
-				setContent(`File "${fileName}" not found`)
-			}
+			setContent(await fetchNote(fileName))
 		}
+
 		getContent()
 	}, [fileName, enabled])
 

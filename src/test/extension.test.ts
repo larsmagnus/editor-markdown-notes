@@ -5,8 +5,62 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
+import { getDocumentResourceRoots, getImageBaseUris } from '../extension'
+import { resolveImageSrc } from '../lib/resolve-image-src'
+
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 const VIEW_TYPE = 'editor-markdown-notes.markdownEditor'
+
+/** A 1x1 transparent PNG, so the image on disk is a real one. */
+const PIXEL_PNG = Buffer.from(
+	'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+	'base64'
+)
+
+/** `![alt](src)` — enough for the sample notes, which hold no reference links. */
+const MARKDOWN_IMAGE = /!\[[^\]]*\]\(([^)\s]+)\)/g
+
+/**
+ * A throwaway panel purely for its `Webview`. `asWebviewUri` is the piece under
+ * test and only a real webview has it.
+ */
+async function withWebview<T>(run: (webview: vscode.Webview) => Promise<T>) {
+	const panel = vscode.window.createWebviewPanel(
+		'editor-markdown-notes.test',
+		'Image resolution',
+		vscode.ViewColumn.One,
+		{ localResourceRoots: [] }
+	)
+
+	try {
+		return await run(panel.webview)
+	} finally {
+		panel.dispose()
+	}
+}
+
+/**
+ * Where the author's path lands on disk, derived independently of
+ * `resolveImageSrc` so the test does not just restate the implementation.
+ */
+function expectedImageFile(
+	src: string,
+	document: vscode.TextDocument,
+	workspaceRoot: string
+) {
+	if (src.startsWith('/')) return path.join(workspaceRoot, src)
+
+	return path.resolve(path.dirname(document.uri.fsPath), src)
+}
+
+/** URLs compared as URLs: both sides normalise the `file+…` webview authority. */
+function assertSameUrl(actual: string, expected: string, message: string) {
+	assert.strictEqual(
+		new URL(actual).toString(),
+		new URL(expected).toString(),
+		message
+	)
+}
 
 /** Opening a custom editor is asynchronous; give the tab a moment to appear. */
 async function waitForActiveTab(predicate: (tab: vscode.Tab) => boolean) {
@@ -145,6 +199,106 @@ suite('Editor Markdown Notes', () => {
 			)
 
 			assert.ok(tab, 'the custom editor should still open')
+		} finally {
+			await vscode.commands.executeCommand('workbench.action.closeAllEditors')
+			await fs.rm(directory, { recursive: true, force: true })
+		}
+	})
+
+	// The webview has its own origin, so an image path only loads if the host
+	// resolves it to a `vscode-resource` URI pointing at a file that exists
+	// inside `localResourceRoots`. A path that resolves to nothing renders as a
+	// broken image with no error anywhere — hence these tests.
+	test('every image in the sample notes resolves to a file the webview can load', async () => {
+		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
+		assert.ok(workspaceRoot, 'the tests must run with the repo as a workspace')
+
+		const contentDirectory = path.join(workspaceRoot, 'public')
+		const notes = (await fs.readdir(contentDirectory)).filter((name) =>
+			name.endsWith('.md')
+		)
+		assert.ok(notes.length > 0, 'there should be sample notes to check')
+
+		const checked: string[] = []
+
+		await withWebview(async (webview) => {
+			for (const note of notes) {
+				const file = vscode.Uri.file(path.join(contentDirectory, note))
+				const document = await vscode.workspace.openTextDocument(file)
+				const baseUris = getImageBaseUris(webview, document)
+				const roots = getDocumentResourceRoots(document)
+
+				const sources = [...document.getText().matchAll(MARKDOWN_IMAGE)].map(
+					([, src]) => src
+				)
+				assert.ok(sources.length > 0, `${note} should document an image`)
+				checked.push(...sources)
+
+				for (const src of sources) {
+					const expected = expectedImageFile(src, document, workspaceRoot)
+
+					await assert.doesNotReject(
+						fs.access(expected),
+						`${note} points at ${src}, which resolves to ${expected} — no such file`
+					)
+
+					assertSameUrl(
+						resolveImageSrc(src, baseUris),
+						webview.asWebviewUri(vscode.Uri.file(expected)).toString(),
+						`${note} should load ${src} from ${expected}`
+					)
+
+					assert.ok(
+						roots.some(
+							(root) =>
+								expected === root.fsPath ||
+								expected.startsWith(root.fsPath + path.sep)
+						),
+						`${expected} is outside localResourceRoots, so the webview would refuse it`
+					)
+				}
+			}
+		})
+
+		// The samples are the only end-to-end coverage of either branch, so losing
+		// one to an edit should fail here rather than go unnoticed.
+		assert.ok(
+			checked.some((src) => src.startsWith('/')),
+			'a sample note should document a workspace-root path'
+		)
+		assert.ok(
+			checked.some((src) => !src.startsWith('/')),
+			'a sample note should document a document-relative path'
+		)
+	})
+
+	test('a document-relative image resolves out of the document folder', async () => {
+		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))
+		const documentFile = path.join(directory, 'docs', 'notes.md')
+		const imageFile = path.join(directory, 'assets', 'diagram.png')
+
+		await fs.mkdir(path.dirname(documentFile))
+		await fs.mkdir(path.dirname(imageFile))
+		await fs.writeFile(documentFile, '![Architecture](../assets/diagram.png)\n')
+		await fs.writeFile(imageFile, PIXEL_PNG)
+
+		try {
+			const document = await vscode.workspace.openTextDocument(
+				vscode.Uri.file(documentFile)
+			)
+
+			await withWebview(async (webview) => {
+				// The temp file sits outside the workspace, so `getImageBaseUris`
+				// falls the workspace base back to the document folder. Only the
+				// relative branch is meaningful here.
+				const baseUris = getImageBaseUris(webview, document)
+
+				assertSameUrl(
+					resolveImageSrc('../assets/diagram.png', baseUris),
+					webview.asWebviewUri(vscode.Uri.file(imageFile)).toString(),
+					'the image should load from the sibling assets folder'
+				)
+			})
 		} finally {
 			await vscode.commands.executeCommand('workbench.action.closeAllEditors')
 			await fs.rm(directory, { recursive: true, force: true })

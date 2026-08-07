@@ -1,5 +1,8 @@
 # notes.md
 
+The image near the bottom uses a path relative to this file. See `other-note.md`
+for the root-absolute form.
+
 # Heading 1
 
 ## Heading 2
@@ -71,7 +74,7 @@ Table with column alignment (the alignment is dropped on load - see CLAUDE.md)
 
 Image
 
-![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)
+![Editor Markdown Notes icon](./icon-editor-markdown-notes.png)
 
 An inline [link to example.com](https://example.com), and a bare autolink:
 https://example.com

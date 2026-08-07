@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import type { Config, WebviewToHost } from '@/shared/messages'
+import type { Config, ImageBaseUris, WebviewToHost } from '@/shared/messages'
 
 interface VSCodeAPI {
 	postMessage: (message: WebviewToHost) => void
@@ -14,6 +14,7 @@ declare global {
 		initialContent?: string
 		fileName?: string
 		initialConfig?: Config
+		imageBaseUris?: ImageBaseUris
 	}
 }
 

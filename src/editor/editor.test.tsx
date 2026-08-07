@@ -1,7 +1,11 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import Editor from '@/editor/editor'
+
+afterEach(() => {
+	delete window.imageBaseUris
+})
 
 describe('Editor', () => {
 	it('renders a markdown table as a real table', async () => {
@@ -56,16 +60,34 @@ describe('Editor', () => {
 		expect(checkboxes[1]).not.toBeChecked()
 	})
 
+	// Outside VSCode the notes are served from the site root, so the author's
+	// path is already the right one and must reach the DOM untouched.
 	it('renders an image with its alt text', async () => {
 		const content =
-			'![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)'
+			'![Editor Markdown Notes icon](./icon-editor-markdown-notes.png)'
 
 		render(<Editor content={content} />)
 
 		const image = await screen.findByRole('img', {
 			name: 'Editor Markdown Notes icon',
 		})
-		expect(image).toHaveAttribute('src', '/icon-editor-markdown-notes.png')
+		expect(image).toHaveAttribute('src', './icon-editor-markdown-notes.png')
+	})
+
+	it('points images at a vscode-resource URI without rewriting the markdown', async () => {
+		window.imageBaseUris = {
+			document:
+				'https://file+.vscode-resource.vscode-cdn.net/Users/dev/notes/docs',
+			workspace: 'https://file+.vscode-resource.vscode-cdn.net/Users/dev/notes',
+		}
+
+		render(<Editor content="![Architecture](./diagram.png)" />)
+
+		const image = await screen.findByRole('img', { name: 'Architecture' })
+		expect(image).toHaveAttribute(
+			'src',
+			'https://file+.vscode-resource.vscode-cdn.net/Users/dev/notes/docs/diagram.png'
+		)
 	})
 
 	it('renders a link for a bare URL', async () => {

@@ -10,11 +10,13 @@ import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import TextStyle from '@tiptap/extension-text-style'
 import type { TextStyleOptions } from '@tiptap/extension-text-style'
-import { Extension, getHTMLFromFragment } from '@tiptap/react'
+import { Extension, getHTMLFromFragment, mergeAttributes } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 import { Markdown } from 'tiptap-markdown'
+
+import { resolveImageSrc } from '@/lib/resolve-image-src'
 
 /**
  * The subset of markdown-it we touch. The package is a transitive dependency of
@@ -179,7 +181,23 @@ export const extensions = [
 	TaskItem.configure({ nested: true }),
 	// Inline, so an image sits in a paragraph. As a block node the serializer
 	// never closes the block and the image runs into the text that follows it.
-	Image.configure({ inline: true }),
+	Image.configure({ inline: true }).extend({
+		// Display only - `src` keeps the author's path, so saving does not
+		// rewrite the file with vscode-resource URIs. Outside VSCode there are
+		// no bases: the notes are served from the site root, so the browser
+		// already resolves the author's path correctly.
+		renderHTML({ HTMLAttributes }) {
+			return [
+				'img',
+				mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+					src: resolveImageSrc(
+						String(HTMLAttributes.src ?? ''),
+						window.imageBaseUris
+					),
+				}),
+			]
+		},
+	}),
 	Markdown.configure({
 		// No p inside li in md
 		tightLists: true,

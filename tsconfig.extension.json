@@ -13,6 +13,13 @@
 			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["src/extension.ts", "src/shared/**/*", "src/test/**/*"],
+	"include": [
+		"src/extension.ts",
+		"src/shared/**/*",
+		"src/test/**/*",
+		// Pure and dependency-free, and its only `@/` import is `import type`,
+		// so nothing survives to runtime that CommonJS would fail to resolve.
+		"src/lib/resolve-image-src.ts"
+	],
 	"exclude": ["node_modules", "out"]
 }
