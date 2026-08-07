@@ -8,7 +8,6 @@ A VS Code custom editor that opens `.md` files in a WYSIWYG editor with live pre
 - Formatting toolbar plus a selection bubble menu (headings, text styles, colors, links)
 - Follows the active VS Code color theme
 - Auto-save with a 1000ms debounce
-- Frontmatter-aware via `gray-matter`
 - Toolbar toggles (raw markdown, full width, theme) persist across tabs and sessions
 
 ## Usage

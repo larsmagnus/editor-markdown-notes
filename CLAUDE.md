@@ -68,7 +68,6 @@ Not supported: table column alignment, merged cells (they fall back to raw HTML)
 
 - `src/hooks/use-content.ts` - Fetches the standalone web app's demo notes from `public/`. They sit there so their images are reachable by URL; `import.meta.glob` cannot see into `public/`, hence the hardcoded file list
 - `src/hooks/use-settings.ts` & `src/hooks/use-theme.ts` - React contexts and their accessor hooks, kept out of the provider files so each `.tsx` exports exactly one component
-- `src/lib/db.ts` - File system operations for markdown files with frontmatter support
 - `src/lib/update-notes.ts` - Handles saving markdown content
 
 #### UI Components (`src/components/`)
@@ -101,7 +100,6 @@ Contributed under the `editorMarkdownNotes` section in `package.json` (`contribu
 - **UI**: React 19 + Radix UI + Tailwind CSS v4
 - **Build**: Vite for web app, TypeScript compiler for extension
 - **Styling**: Tailwind CSS with custom prose styling for markdown
-- **File Management**: Gray-matter for frontmatter parsing
 
 ### Configuration Files
 
