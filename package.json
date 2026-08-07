@@ -156,6 +156,7 @@
 		"build": "tsc -b && vite build && pnpm vscode:compile",
 		"typecheck": "tsc -b --noEmit && tsc -p ./tsconfig.extension.json --noEmit",
 		"lint": "pnpm typecheck && oxlint --fix && oxfmt",
+		"knip": "knip",
 		"preview": "vite preview"
 	},
 	"devDependencies": {
@@ -173,8 +174,8 @@
 		"@vitejs/plugin-react-swc": "3.10.2",
 		"@vscode/test-cli": "0.0.15",
 		"@vscode/test-electron": "3.1.0",
-		"globals": "16.2.0",
 		"happy-dom": "20.11.1",
+		"knip": "^6.32.0",
 		"oxfmt": "0.62.0",
 		"oxlint": "1.77.0",
 		"tailwindcss": "4.1.11",

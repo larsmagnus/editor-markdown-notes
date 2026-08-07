@@ -31,6 +31,9 @@ This is a VSCode extension for editing markdown in an live preview powered by a 
 - `pnpm test:watch` - Vitest in watch mode
 - `pnpm test:extension` - Run the VSCode extension tests via `@vscode/test-electron`
 - `pnpm pretest` - Prepare for testing (compile + lint)
+- `pnpm knip` - Find unused files, exports and dependencies. Deliberately out of `pnpm lint`
+
+`knip.jsonc` has to include `.css` in `project`, or the Tailwind v4 `@plugin` directives in `src/globals.css` don't count as usage and the plugins read as unused dependencies. Exports in `src/components/ui/**` are exempt so vendored shadcn files stay a clean overwrite.
 
 Vitest takes `src/**/*.test.{ts,tsx}` except `src/test/**`. Keep webview tests out of `src/test/` - it's compiled by `tsconfig.extension.json`, which has no DOM lib.
 

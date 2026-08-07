@@ -25,7 +25,7 @@ import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
 // error. Opting out up front keeps that channel meaningful.
 z.config({ jitless: true })
 
-export const themeSchema = z
+const themeSchema = z
 	.enum(['dark', 'light', 'system'])
 	.catch(DEFAULT_VIEW_OPTIONS.theme)
 	.meta({
@@ -58,7 +58,7 @@ export const viewOptionsSchema = z
 			'User-toggleable view state. Persisted in the host\'s globalState and broadcast to every open editor tab, so it survives reloads and stays in sync across tabs. Also settable from the "Toggle raw markdown", "Toggle full width" and "Select theme" commands.',
 	})
 
-export const extensionSettingsSchema = z
+const extensionSettingsSchema = z
 	.object({
 		centerContent: z.boolean().catch(DEFAULT_SETTINGS.centerContent).meta({
 			title: 'Center content',

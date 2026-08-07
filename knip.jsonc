@@ -1,0 +1,28 @@
+{
+	"$schema": "https://unpkg.com/knip@6/schema.json",
+	// Knip's vite/vitest/typescript plugins already find `index.html` →
+	// `src/main.tsx`, `src/test-setup.ts` and — via package.json `main` →
+	// `out/extension.js` — the extension host entry. Listing those again is
+	// redundant and knip says so, hence only the one it cannot infer:
+	// `.vscode-test.mjs` points at `out/test/**/*.test.js`, compiled output with
+	// no path back to source.
+	"entry": ["src/test/**/*.test.ts"],
+	// `.css` is in here so the Tailwind v4 `@plugin` directives in
+	// `src/globals.css` count as usage of `@tailwindcss/typography` and
+	// `tailwindcss-animate`.
+	"project": ["src/**/*.{ts,tsx,css}"],
+	"ignoreIssues": {
+		// Vendored shadcn/ui primitives. They deliberately re-export the full
+		// Radix surface whether or not this app reaches for all of it, so that
+		// `pnpm dlx shadcn add` stays a clean overwrite.
+		"src/components/ui/**": ["exports", "types"],
+	},
+	"ignoreDependencies": [
+		// Ambient `suite`/`test` globals for the @vscode/test-cli suite; there is
+		// no import to trace.
+		"@types/mocha",
+		// Downloads and runs VS Code for `pnpm test:extension`. Driven by
+		// @vscode/test-cli, never imported.
+		"@vscode/test-electron",
+	],
+}
