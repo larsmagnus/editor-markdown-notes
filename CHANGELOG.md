@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-08-08
+
+- **Add `editor-markdown-notes.toggleHideToolbar` command**, and rename the `editorMarkdownNotes.hideNav` setting to `editorMarkdownNotes.hideToolbar` (it hides a toolbar, not a navigation bar)
+
 ## [0.15.0] - 2026-08-07
 
 - Switch the frontmatter panel to a proper `<textarea>` (shadcn) instead of a plain input, so multi-line frontmatter values are usable

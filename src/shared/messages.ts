@@ -36,7 +36,7 @@ export type ViewOptions = {
 
 export type ExtensionSettings = {
 	centerContent: boolean
-	hideNav: boolean
+	hideToolbar: boolean
 	/**
 	 * Reading age the readability check scores against. A sentence too hard for
 	 * this age reads as "hard"; one still too hard six years later, "very hard"
@@ -55,7 +55,7 @@ export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {
 	centerContent: false,
-	hideNav: false,
+	hideToolbar: false,
 	textToolsTargetAge: 16,
 }
 

@@ -10,13 +10,13 @@ const DevFileSelector = import.meta.env.DEV
 	? lazy(() => import('@/components/dev-file-selector'))
 	: null
 
-type NavProps = {
+type ToolbarProps = {
 	files: DevFileSelectorProps['values']
 	fileName: string
 	setFileName: DevFileSelectorProps['setValue']
 }
 
-function Nav({ files, fileName, setFileName }: NavProps) {
+function Toolbar({ files, fileName, setFileName }: ToolbarProps) {
 	const { viewOptions, setViewOptions, isVSCodeContext } = useSettings()
 
 	// `onValueChange` below rebuilds every key from this array, so a toggle
@@ -27,7 +27,10 @@ function Nav({ files, fileName, setFileName }: NavProps) {
 	if (viewOptions.textTools) value.push('text-tools')
 
 	return (
-		<nav className="sticky top-0 left-0 bg-background/20 backdrop-blur-md p-3 flex gap-2 items-center z-10">
+		<div
+			role="toolbar"
+			className="sticky top-0 left-0 bg-background/20 backdrop-blur-md p-3 flex gap-2 items-center z-10"
+		>
 			{DevFileSelector && !isVSCodeContext && (
 				<Suspense fallback={null}>
 					<DevFileSelector
@@ -61,8 +64,8 @@ function Nav({ files, fileName, setFileName }: NavProps) {
 			</ToggleGroup>
 
 			<ThemeToggle />
-		</nav>
+		</div>
 	)
 }
 
-export default Nav
+export default Toolbar

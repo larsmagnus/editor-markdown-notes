@@ -73,7 +73,10 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 				'centerContent',
 				DEFAULT_SETTINGS.centerContent
 			),
-			hideNav: config.get<boolean>('hideNav', DEFAULT_SETTINGS.hideNav),
+			hideToolbar: config.get<boolean>(
+				'hideToolbar',
+				DEFAULT_SETTINGS.hideToolbar
+			),
 			textToolsTargetAge: config.get<number>(
 				'textToolsTargetAge',
 				DEFAULT_SETTINGS.textToolsTargetAge
@@ -456,7 +459,19 @@ export function activate(context: vscode.ExtensionContext) {
 		return vscode.commands.executeCommand('vscode.openWith', target, VIEW_TYPE)
 	}
 
-	// Mirrors the toolbar toggles, so they stay reachable when the nav is hidden.
+	// `hideToolbar` is a workspace/user setting rather than a persisted view
+	// option, so it is flipped through the configuration API instead of
+	// `provider.updateViewOptions`.
+	const toggleHideToolbar = async () => {
+		const config = vscode.workspace.getConfiguration(CONFIG_SECTION)
+		await config.update(
+			'hideToolbar',
+			!config.get<boolean>('hideToolbar', DEFAULT_SETTINGS.hideToolbar),
+			vscode.ConfigurationTarget.Global
+		)
+	}
+
+	// Mirrors the toolbar toggles, so they stay reachable when it is hidden.
 	const selectTheme = async () => {
 		const current = provider.getViewOptions().theme
 		const items: vscode.QuickPickItem[] = THEME_CHOICES.map(
@@ -505,6 +520,10 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(
 			'editor-markdown-notes.selectTheme',
 			selectTheme
+		),
+		vscode.commands.registerCommand(
+			'editor-markdown-notes.toggleHideToolbar',
+			toggleHideToolbar
 		),
 		vscode.commands.registerCommand('editor-markdown-notes.showLogs', () =>
 			log.show()

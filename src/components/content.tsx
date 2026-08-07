@@ -6,7 +6,7 @@ import { useSettings } from '@/hooks/use-settings'
 import { useVSCode } from '@/hooks/use-vscode'
 import { cn } from '@/lib/utils'
 
-const Nav = lazy(() => import('@/components/nav'))
+const Toolbar = lazy(() => import('@/components/toolbar'))
 
 type ContentProps = {
 	defaultFileName: string
@@ -47,9 +47,13 @@ function Content({ defaultFileName }: ContentProps) {
 
 	return (
 		<div className="h-screen overflow-auto">
-			{!settings.hideNav && (
+			{!settings.hideToolbar && (
 				<Suspense fallback={null}>
-					<Nav files={files} fileName={fileName} setFileName={setFileName} />
+					<Toolbar
+						files={files}
+						fileName={fileName}
+						setFileName={setFileName}
+					/>
 				</Suspense>
 			)}
 

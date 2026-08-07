@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
-import Nav from './nav'
+import Toolbar from './toolbar'
 
 const meta = {
-	component: Nav,
+	component: Toolbar,
 	parameters: {
 		layout: 'centered',
 	},
-} satisfies Meta<typeof Nav>
+} satisfies Meta<typeof Toolbar>
 
 export default meta
 type Story = StoryObj<typeof meta>

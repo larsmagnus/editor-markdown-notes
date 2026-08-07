@@ -49,12 +49,12 @@ Available under Settings → Extensions → Editor Markdown Notes (or the cog on
 
 | Setting                                  | Default | Purpose                                                |
 | ---------------------------------------- | ------- | ------------------------------------------------------ |
-| `editorMarkdownNotes.hideNav`            | `false` | Hide the editor's top navigation bar                   |
+| `editorMarkdownNotes.hideToolbar`        | `false` | Hide the editor's toolbar                              |
 | `editorMarkdownNotes.centerContent`      | `false` | Center the content horizontally when full width is off |
 | `editorMarkdownNotes.textToolsTargetAge` | `16`    | Reading age the text tools score sentences against     |
 
 The toolbar toggles are also available from the command palette while the editor
-is focused, so they stay reachable with `hideNav` turned on:
+is focused, so they stay reachable with `hideToolbar` turned on:
 
 - **Editor Markdown Notes: Toggle raw markdown**
 - **Editor Markdown Notes: Toggle full width**
@@ -73,6 +73,7 @@ All four are shared across open tabs and persist between sessions.
 | `editor-markdown-notes.toggleFullWidth`    | Toggle full width               | Toggle whether the content fills the available width        |
 | `editor-markdown-notes.toggleTextTools`    | Toggle text tools               | Show or hide the writing-checks sidebar                     |
 | `editor-markdown-notes.selectTheme`        | Select theme                    | Choose the editor color theme (dark, light, or system)      |
+| `editor-markdown-notes.toggleHideToolbar`  | Toggle toolbar                  | Show or hide the toolbar                                    |
 | `editor-markdown-notes.showLogs`           | Show logs                       | Open the output channel used to debug a blank panel         |
 
 ## Text tools

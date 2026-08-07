@@ -5,7 +5,7 @@
 	"publisher": "larsmagnus",
 	"author": "Lars Magnus Klavenes <larsmagnus@gmail.com> (https://larsmagnus.co)",
 	"license": "MIT",
-	"version": "0.15.0",
+	"version": "0.16.0",
 	"type": "module",
 	"private": true,
 	"repository": {
@@ -56,10 +56,10 @@
 					"default": false,
 					"description": "Center the editor content horizontally when full width is off."
 				},
-				"editorMarkdownNotes.hideNav": {
+				"editorMarkdownNotes.hideToolbar": {
 					"type": "boolean",
 					"default": false,
-					"description": "Hide the editor's top navigation bar. The raw, full width, text tools and theme toggles remain available from the command palette."
+					"description": "Hide the editor's toolbar. The raw, full width, text tools and theme toggles remain available from the command palette."
 				},
 				"editorMarkdownNotes.textToolsTargetAge": {
 					"type": "integer",
@@ -98,6 +98,11 @@
 			{
 				"command": "editor-markdown-notes.selectTheme",
 				"title": "Select theme",
+				"category": "Editor Markdown Notes"
+			},
+			{
+				"command": "editor-markdown-notes.toggleHideToolbar",
+				"title": "Toggle toolbar",
 				"category": "Editor Markdown Notes"
 			},
 			{
@@ -151,6 +156,10 @@
 				},
 				{
 					"command": "editor-markdown-notes.selectTheme",
+					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+				},
+				{
+					"command": "editor-markdown-notes.toggleHideToolbar",
 					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
 				}
 			]

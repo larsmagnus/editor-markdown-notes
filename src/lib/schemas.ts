@@ -88,10 +88,10 @@ const extensionSettingsSchema = z
 			description:
 				'Center the content horizontally when full width is off. Maps to `editorMarkdownNotes.centerContent`.',
 		}),
-		hideNav: z.boolean().catch(DEFAULT_SETTINGS.hideNav).meta({
-			title: 'Hide nav',
+		hideToolbar: z.boolean().catch(DEFAULT_SETTINGS.hideToolbar).meta({
+			title: 'Hide toolbar',
 			description:
-				'Hide the top navigation bar. The toggles remain reachable from the command palette. Maps to `editorMarkdownNotes.hideNav`.',
+				'Hide the toolbar. The toggles remain reachable from the command palette. Maps to `editorMarkdownNotes.hideToolbar`.',
 		}),
 		textToolsTargetAge: z
 			.number()

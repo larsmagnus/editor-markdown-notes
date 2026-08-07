@@ -194,7 +194,7 @@ suite('Editor Markdown Notes', () => {
 	test('contributes the settings that put a Settings entry on the extension page', () => {
 		const config = vscode.workspace.getConfiguration('editorMarkdownNotes')
 
-		assert.strictEqual(config.get('hideNav'), false)
+		assert.strictEqual(config.get('hideToolbar'), false)
 		assert.strictEqual(config.get('centerContent'), false)
 		assert.strictEqual(config.get('textToolsTargetAge'), 16)
 	})
