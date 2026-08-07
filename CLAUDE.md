@@ -43,6 +43,10 @@ Vitest takes `src/**/*.test.{ts,tsx}` except `src/test/**`. Keep webview tests o
 3. Right-click the file and select "Open with Editor Markdown Notes", or run "Editor Markdown Notes: Open file" from the command palette
 4. The custom React-based markdown editor should now load without errors
 
+#### Debugging a blank panel
+
+Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The webview's own console is invisible to the extension host, so `src/extension.ts` injects a bridge ahead of the app bundle that forwards uncaught errors, rejected promises, CSP violations, `console.error`/`console.warn` and a "#root is still empty" watchdog into that channel. A blank panel with nothing logged means the host never got that far - check the entry-chunk line at the top of the channel.
+
 ## Architecture
 
 ### Key Components

@@ -7,6 +7,7 @@ import * as vscode from 'vscode'
 
 import { getDocumentResourceRoots, getImageBaseUris } from '../extension'
 import { resolveImageSrc } from '../lib/resolve-image-src'
+import { getWebviewProblems } from '../lib/webview-diagnostics'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 const VIEW_TYPE = 'editor-markdown-notes.markdownEditor'
@@ -98,6 +99,10 @@ suite('Editor Markdown Notes', () => {
 			commands.includes('editor-markdown-notes.openMarkdownEditor'),
 			'"Open with Editor Markdown Notes" should be registered'
 		)
+		assert.ok(
+			commands.includes('editor-markdown-notes.showLogs'),
+			'"Editor Markdown Notes: Show logs" should be registered'
+		)
 	})
 
 	test('registers a command for each toolbar toggle', async () => {
@@ -109,6 +114,36 @@ suite('Editor Markdown Notes', () => {
 			'editor-markdown-notes.selectTheme',
 		]) {
 			assert.ok(commands.includes(command), `${command} should be registered`)
+		}
+	})
+
+	test('opens a note without the editor reporting a problem', async function () {
+		// Longer than Mocha's 2s default, because the check below outwaits the
+		// webview's own watchdog.
+		this.timeout(15_000)
+
+		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))
+		const file = vscode.Uri.file(path.join(directory, 'notes.md'))
+		await fs.writeFile(
+			file.fsPath,
+			'# Hello\n\nA note with a [link](/other).\n'
+		)
+
+		try {
+			await vscode.commands.executeCommand(
+				'editor-markdown-notes.openFile',
+				file
+			)
+
+			// The webview's watchdog reports an empty #root two seconds in, so a
+			// quiet channel past that point means the app really did render - not
+			// just that the bundle loaded without throwing.
+			await new Promise((resolve) => setTimeout(resolve, 3000))
+
+			assert.deepStrictEqual(getWebviewProblems(), [])
+		} finally {
+			await vscode.commands.executeCommand('workbench.action.closeAllEditors')
+			await fs.rm(directory, { recursive: true, force: true })
 		}
 	})
 

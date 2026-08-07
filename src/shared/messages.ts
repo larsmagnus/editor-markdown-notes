@@ -50,10 +50,18 @@ export type ImageBaseUris = {
 	workspace: string
 }
 
+export type LogLevel = 'error' | 'warn' | 'info'
+
 export type WebviewToHost =
 	| { type: 'save'; content: string }
 	| { type: 'getContent' }
 	| { type: 'setViewOptions'; viewOptions: ViewOptions }
+	/**
+	 * Diagnostics from inside the webview. Nothing in there reaches the extension
+	 * host's console, so without this a script that fails to load or throws on
+	 * mount just leaves a blank panel.
+	 */
+	| { type: 'log'; level: LogLevel; message: string }
 
 export type HostToWebview =
 	| { type: 'update'; content: string; fileName: string }

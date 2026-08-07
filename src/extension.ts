@@ -2,6 +2,7 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
+import { recordWebviewLog, WEBVIEW_LOG_BRIDGE } from './lib/webview-diagnostics'
 // Resolves to `out/shared/messages.js`, which loads as CommonJS thanks to the
 // `out/package.json` sentinel written by `pnpm vscode:sentinel`.
 import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from './shared/messages'
@@ -27,11 +28,13 @@ const THEME_CHOICES: { label: string; value: Theme }[] = [
 
 class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 	private readonly context: vscode.ExtensionContext
+	private readonly log: vscode.LogOutputChannel
 	private readonly panels = new Set<vscode.WebviewPanel>()
 	private updateInProgress = false
 
-	constructor(context: vscode.ExtensionContext) {
+	constructor(context: vscode.ExtensionContext, log: vscode.LogOutputChannel) {
 		this.context = context
+		this.log = log
 	}
 
 	public register(): vscode.Disposable {
@@ -139,6 +142,9 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 				case 'setViewOptions':
 					await this.updateViewOptions(message.viewOptions)
 					break
+				case 'log':
+					recordWebviewLog(this.log, message.level, message.message)
+					break
 			}
 		})
 
@@ -154,11 +160,15 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 		document: vscode.TextDocument
 	): string {
 		const distPath = path.join(this.context.extensionPath, 'dist')
-		const entry = readEntryChunk(distPath)
+		const entry = readEntryChunk(distPath, this.log)
 
 		// Without the manifest there is nothing to load, and an empty panel gives
 		// no hint as to why. `pnpm build` is what produces it.
 		if (!entry) {
+			this.log.error(
+				`No webview entry chunk found in ${distPath}. Run \`pnpm build\`.`
+			)
+
 			return `<!DOCTYPE html>
     <html lang="en">
     <body>
@@ -181,6 +191,10 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 		const nonce = getNonce()
 
 		const imageBaseUris = getImageBaseUris(webview, document)
+
+		this.log.info(
+			`Loading webview for ${path.basename(document.fileName)}: entry ${entry.file}, ${entry.imports.length} imported chunk(s), ${entry.css.length} stylesheet(s)`
+		)
 
 		return `<!DOCTYPE html>
     <html lang="en">
@@ -206,6 +220,7 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         <div id="root"></div>
         <script nonce="${nonce}">
             window.vscode = acquireVsCodeApi();
+            ${WEBVIEW_LOG_BRIDGE}
             window.initialContent = ${toScriptLiteral(document.getText())};
             window.fileName = ${toScriptLiteral(path.basename(document.fileName))};
             window.initialConfig = ${toScriptLiteral(this.getConfig())};
@@ -280,7 +295,10 @@ type ManifestChunk = {
  * Hand-rolled rather than validated with zod: the `.vsix` is packaged with
  * `--no-dependencies`, so the host cannot require anything at runtime.
  */
-function readEntryChunk(distPath: string): EntryChunk | undefined {
+function readEntryChunk(
+	distPath: string,
+	log: vscode.LogOutputChannel
+): EntryChunk | undefined {
 	let manifest: Record<string, ManifestChunk>
 
 	try {
@@ -289,13 +307,13 @@ function readEntryChunk(distPath: string): EntryChunk | undefined {
 			fs.readFileSync(path.join(distPath, 'manifest.json'), 'utf8')
 		)
 	} catch (error) {
-		console.error('Failed to read the Vite manifest:', error)
+		log.error(`Failed to read the Vite manifest: ${String(error)}`)
 		return undefined
 	}
 
 	const entry = manifest['index.html']
 	if (!entry?.file) {
-		console.error('The Vite manifest has no index.html entry')
+		log.error('The Vite manifest has no index.html entry')
 		return undefined
 	}
 
@@ -366,10 +384,18 @@ export function getImageBaseUris(
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Editor Markdown Notes extension is now active!')
+	// Surfaced as "Editor Markdown Notes" in the Output panel. `log: true` makes
+	// it a LogOutputChannel, so entries carry a timestamp and level and the
+	// panel's own level picker filters them.
+	const log = vscode.window.createOutputChannel('Editor Markdown Notes', {
+		log: true,
+	})
+	context.subscriptions.push(log)
+
+	log.info('Extension activated')
 
 	// Register the custom editor provider
-	const provider = new MarkdownEditorProvider(context)
+	const provider = new MarkdownEditorProvider(context, log)
 	context.subscriptions.push(provider.register())
 
 	// Opens `uri` — or the active editor's file — with our custom editor. The
@@ -441,6 +467,9 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(
 			'editor-markdown-notes.selectTheme',
 			selectTheme
+		),
+		vscode.commands.registerCommand('editor-markdown-notes.showLogs', () =>
+			log.show()
 		)
 	)
 }

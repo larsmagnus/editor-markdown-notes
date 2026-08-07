@@ -17,9 +17,10 @@
 		"src/extension.ts",
 		"src/shared/**/*",
 		"src/test/**/*",
-		// Pure and dependency-free, and its only `@/` import is `import type`,
+		// Pure and dependency-free, and their only `@/` imports are `import type`,
 		// so nothing survives to runtime that CommonJS would fail to resolve.
-		"src/lib/resolve-image-src.ts"
+		"src/lib/resolve-image-src.ts",
+		"src/lib/webview-diagnostics.ts"
 	],
 	"exclude": ["node_modules", "out"]
 }
