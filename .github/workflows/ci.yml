@@ -1,0 +1,44 @@
+name: 🚀 CI
+
+on:
+  push:
+    branches:
+      - main
+    # Skip CI for docs-only changes to save compute
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.claude/**'
+      - '.storybook/**'
+      - '.vscode/**'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Setup pnpm
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🤖 Run type checks
+        run: pnpm typecheck
+
+      - name: ✨ Run lint and format checks
+        run: pnpm lint:ci
+
+      - name: 🤯 Run code complexity checks
+        run: pnpm run complexity
+
+      - name: 🧪 Run VS Code tests and Vitest tests
+        run: xvfb-run --auto-servernum pnpm test
