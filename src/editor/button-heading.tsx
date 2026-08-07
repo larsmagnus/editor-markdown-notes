@@ -18,8 +18,15 @@ export function ButtonHeading({
 	return (
 		<Button
 			type="button"
+			variant="ghost"
+			size="sm"
 			onClick={() => toggleHeadingByLevel(level)}
-			className={cn(className, hasHeadingLevel(level) ? 'is-active' : '')}
+			className={cn(
+				className,
+				hasHeadingLevel(level)
+					? 'is-active bg-accent text-accent-foreground'
+					: ''
+			)}
 			{...rest}
 		>
 			{children ?? `H${level}`}

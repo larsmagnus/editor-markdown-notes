@@ -53,14 +53,18 @@ export function MenuBubble() {
 				duration: 50,
 			}}
 		>
-			<div className="flex items-center gap-1 p-1 bg-background border border-foreground/5 rounded-lg shadow-xs drop-shadow-lg w-[400px]">
+			<div className="flex items-center gap-1 p-1 bg-popover text-popover-foreground border border-border rounded-lg shadow-xs drop-shadow-lg w-[400px]">
 				<Popover>
 					<PopoverTrigger asChild>
 						<Button type="button" variant="ghost" size="sm" title="Heading">
 							<Heading className="size-4" />
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent side="top" sideOffset={12} className="p-2 flex gap-1">
+					<PopoverContent
+						side="top"
+						sideOffset={12}
+						className="w-auto p-2 flex gap-1"
+					>
 						<ButtonHeading level={1}>
 							<Heading1 />
 						</ButtonHeading>
@@ -84,6 +88,8 @@ export function MenuBubble() {
 						<ButtonHeading level={6}>
 							<Heading6 />
 						</ButtonHeading>
+
+						<PopoverArrow className="fill-popover" />
 					</PopoverContent>
 				</Popover>
 
@@ -145,7 +151,7 @@ export function MenuBubble() {
 								</Button>
 							</div>
 						</form>
-						<PopoverArrow className="fill-background" />
+						<PopoverArrow className="fill-popover" />
 					</PopoverContent>
 				</Popover>
 
