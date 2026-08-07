@@ -6,8 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a VSCode extension for editing markdown in an live preview powered by a React web application. Main project components include:
 
-- **VSCode Extension**: Entry point at `src/extension.ts`, compiles to `out/extension.js`. The root package is `type: "module"` for Vite, but the extension host needs CommonJS, so `vscode:compile` writes an `out/package.json` containing `{"type":"commonjs"}` — everything under `out/` is CJS because of that sentinel.
-- **React Web App**: Entry point at `src/main.tsx`, builds with Vite
+- **VSCode Extension**: Entry point at `src/extension.ts` — registers the custom editor and commands, owns settings and persisted view options; compiles to `out/extension.js`. The root package is `type: "module"` for Vite, but the extension host needs CommonJS, so `vscode:compile` writes an `out/package.json` containing `{"type":"commonjs"}` — everything under `out/` is CJS because of that sentinel.
+- **React Web App**: Entry point at `src/main.tsx`, bundled to `dist/` by Vite
 - **Shared contract**: `src/shared/messages.ts` — host ↔ webview message types and defaults, included in both tsconfig projects. Value imports are safe from the extension host because the `out/package.json` sentinel makes `out/shared/messages.js` load as CommonJS.
 
 ## Development Commands

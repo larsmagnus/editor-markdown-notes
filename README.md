@@ -9,7 +9,6 @@ A VS Code custom editor that opens `.md` files in a WYSIWYG editor with live pre
 - WYSIWYG markdown editing as a VS Code custom editor for `*.md`
 - Formatting toolbar plus a selection bubble menu (headings, text styles, colors, links)
 - Follows the active VS Code color theme
-- Auto-save with a 1000ms debounce
 - Toolbar toggles (raw markdown, full width, theme) persist across tabs and sessions
 
 ## Usage
@@ -41,6 +40,12 @@ is focused, so they stay reachable with `hideNav` turned on:
 
 All three are shared across open tabs and persist between sessions.
 
+## Troubleshooting
+
+If the editor panel loads blank, run **Editor Markdown Notes: Show logs** from
+the command palette and check the _Editor Markdown Notes_ output channel — the
+webview forwards its errors there.
+
 ## Requirements
 
 VS Code `^1.101.0`.
@@ -59,14 +64,16 @@ To uninstall: `code --uninstall-extension larsmagnus.editor-markdown-notes`.
 
 ## Development
 
-| Command             | Purpose                                       |
-| ------------------- | --------------------------------------------- |
-| `pnpm dev`          | Vite dev server for the React app standalone  |
-| `pnpm build`        | Build the web app and compile the extension   |
-| `pnpm vscode:watch` | Watch-mode compile of the extension host code |
-| `pnpm typecheck`    | TypeScript check, no emit                     |
-| `pnpm lint`         | Typecheck + `oxlint --fix` + `oxfmt`          |
-| `pnpm test`         | Run extension tests via `vscode-test`         |
+| Command               | Purpose                                       |
+| --------------------- | --------------------------------------------- |
+| `pnpm dev`            | Vite dev server for the React app standalone  |
+| `pnpm build`          | Build the web app and compile the extension   |
+| `pnpm vscode:watch`   | Watch-mode compile of the extension host code |
+| `pnpm typecheck`      | TypeScript check, no emit                     |
+| `pnpm lint`           | Typecheck + `oxlint --fix` + `oxfmt`          |
+| `pnpm test`           | Run both suites                               |
+| `pnpm test:unit`      | Vitest webview tests                          |
+| `pnpm test:extension` | Extension tests via `vscode-test`             |
 
 ### Running from source
 
@@ -74,14 +81,6 @@ To uninstall: `code --uninstall-extension larsmagnus.editor-markdown-notes`.
 2. In the new window, open a `.md` file
 3. Right-click the file and select **Open with Editor Markdown Notes**
 
-## Architecture
+## Disclaimer
 
-- `src/extension.ts` — extension host entry, registers the custom editor and commands, owns settings and persisted view options; compiled to `out/extension.js`
-- `src/shared/messages.ts` — the host ↔ webview message contract, shared by both build graphs
-- `src/main.tsx` — React webview entry, bundled to `dist/` by Vite
-- `src/editor/` — TipTap editor, toolbar, and bubble menu
-- `src/components/` — Radix UI + shadcn/ui components, plus `nav.tsx` and `settings-provider.tsx`
-
-## License
-
-MIT — see [LICENSE](LICENSE).
+Use or not at your own risk.
