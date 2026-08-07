@@ -28,6 +28,18 @@ Open the editor in any of these ways:
 
 The default text editor is unchanged; this editor is registered with `priority: "option"`, so you opt in per file.
 
+### Always open `.md` files with this editor
+
+To make Editor Markdown Notes the default for all markdown files, add an editor association in `settings.json`:
+
+```json
+"workbench.editorAssociations": {
+  "*.md": "editor-markdown-notes.markdownEditor"
+}
+```
+
+You can also set this without editing JSON directly: open a `.md` file, right-click its tab → **Configure Default Editor for '\*.md'...** → choose **Editor Markdown Notes**.
+
 ## Settings
 
 Available under Settings → Extensions → Editor Markdown Notes (or the cog on the extension page):
