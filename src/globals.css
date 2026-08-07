@@ -159,8 +159,12 @@
 		@apply flex items-start gap-2;
 	}
 
+	.ProseMirror ul[data-type='taskList'] li p {
+		@apply mb-0;
+	}
+
 	.ProseMirror ul[data-type='taskList'] li > label {
-		@apply mt-1 shrink-0;
+		@apply mt-0.5 shrink-0;
 	}
 
 	.ProseMirror ul[data-type='taskList'] li > div {
