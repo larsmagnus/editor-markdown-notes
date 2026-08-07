@@ -1,17 +1,19 @@
 import { Eye, EyeClosed, Maximize2, Minimize2 } from 'lucide-react'
-import type { ComponentProps } from 'react'
+import { lazy, Suspense } from 'react'
 
-import { Combobox } from '@/components/combobox'
+import type { DevFileSelectorProps } from '@/components/dev-file-selector'
 import ThemeToggle from '@/components/theme-toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useSettings } from '@/hooks/use-settings'
 
-type ComboboxProps = ComponentProps<typeof Combobox>
+const DevFileSelector = import.meta.env.DEV
+	? lazy(() => import('@/components/dev-file-selector'))
+	: null
 
 type NavProps = {
-	files: ComboboxProps['values']
+	files: DevFileSelectorProps['values']
 	fileName: string
-	setFileName: ComboboxProps['setValue']
+	setFileName: DevFileSelectorProps['setValue']
 }
 
 function Nav({ files, fileName, setFileName }: NavProps) {
@@ -23,9 +25,14 @@ function Nav({ files, fileName, setFileName }: NavProps) {
 
 	return (
 		<nav className="sticky top-0 left-0 bg-background/20 backdrop-blur-md p-3 flex gap-2 items-center">
-			{/* VS Code owns file switching via its own tabs. */}
-			{!isVSCodeContext && (
-				<Combobox values={files} value={fileName} setValue={setFileName} />
+			{DevFileSelector && !isVSCodeContext && (
+				<Suspense fallback={null}>
+					<DevFileSelector
+						values={files}
+						value={fileName}
+						setValue={setFileName}
+					/>
+				</Suspense>
 			)}
 
 			<ToggleGroup

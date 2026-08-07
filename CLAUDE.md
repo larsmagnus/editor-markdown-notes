@@ -73,7 +73,7 @@ Not supported: table column alignment, merged cells (they fall back to raw HTML)
 #### UI Components (`src/components/`)
 
 - Built with Radix UI primitives and shadcn/ui patterns
-- `combobox.tsx` - File selector dropdown
+- `dev-file-selector.tsx` - File selector dropdown, dev-only
 - `content.tsx` - The editor surface: picks the content source (VSCode vs. local), renders the nav and either the raw `<pre>` or the TipTap editor
 - `nav.tsx` - Top toolbar (file selector, raw/full-width toggles, theme toggle)
 - `settings-provider.tsx` - Single source of truth for `viewOptions` (user toggles) and `settings` (VSCode configuration). In VSCode it seeds from `window.initialConfig`, posts `setViewOptions` to the host, and re-renders on `config` broadcasts; standalone it falls back to `localStorage`.
@@ -87,6 +87,10 @@ Not supported: table column alignment, merged cells (they fall back to raw HTML)
 #### Extension Settings
 
 Contributed under the `editorMarkdownNotes` section in `package.json` (`contributes.configuration`, which is also what surfaces the cog → Settings entry on the extension page). Persisted view options live in `context.globalState` under `editorMarkdownNotes.viewOptions` and are broadcast to every open webview panel, so tabs stay in sync. The `toggleRaw` / `toggleFullWidth` / `selectTheme` commands drive the same state from the command palette, gated on `activeCustomEditorId`.
+
+#### Bundle chunks
+
+**Three things keep the split bundle loadable in the webview; break one and the panel loads blank.** `base: './'`, because root-absolute chunk URLs point outside the extension under a `vscode-webview://` origin. `${webview.cspSource}` in `script-src`, because the entry script's nonce is not inherited by the modules it imports. And `build.manifest`, which `readEntryChunk` reads to find the hashed entry.
 
 #### Validation
 

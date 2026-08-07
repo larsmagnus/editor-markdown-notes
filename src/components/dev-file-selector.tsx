@@ -1,10 +1,5 @@
 import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
-import type {
-	ComponentProps,
-	Dispatch,
-	PropsWithChildren,
-	SetStateAction,
-} from 'react'
+import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -23,17 +18,21 @@ import {
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 
-export function Combobox({
+export type DevFileSelectorProps = {
+	value: string
+	setValue: Dispatch<SetStateAction<string>>
+	values: { value: string; label: string }[]
+} & ComponentProps<'button'>
+
+/**
+ * Switches between the demo notes in `public/`. Development web-view only
+ */
+function DevFileSelector({
 	className,
 	values,
 	value,
 	setValue,
-}: PropsWithChildren<{
-	value: string
-	setValue: Dispatch<SetStateAction<string>>
-	values: { value: string; label: string }[]
-}> &
-	ComponentProps<'button'>) {
+}: DevFileSelectorProps) {
 	const [open, setOpen] = useState(false)
 
 	return (
@@ -82,3 +81,5 @@ export function Combobox({
 		</Popover>
 	)
 }
+
+export default DevFileSelector

@@ -1,9 +1,12 @@
-import Nav from '@/components/nav'
+import { lazy, Suspense } from 'react'
+
 import Editor from '@/editor/editor'
 import useContent from '@/hooks/use-content'
 import { useSettings } from '@/hooks/use-settings'
 import { useVSCode } from '@/hooks/use-vscode'
 import { cn } from '@/lib/utils'
+
+const Nav = lazy(() => import('@/components/nav'))
 
 type ContentProps = {
 	defaultFileName: string
@@ -45,7 +48,9 @@ function Content({ defaultFileName }: ContentProps) {
 	return (
 		<div className="h-screen overflow-auto">
 			{!settings.hideNav && (
-				<Nav files={files} fileName={fileName} setFileName={setFileName} />
+				<Suspense fallback={null}>
+					<Nav files={files} fileName={fileName} setFileName={setFileName} />
+				</Suspense>
 			)}
 
 			<main className="grid p-3 min-h-screen">

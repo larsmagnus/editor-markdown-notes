@@ -154,33 +154,28 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 		document: vscode.TextDocument
 	): string {
 		const distPath = path.join(this.context.extensionPath, 'dist')
-		const assetsPath = path.join(distPath, 'assets')
+		const entry = readEntryChunk(distPath)
 
-		// Find the actual built file names (they have content hashes)
-		const fs = require('fs')
-		let jsFile = ''
-		let cssFile = ''
-
-		try {
-			const assetFiles = fs.readdirSync(assetsPath)
-			jsFile =
-				assetFiles.find(
-					(file: string) => file.startsWith('index-') && file.endsWith('.js')
-				) || ''
-			cssFile =
-				assetFiles.find(
-					(file: string) => file.startsWith('index-') && file.endsWith('.css')
-				) || ''
-		} catch (error) {
-			console.error('Failed to read assets directory:', error)
+		// Without the manifest there is nothing to load, and an empty panel gives
+		// no hint as to why. `pnpm build` is what produces it.
+		if (!entry) {
+			return `<!DOCTYPE html>
+    <html lang="en">
+    <body>
+        <h1>Editor Markdown Notes could not start</h1>
+        <p>The built webview assets are missing. Run <code>pnpm build</code> and reopen the file.</p>
+    </body>
+    </html>`
 		}
 
-		const jsUri = webview.asWebviewUri(
-			vscode.Uri.file(path.join(assetsPath, jsFile))
-		)
-		const cssUri = webview.asWebviewUri(
-			vscode.Uri.file(path.join(assetsPath, cssFile))
-		)
+		const toUri = (file: string) =>
+			webview.asWebviewUri(vscode.Uri.file(path.join(distPath, file)))
+
+		const jsUri = toUri(entry.file)
+		const cssUris = entry.css.map(toUri)
+		// Fetched up front rather than when the entry chunk gets around to
+		// importing them.
+		const preloadUris = entry.imports.map(toUri)
 
 		// Generate nonce for CSP
 		const nonce = getNonce()
@@ -192,9 +187,13 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} https: data:; script-src 'nonce-${nonce}'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource} data:; connect-src ${webview.cspSource};">
+        <!-- The nonce covers the inline bootstrap script below. It is not
+             inherited by imported modules, so the code-split chunks need
+             \`cspSource\` to be allowed as well. -->
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} https: data:; script-src 'nonce-${nonce}' ${webview.cspSource}; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource} data:; connect-src ${webview.cspSource};">
         <title>Editor Markdown Notes</title>
-        <link rel="stylesheet" crossorigin href="${cssUri}">
+        ${cssUris.map((uri) => `<link rel="stylesheet" crossorigin href="${uri}">`).join('\n        ')}
+        ${preloadUris.map((uri) => `<link rel="modulepreload" crossorigin href="${uri}" nonce="${nonce}">`).join('\n        ')}
         <style>
             body, html {
                 margin: 0;
@@ -255,6 +254,75 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			}, 100)
 		}
 	}
+}
+
+type EntryChunk = {
+	/** Entry chunk path, relative to `dist/`. */
+	file: string
+	/** Stylesheets from the entry and everything it imports. */
+	css: string[]
+	/** Chunks reachable from the entry by static import, relative to `dist/`. */
+	imports: string[]
+}
+
+/** The subset of a Vite manifest entry the host reads. */
+type ManifestChunk = {
+	file?: string
+	css?: string[]
+	imports?: string[]
+}
+
+/**
+ * Locates the built entry chunk through Vite's manifest. The file names carry
+ * content hashes and the code-split chunks are named after their modules, so
+ * there is nothing stable to match on by hand.
+ *
+ * Hand-rolled rather than validated with zod: the `.vsix` is packaged with
+ * `--no-dependencies`, so the host cannot require anything at runtime.
+ */
+function readEntryChunk(distPath: string): EntryChunk | undefined {
+	let manifest: Record<string, ManifestChunk>
+
+	try {
+		const fs = require('fs')
+		manifest = JSON.parse(
+			fs.readFileSync(path.join(distPath, 'manifest.json'), 'utf8')
+		)
+	} catch (error) {
+		console.error('Failed to read the Vite manifest:', error)
+		return undefined
+	}
+
+	const entry = manifest['index.html']
+	if (!entry?.file) {
+		console.error('The Vite manifest has no index.html entry')
+		return undefined
+	}
+
+	// A chunk's stylesheets hang off that chunk, so collecting only the entry's
+	// would leave anything a vendor chunk brings with it unstyled. The graph is
+	// walked in full because an imported chunk may import further chunks.
+	const imports: string[] = []
+	const css = [...(entry.css ?? [])]
+	const seen = new Set<string>()
+
+	const collect = (keys: string[] = []) => {
+		for (const key of keys) {
+			if (seen.has(key)) continue
+			seen.add(key)
+
+			const chunk = manifest[key]
+			if (!chunk?.file) continue
+
+			imports.push(chunk.file)
+			css.push(...(chunk.css ?? []))
+			collect(chunk.imports)
+		}
+	}
+
+	collect(entry.imports)
+
+	return { file: entry.file, css, imports }
 }
 
 /**
