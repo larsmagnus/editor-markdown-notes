@@ -1,8 +1,14 @@
 # Editor Markdown Notes
 
-A VS Code custom editor that opens `.md` files in a WYSIWYG editor with live preview, built on [TipTap](https://tiptap.dev) and React.
+A VS Code markdown WYSIWYG editor with live preview, built on [TipTap](https://tiptap.dev).
 
 ![A VSCode window editing markdown with Editor Markdown Notes](https://raw.githubusercontent.com/larsmagnus/editor-markdown-notes/main/public/screenshot-editor-markdown-notes.png)
+
+## Why
+
+- Plain markdown is ideal for editing but not for reading. I wanted one tool that excels at both without compromising on either.
+- There's more markdown than ever in development—specs, prompts, agent definitions, and config. A better writing and reading experience matters.
+- I love [Obsidian](https://obsidian.md) but prefer not switching windows.
 
 ## Features
 
