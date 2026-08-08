@@ -8,10 +8,12 @@
 		"rootDir": "src",
 		"strict": true,
 		"baseUrl": ".",
-		"skipLibCheck": true,
-		"paths": {
-			"@/*": ["./src/*"]
-		}
+		"skipLibCheck": true
+		// No `paths` mapping, deliberately. `tsc` does not rewrite path aliases, so
+		// `@/lib/x` would typecheck here and emit `require("@/lib/x")` verbatim,
+		// killing the extension with MODULE_NOT_FOUND on activation - a failure
+		// neither test suite can see. Omitting the mapping turns that into a
+		// typecheck error instead, which is why host code uses relative imports.
 	},
 	"include": [
 		"src/extension.ts",

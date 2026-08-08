@@ -1,6 +1,8 @@
 import type * as vscode from 'vscode'
 
-import type { LogLevel } from '@/shared/messages'
+// Relative, not `@/`: this module is also compiled by `tsconfig.extension.json`,
+// which has no `paths` mapping precisely so aliases cannot reach the host build.
+import type { LogLevel } from '../shared/messages'
 
 /**
  * Seeing inside a webview from the extension host. The page has its own console

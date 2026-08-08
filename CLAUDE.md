@@ -41,6 +41,22 @@ This is a VSCode extension for editing markdown in an live preview powered by a 
 
 Vitest takes `src/**/*.test.{ts,tsx}` except `src/test/**`. Keep webview tests out of `src/test/` - it's compiled by `tsconfig.extension.json`, which has no DOM lib.
 
+#### Complexity budget
+
+`pnpm complexity` gates CI at an FTA score of 50. `fta.json` is the source of truth for the cap and the exclusions; `scripts/check-complexity.ts` (the PostToolUse hook) reads the same file, and both pass `--score-cap` on the command line as well, because fta parses its config with `unwrap_or_default()` - a typo'd key silently reverts the cap to 1000 and CI goes green enforcing nothing. The hook parses `fta.json` with a `z.strictObject` so that mistake surfaces somewhere.
+
+Three things about the config that are easy to get wrong: fta looks for `<project>/fta.json`, and the script analyses `src`, so the root file only applies because of `--config-path`. Exclusion paths are relative to that analysed root, hence `/components/ui` rather than `src/components/ui`. And config values are appended to fta's defaults, never replace them. `fta.json` must be plain JSON - serde rejects comments.
+
+Only `src/components/ui/**` is excluded, matching the exemption `knip.jsonc` already grants vendored shadcn files. Tests and stories stay in scope on purpose: the metric then enforces the WET testing rule for free, since an extracted test helper costs more than the duplication it removes.
+
+The score is `(100/171) · [5.2·ln(U) + 0.23·C + 16.2·ln(L / ln C)]`, where `L` is lines excluding blanks and comments, `U` is unique operators plus operands, and `C` is cyclomatic complexity. Three consequences worth knowing before "simplifying" anything:
+
+- **Comments and blank lines are free.** This repo's comment density costs nothing.
+- **`C ≤ 2` zeroes the length term entirely**, because `ln(2) < 1` clamps the ratio to 1. A data table or a branch-free component is unbounded in length; `markdown-round-trip.test.ts` scores 16 at 369 lines. This is why a `Record` lookup beats parallel `switch` statements here twice over.
+- **`C = 3` is the worst possible value** - a ~38-point cliff up from `C = 2`, after which _more_ branching lowers the score until `C ≈ 24`. A 40-line module with one `if` guard can score worse than the file it was extracted from. Keep imperative modules under ~60 counted lines, and don't add redundant guards to extracted children.
+
+While refactoring use `npx fta src -c fta.json -s 1000 --format json` - a capped run exits on the first breach in walk order, not the worst one.
+
 ### VSCode Extension
 
 - `pnpm vscode:compile` - Compile TypeScript extension (`tsc -p ./tsconfig.extension.json`, then write the `out/package.json` CommonJS sentinel)
