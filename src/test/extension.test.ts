@@ -6,10 +6,9 @@ import * as path from 'path'
 import * as vscode from 'vscode'
 
 import {
-	buildContentSecurityPolicy,
 	getDocumentResourceRoots,
 	getImageBaseUris,
-} from '../extension'
+} from '../extension/image-base-uris'
 import { resolveImageSrc } from '../lib/resolve-image-src'
 import { getWebviewProblems } from '../lib/webview-diagnostics'
 
@@ -197,42 +196,6 @@ suite('Editor Markdown Notes', () => {
 		assert.strictEqual(config.get('hideToolbar'), false)
 		assert.strictEqual(config.get('centerContent'), false)
 		assert.strictEqual(config.get('textToolsTargetAge'), 16)
-	})
-
-	// Both directives fail silently: the diagram either never loads or draws
-	// with no styling, and nothing is reported anywhere.
-	test('serves a policy a rendered mermaid diagram can load under', () => {
-		const csp = buildContentSecurityPolicy('vscode-resource://test', 'abc123')
-
-		const directive = (name: string) =>
-			csp.split('; ').find((part) => part.startsWith(`${name} `)) ?? ''
-
-		// Mermaid's diagram bundles are imported on demand, and the entry script's
-		// nonce does not reach them.
-		assert.ok(
-			directive('script-src').includes('vscode-resource://test'),
-			'dynamically imported chunks should be allowed to load'
-		)
-		// A rendered diagram carries its own <style> element inside the SVG.
-		assert.ok(
-			directive('style-src').includes("'unsafe-inline'"),
-			'the styles mermaid embeds in its SVG should be allowed'
-		)
-	})
-
-	// `cspSource` would not do: it is a different origin from the webview
-	// document, and a worker has to be same-origin. The analyser is inlined and
-	// booted from a blob URL, which inherits this document's origin.
-	test('serves a policy the text tools worker can start under', () => {
-		const csp = buildContentSecurityPolicy('vscode-resource://test', 'abc123')
-
-		const workerSrc =
-			csp.split('; ').find((part) => part.startsWith('worker-src ')) ?? ''
-
-		assert.ok(
-			workerSrc.includes('blob:'),
-			'the inlined analysis worker should be allowed to start'
-		)
 	})
 
 	test('toggling raw and full width persists across invocations', async () => {

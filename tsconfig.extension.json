@@ -17,12 +17,21 @@
 	},
 	"include": [
 		"src/extension.ts",
+		"src/extension/**/*",
 		"src/shared/**/*",
 		"src/test/**/*",
-		// Pure and dependency-free, and their only `@/` imports are `import type`,
-		// so nothing survives to runtime that CommonJS would fail to resolve.
+		// Pure and dependency-free host-side modules. Listed one by one rather
+		// than as `src/lib/**/*`, which would drag the whole webview lib tree —
+		// zod, React, the retext stack — into the CommonJS host build. Their
+		// `*.test.ts` siblings stay out for the same reason: this project has no
+		// DOM lib and no vitest types.
+		"src/lib/content-security-policy.ts",
+		"src/lib/nonce.ts",
 		"src/lib/resolve-image-src.ts",
-		"src/lib/webview-diagnostics.ts"
+		"src/lib/script-literal.ts",
+		"src/lib/vite-manifest.ts",
+		"src/lib/webview-diagnostics.ts",
+		"src/lib/webview-html.ts"
 	],
 	"exclude": ["node_modules", "out"]
 }
