@@ -1,5 +1,7 @@
 import { useCurrentEditor } from '@tiptap/react'
 
+import { Checkbox } from '@/components/ui/checkbox'
+import { Field, FieldLabel } from '@/components/ui/field'
 import { findIssueRange } from '@/editor/text-tools-extension'
 import { RULES } from '@/lib/text-tools/rules'
 import { summarize } from '@/lib/text-tools/summarize'
@@ -85,18 +87,18 @@ export function TextToolsPanel({
 			<fieldset className="flex flex-col gap-1.5">
 				<legend className="sr-only">Checks to run</legend>
 				{TEXT_TOOL_RULE_IDS.map((ruleId) => (
-					<label
+					<Field
 						key={ruleId}
-						className="flex items-center gap-2"
+						orientation="horizontal"
 						title={RULES[ruleId].description}
 					>
-						<input
-							type="checkbox"
+						<Checkbox
+							id={ruleId}
 							checked={rules.includes(ruleId)}
-							onChange={(event) => toggleRule(ruleId, event.target.checked)}
+							onCheckedChange={(checked) => toggleRule(ruleId, !!checked)}
 						/>
-						{RULES[ruleId].label}
-					</label>
+						<FieldLabel htmlFor={ruleId}>{RULES[ruleId].label}</FieldLabel>
+					</Field>
 				))}
 			</fieldset>
 
