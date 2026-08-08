@@ -319,6 +319,74 @@ describe('escaping', () => {
 	it('still escapes a literal backslash', () => {
 		expect(roundTrip('C:\\Users\\name')).toBe('C:\\\\Users\\\\name')
 	})
+
+	it('does not escape an intraword underscore that cannot form emphasis', () => {
+		expect(roundTrip('snake_case_var')).toBe('snake_case_var')
+	})
+
+	it('does not escape an unrelated flanking asterisk with no real partner', () => {
+		expect(roundTrip('5 * 3 and a*b')).toBe('5 * 3 and a*b')
+	})
+
+	it('does not escape backtick runs whose lengths have no match elsewhere', () => {
+		expect(roundTrip('a`b c``d')).toBe('a`b c``d')
+	})
+
+	it('escapes a plain-text line shaped like a link reference definition', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editors.push(editor)
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{
+					type: 'paragraph',
+					content: [
+						{ type: 'text', text: '[MDN]: https://developer.mozilla.org' },
+					],
+				},
+			],
+		})
+
+		const markdown = String(editor.storage.markdown.getMarkdown()).trimEnd()
+		expect(markdown).toBe('\\[MDN]: https://developer.mozilla.org')
+
+		// The escaped bracket keeps this a visible paragraph on reload rather
+		// than a vanished reference definition.
+		const reloaded = new Editor({ extensions, content: '' })
+		editors.push(reloaded)
+		reloaded.commands.setContent(markdown)
+		expect(reloaded.getText()).toContain('MDN')
+	})
+
+	it('escapes asterisks that would otherwise re-parse as emphasis', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editors.push(editor)
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{ type: 'paragraph', content: [{ type: 'text', text: 'a*b*c' }] },
+			],
+		})
+
+		const markdown = String(editor.storage.markdown.getMarkdown()).trimEnd()
+		expect(markdown).toBe('a\\*b\\*c')
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
+	it('escapes backtick runs that share a length with another run in the text', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editors.push(editor)
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{ type: 'paragraph', content: [{ type: 'text', text: 'x`y``z`w' }] },
+			],
+		})
+
+		const markdown = String(editor.storage.markdown.getMarkdown()).trimEnd()
+		expect(markdown).toBe('x\\`y``z\\`w')
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
 })
 
 describe('italic markup', () => {
@@ -368,6 +436,30 @@ describe('italic markup', () => {
 
 		expect(String(editor.storage.markdown.getMarkdown()).trimEnd()).toBe(
 			'hello*world*'
+		)
+	})
+
+	it('removes italics even when the selection markup differs from the configured default', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editors.push(editor)
+		editor.commands.setContent('_italic text_')
+		editor.storage.italic.preferredMarkup = '*'
+		editor.commands.setTextSelection({ from: 1, to: 13 })
+		editor.commands.toggleItalic()
+
+		expect(String(editor.storage.markdown.getMarkdown()).trimEnd()).toBe(
+			'italic text'
+		)
+	})
+
+	it('uses the configured default marker for pasted HTML italics without a source markup', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editors.push(editor)
+		editor.storage.italic.preferredMarkup = '*'
+		editor.commands.insertContent('<p><em>foo</em></p>')
+
+		expect(String(editor.storage.markdown.getMarkdown()).trimEnd()).toBe(
+			'*foo*'
 		)
 	})
 })

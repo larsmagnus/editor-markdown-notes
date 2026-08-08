@@ -1,5 +1,7 @@
 import type { Mark, Node as ProseMirrorNode } from 'prosemirror-model'
 
+import { isWordChar } from '@/editor/word-boundary'
+
 function charBefore(
 	parent: ProseMirrorNode,
 	index: number
@@ -53,7 +55,7 @@ export function italicMarkup(
 
 	const before = charBefore(parent, start)
 	const after = charAfter(parent, end)
-	const intraword = (before && /\w/.test(before)) || (after && /\w/.test(after))
+	const intraword = isWordChar(before) || isWordChar(after)
 
 	return intraword ? '*' : '_'
 }

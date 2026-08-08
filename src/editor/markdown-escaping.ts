@@ -1,5 +1,15 @@
 import { MarkdownSerializerState } from 'prosemirror-markdown'
 
+import {
+	backtickRuns,
+	flankingAsteriskOffsets,
+	hasFlankingAsteriskPartner,
+	hasMatchingBacktickRun,
+} from '@/editor/markdown-escape-partners'
+import { isWordChar } from '@/editor/word-boundary'
+
+let patched = false
+
 /**
  * Patches `prosemirror-markdown`'s `esc()` - there's no serializer hook to
  * override it otherwise - so it only escapes a character when leaving it
@@ -7,31 +17,45 @@ import { MarkdownSerializerState } from 'prosemirror-markdown'
  * `` ` ``, `*`, `\`, `~`, `[`, `]` unconditionally, so e.g. `## [Unreleased]`
  * comes back as `## \[Unreleased\]` and `~44kB` as `\~44kB`.
  *
- * - `[` never escaped; `]` only before `(` or `[` (the only link/image risk).
+ * - `[` only escaped when it would start a link reference definition
+ *   (`[label]: destination`); `]` only before `(` or `[` (the only
+ *   link/image risk).
  * - `~` only escaped next to another `~` (needs a `~~` run to mean anything).
- * - `` ` ``/`*` only escaped when a partner exists elsewhere in the run
- *   (`*` also only when flanking non-whitespace).
+ * - `` ` ``/`*` only escaped when a same-length backtick run / flanking
+ *   asterisk partner exists elsewhere in the string - see
+ *   `markdown-escape-partners.ts`.
  * - `_` keeps the base intraword exception; `\` always escapes.
+ *
+ * `tiptap-markdown` builds its serializer state internally and exposes no
+ * way to scope a custom `esc` to it, so this patches the shared
+ * `prosemirror-markdown` prototype its subclass inherits from - process-wide
+ * by necessity, not by accident. The `patched` guard just keeps re-imports
+ * from reassigning the same function.
  */
 export function patchMarkdownEscaping(): void {
+	if (patched) return
+	patched = true
+
 	MarkdownSerializerState.prototype.esc = function (
 		this: MarkdownSerializerState,
 		str: string,
 		startOfLine = false
 	): string {
+		const asteriskOffsets = flankingAsteriskOffsets(str)
+		const runs = backtickRuns(str)
+
 		let escaped = str.replace(
 			/[`*\\~[\]_]/g,
 			(match: string, offset: number) => {
 				switch (match) {
 					case '_':
-						return offset > 0 &&
-							offset + 1 < str.length &&
-							/\w/.test(str[offset - 1]) &&
-							/\w/.test(str[offset + 1])
+						return isWordChar(str[offset - 1]) && isWordChar(str[offset + 1])
 							? match
 							: '\\' + match
 					case '[':
-						return match
+						return startOfLine && offset === 0 && /^\[[^\]]+\]:\s*\S/.test(str)
+							? '\\' + match
+							: match
 					case ']':
 						return str[offset + 1] === '(' || str[offset + 1] === '['
 							? '\\' + match
@@ -41,19 +65,11 @@ export function patchMarkdownEscaping(): void {
 							? '\\' + match
 							: match
 					case '`':
-						return str.slice(0, offset).includes('`') ||
-							str.slice(offset + 1).includes('`')
+						return hasMatchingBacktickRun(runs, offset) ? '\\' + match : match
+					case '*':
+						return hasFlankingAsteriskPartner(asteriskOffsets, offset)
 							? '\\' + match
 							: match
-					case '*': {
-						const flanking =
-							(offset + 1 < str.length && !/\s/.test(str[offset + 1])) ||
-							(offset > 0 && !/\s/.test(str[offset - 1]))
-						const hasPartner =
-							str.slice(0, offset).includes('*') ||
-							str.slice(offset + 1).includes('*')
-						return flanking && hasPartner ? '\\' + match : match
-					}
 					default:
 						return '\\' + match
 				}
