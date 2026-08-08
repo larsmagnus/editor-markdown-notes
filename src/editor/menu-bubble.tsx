@@ -1,16 +1,15 @@
 'use client'
 
-import { BubbleMenu } from '@tiptap/react'
+import { BubbleMenu, useCurrentEditor } from '@tiptap/react'
 
 import { BubbleMenuContent } from '@/editor/bubble-menu-content'
-import { useEditorTools } from '@/hooks/use-editor-tools'
 
 /**
  * A contextual menu that is only visible
  * when selecting text
  */
 export function MenuBubble() {
-	const { editor } = useEditorTools()
+	const { editor } = useCurrentEditor()
 
 	if (!editor) {
 		return null

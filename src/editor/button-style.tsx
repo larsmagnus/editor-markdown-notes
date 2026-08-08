@@ -1,8 +1,8 @@
 import type { ComponentProps } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { useEditorTools } from '@/hooks/use-editor-tools'
-import type { Style } from '@/hooks/use-editor-tools'
+import { useEditorStyles } from '@/hooks/use-editor-styles'
+import type { Style } from '@/hooks/use-editor-styles'
 import { cn } from '@/lib/utils'
 
 export function ButtonStyle({
@@ -13,7 +13,7 @@ export function ButtonStyle({
 }: ComponentProps<'button'> & {
 	style: Style
 }) {
-	const { toggleStyle, hasStyle, canToggleStyle } = useEditorTools()
+	const { toggleStyle, hasStyle, canToggleStyle } = useEditorStyles()
 
 	return (
 		<Button
