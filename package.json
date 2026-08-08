@@ -5,7 +5,7 @@
 	"publisher": "larsmagnus",
 	"author": "Lars Magnus Klavenes <larsmagnus@gmail.com> (https://larsmagnus.co)",
 	"license": "MIT",
-	"version": "0.16.1",
+	"version": "0.16.2",
 	"type": "module",
 	"private": true,
 	"repository": {
@@ -179,7 +179,7 @@
 		"vscode:sentinel": "mkdir -p out && echo '{\"type\":\"commonjs\"}' > out/package.json",
 		"vscode:compile": "tsc -p ./tsconfig.extension.json && pnpm vscode:sentinel",
 		"vscode:watch": "pnpm vscode:sentinel && tsc -watch -p ./tsconfig.extension.json",
-		"vscode:install": "pnpm install && npx @vscode/vsce package --no-dependencies && code --install-extension editor-markdown-notes-0.1.0.vsix",
+		"vscode:install": "pnpm install && npx @vscode/vsce package --no-dependencies && code --install-extension editor-markdown-notes-$npm_package_version.vsix",
 		"watch": "pnpm vscode:watch",
 		"pretest": "pnpm run build && pnpm run lint",
 		"test": "pnpm test:unit && pnpm test:extension",

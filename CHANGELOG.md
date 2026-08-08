@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.16.2] - 2026-08-08
+
+- Enable VSCode's native find widget (Cmd/Ctrl+F) inside the editor panel
+
 ## [0.16.1] - 2026-08-08
 
 - Fix markdown escaping bugs that corrupted saved files: unnecessary backslashes before headings/brackets, tildes, and unrelated asterisks/backticks, plus a `[label]: url`-shaped line silently disappearing on reload

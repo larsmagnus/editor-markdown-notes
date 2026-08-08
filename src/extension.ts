@@ -40,7 +40,12 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 
 	public register(): vscode.Disposable {
 		return vscode.Disposable.from(
-			vscode.window.registerCustomEditorProvider(VIEW_TYPE, this),
+			// `enableFindWidget` is what makes Cmd/Ctrl+F trigger VSCode's built-in
+			// webview find widget (searches rendered DOM text); it can only be set
+			// here, not on `webviewPanel.options`, which is read-only per-panel.
+			vscode.window.registerCustomEditorProvider(VIEW_TYPE, this, {
+				webviewOptions: { enableFindWidget: true },
+			}),
 			vscode.workspace.onDidChangeConfiguration((e) => {
 				if (e.affectsConfiguration(CONFIG_SECTION)) this.broadcastConfig()
 			})
