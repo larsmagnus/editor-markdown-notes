@@ -1,9 +1,13 @@
-import { Eye, EyeClosed, Maximize2, Minimize2, SpellCheck } from 'lucide-react'
 import { lazy, Suspense } from 'react'
 
 import type { DevFileSelectorProps } from '@/components/dev-file-selector'
 import ThemeToggle from '@/components/theme-toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import {
+	fromToggleValues,
+	toToggleValues,
+	VIEW_TOGGLES,
+} from '@/components/view-toggle-options'
 import { useSettings } from '@/hooks/use-settings'
 
 const DevFileSelector = import.meta.env.DEV
@@ -18,13 +22,6 @@ type ToolbarProps = {
 
 function Toolbar({ files, fileName, setFileName }: ToolbarProps) {
 	const { viewOptions, setViewOptions, isVSCodeContext } = useSettings()
-
-	// `onValueChange` below rebuilds every key from this array, so a toggle
-	// missing from either side gets reset the next time any other one is used.
-	const value: string[] = []
-	if (viewOptions.raw) value.push('raw')
-	if (viewOptions.fullWidth) value.push('max-w-full')
-	if (viewOptions.textTools) value.push('text-tools')
 
 	return (
 		<div
@@ -43,24 +40,14 @@ function Toolbar({ files, fileName, setFileName }: ToolbarProps) {
 
 			<ToggleGroup
 				type="multiple"
-				value={value}
-				onValueChange={(values) =>
-					setViewOptions({
-						raw: values.includes('raw'),
-						fullWidth: values.includes('max-w-full'),
-						textTools: values.includes('text-tools'),
-					})
-				}
+				value={toToggleValues(viewOptions)}
+				onValueChange={(values) => setViewOptions(fromToggleValues(values))}
 			>
-				<ToggleGroupItem value="raw" aria-label="Toggle raw markdown">
-					{viewOptions.raw ? <EyeClosed /> : <Eye />}
-				</ToggleGroupItem>
-				<ToggleGroupItem value="max-w-full" aria-label="Toggle full width">
-					{viewOptions.fullWidth ? <Maximize2 /> : <Minimize2 />}
-				</ToggleGroupItem>
-				<ToggleGroupItem value="text-tools" aria-label="Toggle text tools">
-					<SpellCheck />
-				</ToggleGroupItem>
+				{VIEW_TOGGLES.map(({ value, key, label, on: On, off: Off }) => (
+					<ToggleGroupItem key={value} value={value} aria-label={label}>
+						{viewOptions[key] ? <On /> : <Off />}
+					</ToggleGroupItem>
+				))}
 			</ToggleGroup>
 
 			<ThemeToggle />

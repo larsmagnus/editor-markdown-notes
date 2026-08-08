@@ -1,16 +1,9 @@
-import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
+import { ChevronsUpDownIcon } from 'lucide-react'
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 import { useState } from 'react'
 
+import { DevFileSelectorList } from '@/components/dev-file-selector-list'
 import { Button } from '@/components/ui/button'
-import {
-	Command,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-	CommandItem,
-	CommandList,
-} from '@/components/ui/command'
 import {
 	Popover,
 	PopoverContent,
@@ -35,6 +28,13 @@ function DevFileSelector({
 }: DevFileSelectorProps) {
 	const [open, setOpen] = useState(false)
 
+	const selectFile = (selected: string) => {
+		// Re-picking the open file clears the selection, the way a combobox
+		// deselects.
+		setValue(selected === value ? '' : selected)
+		setOpen(false)
+	}
+
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
@@ -51,32 +51,11 @@ function DevFileSelector({
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-[200px] p-0">
-				<Command>
-					<CommandInput placeholder="Search files..." />
-					<CommandList>
-						<CommandEmpty>No file found.</CommandEmpty>
-						<CommandGroup>
-							{values.map((item) => (
-								<CommandItem
-									key={item.value}
-									value={item.value}
-									onSelect={(currentValue) => {
-										setValue(currentValue === value ? '' : currentValue)
-										setOpen(false)
-									}}
-								>
-									<CheckIcon
-										className={cn(
-											'mr-2 h-4 w-4',
-											value === item.value ? 'opacity-100' : 'opacity-0'
-										)}
-									/>
-									{item.label}
-								</CommandItem>
-							))}
-						</CommandGroup>
-					</CommandList>
-				</Command>
+				<DevFileSelectorList
+					value={value}
+					values={values}
+					onSelect={selectFile}
+				/>
 			</PopoverContent>
 		</Popover>
 	)

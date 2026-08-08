@@ -2,11 +2,11 @@ import { useEditor } from '@tiptap/react'
 
 import { extensions } from '@/editor/extensions'
 import { useFrontmatterDocument } from '@/hooks/use-frontmatter-document'
+import { useHostDocument } from '@/hooks/use-host-document'
 import { useItalicMarker } from '@/hooks/use-italic-marker'
 import { useMarkdownAutosave } from '@/hooks/use-markdown-autosave'
 import { useSettings } from '@/hooks/use-settings'
 import { useTextTools } from '@/hooks/use-text-tools'
-import { useVSCode } from '@/hooks/use-vscode'
 import { splitFrontmatter } from '@/lib/frontmatter'
 
 /**
@@ -17,8 +17,8 @@ import { splitFrontmatter } from '@/lib/frontmatter'
  * and so the order these depend on each other is stated once.
  */
 export function useMarkdownEditor(content: string) {
-	const { isVSCodeContext, saveContent } = useVSCode()
-	const { viewOptions, settings } = useSettings()
+	const { viewOptions, settings, isVSCodeContext } = useSettings()
+	const { saveContent } = useHostDocument()
 
 	const editor = useEditor({
 		extensions,
