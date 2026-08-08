@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Fix the **Paragraph** and **Code block** toolbar buttons, which were permanently disabled and did nothing
+- Fix the raw markdown view appearing editable while silently discarding anything typed into it — it is now read-only, as it always effectively was
+- Fix switching demo notes quickly leaving the previously selected note on screen (standalone web app only)
+- Give the heading buttons accessible names, so a screen reader announces which level each one applies
+- Restructure the extension host and the editor internals to bring every file under the project's complexity budget; no other behaviour change
+
 ## [0.16.2] - 2026-08-08
 
 - Enable VSCode's native find widget (Cmd/Ctrl+F) inside the editor panel

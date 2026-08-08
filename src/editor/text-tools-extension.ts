@@ -22,7 +22,7 @@ import type { TextIssue } from '@/lib/text-tools/types'
 /** An issue with its offsets already resolved to document positions. */
 export type PlacedIssue = TextIssue & { from: number; to: number }
 
-export const textToolsPluginKey = new PluginKey<DecorationSet>('textTools')
+const textToolsPluginKey = new PluginKey<DecorationSet>('textTools')
 
 function toDecorations(
 	doc: Parameters<typeof DecorationSet.create>[0],
