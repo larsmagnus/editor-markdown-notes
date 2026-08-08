@@ -50,11 +50,20 @@ function useContent({
 	useEffect(() => {
 		if (!enabled) return
 
+		// Switching files leaves the previous fetch in flight. Without this guard a
+		// slow, now-stale response overwrites the note the selector actually shows.
+		let current = true
+
 		async function getContent() {
-			setContent(await fetchNote(fileName))
+			const next = await fetchNote(fileName)
+			if (current) setContent(next)
 		}
 
 		getContent()
+
+		return () => {
+			current = false
+		}
 	}, [fileName, enabled])
 
 	return { fileName, setFileName, content, files }

@@ -215,6 +215,41 @@ describe('Editor', () => {
 		expect(link).toHaveAttribute('href', 'https://example.com')
 	})
 
+	describe('syncing the content prop', () => {
+		/**
+		 * In VSCode the host echoes each autosave back as an `update`, so the
+		 * editor is routinely handed markdown equivalent to what it already holds.
+		 * The document has to survive that untouched.
+		 */
+		it('keeps the document when the host echoes back equivalent markdown', async () => {
+			const { rerender } = render(<Editor content={'# Roadmap\n\nShip it.'} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			await userEvent.click(screen.getByText('Ship it.'))
+			await userEvent.keyboard(' Today.')
+
+			// What the host would write to disk and send straight back.
+			rerender(<Editor content={'# Roadmap\n\nShip it. Today.'} />)
+
+			await userEvent.keyboard(' Really.')
+
+			expect(screen.getByText('Ship it. Today. Really.')).toBeInTheDocument()
+		})
+
+		it('adopts genuinely new content from the host', async () => {
+			const { rerender } = render(<Editor content={'# Roadmap\n\nShip it.'} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+
+			rerender(<Editor content={'# Backlog\n\nSoon.'} />)
+
+			expect(
+				await screen.findByRole('heading', { name: 'Backlog' })
+			).toBeInTheDocument()
+			expect(screen.getByText('Soon.')).toBeInTheDocument()
+		})
+	})
+
 	describe('frontmatter', () => {
 		const FRONTMATTER_NOTE = [
 			'---',

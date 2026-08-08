@@ -20,6 +20,9 @@ export function ButtonHeading({
 			type="button"
 			variant="ghost"
 			size="sm"
+			// Both menus pass an icon as `children`, which leaves the button with no
+			// accessible name of its own. `rest` still wins, so a caller can override.
+			title={`Heading ${level}`}
 			onClick={() => toggleHeadingByLevel(level)}
 			className={cn(
 				className,

@@ -122,7 +122,7 @@ export function useEditorTools() {
 				return editor?.can().chain().focus().toggleCode().run() ?? false
 			}
 			case 'blockquote': {
-				return editor?.chain().focus().toggleBlockquote().run() ?? false
+				return editor?.can().chain().focus().toggleBlockquote().run() ?? false
 			}
 		}
 	}

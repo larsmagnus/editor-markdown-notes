@@ -133,7 +133,10 @@ function Editor({
 		if (!editor || content === undefined) return
 
 		const { frontmatter: nextFrontmatter, body } = splitFrontmatter(content)
-		if (editor.getHTML() !== body) {
+		// Compared like for like. This read `editor.getHTML() !== body`, which
+		// weighed rendered HTML against markdown source - never equal, so the guard
+		// never held and every incoming update re-set the document.
+		if (editor.storage.markdown.getMarkdown() !== body) {
 			editor.commands.setContent(body)
 		}
 
