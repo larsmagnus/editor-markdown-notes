@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.16.1] - 2026-08-08
+
+- Fix markdown escaping bugs that corrupted saved files: unnecessary backslashes before headings/brackets, tildes, and unrelated asterisks/backticks, plus a `[label]: url`-shaped line silently disappearing on reload
+- **Preserve the italic marker (`_` or `*`) a file was already using** instead of always rewriting it to `*` on save, and add an `editorMarkdownNotes.italicMarker` setting for which marker fresh italics (toolbar, bubble menu, Cmd/Ctrl+I) use
+
 ## [0.16.0] - 2026-08-08
 
 - **Add `editor-markdown-notes.toggleHideToolbar` command**, and rename the `editorMarkdownNotes.hideNav` setting to `editorMarkdownNotes.hideToolbar` (it hides a toolbar, not a navigation bar)
