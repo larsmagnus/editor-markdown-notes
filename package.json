@@ -182,7 +182,7 @@
 		"typecheck": "tsc -b --noEmit && tsc -p ./tsconfig.extension.json --noEmit",
 		"lint": "pnpm typecheck && oxlint --fix && oxfmt",
 		"lint:ci": "oxlint && oxfmt --check",
-		"complexity": "fta src --score-cap 70",
+		"complexity": "fta src --score-cap 50",
 		"knip": "knip",
 		"preview": "vite preview",
 		"storybook": "storybook dev -p 6006",
