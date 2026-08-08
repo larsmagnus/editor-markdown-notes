@@ -11,6 +11,7 @@ import type {
 	ExtensionSettings,
 	HostToWebview,
 	ImageBaseUris,
+	ItalicMarker,
 	Theme,
 	ViewOptions,
 	WebviewToHost,
@@ -80,6 +81,10 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			textToolsTargetAge: config.get<number>(
 				'textToolsTargetAge',
 				DEFAULT_SETTINGS.textToolsTargetAge
+			),
+			italicMarker: config.get<ItalicMarker>(
+				'italicMarker',
+				DEFAULT_SETTINGS.italicMarker
 			),
 		}
 	}

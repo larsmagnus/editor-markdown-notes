@@ -3,7 +3,6 @@ import { Color } from '@tiptap/extension-color'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import ListItem from '@tiptap/extension-list-item'
-import Table from '@tiptap/extension-table'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
@@ -11,148 +10,29 @@ import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import TextStyle from '@tiptap/extension-text-style'
 import type { TextStyleOptions } from '@tiptap/extension-text-style'
-import {
-	Extension,
-	getHTMLFromFragment,
-	mergeAttributes,
-	ReactNodeViewRenderer,
-} from '@tiptap/react'
+import { mergeAttributes, ReactNodeViewRenderer } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import type { MarkdownSerializerState } from 'prosemirror-markdown'
-import type { Node as ProseMirrorNode } from 'prosemirror-model'
 import { Markdown } from 'tiptap-markdown'
 
 import { CodeBlockView } from '@/editor/code-block-view'
+import { CodeExtension } from '@/editor/code-extension'
+import { ItalicExtension } from '@/editor/italic-extension'
+import { patchMarkdownEscaping } from '@/editor/markdown-escaping'
+import { StrictLinkify } from '@/editor/strict-linkify-extension'
+import { MarkdownTable } from '@/editor/table-extension'
 import { TextTools } from '@/editor/text-tools-extension'
 import { resolveImageSrc } from '@/lib/resolve-image-src'
 
-/**
- * The subset of markdown-it we touch. The package is a transitive dependency of
- * `tiptap-markdown` and is not resolvable from here, so the shape is declared
- * rather than imported.
- */
-interface MarkdownIt {
-	linkify: {
-		set: (options: { fuzzyLink: boolean; fuzzyEmail: boolean }) => void
-	}
-}
+patchMarkdownEscaping()
 
 /**
- * With linkify on, markdown-it's fuzzy matching treats any prose that looks like
- * a domain as a link - so a heading reading `notes.md` is rewritten to
- * `[notes.md](http://notes.md)` on the first auto-save. Only linkify URLs that
- * carry an explicit scheme.
+ * The TipTap schema the editor runs on. `tiptap-markdown`'s table/task-list/
+ * image serializers only activate when a same-named extension is
+ * registered - without the nodes below, markdown-it parses them into HTML
+ * that the schema then drops, and the next auto-save writes the loss to disk.
  *
- * `tiptap-markdown` calls `parse.setup` with its markdown-it instance on every
- * parse, which is the only hook it offers for configuring the parser.
- */
-const StrictLinkify = Extension.create({
-	name: 'strictLinkify',
-	addStorage: () => ({
-		markdown: {
-			parse: {
-				setup(markdownit: MarkdownIt) {
-					markdownit.linkify.set({ fuzzyLink: false, fuzzyEmail: false })
-				},
-			},
-		},
-	}),
-})
-
-/** `tiptap-markdown` adds `inTable` to prosemirror-markdown's state. */
-type TableSerializerState = MarkdownSerializerState & { inTable: boolean }
-
-/**
- * Does this table fit GFM's grid? Merged cells and headers outside the first
- * row have no markdown syntax, so those tables are written out as HTML.
- */
-function isGfmTable(table: ProseMirrorNode): boolean {
-	const rows = Array.from({ length: table.childCount }, (_, i) =>
-		table.child(i)
-	)
-	const [headerRow, ...bodyRows] = rows
-	const cellsOf = (row: ProseMirrorNode) =>
-		Array.from({ length: row.childCount }, (_, i) => row.child(i))
-	const isSpanned = (cell: ProseMirrorNode) =>
-		Number(cell.attrs.colspan) > 1 || Number(cell.attrs.rowspan) > 1
-
-	if (!headerRow) return false
-
-	return (
-		cellsOf(headerRow).every(
-			(cell) => cell.type.name === 'tableHeader' && !isSpanned(cell)
-		) &&
-		bodyRows.every((row) =>
-			cellsOf(row).every(
-				(cell) => cell.type.name !== 'tableHeader' && !isSpanned(cell)
-			)
-		)
-	)
-}
-
-/**
- * `tiptap-markdown`'s own table serializer reaches into `cell.firstChild` for
- * the paragraph TipTap normally wraps cell content in. Cells here hold inline
- * content directly, so the cell is rendered instead of its first child.
- */
-const MarkdownTable = Table.configure({ resizable: false }).extend({
-	addStorage() {
-		return {
-			markdown: {
-				serialize(state: TableSerializerState, node: ProseMirrorNode) {
-					if (!isGfmTable(node)) {
-						const schema = node.type.schema
-						state.write(
-							getHTMLFromFragment(
-								schema.topNodeType.create(null, node).content,
-								schema
-							)
-						)
-						state.closeBlock(node)
-						return
-					}
-
-					// Hard breaks serialize differently inside a table row.
-					state.inTable = true
-
-					node.forEach((row, _offset, rowIndex) => {
-						state.write('| ')
-						row.forEach((cell, _cellOffset, cellIndex) => {
-							if (cellIndex) state.write(' | ')
-							if (cell.textContent.trim()) state.renderInline(cell)
-						})
-						state.write(' |')
-						state.ensureNewLine()
-
-						if (rowIndex === 0) {
-							const delimiters = Array.from(
-								{ length: row.childCount },
-								() => '---'
-							)
-							state.write(`| ${delimiters.join(' | ')} |`)
-							state.ensureNewLine()
-						}
-					})
-
-					state.closeBlock(node)
-					state.inTable = false
-				},
-				parse: {
-					// handled by markdown-it
-				},
-			},
-		}
-	},
-})
-
-/**
- * The TipTap schema the editor runs on.
- *
- * `tiptap-markdown` ships serializers for tables, task lists and images, but
- * each one only activates when a TipTap extension of the matching name is
- * registered. Without the nodes below, markdown-it still parses these into
- * HTML and the ProseMirror schema then drops them - so they vanish from the
- * editor, and the next auto-save writes the loss back to disk.
+ * `Code`/`Italic`/`Table` are StarterKit's defaults disabled and replaced by
+ * their own file in this folder - see each for why.
  */
 export const extensions = [
 	Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -171,9 +51,9 @@ export const extensions = [
 			keepMarks: true,
 			keepAttributes: false,
 		},
-		// Replaced below. StarterKit's copy cannot be extended in place, and two
-		// extensions of the same name cannot both be registered.
 		codeBlock: false,
+		code: false,
+		italic: false,
 	}),
 	// The name stays `codeBlock`, which is what keeps `tiptap-markdown`'s fenced
 	// block serializer attached. The node view only changes how a block is drawn:
@@ -181,6 +61,11 @@ export const extensions = [
 	CodeBlock.extend({
 		addNodeView: () => ReactNodeViewRenderer(CodeBlockView),
 	}),
+	// Order nests marks: Italic before Code so `*text `code` text*` nests as
+	// `*` around the backticks rather than the reverse (mark rank, not source
+	// order, decides nesting - see each file's comment for why they coexist).
+	ItalicExtension,
+	CodeExtension,
 	// Column resizing needs handle styling and a toolbar to be worth it - tables
 	// are edited in place instead, with Tab/Shift-Tab moving between cells.
 	MarkdownTable,

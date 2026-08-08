@@ -77,6 +77,15 @@ function Editor({
 		targetAge: settings.textToolsTargetAge,
 	})
 
+	// The italic mark reads this at the moment a new italic is created (see
+	// `Italic.extend` in extensions.ts) - `extensions` is built once, so the
+	// only way for `editorMarkdownNotes.italicMarker` to reach it live is
+	// through mutable storage rather than an extension option.
+	useEffect(() => {
+		if (!editor) return
+		editor.storage.italic.preferredMarkup = settings.italicMarker
+	}, [editor, settings.italicMarker])
+
 	// Handle manual save requests (e.g., from Cmd+S)
 	useEffect(() => {
 		if (!isVSCodeContext || !editor) return

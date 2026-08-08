@@ -104,6 +104,11 @@ const extensionSettingsSchema = z
 				description:
 					'Reading age the readability check scores against. Maps to `editorMarkdownNotes.textToolsTargetAge`.',
 			}),
+		italicMarker: z.enum(['_', '*']).catch(DEFAULT_SETTINGS.italicMarker).meta({
+			title: 'Italic marker',
+			description:
+				'Marker used when italicizing from the editor itself. Maps to `editorMarkdownNotes.italicMarker`.',
+		}),
 	})
 	.catch(DEFAULT_SETTINGS)
 	.meta({
