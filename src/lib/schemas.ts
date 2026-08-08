@@ -131,6 +131,19 @@ export const configSchema = z
 			'Injected into the page as `window.initialConfig` before the bundle runs, so the first render already has the right theme and width.',
 	})
 
+export const updateMessageSchema = z
+	.object({
+		type: z.literal('update'),
+		content: z.string(),
+		fileName: z.string(),
+	})
+	.meta({
+		id: 'UpdateMessage',
+		title: 'Document update',
+		description:
+			'Posted by the host whenever the underlying file changes. No `.catch()`, for the same reason as the config broadcast below: anything that fails to parse is not ours.',
+	})
+
 export const configMessageSchema = z
 	.object({
 		type: z.literal('config'),

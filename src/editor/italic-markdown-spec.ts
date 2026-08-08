@@ -1,7 +1,5 @@
-import type { MarkdownSerializerState } from 'prosemirror-markdown'
-import type { Mark, Node as ProseMirrorNode } from 'prosemirror-model'
-
 import { italicMarkup } from '@/editor/italic-markup'
+import type { MarkSerializerSide } from '@/editor/mark-serializer'
 import type { MarkdownIt } from '@/editor/markdown-it-types'
 
 /**
@@ -14,18 +12,15 @@ import type { MarkdownIt } from '@/editor/markdown-it-types'
 export function italicMarkdownSpec() {
 	return {
 		serialize: {
-			open: (
-				_state: MarkdownSerializerState,
-				mark: Mark,
-				parent: ProseMirrorNode,
-				index: number
-			) => italicMarkup(mark, parent, index, 'open'),
-			close: (
-				_state: MarkdownSerializerState,
-				mark: Mark,
-				parent: ProseMirrorNode,
-				index: number
-			) => italicMarkup(mark, parent, index, 'close'),
+			open: ((_state, mark, parent, index) =>
+				italicMarkup(mark, parent, index, 'open')) satisfies MarkSerializerSide,
+			close: ((_state, mark, parent, index) =>
+				italicMarkup(
+					mark,
+					parent,
+					index,
+					'close'
+				)) satisfies MarkSerializerSide,
 			mixable: true,
 			// No `expelEnclosingWhitespace`: it corrupts output with function
 			// delimiters like ours.

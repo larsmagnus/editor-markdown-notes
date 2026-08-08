@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { useEditorTools } from '@/hooks/use-editor-tools'
-import type { HeadingLevel } from '@/hooks/use-editor-tools'
+import type { HeadingLevel } from '@/lib/heading-levels'
 import { cn } from '@/lib/utils'
 
 export function ButtonHeading({

@@ -134,6 +134,8 @@ export function useTextTools({
 
 		run().catch((error) => {
 			if (cancelled) return
+			// The error object, not `errorMessage(error)` - devtools renders a stack
+			// from it, and nothing here needs a string.
 			console.error('Text tools analysis failed:', error)
 			setIsAnalyzing(false)
 		})

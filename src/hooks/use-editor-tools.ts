@@ -1,6 +1,8 @@
 import { useCurrentEditor } from '@tiptap/react'
 import { useState } from 'react'
 
+import type { HeadingLevel } from '@/lib/heading-levels'
+
 type TextStyle =
 	| 'italic'
 	| 'bold'
@@ -12,7 +14,6 @@ type TextStyle =
 	| 'none'
 type ListStyle = 'ordered' | 'unordered' | 'none'
 export type Style = ListStyle | TextStyle
-export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
 
 export function useEditorTools() {
 	const { editor } = useCurrentEditor()

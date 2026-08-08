@@ -1,22 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import type { Config, ImageBaseUris, WebviewToHost } from '@/shared/messages'
+import { getVSCodeApi } from '@/lib/vscode-api'
 
-interface VSCodeAPI {
-	postMessage: (message: WebviewToHost) => void
-	getState: () => unknown
-	setState: (state: unknown) => void
-}
-
-declare global {
-	interface Window {
-		vscode?: VSCodeAPI
-		initialContent?: string
-		fileName?: string
-		initialConfig?: Config
-		imageBaseUris?: ImageBaseUris
-	}
-}
+type VSCodeAPI = NonNullable<ReturnType<typeof getVSCodeApi>>
 
 export function useVSCode() {
 	const [vscode, setVscode] = useState<VSCodeAPI | null>(null)

@@ -5,14 +5,13 @@ import type {
 	PropsWithChildren,
 } from 'react'
 
+import type { HeadingLevel } from '@/lib/heading-levels'
 import { cn } from '@/lib/utils'
-
-type HeadingLevels = 1 | 2 | 3 | 4 | 5 | 6
 
 interface HeadingProps extends PropsWithChildren<
 	DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>
 > {
-	level: HeadingLevels
+	level: HeadingLevel
 }
 
 /**
