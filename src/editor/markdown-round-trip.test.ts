@@ -188,10 +188,23 @@ describe('features that already worked keep working', () => {
 		expect(roundTrip(markdown)).toBe(markdown)
 	})
 
-	it('keeps bold, italic and strikethrough, normalising italics to asterisks', () => {
+	it('keeps bold, italic and strikethrough, preserving whichever italic marker was used', () => {
 		expect(
 			roundTrip('**Bold text** and _italic text_ and ~~struck text~~')
-		).toBe('**Bold text** and *italic text* and ~~struck text~~')
+		).toBe('**Bold text** and _italic text_ and ~~struck text~~')
+		expect(roundTrip('*italic text*')).toBe('*italic text*')
+	})
+
+	it('keeps one contiguous bold run around inline code', () => {
+		expect(roundTrip('**Add `x` command**')).toBe('**Add `x` command**')
+	})
+
+	it('keeps one contiguous italic run around inline code', () => {
+		expect(roundTrip('*Add `x` command*')).toBe('*Add `x` command*')
+	})
+
+	it('keeps one contiguous strikethrough run around inline code', () => {
+		expect(roundTrip('~~Add `x` command~~')).toBe('~~Add `x` command~~')
 	})
 
 	it('keeps inline code', () => {
@@ -259,5 +272,102 @@ describe('features that already worked keep working', () => {
 		].join('\n')
 
 		expect(roundTrip(markdown)).toBe(markdown)
+	})
+})
+
+describe('escaping', () => {
+	it('does not escape brackets in a heading', () => {
+		expect(roundTrip('## [Unreleased]')).toBe('## [Unreleased]')
+	})
+
+	it('does not escape brackets in prose that are not part of a link', () => {
+		expect(roundTrip('See [notes] for details.')).toBe(
+			'See [notes] for details.'
+		)
+	})
+
+	it('escapes a closing bracket immediately followed by an opening paren', () => {
+		expect(roundTrip('Weird](but not a link) case.')).toBe(
+			'Weird\\](but not a link) case.'
+		)
+	})
+
+	it('does not escape a lone tilde used as an approximation sign', () => {
+		expect(roundTrip('the ~44kB gzipped stack')).toBe('the ~44kB gzipped stack')
+	})
+
+	it('keeps a single-backtick fence around code containing a triple-backtick run', () => {
+		expect(roundTrip('fenced ` ```mermaid ` code blocks')).toBe(
+			'fenced ` ```mermaid ` code blocks'
+		)
+	})
+
+	it('does not escape an unpaired backtick', () => {
+		expect(roundTrip("It's a 'tick, not a `backtick.")).toBe(
+			"It's a 'tick, not a `backtick."
+		)
+	})
+
+	it('does not escape a spaced, non-flanking asterisk', () => {
+		expect(roundTrip('5 * 3 = 15')).toBe('5 * 3 = 15')
+	})
+
+	it('does not escape a flanking asterisk with no closing partner', () => {
+		expect(roundTrip('Rated 5*')).toBe('Rated 5*')
+	})
+
+	it('still escapes a literal backslash', () => {
+		expect(roundTrip('C:\\Users\\name')).toBe('C:\\\\Users\\\\name')
+	})
+})
+
+describe('italic markup', () => {
+	it('preserves an underscore-delimited italic', () => {
+		expect(roundTrip('_italic text_')).toBe('_italic text_')
+	})
+
+	it('preserves an asterisk-delimited italic', () => {
+		expect(roundTrip('*italic text*')).toBe('*italic text*')
+	})
+
+	it('preserves each marker independently within one paragraph', () => {
+		expect(roundTrip('_one_ and *two*')).toBe('_one_ and *two*')
+	})
+
+	it('uses the configured default marker for a fresh italic with no source markup', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editors.push(editor)
+		editor.commands.setContent('hello world')
+		editor.commands.setTextSelection({ from: 1, to: 6 })
+		editor.commands.toggleItalic()
+
+		expect(String(editor.storage.markdown.getMarkdown()).trimEnd()).toBe(
+			'_hello_ world'
+		)
+	})
+
+	it('respects a configured asterisk default for a fresh italic', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editors.push(editor)
+		editor.commands.setContent('hello world')
+		editor.storage.italic.preferredMarkup = '*'
+		editor.commands.setTextSelection({ from: 1, to: 6 })
+		editor.commands.toggleItalic()
+
+		expect(String(editor.storage.markdown.getMarkdown()).trimEnd()).toBe(
+			'*hello* world'
+		)
+	})
+
+	it('falls back to an asterisk when the default marker would land mid-word', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editors.push(editor)
+		editor.commands.setContent('helloworld')
+		editor.commands.setTextSelection({ from: 6, to: 11 })
+		editor.commands.toggleItalic()
+
+		expect(String(editor.storage.markdown.getMarkdown()).trimEnd()).toBe(
+			'hello*world*'
+		)
 	})
 })

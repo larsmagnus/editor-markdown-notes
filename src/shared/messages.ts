@@ -34,6 +34,8 @@ export type ViewOptions = {
 	textToolRules: TextToolRuleId[]
 }
 
+export type ItalicMarker = '_' | '*'
+
 export type ExtensionSettings = {
 	centerContent: boolean
 	hideToolbar: boolean
@@ -43,6 +45,12 @@ export type ExtensionSettings = {
 	 * (see `VERY_HARD_AGE_OFFSET` for why six).
 	 */
 	textToolsTargetAge: number
+	/**
+	 * Marker used when italicizing from the editor itself, not when parsing an
+	 * existing file - italics already on disk keep whichever marker they were
+	 * written with (see `Italic.extend` in `src/editor/extensions.ts`).
+	 */
+	italicMarker: ItalicMarker
 }
 
 export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
@@ -57,6 +65,7 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
 	centerContent: false,
 	hideToolbar: false,
 	textToolsTargetAge: 16,
+	italicMarker: '_',
 }
 
 /**
