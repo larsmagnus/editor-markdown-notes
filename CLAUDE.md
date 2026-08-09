@@ -43,21 +43,14 @@ Vitest takes `src/**/*.test.{ts,tsx}` except `src/test/**`. Keep webview tests o
 
 #### Complexity budget
 
-`pnpm complexity` gates CI at an FTA score of 50. `fta.json` is the source of truth for the cap and the exclusions; `scripts/check-complexity.ts` (the PostToolUse hook) reads the same file, and both pass `--score-cap` on the command line as well, because fta parses its config with `unwrap_or_default()` - a typo'd key silently reverts the cap to 1000 and CI goes green enforcing nothing. The hook parses `fta.json` with a `z.strictObject` so that mistake surfaces somewhere.
+`pnpm complexity` gates CI at an FTA score of 50; `fta.json` holds the cap and the exclusions.
 
-Three things about the config that are easy to get wrong: fta looks for `<project>/fta.json`, and the script analyses `src`, so the root file only applies because of `--config-path`. Exclusion paths are relative to that analysed root, hence `/components/ui` rather than `src/components/ui`. And config values are appended to fta's defaults, never replace them. `fta.json` must be plain JSON - serde rejects comments.
-
-Only `src/components/ui/**` is excluded, matching the exemption `knip.jsonc` already grants vendored shadcn files. Tests and stories stay in scope on purpose: the metric then enforces the WET testing rule for free, since an extracted test helper costs more than the duplication it removes.
-
-The score is `(100/171) · [5.2·ln(U) + 0.23·C + 16.2·ln(L / ln C)]`, where `L` is lines excluding blanks and comments, `U` is unique operators plus operands, and `C` is cyclomatic complexity. Three consequences worth knowing before "simplifying" anything:
-
-- **Comments and blank lines are free.** This repo's comment density costs nothing.
-- **`C ≤ 2` zeroes the length term entirely**, because `ln(2) < 1` clamps the ratio to 1. A data table or a branch-free component is unbounded in length; `markdown-round-trip.test.ts` scores 16 at 369 lines. This is why a `Record` lookup beats parallel `switch` statements here twice over.
-- **`C = 3` is the worst possible value** - a ~38-point cliff up from `C = 2`, after which _more_ branching lowers the score until `C ≈ 24`. A 40-line module with one `if` guard can score worse than the file it was extracted from. Keep imperative modules under ~60 counted lines, and don't add redundant guards to extracted children.
-
-While refactoring use `npx fta src -c fta.json -s 1000 --format json` - a capped run exits on the first breach in walk order, not the worst one.
-
-Aim to land a file you are already editing at 45 or below, so the next unrelated change to it does not break CI. Roughly a dozen sit in the 45-50 band and are fine where they are; a score just under the cap is not on its own a reason to touch a file. Splitting has a real cost - `dev-file-selector.tsx` sits at 48 because pulling its trigger out into a component would have meant re-implementing Radix's `asChild` prop forwarding, which is a worse trade than three points.
+- Aim for 45 or below on a file you are already editing, so the next unrelated change to it does not break CI. A dozen files sit in the 45-50 band and are fine there - a score near the cap is not on its own a reason to touch a file.
+- **`C ≤ 2` makes length free**, because `ln(2) < 1` clamps the length term. A data table or a branch-free component can be any length, which is why a `Record` lookup beats parallel `switch` statements here.
+- **`C = 3` is the worst possible value** - a ~38-point cliff above `C = 2`, after which _more_ branching lowers the score until `C ≈ 24`. An extracted 40-line module with one `if` guard can score worse than its parent, so don't add redundant guards to extracted children.
+- Comments and blank lines don't count, so never strip them to hit the budget.
+- Use `npx fta src -c fta.json -s 1000 --format json` while refactoring - a capped run stops at the first breach in walk order, not the worst.
+- The CI script and the PostToolUse hook both pass `--score-cap` explicitly, and must stay in step with `fta.json`: fta parses its config with `unwrap_or_default()`, so a typo'd key silently reverts the cap to 1000 and CI enforces nothing.
 
 ### VSCode Extension
 
