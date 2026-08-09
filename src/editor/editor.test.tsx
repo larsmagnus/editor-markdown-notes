@@ -10,15 +10,16 @@ import { updateNotes } from '@/lib/update-notes'
 vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 
 // Mermaid draws by measuring text, which happy-dom has no layout engine for.
-// Stubbing the library keeps these tests about what the editor does with a
-// diagram - show it, hide the source, report a parse failure - rather than
-// about mermaid's own output.
-const mermaid = vi.hoisted(() => ({
-	initialize: vi.fn(),
-	render: vi.fn(),
-}))
-
-vi.mock('mermaid', () => ({ default: mermaid }))
+// Stubbing it keeps these tests about what the editor does with a diagram -
+// show it, hide the source, report a parse failure - rather than about
+// mermaid's own output. Stubbed at this boundary rather than the `mermaid`
+// package itself: `renderMermaid` reaches it through a dynamic `import()`,
+// and two blocks mounting together call that concurrently - mocking a
+// dynamically-imported module does not reliably survive being raced like
+// that, so one block would intermittently get the real, un-mocked mermaid
+// instead of the stub.
+const renderMermaid = vi.hoisted(() => vi.fn())
+vi.mock('@/lib/render-mermaid', () => ({ renderMermaid }))
 
 // The bubble menu positions itself with tippy, which measures the DOM and
 // throws in happy-dom the moment anything moves the selection. Nothing here
@@ -28,7 +29,9 @@ vi.mock('@/editor/menu-bubble', () => ({ MenuBubble: () => null }))
 const MERMAID_NOTE = ['```mermaid', 'graph TD', '  A --> B', '```'].join('\n')
 
 beforeEach(() => {
-	mermaid.render.mockResolvedValue({ svg: '<svg data-testid="diagram"></svg>' })
+	renderMermaid.mockResolvedValue({
+		svg: '<svg data-testid="diagram"></svg>',
+	})
 })
 
 afterEach(() => {
@@ -129,9 +132,9 @@ describe('Editor', () => {
 			expect(diagram.querySelector('svg')).toBeInTheDocument()
 		})
 
-		expect(mermaid.render).toHaveBeenCalledWith(
-			expect.any(String),
-			'graph TD\n  A --> B'
+		expect(renderMermaid).toHaveBeenCalledWith(
+			'graph TD\n  A --> B',
+			expect.any(Boolean)
 		)
 	})
 
@@ -139,7 +142,7 @@ describe('Editor', () => {
 	// the first diagram exists - and if that import fails there is no diagram at
 	// all. Either way the block must not read as empty.
 	it('shows the source until the diagram has rendered', async () => {
-		mermaid.render.mockReturnValue(new Promise(() => {}))
+		renderMermaid.mockReturnValue(new Promise(() => {}))
 
 		render(<Editor content={MERMAID_NOTE} />)
 
@@ -198,7 +201,7 @@ describe('Editor', () => {
 	// A diagram that will not parse renders nothing, so without the message the
 	// block looks identical to an empty one and there is no way to fix it.
 	it('reports the parse error when a mermaid block is invalid', async () => {
-		mermaid.render.mockRejectedValue(new Error('Parse error on line 1'))
+		renderMermaid.mockResolvedValue({ error: 'Parse error on line 1' })
 
 		render(<Editor content={['```mermaid', 'graph ??', '```'].join('\n')} />)
 
