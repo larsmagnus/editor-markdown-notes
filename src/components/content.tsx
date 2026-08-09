@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 
+import { AppErrorBoundary } from '@/components/app-error-boundary'
 import { NoteBody } from '@/components/note-body'
 import { useNoteSource } from '@/hooks/use-note-source'
 import { useSettings } from '@/hooks/use-settings'
@@ -28,13 +29,15 @@ function Content({ defaultFileName }: ContentProps) {
 	return (
 		<div className="h-screen overflow-auto">
 			{!settings.hideToolbar && (
-				<Suspense fallback={null}>
-					<Toolbar
-						files={files}
-						fileName={fileName}
-						setFileName={setFileName}
-					/>
-				</Suspense>
+				<AppErrorBoundary title="The toolbar">
+					<Suspense fallback={null}>
+						<Toolbar
+							files={files}
+							fileName={fileName}
+							setFileName={setFileName}
+						/>
+					</Suspense>
+				</AppErrorBoundary>
 			)}
 
 			<main className="grid p-3 min-h-screen">

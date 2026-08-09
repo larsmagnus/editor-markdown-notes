@@ -1,3 +1,4 @@
+import { AppErrorBoundary } from '@/components/app-error-boundary'
 import { RawMarkdownEditor } from '@/components/raw-markdown-editor'
 import Editor from '@/editor/editor'
 
@@ -26,7 +27,15 @@ export function NoteBody({
 		)
 	}
 
+	// Contained rather than fatal, so the toolbar survives and raw mode stays
+	// reachable as the escape hatch for a note that will not parse.
 	return (
-		<Editor content={content} includeProseBaseClassNames className={className} />
+		<AppErrorBoundary title="The editor" resetKeys={[content]}>
+			<Editor
+				content={content}
+				includeProseBaseClassNames
+				className={className}
+			/>
+		</AppErrorBoundary>
 	)
 }
