@@ -15,5 +15,6 @@ type Story = StoryObj<typeof meta>
 export const Primary: Story = {
 	args: {
 		level: 1,
+		children: 'Heading',
 	},
 }

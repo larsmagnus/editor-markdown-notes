@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { Field } from './field'
+import { Checkbox } from './checkbox'
+import { Field, FieldLabel } from './field'
 
 const meta = {
 	component: Field,
@@ -13,5 +14,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Primary: Story = {
-	args: {},
+	args: {
+		orientation: 'horizontal',
+		children: (
+			<>
+				<Checkbox id="field-demo" />
+				<FieldLabel htmlFor="field-demo">Label</FieldLabel>
+			</>
+		),
+	},
 }

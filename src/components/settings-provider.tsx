@@ -7,14 +7,29 @@ import { readInitialSettings } from '@/lib/initial-settings'
 import { configMessageSchema } from '@/lib/schemas'
 import { writeStoredViewOptions } from '@/lib/view-options-storage'
 import { getVSCodeApi, isVSCodeWebview } from '@/lib/vscode-api'
-import type { ViewOptions } from '@/shared/messages'
+import type { ExtensionSettings, ViewOptions } from '@/shared/messages'
 
-export function SettingsProvider({ children }: PropsWithChildren) {
+type SettingsProviderProps = PropsWithChildren<{
+	initialViewOptions?: Partial<ViewOptions>
+	initialSettings?: Partial<ExtensionSettings>
+}>
+
+export function SettingsProvider({
+	children,
+	initialViewOptions,
+	initialSettings,
+}: SettingsProviderProps) {
 	// The host injects `window.vscode` before the bundle runs, so this is known
 	// on the very first render - which is why it is the app's single source for
 	// the answer.
 	const isVSCodeContext = isVSCodeWebview()
-	const [state, setState] = useState(readInitialSettings)
+	const [state, setState] = useState(() => {
+		const initial = readInitialSettings()
+		return {
+			viewOptions: { ...initial.viewOptions, ...initialViewOptions },
+			settings: { ...initial.settings, ...initialSettings },
+		}
+	})
 
 	// Lets `setViewOptions` read the current options without depending on them,
 	// so the callback stays stable and the writes stay outside the reducer.

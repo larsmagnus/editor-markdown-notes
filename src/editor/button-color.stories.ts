@@ -15,5 +15,6 @@ type Story = StoryObj<typeof meta>
 export const Primary: Story = {
 	args: {
 		color: '#e11d48',
+		className: 'bg-red-500 hover:bg-red-300',
 	},
 }

@@ -15,7 +15,7 @@ type Story = StoryObj<typeof meta>
 
 export const Primary: Story = {
 	args: {
-		value: null,
+		value: 'title: Editor Markdown Notes\ntags: [testing, markdown]',
 		onChange: fn(),
 	},
 }

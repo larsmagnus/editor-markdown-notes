@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ToggleGroup } from './toggle-group'
+import { ToggleGroup, ToggleGroupItem } from './toggle-group'
 
 const meta = {
 	component: ToggleGroup,
@@ -15,5 +15,11 @@ type Story = StoryObj<typeof meta>
 export const Primary: Story = {
 	args: {
 		type: 'single',
+		children: (
+			<>
+				<ToggleGroupItem value="bold">Bold</ToggleGroupItem>
+				<ToggleGroupItem value="italic">Italic</ToggleGroupItem>
+			</>
+		),
 	},
 }
