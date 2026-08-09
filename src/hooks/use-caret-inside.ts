@@ -18,9 +18,15 @@ export function useCaretInside({
 
 	useEffect(() => {
 		const update = () => {
-			if (typeof getPos !== 'function') return setInside(false)
+			// Guarded on the position rather than on `getPos` itself: a node view
+			// ProseMirror has already detached keeps its `getPos` function, which
+			// then returns `undefined`. Replacing the document dispatches
+			// `selectionUpdate` synchronously, before React runs the dead view's
+			// effect cleanup, so this listener does fire - and `nodeAt(undefined)`
+			// throws out of the effect and takes the editor down with it.
+			const start = typeof getPos === 'function' ? getPos() : undefined
+			if (start === undefined) return setInside(false)
 
-			const start = getPos()
 			const node = editor.state.doc.nodeAt(start)
 			const { from, to } = editor.state.selection
 

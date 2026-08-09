@@ -25,12 +25,15 @@ export function MermaidBlock({ node, editor, getPos }: MermaidBlockProps) {
 	// Moving the caret into the block is what reveals the source - there is no
 	// separate editing flag to set.
 	const startEditing = () => {
-		if (typeof getPos !== 'function') return
+		// `getPos` survives the node view being detached and returns `undefined`
+		// from then on, which would make this `NaN`. See `useCaretInside`.
+		const pos = typeof getPos === 'function' ? getPos() : undefined
+		if (pos === undefined) return
 
 		editor
 			.chain()
 			.focus()
-			.setTextSelection(getPos() + 1)
+			.setTextSelection(pos + 1)
 			.run()
 	}
 

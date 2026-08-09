@@ -248,6 +248,48 @@ describe('Editor', () => {
 			).toBeInTheDocument()
 			expect(screen.getByText('Soon.')).toBeInTheDocument()
 		})
+
+		/**
+		 * Replacing the document destroys any node view the new one has no room
+		 * for, and ProseMirror dispatches `selectionUpdate` synchronously inside
+		 * that same replacement - before React runs the destroyed view's effect
+		 * cleanup. The dead listener therefore still fires, with a `getPos` that
+		 * now returns `undefined`. Passing that to `doc.nodeAt` threw out of an
+		 * effect and unmounted the whole app, which is what switching from
+		 * `notes.md` (two diagrams) to `other-note.md` (one) used to do.
+		 */
+		it('survives switching to a note with fewer mermaid blocks', async () => {
+			// A trailing paragraph in both, so autofocus lands the caret there rather
+			// than inside the last block - a block holding the caret shows its source
+			// instead of its diagram.
+			const twoDiagrams = [
+				MERMAID_NOTE,
+				'',
+				'```mermaid',
+				'graph LR',
+				'  C --> D',
+				'```',
+				'',
+				'Two diagrams above.',
+			].join('\n')
+
+			const { rerender } = render(<Editor content={twoDiagrams} />)
+
+			await waitFor(() => {
+				expect(
+					screen.getAllByRole('button', { name: /diagram/i })
+				).toHaveLength(2)
+			})
+
+			rerender(<Editor content={`${MERMAID_NOTE}\n\nOne diagram left.`} />)
+
+			expect(await screen.findByText('One diagram left.')).toBeInTheDocument()
+			await waitFor(() => {
+				expect(
+					screen.getAllByRole('button', { name: /diagram/i })
+				).toHaveLength(1)
+			})
+		})
 	})
 
 	describe('frontmatter', () => {
