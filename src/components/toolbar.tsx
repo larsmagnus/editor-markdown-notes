@@ -1,6 +1,10 @@
 import { lazy, Suspense } from 'react'
 
 import type { DevFileSelectorProps } from '@/components/dev-file-selector'
+import {
+	editModeFromViewOptions,
+	EDIT_MODE_OPTIONS,
+} from '@/components/edit-mode-options'
 import ThemeToggle from '@/components/theme-toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import {
@@ -9,6 +13,7 @@ import {
 	VIEW_TOGGLES,
 } from '@/components/view-toggle-options'
 import { useSettings } from '@/hooks/use-settings'
+import { getVSCodeApi } from '@/lib/vscode-api'
 
 const DevFileSelector = import.meta.env.DEV
 	? lazy(() => import('@/components/dev-file-selector'))
@@ -22,6 +27,22 @@ type ToolbarProps = {
 
 function Toolbar({ files, fileName, setFileName }: ToolbarProps) {
 	const { viewOptions, setViewOptions, isVSCodeContext } = useSettings()
+
+	const editModeOptions = isVSCodeContext
+		? EDIT_MODE_OPTIONS
+		: EDIT_MODE_OPTIONS.filter((option) => option.value !== 'text')
+
+	// Radix fires '' when the active item is re-clicked; ignore it so the group
+	// always shows raw or live as selected. 'text' never becomes the persisted
+	// mode - the webview may be gone by the time the host has acted on it.
+	function handleEditModeChange(value: string) {
+		if (value === '') return
+		if (value === 'text') {
+			getVSCodeApi()?.postMessage({ type: 'openInTextEditor' })
+			return
+		}
+		setViewOptions({ raw: value === 'raw' })
+	}
 
 	return (
 		<div
@@ -39,12 +60,34 @@ function Toolbar({ files, fileName, setFileName }: ToolbarProps) {
 			)}
 
 			<ToggleGroup
+				type="single"
+				value={editModeFromViewOptions(viewOptions)}
+				onValueChange={handleEditModeChange}
+			>
+				{editModeOptions.map(({ value, label, icon: Icon }) => (
+					<ToggleGroupItem
+						key={value}
+						value={value}
+						aria-label={label}
+						title={label}
+					>
+						<Icon />
+					</ToggleGroupItem>
+				))}
+			</ToggleGroup>
+
+			<ToggleGroup
 				type="multiple"
 				value={toToggleValues(viewOptions)}
 				onValueChange={(values) => setViewOptions(fromToggleValues(values))}
 			>
 				{VIEW_TOGGLES.map(({ value, key, label, on: On, off: Off }) => (
-					<ToggleGroupItem key={value} value={value} aria-label={label}>
+					<ToggleGroupItem
+						key={value}
+						value={value}
+						aria-label={label}
+						title={label}
+					>
 						{viewOptions[key] ? <On /> : <Off />}
 					</ToggleGroupItem>
 				))}

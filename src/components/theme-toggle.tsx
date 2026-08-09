@@ -36,6 +36,7 @@ function ThemeToggle({ children, className, ...rest }: ThemeToggleProps) {
 					type="button"
 					variant="ghost"
 					className={cn('h-auto relative', className)}
+					title="Toggle theme"
 					{...rest}
 				>
 					<span className="relative">

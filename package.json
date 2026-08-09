@@ -110,6 +110,11 @@
 				"category": "Editor Markdown Notes"
 			},
 			{
+				"command": "editor-markdown-notes.openInTextEditor",
+				"title": "Open in text editor",
+				"category": "Editor Markdown Notes"
+			},
+			{
 				"command": "editor-markdown-notes.toggleHideToolbar",
 				"title": "Toggle toolbar",
 				"category": "Editor Markdown Notes"
@@ -165,6 +170,10 @@
 				},
 				{
 					"command": "editor-markdown-notes.selectTheme",
+					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+				},
+				{
+					"command": "editor-markdown-notes.openInTextEditor",
 					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
 				},
 				{
@@ -259,7 +268,7 @@
 		"class-variance-authority": "0.7.1",
 		"clsx": "2.1.1",
 		"cmdk": "1.1.1",
-		"lucide-react": "0.525.0",
+		"lucide-react": "1.30.0",
 		"mermaid": "11.16.1",
 		"prosemirror-markdown": "1.13.5",
 		"prosemirror-model": "1.25.11",

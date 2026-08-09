@@ -8,18 +8,14 @@ import { DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
 
 /**
  * The toggle group rebuilds every option from the values it hands back, so a
- * key missing from either direction silently resets itself. All eight
+ * key missing from either direction silently resets itself. All four
  * combinations round-trip to prove neither direction has a gap.
  */
 const COMBINATIONS = [
-	{ raw: false, fullWidth: false, textTools: false },
-	{ raw: true, fullWidth: false, textTools: false },
-	{ raw: false, fullWidth: true, textTools: false },
-	{ raw: false, fullWidth: false, textTools: true },
-	{ raw: true, fullWidth: true, textTools: false },
-	{ raw: true, fullWidth: false, textTools: true },
-	{ raw: false, fullWidth: true, textTools: true },
-	{ raw: true, fullWidth: true, textTools: true },
+	{ fullWidth: false, textTools: false },
+	{ fullWidth: true, textTools: false },
+	{ fullWidth: false, textTools: true },
+	{ fullWidth: true, textTools: true },
 ]
 
 describe('view toggle round trip', () => {
@@ -48,9 +44,8 @@ describe('toToggleValues', () => {
 
 describe('fromToggleValues', () => {
 	it('ignores a value that belongs to no toggle', () => {
-		expect(fromToggleValues(['raw', 'something-else'])).toEqual({
-			raw: true,
-			fullWidth: false,
+		expect(fromToggleValues(['max-w-full', 'something-else'])).toEqual({
+			fullWidth: true,
 			textTools: false,
 		})
 	})

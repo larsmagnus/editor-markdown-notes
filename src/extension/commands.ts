@@ -5,6 +5,7 @@ import type { ViewOptions } from '../shared/messages'
 
 import { CONFIG_SECTION } from './constants'
 import { openFile } from './open-file-command'
+import { openInTextEditor } from './open-in-text-editor-command'
 import type { SettingsStore } from './settings-store'
 import { pickTheme } from './theme-picker'
 
@@ -30,6 +31,20 @@ async function toggleHideToolbar() {
 	)
 }
 
+/**
+ * Resolves the active tab's document, needed because `activeTextEditor` is
+ * unset while a custom editor (not a text editor) has focus.
+ */
+function openActiveTabInTextEditor() {
+	const tab = vscode.window.tabGroups.activeTabGroup.activeTab
+	const uri =
+		tab?.input instanceof vscode.TabInputCustom ? tab.input.uri : undefined
+
+	if (!uri) return
+
+	return openInTextEditor(uri)
+}
+
 export function registerCommands(
 	store: SettingsStore,
 	log: vscode.LogOutputChannel,
@@ -42,25 +57,21 @@ export function registerCommands(
 		})
 	)
 
-	return vscode.Disposable.from(
-		...toggles,
-		// Two ids share one handler: `openFile` reads well in the command palette
-		// ("Editor Markdown Notes: Open file"), `openMarkdownEditor` reads well in
-		// the context menus, where the category is not shown.
-		vscode.commands.registerCommand('editor-markdown-notes.openFile', openFile),
-		vscode.commands.registerCommand(
-			'editor-markdown-notes.openMarkdownEditor',
-			openFile
-		),
-		vscode.commands.registerCommand('editor-markdown-notes.selectTheme', () =>
-			pickTheme(store, broadcastConfig)
-		),
-		vscode.commands.registerCommand(
-			'editor-markdown-notes.toggleHideToolbar',
-			toggleHideToolbar
-		),
-		vscode.commands.registerCommand('editor-markdown-notes.showLogs', () =>
-			log.show()
-		)
+	// Two ids share `openFile`: it reads well in the command palette
+	// ("Editor Markdown Notes: Open file"), `openMarkdownEditor` reads well in
+	// the context menus, where the category is not shown.
+	const simpleCommands: Record<string, () => unknown> = {
+		'editor-markdown-notes.openFile': openFile,
+		'editor-markdown-notes.openMarkdownEditor': openFile,
+		'editor-markdown-notes.selectTheme': () =>
+			pickTheme(store, broadcastConfig),
+		'editor-markdown-notes.openInTextEditor': openActiveTabInTextEditor,
+		'editor-markdown-notes.toggleHideToolbar': toggleHideToolbar,
+		'editor-markdown-notes.showLogs': () => log.show(),
+	}
+	const simple = Object.entries(simpleCommands).map(([command, handler]) =>
+		vscode.commands.registerCommand(command, handler)
 	)
+
+	return vscode.Disposable.from(...toggles, ...simple)
 }

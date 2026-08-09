@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added a Text Editor button that reopens the file in VSCode's built-in text editor
+- Changed the raw markdown toggle into three buttons: Text Editor, Raw Editor, Live Editor
+
 ## [0.17.0] - 2026-08-09
 
 - Added editing to the raw markdown view, which autosaves and saves on Cmd/Ctrl+S like the rich editor

@@ -6,6 +6,7 @@ import type { WebviewToHost } from '../shared/messages'
 
 import type { DocumentWriter } from './document-updates'
 import { postDocumentUpdate } from './document-updates'
+import { openInTextEditor } from './open-in-text-editor-command'
 import type { SettingsStore } from './settings-store'
 
 type WebviewMessageHandlers = {
@@ -50,6 +51,9 @@ export function createWebviewMessageHandlers({
 			broadcastConfig()
 		},
 		log: (message) => recordWebviewLog(log, message.level, message.message),
+		openInTextEditor: () => {
+			void openInTextEditor(document.uri)
+		},
 	}
 }
 

@@ -73,6 +73,7 @@ All four are shared across open tabs and persist between sessions.
 | `editor-markdown-notes.toggleFullWidth`    | Toggle full width               | Toggle whether the content fills the available width        |
 | `editor-markdown-notes.toggleTextTools`    | Toggle text tools               | Show or hide the writing-checks sidebar                     |
 | `editor-markdown-notes.selectTheme`        | Select theme                    | Choose the editor color theme (dark, light, or system)      |
+| `editor-markdown-notes.openInTextEditor`   | Open in text editor             | Reopen the current file with VSCode's built-in text editor  |
 | `editor-markdown-notes.toggleHideToolbar`  | Toggle toolbar                  | Show or hide the toolbar                                    |
 | `editor-markdown-notes.showLogs`           | Show logs                       | Open the output channel used to debug a blank panel         |
 

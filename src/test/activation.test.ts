@@ -41,6 +41,7 @@ suite('Activation and contributions', () => {
 			'editor-markdown-notes.toggleFullWidth',
 			'editor-markdown-notes.toggleTextTools',
 			'editor-markdown-notes.selectTheme',
+			'editor-markdown-notes.openInTextEditor',
 		]) {
 			assert.ok(commands.includes(command), `${command} should be registered`)
 		}

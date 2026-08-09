@@ -97,6 +97,12 @@ export type WebviewToHost =
 	| { type: 'getContent' }
 	| { type: 'setViewOptions'; viewOptions: ViewOptions }
 	/**
+	 * Asks the host to reopen this document with VSCode's built-in text editor.
+	 * Deliberately not part of `ViewOptions` - the webview may be disposed the
+	 * moment the host acts on it, so there is nothing to persist.
+	 */
+	| { type: 'openInTextEditor' }
+	/**
 	 * Diagnostics from inside the webview. Nothing in there reaches the extension
 	 * host's console, so without this a script that fails to load or throws on
 	 * mount just leaves a blank panel.

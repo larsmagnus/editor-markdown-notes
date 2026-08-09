@@ -1,12 +1,12 @@
-import { Eye, EyeClosed, Maximize2, Minimize2, SpellCheck } from 'lucide-react'
+import { Maximize2, Minimize2, SpellCheck } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import type { ViewOptions } from '@/shared/messages'
 
-type BooleanViewOption = 'raw' | 'fullWidth' | 'textTools'
+type BooleanViewOption = 'fullWidth' | 'textTools'
 
 /**
- * The toolbar's toggles, in display order.
+ * The toolbar's boolean toggles, in display order.
  *
  * One table drives both directions. The toggle group hands back the whole list
  * of pressed values, so the handler rebuilds every option from it - and a toggle
@@ -21,13 +21,6 @@ export const VIEW_TOGGLES: {
 	on: LucideIcon
 	off: LucideIcon
 }[] = [
-	{
-		value: 'raw',
-		key: 'raw',
-		label: 'Toggle raw markdown',
-		on: EyeClosed,
-		off: Eye,
-	},
 	{
 		value: 'max-w-full',
 		key: 'fullWidth',
@@ -64,7 +57,6 @@ export function fromToggleValues(
 	}
 
 	return {
-		raw: isPressed('raw'),
 		fullWidth: isPressed('fullWidth'),
 		textTools: isPressed('textTools'),
 	}
