@@ -1,16 +1,19 @@
 # Change Log
 
-All notable changes to the "editor-markdown-notes" extension will be documented in this file.
+All notable changes to the "editor-markdown-notes" extension are documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-- Fix the **Paragraph** and **Code block** toolbar buttons, which were permanently disabled and did nothing
-- Fix the raw markdown view appearing editable while silently discarding anything typed into it — it is now read-only, as it always effectively was
-- Fix switching demo notes quickly leaving the previously selected note on screen (standalone web app only)
-- Give the heading buttons accessible names, so a screen reader announces which level each one applies
-- Restructure the extension host and the editor internals to bring every file under the project's complexity budget; no other behaviour change
+## [0.17.0] - 2026-08-09
+
+- Added editing to the raw markdown view, which autosaves and saves on Cmd/Ctrl+S like the rich editor
+- Changed a failure in the toolbar, the document, the writing tools or a diagram to show an error with a Try again button instead of blanking the panel
+- Fixed the editor going blank when switching to a note with fewer diagrams
+- Fixed an emptied note never being saved
+- Fixed switching demo notes quickly leaving the previous note on screen
+- Fixed the heading buttons not announcing their level to screen readers
 
 ## [0.16.2] - 2026-08-08
 
