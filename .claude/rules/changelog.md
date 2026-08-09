@@ -1,9 +1,11 @@
 ---
 paths:
-  - 'CHANGELOG.md'
+  - 'CHANGELOG.md,package.json'
 ---
 
-# Changelog Rules
+# Versioning & Changelog Rules
+
+`pnpm version minor` after a `feat` commit, `pnpm version patch` after `fix`/`perf`, `major` bumped manually for breaking changes only. Nothing for `chore`/`build`/`docs`/`test`/`refactor`. Log each bump in `CHANGELOG.md` under a matching `## [x.y.z]` heading.
 
 Entries are for people using the extension, not for whoever wrote the code. Short and plain beats complete.
 
