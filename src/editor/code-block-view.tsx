@@ -2,6 +2,7 @@ import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 
 import { AppErrorBoundary } from '@/components/app-error-boundary'
+import { CodeBlockCopyButton } from '@/editor/code-block-copy-button'
 import { MermaidBlock } from '@/editor/mermaid-block'
 import { MERMAID_LANGUAGE } from '@/editor/mermaid-language'
 
@@ -28,7 +29,8 @@ export function CodeBlockView({ node, editor, getPos }: NodeViewProps) {
 	}
 
 	return (
-		<NodeViewWrapper as="pre">
+		<NodeViewWrapper as="pre" className="group relative">
+			<CodeBlockCopyButton code={node.textContent} />
 			<NodeViewContent
 				as="code"
 				className={language ? `language-${language}` : undefined}

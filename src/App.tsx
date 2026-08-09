@@ -4,6 +4,7 @@ import { AppErrorBoundary } from '@/components/app-error-boundary'
 import Content from '@/components/content'
 import { SettingsProvider } from '@/components/settings-provider'
 import { ThemeProvider } from '@/components/theme-provider'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 function App({
 	defaultFileName = 'notes.md',
@@ -14,7 +15,9 @@ function App({
 		<AppErrorBoundary title="The editor">
 			<SettingsProvider>
 				<ThemeProvider>
-					<Content defaultFileName={defaultFileName} />
+					<TooltipProvider delayDuration={300}>
+						<Content defaultFileName={defaultFileName} />
+					</TooltipProvider>
 				</ThemeProvider>
 			</SettingsProvider>
 		</AppErrorBoundary>

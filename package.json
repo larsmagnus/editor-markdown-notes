@@ -247,6 +247,7 @@
 		"@radix-ui/react-slot": "1.2.3",
 		"@radix-ui/react-toggle": "1.1.9",
 		"@radix-ui/react-toggle-group": "1.1.10",
+		"@radix-ui/react-tooltip": "1.2.16",
 		"@tiptap/core": "2.23.0",
 		"@tiptap/extension-code": "2.23.0",
 		"@tiptap/extension-code-block": "2.23.0",
