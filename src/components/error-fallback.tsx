@@ -23,7 +23,7 @@ export function ErrorFallback({
 	return (
 		<div
 			role="alert"
-			className="not-prose my-2 rounded-md border border-red-300 bg-red-50 p-3 text-sm dark:border-red-900 dark:bg-red-950/40"
+			className="not-prose my-2 h-fit rounded-md border border-red-300 bg-red-50 p-3 text-sm dark:border-red-900 dark:bg-red-950/40"
 		>
 			<p className="m-0 font-medium text-red-700 dark:text-red-300">
 				{title} stopped working
