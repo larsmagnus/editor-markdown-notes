@@ -33,6 +33,7 @@ export function EditorSurface({
 						className={cn(
 							includeProseBaseClassNames &&
 								'prose dark:prose-invert prose-headings:font-bold prose-headings:text-black dark:prose-headings:text-white',
+							'prose-code:before:content-none prose-code:after:content-none',
 							'prose-headings:first:mt-0 prose-p:first:mt-0',
 							'min-w-0 flex-1',
 							className
