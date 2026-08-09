@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 
-import Editor from '@/editor/editor'
+import { NoteBody } from '@/components/note-body'
 import { useNoteSource } from '@/hooks/use-note-source'
 import { useSettings } from '@/hooks/use-settings'
 import { contentWidthClassName } from '@/lib/content-width-class'
@@ -14,7 +14,7 @@ type ContentProps = {
 
 function Content({ defaultFileName }: ContentProps) {
 	const { viewOptions, settings } = useSettings()
-	const { content, fileName, setFileName, files } =
+	const { content, fileName, setFileName, files, saveContent } =
 		useNoteSource(defaultFileName)
 
 	const widthClassName = cn(
@@ -38,15 +38,12 @@ function Content({ defaultFileName }: ContentProps) {
 			)}
 
 			<main className="grid p-3 min-h-screen">
-				{viewOptions.raw ? (
-					<pre className={widthClassName}>{content}</pre>
-				) : (
-					<Editor
-						content={content}
-						includeProseBaseClassNames
-						className={widthClassName}
-					/>
-				)}
+				<NoteBody
+					content={content}
+					saveContent={saveContent}
+					raw={viewOptions.raw}
+					className={widthClassName}
+				/>
 			</main>
 		</div>
 	)

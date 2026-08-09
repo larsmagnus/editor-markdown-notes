@@ -26,6 +26,7 @@ export function useNoteSource(defaultFileName: string) {
 			// VSCode switches files by opening another editor, not through the app.
 			setFileName: () => {},
 			files: [],
+			saveContent: host.saveContent,
 		}
 	}
 
@@ -34,5 +35,8 @@ export function useNoteSource(defaultFileName: string) {
 		fileName: demo.fileName,
 		setFileName: demo.setFileName,
 		files: demo.files,
+		// Standalone there is no host to post to; `useNoteSave` routes to the
+		// `updateNotes` stub instead and never reaches this.
+		saveContent: host.saveContent,
 	}
 }
