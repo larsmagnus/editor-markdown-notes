@@ -7,8 +7,8 @@
 		"sourceMap": true,
 		"rootDir": "src",
 		"strict": true,
-		"baseUrl": ".",
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"types": ["mocha", "node"]
 		// No `paths` mapping, deliberately. `tsc` does not rewrite path aliases, so
 		// `@/lib/x` would typecheck here and emit `require("@/lib/x")` verbatim,
 		// killing the extension with MODULE_NOT_FOUND on activation - a failure
