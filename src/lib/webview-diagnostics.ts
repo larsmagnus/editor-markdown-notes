@@ -1,6 +1,7 @@
-import type * as vscode from 'vscode'
-
-import type { LogLevel } from '@/shared/messages'
+// Relative, not `@/`: this module is also compiled by `tsconfig.extension.json`,
+// which has no `paths` mapping precisely so aliases cannot reach the host build.
+import type { Logger } from '../shared/logger'
+import type { LogLevel } from '../shared/messages'
 
 /**
  * Seeing inside a webview from the extension host. The page has its own console
@@ -73,7 +74,7 @@ const PROBLEM_LIMIT = 100
 
 /** Mirrors a diagnostic the webview reported into the output channel. */
 export function recordWebviewLog(
-	log: vscode.LogOutputChannel,
+	log: Logger,
 	level: LogLevel,
 	message: string
 ) {

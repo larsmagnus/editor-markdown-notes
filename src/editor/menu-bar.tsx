@@ -1,10 +1,14 @@
+import { useCurrentEditor } from '@tiptap/react'
+
 import { Button } from '@/components/ui/button'
-import { ButtonHeading } from '@/editor/button-heading'
 import { ButtonStyle } from '@/editor/button-style'
-import { useEditorTools } from '@/hooks/use-editor-tools'
+import { HeadingButtons } from '@/editor/heading-buttons'
+import { MENU_BAR_COMMANDS } from '@/editor/menu-bar-commands'
+import { useEditorHistory } from '@/hooks/use-editor-history'
 
 export function MenuBar() {
-	const { editor, undo, canUndo, redo, canRedo } = useEditorTools()
+	const { editor } = useCurrentEditor()
+	const { undo, redo, canUndo, canRedo } = useEditorHistory()
 
 	if (!editor) {
 		return null
@@ -18,48 +22,27 @@ export function MenuBar() {
 			<ButtonStyle style="code" />
 			<ButtonStyle style="paragraph" />
 
-			<Button
-				type="button"
-				onClick={() => editor.chain().focus().unsetAllMarks().run()}
-			>
-				Clear marks
-			</Button>
-			<Button
-				type="button"
-				onClick={() => editor.chain().focus().clearNodes().run()}
-			>
-				Clear nodes
-			</Button>
+			{MENU_BAR_COMMANDS.map(({ label, apply }) => (
+				<Button
+					key={label}
+					type="button"
+					onClick={() => apply(editor.chain().focus()).run()}
+				>
+					{label}
+				</Button>
+			))}
 
-			<ButtonHeading level={1} />
-			<ButtonHeading level={2} />
-			<ButtonHeading level={3} />
-			<ButtonHeading level={4} />
-			<ButtonHeading level={5} />
-			<ButtonHeading level={6} />
+			<HeadingButtons />
 
 			<ButtonStyle style="unordered">Bullet list</ButtonStyle>
 			<ButtonStyle style="ordered">Ordered list</ButtonStyle>
 			<ButtonStyle style="codeBlock">Code block</ButtonStyle>
 			<ButtonStyle style="blockquote">Blockquote</ButtonStyle>
 
-			<Button
-				type="button"
-				onClick={() => editor.chain().focus().setHorizontalRule().run()}
-			>
-				Horizontal rule
-			</Button>
-			<Button
-				type="button"
-				onClick={() => editor.chain().focus().setHardBreak().run()}
-			>
-				Hard break
-			</Button>
-
-			<Button type="button" onClick={() => undo()} disabled={!canUndo()}>
+			<Button type="button" onClick={undo} disabled={!canUndo()}>
 				Undo
 			</Button>
-			<Button type="button" onClick={() => redo()} disabled={!canRedo()}>
+			<Button type="button" onClick={redo} disabled={!canRedo()}>
 				Redo
 			</Button>
 		</div>

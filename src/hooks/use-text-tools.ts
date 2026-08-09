@@ -1,21 +1,12 @@
 import type { Editor } from '@tiptap/react'
 import { useEffect, useRef, useState } from 'react'
-import { useDebounceValue } from 'usehooks-ts'
 
-import type { PlacedIssue } from '@/editor/text-tools-extension'
+import { useDocumentRevision } from '@/hooks/use-document-revision'
 import type { Analyzer } from '@/lib/text-tools/analyze-client'
-import {
-	getDocumentText,
-	offsetToPosition,
-} from '@/lib/text-tools/document-text'
+import { getDocumentText } from '@/lib/text-tools/document-text'
+import { placeIssues } from '@/lib/text-tools/place-issues'
 import type { Analysis } from '@/lib/text-tools/types'
 import type { TextToolRuleId } from '@/shared/messages'
-
-/**
- * Long enough that the analysis lands in a typing pause rather than between two
- * keystrokes, short enough that it feels immediate once you stop.
- */
-const ANALYSIS_DEBOUNCE_MS = 500
 
 const EMPTY_ANALYSIS: Analysis = { issues: [], sentenceCount: 0 }
 
@@ -43,27 +34,7 @@ export function useTextTools({
 	const [isAnalyzing, setIsAnalyzing] = useState(false)
 	const analyzerRef = useRef<Analyzer | null>(null)
 
-	// A counter rather than the document itself: `useDebounceValue` compares by
-	// identity, and every transaction produces a fresh doc object.
-	const [revision, setRevision] = useState(0)
-	const [debouncedRevision, setDebouncedRevision] = useDebounceValue(
-		0,
-		ANALYSIS_DEBOUNCE_MS
-	)
-
-	useEffect(() => {
-		setDebouncedRevision(revision)
-	}, [revision, setDebouncedRevision])
-
-	useEffect(() => {
-		if (!editor) return
-
-		const bump = () => setRevision((current) => current + 1)
-		editor.on('update', bump)
-		return () => {
-			editor.off('update', bump)
-		}
-	}, [editor])
+	const debouncedRevision = useDocumentRevision(editor)
 
 	// Re-run when the rules or the target age change, not just when the text
 	// does. A string, because `viewOptions.textToolRules` is rebuilt by its zod
@@ -113,27 +84,17 @@ export function useTextTools({
 			// debounce already has the next run queued.
 			if (cancelled || editor.isDestroyed) return
 
-			// Filtered here as well as in the worker, so the highlights and the
-			// panel - which filters the same analysis through `summarize` - can
-			// never disagree about which rules are on.
-			const enabledRules = new Set(rules)
-			const placed = result.issues.flatMap((issue): PlacedIssue[] => {
-				if (!enabledRules.has(issue.ruleId)) return []
-
-				const from = offsetToPosition(documentText, issue.start)
-				const to = offsetToPosition(documentText, issue.end)
-				if (from === null || to === null || from >= to) return []
-
-				return [{ ...issue, from, to }]
-			})
-
 			setAnalysis(result)
 			setIsAnalyzing(false)
-			editor.commands.setTextToolIssues(placed)
+			editor.commands.setTextToolIssues(
+				placeIssues(result.issues, documentText, new Set(rules))
+			)
 		}
 
 		run().catch((error) => {
 			if (cancelled) return
+			// The error object, not `errorMessage(error)` - devtools renders a stack
+			// from it, and nothing here needs a string.
 			console.error('Text tools analysis failed:', error)
 			setIsAnalyzing(false)
 		})

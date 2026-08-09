@@ -5,7 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Editor from '@/editor/editor'
 import { updateNotes } from '@/lib/update-notes'
 
-vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn() }))
+// Resolves rather than returning `undefined`: the real `updateNotes` is `async`
+// and the save effect attaches a rejection handler to what it hands back.
+vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 
 // Mermaid draws by measuring text, which happy-dom has no layout engine for.
 // Stubbing the library keeps these tests about what the editor does with a
@@ -215,6 +217,124 @@ describe('Editor', () => {
 		expect(link).toHaveAttribute('href', 'https://example.com')
 	})
 
+	describe('syncing the content prop', () => {
+		/**
+		 * In VSCode the host echoes each autosave back as an `update`, so the
+		 * editor is routinely handed markdown equivalent to what it already holds.
+		 * The document has to survive that untouched.
+		 */
+		it('keeps the document when the host echoes back equivalent markdown', async () => {
+			const { rerender } = render(<Editor content={'# Roadmap\n\nShip it.'} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			await userEvent.click(screen.getByText('Ship it.'))
+			await userEvent.keyboard(' Today.')
+
+			// What the host would write to disk and send straight back.
+			rerender(<Editor content={'# Roadmap\n\nShip it. Today.'} />)
+
+			await userEvent.keyboard(' Really.')
+
+			expect(screen.getByText('Ship it. Today. Really.')).toBeInTheDocument()
+		})
+
+		it('adopts genuinely new content from the host', async () => {
+			const { rerender } = render(<Editor content={'# Roadmap\n\nShip it.'} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+
+			rerender(<Editor content={'# Backlog\n\nSoon.'} />)
+
+			expect(
+				await screen.findByRole('heading', { name: 'Backlog' })
+			).toBeInTheDocument()
+			expect(screen.getByText('Soon.')).toBeInTheDocument()
+		})
+
+		/**
+		 * Replacing the document destroys any node view the new one has no room
+		 * for, and ProseMirror dispatches `selectionUpdate` synchronously inside
+		 * that same replacement - before React runs the destroyed view's effect
+		 * cleanup. The dead listener therefore still fires, with a `getPos` that
+		 * now returns `undefined`. Passing that to `doc.nodeAt` threw out of an
+		 * effect and unmounted the whole app, which is what switching from
+		 * `notes.md` (two diagrams) to `other-note.md` (one) used to do.
+		 */
+		it('survives switching to a note with fewer mermaid blocks', async () => {
+			// A trailing paragraph in both, so autofocus lands the caret there rather
+			// than inside the last block - a block holding the caret shows its source
+			// instead of its diagram.
+			const twoDiagrams = [
+				MERMAID_NOTE,
+				'',
+				'```mermaid',
+				'graph LR',
+				'  C --> D',
+				'```',
+				'',
+				'Two diagrams above.',
+			].join('\n')
+
+			const { rerender } = render(<Editor content={twoDiagrams} />)
+
+			await waitFor(() => {
+				expect(
+					screen.getAllByRole('button', { name: /diagram/i })
+				).toHaveLength(2)
+			})
+
+			rerender(<Editor content={`${MERMAID_NOTE}\n\nOne diagram left.`} />)
+
+			expect(await screen.findByText('One diagram left.')).toBeInTheDocument()
+			await waitFor(() => {
+				expect(
+					screen.getAllByRole('button', { name: /diagram/i })
+				).toHaveLength(1)
+			})
+		})
+	})
+
+	describe('saving', () => {
+		/**
+		 * Emptying a note without frontmatter serializes to `''`, which the
+		 * debounce used to be seeded with and guarded on truthiness - so the save
+		 * looked like the "nothing has been typed yet" state and never reached
+		 * disk. Deleting everything is exactly how an author clears a note to
+		 * start over, and the deletion has to survive a reload.
+		 */
+		it('saves a note the author has emptied entirely', async () => {
+			render(<Editor content={'# Roadmap\n\nShip it.'} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			await userEvent.click(screen.getByText('Ship it.'))
+			await userEvent.keyboard('{Control>}a{/Control}{Backspace}')
+
+			await waitFor(
+				() => {
+					expect(updateNotes).toHaveBeenCalledWith('')
+				},
+				{ timeout: 2000 }
+			)
+		})
+
+		it('autosaves an ordinary edit once the typing pauses', async () => {
+			render(<Editor content={'# Roadmap\n\nShip it.'} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			await userEvent.click(screen.getByText('Ship it.'))
+			await userEvent.keyboard(' Today.')
+
+			await waitFor(
+				() => {
+					expect(updateNotes).toHaveBeenCalledWith(
+						'# Roadmap\n\nShip it. Today.'
+					)
+				},
+				{ timeout: 2000 }
+			)
+		})
+	})
+
 	describe('frontmatter', () => {
 		const FRONTMATTER_NOTE = [
 			'---',
@@ -252,6 +372,25 @@ describe('Editor', () => {
 
 			await screen.findByRole('heading', { name: 'Roadmap' })
 			expect(screen.queryByLabelText('Frontmatter')).not.toBeInTheDocument()
+		})
+
+		// Only the body was deleted, so the fences and their keys have to survive
+		// it - an emptied body is not an emptied file.
+		it('saves a body the author has emptied, keeping the frontmatter', async () => {
+			render(<Editor content={FRONTMATTER_NOTE} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			await userEvent.click(screen.getByText('Ship it.'))
+			await userEvent.keyboard('{Control>}a{/Control}{Backspace}')
+
+			await waitFor(
+				() => {
+					expect(updateNotes).toHaveBeenCalledWith(
+						'---\ntitle: Roadmap\nstatus: draft\n---\n\n'
+					)
+				},
+				{ timeout: 2000 }
+			)
 		})
 
 		it('saves edits to the panel with the frontmatter fences preserved', async () => {

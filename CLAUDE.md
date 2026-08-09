@@ -10,7 +10,7 @@ Only add a line here if a future session couldn't cheaply rediscover it by readi
 
 This is a VSCode extension for editing markdown in an live preview powered by a React web application. Main project components include:
 
-- **VSCode Extension**: Entry point at `src/extension.ts` — registers the custom editor and commands, owns settings and persisted view options; compiles to `out/extension.js`. The root package is `type: "module"` for Vite, but the extension host needs CommonJS, so `vscode:compile` writes an `out/package.json` containing `{"type":"commonjs"}` — everything under `out/` is CJS because of that sentinel.
+- **VSCode Extension**: Entry point at `src/extension.ts`, which only activates; everything it wires up lives in `src/extension/`. Compiles to `out/extension.js`. That entry file has to keep its name — `package.json` points `main` at `./out/extension.js`, so turning it into `src/extension/index.ts` would break activation. Host code uses relative imports and `tsconfig.extension.json` deliberately has no `paths` mapping, so an `@/` alias fails typecheck instead of dying with MODULE_NOT_FOUND on activation. The root package is `type: "module"` for Vite, but the extension host needs CommonJS, so `vscode:compile` writes an `out/package.json` containing `{"type":"commonjs"}` — everything under `out/` is CJS because of that sentinel.
 - **React Web App**: Entry point at `src/main.tsx`, bundled to `dist/` by Vite
 - **Shared contract**: `src/shared/messages.ts` — host ↔ webview message types and defaults, included in both tsconfig projects. Value imports are safe from the extension host because the `out/package.json` sentinel makes `out/shared/messages.js` load as CommonJS.
 
@@ -41,6 +41,17 @@ This is a VSCode extension for editing markdown in an live preview powered by a 
 
 Vitest takes `src/**/*.test.{ts,tsx}` except `src/test/**`. Keep webview tests out of `src/test/` - it's compiled by `tsconfig.extension.json`, which has no DOM lib.
 
+#### Complexity budget
+
+`pnpm complexity` gates CI at an FTA score of 50; `fta.json` holds the cap and the exclusions.
+
+- Aim for 45 or below on a file you are already editing, so the next unrelated change to it does not break CI. A dozen files sit in the 45-50 band and are fine there - a score near the cap is not on its own a reason to touch a file.
+- **`C ≤ 2` makes length free**, because `ln(2) < 1` clamps the length term. A data table or a branch-free component can be any length, which is why a `Record` lookup beats parallel `switch` statements here.
+- **`C = 3` is the worst possible value** - a ~38-point cliff above `C = 2`, after which _more_ branching lowers the score until `C ≈ 24`. An extracted 40-line module with one `if` guard can score worse than its parent, so don't add redundant guards to extracted children.
+- Comments and blank lines don't count, so never strip them to hit the budget.
+- Use `npx fta src -c fta.json -s 1000 --format json` while refactoring - a capped run stops at the first breach in walk order, not the worst.
+- The CI script and the PostToolUse hook both pass `--score-cap` explicitly, and must stay in step with `fta.json`: fta parses its config with `unwrap_or_default()`, so a typo'd key silently reverts the cap to 1000 and CI enforces nothing.
+
 ### VSCode Extension
 
 - `pnpm vscode:compile` - Compile TypeScript extension (`tsc -p ./tsconfig.extension.json`, then write the `out/package.json` CommonJS sentinel)
@@ -56,7 +67,7 @@ Vitest takes `src/**/*.test.{ts,tsx}` except `src/test/**`. Keep webview tests o
 
 #### Debugging a blank panel
 
-Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The webview's own console is invisible to the extension host, so `src/extension.ts` injects a bridge ahead of the app bundle that forwards uncaught errors, rejected promises, CSP violations, `console.error`/`console.warn` and a "#root is still empty" watchdog into that channel. A blank panel with nothing logged means the host never got that far - check the entry-chunk line at the top of the channel.
+Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The webview's own console is invisible to the extension host, so `src/lib/webview-diagnostics.ts` provides a bridge that `src/extension/webview-document.ts` injects ahead of the app bundle that forwards uncaught errors, rejected promises, CSP violations, `console.error`/`console.warn` and a "#root is still empty" watchdog into that channel. A blank panel with nothing logged means the host never got that far - check the entry-chunk line at the top of the channel.
 
 ## Architecture
 
@@ -64,10 +75,12 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 
 #### Editor System (`src/editor/`)
 
-- `editor.tsx` - Main TipTap-based markdown editor with auto-save functionality
+- `editor.tsx` - Layout only; `src/hooks/use-markdown-editor.ts` composes the editor, its frontmatter, autosaving and the writing checks
 - `extensions.ts` - The TipTap schema (single source of truth, shared with the tests)
 - `menu-bar.tsx` & `menu-bubble.tsx` - Editor toolbars and formatting controls
 - `button-*.tsx` - Specialized formatting buttons (color, heading, style)
+
+Styles are a data table, not a dispatch. `text-style-commands.ts` and `list-style-commands.ts` give each style its command, its `isActive` name and whether `editor.can()` can answer for it; `use-editor-styles.ts` reads all three from there. Three parallel switch statements used to have to be kept in step by hand, and both of the bugs that produced — a query that applied the style, and two styles that fell off the end and read as permanently disabled — are unrepresentable in the table.
 
 **A `tiptap-markdown` serializer only activates when a TipTap extension of the matching name is registered.** Otherwise markdown-it parses the feature into HTML, the schema drops it, and auto-save writes the loss to disk. Registering the node is the whole fix - the serializers already ship with `tiptap-markdown`. Individual workarounds (tight task lists, inline images, strict linkify) are commented where they're configured.
 
@@ -87,27 +100,29 @@ YAML frontmatter never reaches the TipTap document - `tiptap-markdown`/markdown-
 
 The retext writing checks. React owns the pipeline and the `textTools` extension only draws decorations it is handed, because `useEditor` builds the editor once - a conditional extension list would tear it down on every toggle.
 
-**The worker has to be `?worker&inline`.** A plain `new Worker(new URL(…))` gets a URL relative to the entry chunk, which under a webview resolves to the `vscode-cdn.net` resource host - a different origin from the `vscode-webview://` document, and a worker must be same-origin. Inlining boots it from a blob URL instead, which inherits the document's origin; that blob is why `buildContentSecurityPolicy` carries `worker-src blob:`. Dropping that directive fails only at runtime and only once the panel is opened, so `src/test/extension.test.ts` opens a note with the tools on and asserts the log channel stays quiet.
+**The worker has to be `?worker&inline`.** A plain `new Worker(new URL(…))` gets a URL relative to the entry chunk, which under a webview resolves to the `vscode-cdn.net` resource host - a different origin from the `vscode-webview://` document, and a worker must be same-origin. Inlining boots it from a blob URL instead, which inherits the document's origin; that blob is why `buildContentSecurityPolicy` carries `worker-src blob:`. Dropping that directive fails only at runtime and only once the panel is opened, so `src/test/webview-startup.test.ts` opens a note with the tools on and asserts the log channel stays quiet.
 
-`run-pipeline.ts` holds every retext import and is the only thing the worker pulls in, which is what keeps the ~44kB gzipped stack in its own chunk. Nothing on the main thread may import it - `analyze-client.ts` is the boundary, and it is only ever reached through `await import()`.
+`run-pipeline.ts`, `word-issues.ts` and `readability-issues.ts` hold every retext import between them and are the only things the worker pulls in, which is what keeps the ~45kB gzipped stack in its own chunk. Nothing on the main thread may import any of them - `analyze-client.ts` is the boundary, and it is only ever reached through `await import()`. `vfile-message-to-issue.ts` is retext-free on purpose, so the mapping is reachable without the stack.
 
 Two readability passes, not one: `unified` _merges_ the options of a plugin used twice on the same processor, so the two severity tiers need a processor each over one shared parse. The tiers are set six years apart because the seven algorithms bucket coarsely - at four years they flag an identical set and separate nothing.
 
-Adding a rule means four places after the id in `src/shared/messages.ts`: its label in `RULES` (`rules.ts`), its plugin in `RULE_PLUGINS` and its message `source` in `RULE_SOURCES` (`run-pipeline.ts`), and a test. All three maps are `Record<TextToolRuleId, …>` so none compiles until updated - `RULE_SOURCES` in particular is declared id-to-source and reversed at runtime, because keyed the other way a missing entry typechecks and the rule silently reports nothing.
+Adding a rule means four places after the id in `src/shared/messages.ts`: its label in `RULES` (`rules.ts`), its plugin in `RULE_PLUGINS` (`word-issues.ts`) and its message `source` in `RULE_SOURCES` (`vfile-message-to-issue.ts`), and a test. All three maps are `Record<TextToolRuleId, …>` so none compiles until updated - `RULE_SOURCES` in particular is declared id-to-source and reversed at runtime, because keyed the other way a missing entry typechecks and the rule silently reports nothing.
 
 #### Content Management
 
 - `src/hooks/use-content.ts` - Fetches the standalone web app's demo notes from `public/`. They sit there so their images are reachable by URL; `import.meta.glob` cannot see into `public/`, hence the hardcoded file list
 - `src/hooks/use-settings.ts` & `src/hooks/use-theme.ts` - React contexts and their accessor hooks, kept out of the provider files so each `.tsx` exports exactly one component
-- `src/lib/update-notes.ts` - Handles saving markdown content
+- `src/lib/update-notes.ts` - The standalone save path, and a stub: edits in the web build are logged, not persisted
 
 #### UI Components (`src/components/`)
 
 - Built with Radix UI primitives and shadcn/ui patterns
 - `dev-file-selector.tsx` - File selector dropdown, dev-only
-- `content.tsx` - The editor surface: picks the content source (VSCode vs. local), renders the nav and either the raw `<pre>` or the TipTap editor
-- `nav.tsx` - Top toolbar (file selector, raw/full-width/text-tools toggles, theme toggle). The `ToggleGroup`'s `onValueChange` rebuilds every key from the selected array, so a new toggle must be added to both the `value` list and the patch or it gets clobbered
-- `settings-provider.tsx` - Single source of truth for `viewOptions` (user toggles) and `settings` (VSCode configuration). In VSCode it seeds from `window.initialConfig`, posts `setViewOptions` to the host, and re-renders on `config` broadcasts; standalone it falls back to `localStorage`.
+- `content.tsx` - Layout: renders the toolbar and `note-body.tsx`, which picks the raw markdown textarea or the TipTap editor. `src/hooks/use-note-source.ts` picks the content source (VSCode vs. local)
+- `raw-markdown-editor.tsx` - The raw view, which saves the file **verbatim, frontmatter included**, because it shows the whole file. `use-note-save.ts` is the debounce and Cmd/Ctrl+S path both it and the TipTap editor share; the frontmatter split is the TipTap side's business and has already happened by the time text reaches that hook
+- `app-error-boundary.tsx` - Every failable seam wraps in this. A boundary must report explicitly (`report-error.ts` → `console.error` → the log bridge): the startup watchdog only fires while `#root` is empty, and a rendered fallback fills it. The mermaid boundary has to sit in `src/editor/code-block-view.tsx` rather than around the editor, because TipTap mounts each node view as its own React root
+- `toolbar.tsx` - Top toolbar (file selector, raw/full-width/text-tools toggles, theme toggle). The `ToggleGroup` rebuilds every key from the selected array, so both directions are derived from the one table in `view-toggle-options.ts` - a toggle listed in only one of them used to be silently reset the next time any other was used
+- `settings-provider.tsx` - Single source of truth for `viewOptions` (user toggles) and `settings` (VSCode configuration). In VSCode it seeds from `window.initialConfig`, posts `setViewOptions` to the host, and re-renders on `config` broadcasts; standalone it falls back to `localStorage`. Its `isVSCodeContext` is the app's only answer to that question, and is derived synchronously from `window.vscode` — anything deriving it in an effect reports `false` on the first render, which is long enough to send a save down the wrong path.
 - `theme-provider.tsx` & `theme-toggle.tsx` - Dark/light theme system; the theme lives in `viewOptions`, so it persists alongside the other toggles
 - `ui/` - Reusable UI components following shadcn/ui conventions
 

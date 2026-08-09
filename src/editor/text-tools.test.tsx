@@ -7,7 +7,9 @@ import Editor from '@/editor/editor'
 import type { Analysis, TextIssue } from '@/lib/text-tools/types'
 import { DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
 
-vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn() }))
+// Resolves rather than returning `undefined`: the real `updateNotes` is `async`
+// and the save effect attaches a rejection handler to what it hands back.
+vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 vi.mock('@/editor/menu-bubble', () => ({ MenuBubble: () => null }))
 
 /**

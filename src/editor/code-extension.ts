@@ -1,6 +1,8 @@
 import CodeMark from '@tiptap/extension-code'
-import type { MarkdownSerializerState } from 'prosemirror-markdown'
-import type { Mark, Node as ProseMirrorNode } from 'prosemirror-model'
+import type { Node as ProseMirrorNode } from 'prosemirror-model'
+
+import { PARSED_BY_MARKDOWN_IT } from '@/editor/mark-serializer'
+import type { MarkSerializerSide } from '@/editor/mark-serializer'
 
 /**
  * The default serializer fences code with one more backtick than the
@@ -37,23 +39,13 @@ export const CodeExtension = CodeMark.extend({
 	addStorage: () => ({
 		markdown: {
 			serialize: {
-				open: (
-					_state: MarkdownSerializerState,
-					_mark: Mark,
-					parent: ProseMirrorNode,
-					index: number
-				) => codeFence(parent.child(index), -1),
-				close: (
-					_state: MarkdownSerializerState,
-					_mark: Mark,
-					parent: ProseMirrorNode,
-					index: number
-				) => codeFence(parent.child(index - 1), 1),
+				open: ((_state, _mark, parent, index) =>
+					codeFence(parent.child(index), -1)) satisfies MarkSerializerSide,
+				close: ((_state, _mark, parent, index) =>
+					codeFence(parent.child(index - 1), 1)) satisfies MarkSerializerSide,
 				escape: false,
 			},
-			parse: {
-				// handled by markdown-it
-			},
+			parse: PARSED_BY_MARKDOWN_IT,
 		},
 	}),
 })

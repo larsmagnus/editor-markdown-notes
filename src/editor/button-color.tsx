@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { useEditorTools } from '@/hooks/use-editor-tools'
+import { useEditorColor } from '@/hooks/use-editor-color'
 import { cn } from '@/lib/utils'
 
 export function ButtonColor({
@@ -12,7 +12,7 @@ export function ButtonColor({
 }: ComponentProps<'button'> & {
 	color: string
 }) {
-	const { toggleTextColor, hasTextColor } = useEditorTools()
+	const { toggleTextColor, hasTextColor } = useEditorColor()
 
 	return (
 		<Button
