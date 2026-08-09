@@ -5,7 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Editor from '@/editor/editor'
 import { updateNotes } from '@/lib/update-notes'
 
-vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn() }))
+// Resolves rather than returning `undefined`: the real `updateNotes` is `async`
+// and the save effect attaches a rejection handler to what it hands back.
+vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 
 // Mermaid draws by measuring text, which happy-dom has no layout engine for.
 // Stubbing the library keeps these tests about what the editor does with a
@@ -292,6 +294,47 @@ describe('Editor', () => {
 		})
 	})
 
+	describe('saving', () => {
+		/**
+		 * Emptying a note without frontmatter serializes to `''`, which the
+		 * debounce used to be seeded with and guarded on truthiness - so the save
+		 * looked like the "nothing has been typed yet" state and never reached
+		 * disk. Deleting everything is exactly how an author clears a note to
+		 * start over, and the deletion has to survive a reload.
+		 */
+		it('saves a note the author has emptied entirely', async () => {
+			render(<Editor content={'# Roadmap\n\nShip it.'} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			await userEvent.click(screen.getByText('Ship it.'))
+			await userEvent.keyboard('{Control>}a{/Control}{Backspace}')
+
+			await waitFor(
+				() => {
+					expect(updateNotes).toHaveBeenCalledWith('')
+				},
+				{ timeout: 2000 }
+			)
+		})
+
+		it('autosaves an ordinary edit once the typing pauses', async () => {
+			render(<Editor content={'# Roadmap\n\nShip it.'} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			await userEvent.click(screen.getByText('Ship it.'))
+			await userEvent.keyboard(' Today.')
+
+			await waitFor(
+				() => {
+					expect(updateNotes).toHaveBeenCalledWith(
+						'# Roadmap\n\nShip it. Today.'
+					)
+				},
+				{ timeout: 2000 }
+			)
+		})
+	})
+
 	describe('frontmatter', () => {
 		const FRONTMATTER_NOTE = [
 			'---',
@@ -329,6 +372,25 @@ describe('Editor', () => {
 
 			await screen.findByRole('heading', { name: 'Roadmap' })
 			expect(screen.queryByLabelText('Frontmatter')).not.toBeInTheDocument()
+		})
+
+		// Only the body was deleted, so the fences and their keys have to survive
+		// it - an emptied body is not an emptied file.
+		it('saves a body the author has emptied, keeping the frontmatter', async () => {
+			render(<Editor content={FRONTMATTER_NOTE} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			await userEvent.click(screen.getByText('Ship it.'))
+			await userEvent.keyboard('{Control>}a{/Control}{Backspace}')
+
+			await waitFor(
+				() => {
+					expect(updateNotes).toHaveBeenCalledWith(
+						'---\ntitle: Roadmap\nstatus: draft\n---\n\n'
+					)
+				},
+				{ timeout: 2000 }
+			)
 		})
 
 		it('saves edits to the panel with the frontmatter fences preserved', async () => {
