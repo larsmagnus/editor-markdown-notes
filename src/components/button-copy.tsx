@@ -19,12 +19,14 @@ export function ButtonCopy() {
 				<Copy /> Copy page
 			</Button>
 			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button variant="outline" aria-label="Open">
-						<ChevronDown />
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent>
+				<DropdownMenuTrigger
+					render={
+						<Button variant="outline" aria-label="Open">
+							<ChevronDown />
+						</Button>
+					}
+				/>
+				<DropdownMenuContent className="w-52">
 					<DropdownMenuGroup>
 						<DropdownMenuItem>Copy markdown</DropdownMenuItem>
 						<DropdownMenuItem>Copy plain text</DropdownMenuItem>

@@ -18,9 +18,7 @@ export const Primary: Story = {
 		defaultOpen: true,
 		children: (
 			<>
-				<PopoverTrigger asChild>
-					<Button variant="outline">Open</Button>
-				</PopoverTrigger>
+				<PopoverTrigger render={<Button variant="outline">Open</Button>} />
 				<PopoverContent>Popover content goes here.</PopoverContent>
 			</>
 		),

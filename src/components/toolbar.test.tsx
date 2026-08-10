@@ -107,21 +107,15 @@ describe('edit mode', () => {
 			</SettingsProvider>
 		)
 
-		expect(screen.getByLabelText('Raw editor')).toHaveAttribute(
-			'data-state',
-			'on'
+		expect(screen.getByLabelText('Raw editor')).toHaveAttribute('data-pressed')
+		expect(screen.getByLabelText('Live editor')).not.toHaveAttribute(
+			'data-pressed'
 		)
-		expect(screen.getByLabelText('Live editor')).toHaveAttribute(
-			'data-state',
-			'off'
-		)
-		expect(screen.getByLabelText('Toggle full width')).toHaveAttribute(
-			'data-state',
-			'off'
+		expect(screen.getByLabelText('Toggle full width')).not.toHaveAttribute(
+			'data-pressed'
 		)
 		expect(screen.getByLabelText('Toggle text tools')).toHaveAttribute(
-			'data-state',
-			'on'
+			'data-pressed'
 		)
 	})
 
@@ -152,9 +146,6 @@ describe('edit mode', () => {
 
 		expect(postMessage).toHaveBeenCalledTimes(1)
 		expect(postMessage).toHaveBeenCalledWith({ type: 'openInTextEditor' })
-		expect(screen.getByLabelText('Live editor')).toHaveAttribute(
-			'data-state',
-			'on'
-		)
+		expect(screen.getByLabelText('Live editor')).toHaveAttribute('data-pressed')
 	})
 })

@@ -1,14 +1,16 @@
-import { ChevronsUpDownIcon } from 'lucide-react'
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
-import { useState } from 'react'
 
-import { DevFileSelectorList } from '@/components/dev-file-selector-list'
 import { Button } from '@/components/ui/button'
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover'
+	Combobox,
+	ComboboxContent,
+	ComboboxEmpty,
+	ComboboxInput,
+	ComboboxItem,
+	ComboboxList,
+	ComboboxTrigger,
+	ComboboxValue,
+} from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 
 export type DevFileSelectorProps = {
@@ -16,6 +18,8 @@ export type DevFileSelectorProps = {
 	setValue: Dispatch<SetStateAction<string>>
 	values: { value: string; label: string }[]
 } & ComponentProps<'button'>
+
+type FileOption = DevFileSelectorProps['values'][number]
 
 /**
  * Switches between the demo notes in `public/`. Development web-view only
@@ -26,38 +30,38 @@ function DevFileSelector({
 	value,
 	setValue,
 }: DevFileSelectorProps) {
-	const [open, setOpen] = useState(false)
+	const selected = values.find((item) => item.value === value) ?? null
 
-	const selectFile = (selected: string) => {
+	const selectFile = (item: FileOption | null) => {
 		// Re-picking the open file clears the selection, the way a combobox
 		// deselects.
-		setValue(selected === value ? '' : selected)
-		setOpen(false)
+		setValue(item && item.value !== value ? item.value : '')
 	}
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>
-				<Button
-					variant="outline"
-					role="combobox"
-					aria-expanded={open}
-					className={cn('w-[200px] justify-between', className)}
-				>
-					{value
-						? values.find((item) => item.value === value)?.label
-						: 'Select file...'}
-					<ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent className="w-[200px] p-0">
-				<DevFileSelectorList
-					value={value}
-					values={values}
-					onSelect={selectFile}
-				/>
-			</PopoverContent>
-		</Popover>
+		<Combobox items={values} value={selected} onValueChange={selectFile}>
+			<ComboboxTrigger
+				render={
+					<Button
+						variant="outline"
+						className={cn('w-[200px] justify-between', className)}
+					/>
+				}
+			>
+				<ComboboxValue placeholder="Select file..." />
+			</ComboboxTrigger>
+			<ComboboxContent>
+				<ComboboxInput placeholder="Search files..." showTrigger={false} />
+				<ComboboxEmpty>No file found.</ComboboxEmpty>
+				<ComboboxList>
+					{(item: FileOption) => (
+						<ComboboxItem key={item.value} value={item}>
+							{item.label}
+						</ComboboxItem>
+					)}
+				</ComboboxList>
+			</ComboboxContent>
+		</Combobox>
 	)
 }
 

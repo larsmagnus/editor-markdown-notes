@@ -17,19 +17,21 @@ export function CodeBlockCopyButton({ code }: CodeBlockCopyButtonProps) {
 
 	return (
 		<Tooltip>
-			<TooltipTrigger asChild>
-				<Button
-					type="button"
-					variant="ghost"
-					size="icon"
-					contentEditable={false}
-					aria-label="Copy code"
-					className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-					onClick={handleClick}
-				>
-					<Copy />
-				</Button>
-			</TooltipTrigger>
+			<TooltipTrigger
+				render={
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						contentEditable={false}
+						aria-label="Copy code"
+						className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+						onClick={handleClick}
+					>
+						<Copy />
+					</Button>
+				}
+			/>
 			<TooltipContent>Copy</TooltipContent>
 		</Tooltip>
 	)

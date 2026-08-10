@@ -25,7 +25,7 @@ function App({
 				initialSettings={initialSettings}
 			>
 				<ThemeProvider>
-					<TooltipProvider delayDuration={300}>
+					<TooltipProvider delay={300}>
 						<Content defaultFileName={defaultFileName} />
 					</TooltipProvider>
 				</ThemeProvider>

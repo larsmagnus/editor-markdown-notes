@@ -14,7 +14,7 @@ type Story = StoryObj<typeof meta>
 
 export const Primary: Story = {
 	args: {
-		type: 'single',
+		value: ['bold'],
 		children: (
 			<>
 				<ToggleGroupItem value="bold">Bold</ToggleGroupItem>

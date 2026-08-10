@@ -2,12 +2,12 @@ import { Link } from 'lucide-react'
 import { useState } from 'react'
 
 import Header from '@/components/header'
+import { PopoverArrow } from '@/components/popover-arrow'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
 	Popover,
-	PopoverArrow,
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover'
@@ -28,18 +28,20 @@ export function LinkPopover() {
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>
-				<Button
-					type="button"
-					variant="ghost"
-					size="sm"
-					title="Link"
-					onClick={openWithCurrentLink}
-					className={cn('font-bold', isLinkActive() ? 'is-active' : '')}
-				>
-					<Link className="size-4" />
-				</Button>
-			</PopoverTrigger>
+			<PopoverTrigger
+				render={
+					<Button
+						type="button"
+						variant="ghost"
+						size="sm"
+						title="Link"
+						onClick={openWithCurrentLink}
+						className={cn('font-bold', isLinkActive() ? 'is-active' : '')}
+					>
+						<Link className="size-4" />
+					</Button>
+				}
+			/>
 			<PopoverContent side="top" sideOffset={12} className="w-80">
 				<form
 					className="grid gap-4"
@@ -70,7 +72,7 @@ export function LinkPopover() {
 						</Button>
 					</div>
 				</form>
-				<PopoverArrow className="fill-popover" />
+				<PopoverArrow />
 			</PopoverContent>
 		</Popover>
 	)

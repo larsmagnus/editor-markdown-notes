@@ -23,9 +23,7 @@ export const Primary: Story = {
 		defaultOpen: true,
 		children: (
 			<>
-				<DropdownMenuTrigger asChild>
-					<Button variant="outline">Open</Button>
-				</DropdownMenuTrigger>
+				<DropdownMenuTrigger render={<Button variant="outline">Open</Button>} />
 				<DropdownMenuContent>
 					<DropdownMenuItem>Copy markdown</DropdownMenuItem>
 					<DropdownMenuItem>Copy plain text</DropdownMenuItem>

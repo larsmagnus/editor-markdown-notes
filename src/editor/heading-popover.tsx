@@ -1,9 +1,9 @@
 import { Heading } from 'lucide-react'
 
+import { PopoverArrow } from '@/components/popover-arrow'
 import { Button } from '@/components/ui/button'
 import {
 	Popover,
-	PopoverArrow,
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover'
@@ -13,18 +13,20 @@ import { HeadingButtons } from '@/editor/heading-buttons'
 export function HeadingPopover() {
 	return (
 		<Popover>
-			<PopoverTrigger asChild>
-				<Button type="button" variant="ghost" size="sm" title="Heading">
-					<Heading className="size-4" />
-				</Button>
-			</PopoverTrigger>
+			<PopoverTrigger
+				render={
+					<Button type="button" variant="ghost" size="sm" title="Heading">
+						<Heading className="size-4" />
+					</Button>
+				}
+			/>
 			<PopoverContent
 				side="top"
 				sideOffset={12}
 				className="w-auto p-2 flex gap-1"
 			>
 				<HeadingButtons withIcons />
-				<PopoverArrow className="fill-popover" />
+				<PopoverArrow />
 			</PopoverContent>
 		</Popover>
 	)

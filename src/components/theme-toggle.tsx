@@ -31,21 +31,24 @@ function ThemeToggle({ children, className, ...rest }: ThemeToggleProps) {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button
-					type="button"
-					variant="ghost"
-					className={cn('h-auto relative', className)}
-					title="Toggle theme"
-					{...rest}
-				>
-					<span className="relative">
-						<Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-						<Moon className="absolute top-0 left-0 h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-					</span>
-					{children ?? <span className="sr-only">Toggle theme</span>}
-				</Button>
-			</DropdownMenuTrigger>
+			<DropdownMenuTrigger
+				render={
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						className={cn('relative', className)}
+						title="Toggle theme"
+						{...rest}
+					>
+						<span className="relative">
+							<Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+							<Moon className="absolute top-0 left-0 h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+						</span>
+						{children ?? <span className="sr-only">Toggle theme</span>}
+					</Button>
+				}
+			/>
 			<DropdownMenuContent align="start">
 				<DropdownMenuItem onClick={() => setTheme('light')}>
 					Light

@@ -32,11 +32,12 @@ function Toolbar({ files, fileName, setFileName }: ToolbarProps) {
 		? EDIT_MODE_OPTIONS
 		: EDIT_MODE_OPTIONS.filter((option) => option.value !== 'text')
 
-	// Radix fires '' when the active item is re-clicked; ignore it so the group
+	// Re-clicking the active item empties the array; ignore that so the group
 	// always shows raw or live as selected. 'text' never becomes the persisted
 	// mode - the webview may be gone by the time the host has acted on it.
-	function handleEditModeChange(value: string) {
-		if (value === '') return
+	function handleEditModeChange(values: string[]) {
+		const [value] = values
+		if (!value) return
 		if (value === 'text') {
 			getVSCodeApi()?.postMessage({ type: 'openInTextEditor' })
 			return
@@ -60,8 +61,7 @@ function Toolbar({ files, fileName, setFileName }: ToolbarProps) {
 			)}
 
 			<ToggleGroup
-				type="single"
-				value={editModeFromViewOptions(viewOptions)}
+				value={[editModeFromViewOptions(viewOptions)]}
 				onValueChange={handleEditModeChange}
 			>
 				{editModeOptions.map(({ value, label, icon: Icon }) => (
@@ -77,7 +77,7 @@ function Toolbar({ files, fileName, setFileName }: ToolbarProps) {
 			</ToggleGroup>
 
 			<ToggleGroup
-				type="multiple"
+				multiple
 				value={toToggleValues(viewOptions)}
 				onValueChange={(values) => setViewOptions(fromToggleValues(values))}
 			>
