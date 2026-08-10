@@ -239,6 +239,8 @@
 	},
 	"dependencies": {
 		"@base-ui/react": "1.7.0",
+		"@shikijs/langs": "4.4.3",
+		"@shikijs/themes": "4.4.3",
 		"@tiptap/core": "3.29.2",
 		"@tiptap/extension-code": "3.29.2",
 		"@tiptap/extension-code-block": "3.29.2",
@@ -271,6 +273,7 @@
 		"retext-passive": "5.0.0",
 		"retext-readability": "8.0.0",
 		"retext-simplify": "8.0.0",
+		"shiki": "4.4.3",
 		"tailwind-merge": "3.6.0",
 		"tiptap-markdown": "0.9.0",
 		"unified": "11.0.5",

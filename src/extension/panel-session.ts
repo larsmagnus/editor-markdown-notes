@@ -3,7 +3,7 @@ import * as path from 'path'
 import * as vscode from 'vscode'
 
 import type { Logger } from '../shared/logger'
-import type { WebviewToHost } from '../shared/messages'
+import type { ShikiThemePayload, WebviewToHost } from '../shared/messages'
 
 import { onDocumentChanged } from './document-change-subscription'
 import { DocumentWriter, postDocumentUpdate } from './document-updates'
@@ -23,6 +23,8 @@ type PanelSessionOptions = {
 	log: Logger
 	/** Re-broadcasts to every open panel, not just this one. */
 	broadcastConfig: () => void
+	/** The active VS Code theme, for answering this panel's own request. */
+	readShikiTheme: () => ShikiThemePayload
 }
 
 /**
@@ -38,6 +40,7 @@ export function attachPanelSession({
 	store,
 	log,
 	broadcastConfig,
+	readShikiTheme,
 }: PanelSessionOptions): vscode.Disposable {
 	const writer = new DocumentWriter()
 
@@ -65,6 +68,7 @@ export function attachPanelSession({
 		store,
 		log,
 		broadcastConfig,
+		readShikiTheme,
 	})
 
 	return vscode.Disposable.from(

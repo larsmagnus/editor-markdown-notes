@@ -26,6 +26,7 @@
 		// `*.test.ts` siblings stay out for the same reason: this project has no
 		// DOM lib and no vitest types.
 		"src/lib/content-security-policy.ts",
+		"src/lib/jsonc.ts",
 		"src/lib/nonce.ts",
 		"src/lib/resolve-image-src.ts",
 		"src/lib/script-literal.ts",

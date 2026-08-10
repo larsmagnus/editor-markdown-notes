@@ -156,3 +156,22 @@ export const configMessageSchema = z
 		description:
 			"Posted by the host to every open panel whenever the settings or the stored view options change. Unlike the schemas above this one has no `.catch()` — a message that fails to parse is another extension's traffic and must be ignored, not defaulted.",
 	})
+
+export const shikiThemeMessageSchema = z
+	.object({
+		type: z.literal('shikiTheme'),
+		themeId: z.string().catch('unknown'),
+		kind: z
+			.enum(['light', 'dark', 'high-contrast', 'high-contrast-light'])
+			.catch('dark'),
+		// Structural, not exact - the host and webview `shiki` versions only need
+		// to agree this is "object-shaped enough to hand to Shiki", not a byte-
+		// for-byte match of its type.
+		raw: z.record(z.string(), z.unknown()).nullable().catch(null),
+	})
+	.meta({
+		id: 'ShikiThemeMessage',
+		title: 'Shiki theme broadcast',
+		description:
+			"Posted by the host on request and whenever the active VS Code color theme changes. Unlike the schemas above this one has no top-level `.catch()` - a message that fails to parse is another extension's traffic and must be ignored, not defaulted.",
+	})

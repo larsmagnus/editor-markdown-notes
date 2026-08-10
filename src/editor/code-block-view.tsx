@@ -13,6 +13,11 @@ import { MERMAID_LANGUAGE } from '@/editor/mermaid-language'
  * any other language keeps TipTap's `<pre><code>` output. The source itself is
  * untouched either way, so the markdown round trip is the same as it was before
  * this node view existed.
+ *
+ * Syntax highlighting needs nothing here: `SyntaxHighlight` colors the tokens
+ * through decorations, and the block's own background and foreground come from
+ * the custom properties `useSyntaxHighlight` hands `EditorSurface` to publish
+ * on the editor container.
  */
 export function CodeBlockView({ node, editor, getPos }: NodeViewProps) {
 	const language = String(node.attrs.language ?? '')

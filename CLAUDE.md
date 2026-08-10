@@ -39,7 +39,8 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 - Mermaid is rendering-only: `codeBlock` keeps its name (so the fenced-block serializer stays attached) while swapping in the `code-block-view.tsx` node view. `render-mermaid.ts` is lazy-imported so a note without diagrams never loads it.
 - Images resolve at render time only (`resolve-image-src.ts`); the saved `src` keeps the author's path. Needs `icon-editor-markdown-notes.png` duplicated between `public/` and the workspace root, since each is a different app's root.
 - YAML frontmatter is stripped before `setContent` and re-attached on save (`frontmatter.ts`), since markdown-it has no concept of it and would parse `---` as an `<hr>`.
-- Not supported: table column alignment, merged cells (fall back to raw HTML), syntax highlighting, footnotes, underline/highlight/sub/sup.
+- Syntax highlighting is decorations over the real editable text, never a rendered overlay — code has to stay colored while it is typed into, which is what separates it from mermaid's swap. `shiki-language-map.ts` is a hand-written fence-tag → grammar table because Vite cannot split a templated `import()` and a fence tag is freeform text that must never reach an import specifier; an unmapped tag renders plain, never throws.
+- Not supported: table column alignment, merged cells (fall back to raw HTML), footnotes, underline/highlight/sub/sup.
 
 ### Text tools (`src/lib/text-tools/`)
 

@@ -26,6 +26,7 @@ function Editor({
 		handleFrontmatterChange,
 		analysis,
 		isAnalyzing,
+		codeBlockStyle,
 	} = useMarkdownEditor(content)
 
 	if (!editor) return null
@@ -41,6 +42,7 @@ function Editor({
 			    here rather than alongside the editor in `content.tsx`. */}
 			<EditorSurface
 				includeProseBaseClassNames={includeProseBaseClassNames}
+				codeBlockStyle={codeBlockStyle}
 				panel={<TextToolsAside analysis={analysis} isAnalyzing={isAnalyzing} />}
 				{...props}
 			/>

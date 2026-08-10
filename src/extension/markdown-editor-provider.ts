@@ -7,6 +7,7 @@ import { broadcastToPanels } from './broadcast'
 import { CONFIG_SECTION, VIEW_TYPE } from './constants'
 import { attachPanelSession } from './panel-session'
 import type { SettingsStore } from './settings-store'
+import type { ShikiThemeStore } from './shiki-theme-store'
 
 /**
  * The custom editor itself. Owns the set of open panels, which is what lets a
@@ -15,16 +16,19 @@ import type { SettingsStore } from './settings-store'
 export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 	private readonly context: vscode.ExtensionContext
 	private readonly store: SettingsStore
+	private readonly shikiThemeStore: ShikiThemeStore
 	private readonly log: Logger
 	private readonly panels = new Set<vscode.WebviewPanel>()
 
 	constructor(
 		context: vscode.ExtensionContext,
 		store: SettingsStore,
+		shikiThemeStore: ShikiThemeStore,
 		log: Logger
 	) {
 		this.context = context
 		this.store = store
+		this.shikiThemeStore = shikiThemeStore
 		this.log = log
 	}
 
@@ -38,7 +42,8 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			}),
 			vscode.workspace.onDidChangeConfiguration((event) => {
 				if (event.affectsConfiguration(CONFIG_SECTION)) this.broadcastConfig()
-			})
+			}),
+			this.shikiThemeStore.onDidChangeTheme(this.broadcastShikiTheme)
 		)
 	}
 
@@ -47,6 +52,17 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 		const message: HostToWebview = {
 			type: 'config',
 			...this.store.getConfig(),
+		}
+
+		broadcastToPanels(this.panels, message)
+	}
+
+	/** Keeps every open editor tab's syntax highlighting in sync with the
+	 *  user's actual active VS Code color theme. */
+	public broadcastShikiTheme = () => {
+		const message: HostToWebview = {
+			type: 'shikiTheme',
+			...this.shikiThemeStore.getTheme(),
 		}
 
 		broadcastToPanels(this.panels, message)
@@ -64,6 +80,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			store: this.store,
 			log: this.log,
 			broadcastConfig: this.broadcastConfig,
+			readShikiTheme: () => this.shikiThemeStore.getTheme(),
 		})
 
 		this.panels.add(webviewPanel)

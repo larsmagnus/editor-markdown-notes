@@ -2,7 +2,11 @@ import * as vscode from 'vscode'
 
 import { recordWebviewLog } from '../lib/webview-diagnostics'
 import type { Logger } from '../shared/logger'
-import type { WebviewToHost } from '../shared/messages'
+import type {
+	HostToWebview,
+	ShikiThemePayload,
+	WebviewToHost,
+} from '../shared/messages'
 
 import type { DocumentWriter } from './document-updates'
 import { postDocumentUpdate } from './document-updates'
@@ -22,6 +26,7 @@ type HandlerDependencies = {
 	store: SettingsStore
 	log: Logger
 	broadcastConfig: () => void
+	readShikiTheme: () => ShikiThemePayload
 }
 
 /**
@@ -37,6 +42,7 @@ export function createWebviewMessageHandlers({
 	store,
 	log,
 	broadcastConfig,
+	readShikiTheme,
 }: HandlerDependencies): WebviewMessageHandlers {
 	return {
 		save: (message) => writer.save(document, message.content),
@@ -53,6 +59,17 @@ export function createWebviewMessageHandlers({
 		log: (message) => recordWebviewLog(log, message.level, message.message),
 		openInTextEditor: () => {
 			void openInTextEditor(document.uri)
+		},
+		// Answers the asking panel alone. Broadcasting instead would make every
+		// other open tab reload its theme and re-highlight for a request that
+		// told it nothing new.
+		getShikiTheme: () => {
+			const message: HostToWebview = {
+				type: 'shikiTheme',
+				...readShikiTheme(),
+			}
+
+			void panel.webview.postMessage(message)
 		},
 	}
 }

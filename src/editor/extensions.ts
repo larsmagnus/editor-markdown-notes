@@ -20,6 +20,7 @@ import { CodeExtension } from '@/editor/code-extension'
 import { ItalicExtension } from '@/editor/italic-extension'
 import { patchMarkdownEscaping } from '@/editor/markdown-escaping'
 import { StrictLinkify } from '@/editor/strict-linkify-extension'
+import { SyntaxHighlight } from '@/editor/syntax-highlight-extension'
 import { MarkdownTable } from '@/editor/table-extension'
 import { TextTools } from '@/editor/text-tools-extension'
 import { resolveImageSrc } from '@/lib/resolve-image-src'
@@ -116,6 +117,8 @@ export const extensions = [
 	// Decorations only, and inert until the text tools panel feeds it issues.
 	// Registered unconditionally because the editor is built once.
 	TextTools,
+	// Decorations only, and inert until `useSyntaxHighlight` feeds it tokens.
+	SyntaxHighlight,
 ]
 
 // `tiptap-markdown` ships no `Storage` module augmentation of its own, so

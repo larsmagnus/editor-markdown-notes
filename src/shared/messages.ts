@@ -92,6 +92,26 @@ export type ImageBaseUris = {
 
 export type LogLevel = 'error' | 'warn' | 'info'
 
+export type ShikiThemeKind =
+	| 'light'
+	| 'dark'
+	| 'high-contrast'
+	| 'high-contrast-light'
+
+/**
+ * The user's active VS Code color theme, reshaped for Shiki. `raw` is
+ * structurally a Shiki `ThemeRegistrationRaw` (itself close to a VS Code theme
+ * JSON body) - typed loosely here since the host, which produces it, must stay
+ * dependency-free and cannot import Shiki's types. `null` means extraction
+ * failed (theme extension not found, file unreadable, malformed JSON); the
+ * webview falls back to its own bundled theme for `kind` in that case.
+ */
+export type ShikiThemePayload = {
+	themeId: string
+	kind: ShikiThemeKind
+	raw: Record<string, unknown> | null
+}
+
 export type WebviewToHost =
 	| { type: 'save'; content: string }
 	| { type: 'getContent' }
@@ -108,7 +128,14 @@ export type WebviewToHost =
 	 * mount just leaves a blank panel.
 	 */
 	| { type: 'log'; level: LogLevel; message: string }
+	/** Requested once on mount rather than injected alongside `initialConfig`:
+	 *  a resolved theme is tens of kilobytes of JSON, and inlining that into
+	 *  every panel's HTML would cost every note, code blocks or not. */
+	| { type: 'getShikiTheme' }
 
 export type HostToWebview =
 	| { type: 'update'; content: string; fileName: string }
 	| ({ type: 'config' } & Config)
+	/** Sent in reply to `getShikiTheme`, and again whenever the user switches
+	 *  their active VS Code color theme. */
+	| ({ type: 'shikiTheme' } & ShikiThemePayload)

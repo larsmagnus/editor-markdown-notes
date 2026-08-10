@@ -171,6 +171,19 @@
 		@apply min-w-0 flex-1;
 	}
 
+	/*
+	 * Code blocks take both colors from the resolved Shiki theme, published as
+	 * custom properties by `useCodeBlockStyle`. Both, not just the foreground:
+	 * token colors assume their own theme's background, while Typography's `pre`
+	 * shade is a fixed dark one in light mode too - which would leave a light
+	 * theme's dark-on-white palette unreadable. Typography's own values are the
+	 * fallback, so an unresolved theme looks exactly as it did before.
+	 */
+	.ProseMirror pre {
+		background-color: var(--shiki-bg, var(--tw-prose-pre-bg));
+		color: var(--shiki-fg, var(--tw-prose-pre-code));
+	}
+
 	/* Text tools findings. Underlines rather than background fills for the
 	   word-level rules, so several overlapping hits stay legible; the two
 	   readability tiers span whole sentences and tint instead. */

@@ -11,6 +11,7 @@ import * as vscode from 'vscode'
 import { registerCommands } from './extension/commands'
 import { MarkdownEditorProvider } from './extension/markdown-editor-provider'
 import { SettingsStore } from './extension/settings-store'
+import { ShikiThemeStore } from './extension/shiki-theme-store'
 
 export function activate(context: vscode.ExtensionContext) {
 	// Surfaced as "Editor Markdown Notes" in the Output panel. `log: true` makes
@@ -24,7 +25,13 @@ export function activate(context: vscode.ExtensionContext) {
 	log.info('Extension activated')
 
 	const store = new SettingsStore(context)
-	const provider = new MarkdownEditorProvider(context, store, log)
+	const shikiThemeStore = new ShikiThemeStore(log)
+	const provider = new MarkdownEditorProvider(
+		context,
+		store,
+		shikiThemeStore,
+		log
+	)
 
 	context.subscriptions.push(
 		provider.register(),

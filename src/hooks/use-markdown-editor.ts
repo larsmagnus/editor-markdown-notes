@@ -6,6 +6,7 @@ import { useHostDocument } from '@/hooks/use-host-document'
 import { useItalicMarker } from '@/hooks/use-italic-marker'
 import { useMarkdownAutosave } from '@/hooks/use-markdown-autosave'
 import { useSettings } from '@/hooks/use-settings'
+import { useSyntaxHighlight } from '@/hooks/use-syntax-highlight'
 import { useTextTools } from '@/hooks/use-text-tools'
 import { splitFrontmatter } from '@/lib/frontmatter'
 
@@ -46,6 +47,7 @@ export function useMarkdownEditor(content: string) {
 	})
 
 	useItalicMarker(editor, settings.italicMarker)
+	const codeBlockStyle = useSyntaxHighlight(editor)
 
 	// Editing the panel changes what gets written without touching the document,
 	// so the save has to be queued by hand.
@@ -54,5 +56,12 @@ export function useMarkdownEditor(content: string) {
 		queueSave(editor?.storage?.markdown?.getMarkdown() ?? '', nextFrontmatter)
 	}
 
-	return { editor, frontmatter, handleFrontmatterChange, analysis, isAnalyzing }
+	return {
+		editor,
+		frontmatter,
+		handleFrontmatterChange,
+		analysis,
+		isAnalyzing,
+		codeBlockStyle,
+	}
 }
