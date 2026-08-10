@@ -1,6 +1,7 @@
 'use client'
 
-import { BubbleMenu, useCurrentEditor } from '@tiptap/react'
+import { useCurrentEditor } from '@tiptap/react'
+import { BubbleMenu } from '@tiptap/react/menus'
 
 import { BubbleMenuContent } from '@/editor/bubble-menu-content'
 
@@ -16,12 +17,7 @@ export function MenuBubble() {
 	}
 
 	return (
-		<BubbleMenu
-			editor={editor}
-			tippyOptions={{
-				duration: 50,
-			}}
-		>
+		<BubbleMenu editor={editor}>
 			<BubbleMenuContent />
 		</BubbleMenu>
 	)

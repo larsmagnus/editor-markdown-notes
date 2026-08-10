@@ -21,9 +21,9 @@ vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 const renderMermaid = vi.hoisted(() => vi.fn())
 vi.mock('@/lib/render-mermaid', () => ({ renderMermaid }))
 
-// The bubble menu positions itself with tippy, which measures the DOM and
-// throws in happy-dom the moment anything moves the selection. Nothing here
-// tests the menu, so it is stubbed out.
+// The bubble menu positions itself with floating-ui, which measures the DOM
+// and throws in happy-dom the moment anything moves the selection. Nothing
+// here tests the menu, so it is stubbed out.
 vi.mock('@/editor/menu-bubble', () => ({ MenuBubble: () => null }))
 
 const MERMAID_NOTE = ['```mermaid', 'graph TD', '  A --> B', '```'].join('\n')

@@ -62,7 +62,10 @@ export function MermaidBlock({ node, editor, getPos }: MermaidBlockProps) {
 			<pre
 				className={cn('m-0', !showSource && 'absolute h-0 w-0 overflow-hidden')}
 			>
-				<NodeViewContent as="code" className={`language-${MERMAID_LANGUAGE}`} />
+				<NodeViewContent<'code'>
+					as="code"
+					className={`language-${MERMAID_LANGUAGE}`}
+				/>
 			</pre>
 		</NodeViewWrapper>
 	)

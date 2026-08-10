@@ -8,10 +8,11 @@ import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
-import TextStyle from '@tiptap/extension-text-style'
+import { TextStyle } from '@tiptap/extension-text-style'
 import type { TextStyleOptions } from '@tiptap/extension-text-style'
 import { mergeAttributes, ReactNodeViewRenderer } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import type { MarkdownStorage } from 'tiptap-markdown'
 import { Markdown } from 'tiptap-markdown'
 
 import { CodeBlockView } from '@/editor/code-block-view'
@@ -54,6 +55,10 @@ export const extensions = [
 		codeBlock: false,
 		code: false,
 		italic: false,
+		// StarterKit bundles both as of v3. Link is registered above instead
+		// (autolink disabled); underline stays unsupported (see CLAUDE.md).
+		link: false,
+		underline: false,
 	}),
 	// The name stays `codeBlock`, which is what keeps `tiptap-markdown`'s fenced
 	// block serializer attached. The node view only changes how a block is drawn:
@@ -112,3 +117,11 @@ export const extensions = [
 	// Registered unconditionally because the editor is built once.
 	TextTools,
 ]
+
+// `tiptap-markdown` ships no `Storage` module augmentation of its own, so
+// `editor.storage.markdown` is otherwise typed `never`.
+declare module '@tiptap/core' {
+	interface Storage {
+		markdown: MarkdownStorage
+	}
+}

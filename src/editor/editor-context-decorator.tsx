@@ -8,8 +8,8 @@ import { extensions } from '@/editor/extensions'
  * (`MenuBar`, `MenuBubble`) - they read `null` and render nothing without a
  * real `EditorContext.Provider` ancestor, same as `src/editor/editor.tsx`
  * provides in the app. Renders `EditorContent` so the view attaches to a
- * visible DOM node - `MenuBubble` positions itself off that via tippy, and
- * has nowhere to anchor to otherwise.
+ * visible DOM node - `MenuBubble` positions itself off that via floating-ui,
+ * and has nowhere to anchor to otherwise.
  */
 export function EditorContextMount({ children }: { children: ReactNode }) {
 	const editor = useEditor({

@@ -1,4 +1,4 @@
-import Table from '@tiptap/extension-table'
+import { Table } from '@tiptap/extension-table'
 import { getHTMLFromFragment } from '@tiptap/react'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 import type { Node as ProseMirrorNode } from 'prosemirror-model'

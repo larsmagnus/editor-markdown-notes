@@ -5,8 +5,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from '@/App'
 import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
 
-// The bubble menu positions itself with tippy, which measures the DOM and
-// throws in happy-dom. Nothing here tests the menu.
+// The bubble menu positions itself with floating-ui, which measures the DOM
+// and throws in happy-dom. Nothing here tests the menu.
 vi.mock('@/editor/menu-bubble', () => ({ MenuBubble: () => null }))
 
 const NOTE = '---\ntitle: Roadmap\n---\n\n# Roadmap\n\nShip it.'

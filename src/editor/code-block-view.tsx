@@ -31,7 +31,7 @@ export function CodeBlockView({ node, editor, getPos }: NodeViewProps) {
 	return (
 		<NodeViewWrapper as="pre" className="group relative">
 			<CodeBlockCopyButton code={node.textContent} />
-			<NodeViewContent
+			<NodeViewContent<'code'>
 				as="code"
 				className={language ? `language-${language}` : undefined}
 			/>

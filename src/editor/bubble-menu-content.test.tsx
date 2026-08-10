@@ -8,8 +8,8 @@ import { extensions } from '@/editor/extensions'
 
 /**
  * These render `BubbleMenuContent` directly rather than `MenuBubble`. The bubble
- * positions itself through tippy, which measures the DOM, and happy-dom cannot -
- * it renders nothing and then throws on teardown.
+ * positions itself through floating-ui, which measures the DOM, and happy-dom
+ * cannot - it renders nothing and then throws on teardown.
  *
  * Colours are asserted through `editor.isActive` rather than `getHTML()`:
  * Tailwind v4 ships `oklch(...)` values and happy-dom's CSS parser drops them

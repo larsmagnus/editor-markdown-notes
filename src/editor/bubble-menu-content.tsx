@@ -14,8 +14,8 @@ import { cn } from '@/lib/utils'
 
 /**
  * The formatting controls themselves, separate from the bubble that positions
- * them. `BubbleMenu` measures the DOM through tippy, which happy-dom cannot do,
- * so this split is what makes the controls testable at all.
+ * them. `BubbleMenu` measures the DOM through floating-ui, which happy-dom
+ * cannot do, so this split is what makes the controls testable at all.
  */
 export function BubbleMenuContent() {
 	const { reset } = useEditorStyles()
