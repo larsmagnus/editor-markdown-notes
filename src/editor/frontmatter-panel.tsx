@@ -8,10 +8,6 @@ interface FrontmatterPanelProps {
 export function FrontmatterPanel({ value, onChange }: FrontmatterPanelProps) {
 	if (value === null) return null
 
-	// Grows with the content instead of scrolling internally, capped so a huge
-	// block doesn't push the note's body off screen.
-	const rows = Math.min(Math.max(value.split('\n').length, 2), 12)
-
 	return (
 		<div className="mb-3 rounded-md border bg-muted/50 focus-within:ring-2">
 			<div className="border-b px-3 py-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
@@ -19,8 +15,10 @@ export function FrontmatterPanel({ value, onChange }: FrontmatterPanelProps) {
 			</div>
 			<Textarea
 				aria-label="Frontmatter"
-				className="w-full resize-y border-none bg-transparent rounded-none rounded-b-md shadow-none font-mono text-sm text-muted-foreground focus-visible:ring-0 outline-none"
-				rows={rows}
+				// `field-sizing-content` (from the shared Textarea) grows this with its
+				// content and has no cap - deliberately, so a large frontmatter block
+				// never scrolls within its own box. Scrolling stays with the page.
+				className="w-full min-h-9 resize-none border-none bg-transparent rounded-none rounded-b-md shadow-none font-mono text-sm text-muted-foreground focus-visible:ring-0 outline-none"
 				spellCheck={false}
 				value={value}
 				onChange={(event) => onChange(event.target.value)}
