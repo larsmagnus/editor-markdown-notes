@@ -18,10 +18,12 @@ import { Markdown } from 'tiptap-markdown'
 import { CodeBlockView } from '@/editor/code-block-view'
 import { CodeExtension } from '@/editor/code-extension'
 import { ItalicExtension } from '@/editor/italic-extension'
+import { MarkdownClipboard } from '@/editor/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '@/editor/markdown-escaping'
 import { StrictLinkify } from '@/editor/strict-linkify-extension'
 import { SyntaxHighlight } from '@/editor/syntax-highlight-extension'
-import { MarkdownTable } from '@/editor/table-extension'
+import { TableCommands } from '@/editor/table/commands'
+import { MarkdownTable } from '@/editor/table/extension'
 import { TextTools } from '@/editor/text-tools-extension'
 import { resolveImageSrc } from '@/lib/resolve-image-src'
 
@@ -75,6 +77,8 @@ export const extensions = [
 	// Column resizing needs handle styling and a toolbar to be worth it - tables
 	// are edited in place instead, with Tab/Shift-Tab moving between cells.
 	MarkdownTable,
+	// Reordering and column alignment, neither of which TipTap exposes.
+	TableCommands,
 	TableRow,
 	// Cells hold inline content directly. TipTap's default is `block+`, which
 	// wraps every cell in a paragraph.
@@ -114,6 +118,9 @@ export const extensions = [
 		linkify: true,
 	}),
 	StrictLinkify,
+	// Registered after `Markdown`, whose `onBeforeCreate` builds the parser and
+	// serializer this reads off `editor.storage`.
+	MarkdownClipboard,
 	// Decorations only, and inert until the text tools panel feeds it issues.
 	// Registered unconditionally because the editor is built once.
 	TextTools,

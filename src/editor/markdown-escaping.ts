@@ -6,6 +6,7 @@ import {
 	hasFlankingAsteriskPartner,
 	hasMatchingBacktickRun,
 } from '@/editor/markdown-escape-partners'
+import type { TableSerializerState } from '@/editor/table/extension'
 import { isWordChar } from '@/editor/word-boundary'
 
 let patched = false
@@ -25,6 +26,8 @@ let patched = false
  *   asterisk partner exists elsewhere in the string - see
  *   `markdown-escape-partners.ts`.
  * - `_` keeps the base intraword exception; `\` always escapes.
+ * - `|` only escaped inside a table row, where it would otherwise end the cell:
+ *   a cell reading `Revenue | Growth` saved as two cells.
  *
  * `tiptap-markdown` builds its serializer state internally and exposes no
  * way to scope a custom `esc` to it, so this patches the shared
@@ -44,10 +47,14 @@ export function patchMarkdownEscaping(): void {
 		const asteriskOffsets = flankingAsteriskOffsets(str)
 		const runs = backtickRuns(str)
 
+		const { inTable } = this as TableSerializerState
+
 		let escaped = str.replace(
-			/[`*\\~[\]_]/g,
+			/[`*\\~[\]_|]/g,
 			(match: string, offset: number) => {
 				switch (match) {
+					case '|':
+						return inTable ? '\\' + match : match
 					case '_':
 						return isWordChar(str[offset - 1]) && isWordChar(str[offset + 1])
 							? match

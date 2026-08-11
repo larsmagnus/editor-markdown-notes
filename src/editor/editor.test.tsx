@@ -79,6 +79,22 @@ describe('Editor', () => {
 		)
 	})
 
+	it('renders a column the markdown aligns, header and body alike', async () => {
+		const content = [
+			'| Quarter | Revenue |',
+			'| --- | ---: |',
+			'| Q1 2025 | 1.2M |',
+		].join('\n')
+
+		render(<Editor content={content} />)
+
+		const revenue = await screen.findByRole('columnheader', { name: 'Revenue' })
+		expect(revenue).toHaveStyle({ textAlign: 'right' })
+		expect(screen.getByRole('cell', { name: '1.2M' })).toHaveStyle({
+			textAlign: 'right',
+		})
+	})
+
 	it('renders a task list as checkboxes with their checked state', async () => {
 		const content = ['- [x] Ship table support', '- [ ] Ship footnotes'].join(
 			'\n'

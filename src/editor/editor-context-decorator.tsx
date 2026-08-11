@@ -3,6 +3,12 @@ import type { ReactNode } from 'react'
 
 import { extensions } from '@/editor/extensions'
 
+interface EditorContextMountProps {
+	children: ReactNode
+	/** The note to mount, for the stories that need something specific in it. */
+	content?: string
+}
+
 /**
  * Storybook decorator target for components that call `useCurrentEditor()`
  * (`MenuBar`, `MenuBubble`) - they read `null` and render nothing without a
@@ -11,10 +17,13 @@ import { extensions } from '@/editor/extensions'
  * visible DOM node - `MenuBubble` positions itself off that via floating-ui,
  * and has nowhere to anchor to otherwise.
  */
-export function EditorContextMount({ children }: { children: ReactNode }) {
+export function EditorContextMount({
+	children,
+	content = '<p>Some sample text to format.</p>',
+}: EditorContextMountProps) {
 	const editor = useEditor({
 		extensions,
-		content: '<p>Some sample text to format.</p>',
+		content,
 		autofocus: 'end',
 	})
 
