@@ -126,8 +126,6 @@ flowchart LR
 
 ## Table with column alignment
 
-(the alignment is dropped on load - see CLAUDE.md)
-
 | Left | Centered | Right |
 | ---- | -------- | ----- |
 | a    | b        | c     |
@@ -144,7 +142,7 @@ An inline [link to example.com](https://example.com), and a bare autolink:
 
 A relative link back to [notes.md](./notes.md), an anchor link to the
 [headings section](#heading-2) further up this page, and a mailto link to
-[mail@larsmagnus.co](mailto:mail@larsmagnus.co).
+[mail@hello.co](mailto:mail@hello.co).
 
 Plain, unlinked URL for autolink detection: https://example.com/docs?ref=fixture
 
