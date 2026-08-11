@@ -139,8 +139,14 @@
 		@apply bg-muted text-left font-bold;
 	}
 
+	/*
+	 * Selected cells get a ring as well as a wash: a whole-cell selection is a
+	 * different thing from a text selection inside one, and the fill alone read
+	 * as a highlight rather than as "this cell is the unit you are acting on".
+	 */
 	.ProseMirror .selectedCell::after {
-		@apply pointer-events-none absolute inset-0 z-10 bg-accent/50 content-[''];
+		@apply pointer-events-none absolute inset-0 z-10 bg-accent/40 ring-2
+    ring-ring ring-inset content-[''];
 	}
 
 	/*

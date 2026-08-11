@@ -59,6 +59,29 @@ describe('tables', () => {
 		expect(roundTrip(markdown)).toBe(markdown)
 	})
 
+	// Left bare, the pipe ends the cell and the row comes back one column wider.
+	it('escapes a pipe typed into a cell', () => {
+		const markdown = [
+			'| Metric | Formula |',
+			'| --- | --- |',
+			'| Uptime | up \\| down |',
+		].join('\n')
+
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
+	// A cell holding only an image has no text content at all, and the
+	// serializer used to read that as an empty cell.
+	it('keeps a cell that holds only an image', () => {
+		const markdown = [
+			'| Build | Status |',
+			'| --- | --- |',
+			'| main | ![passing](./badge.png) |',
+		].join('\n')
+
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
 	it('falls back to HTML for merged cells, which GFM cannot express', () => {
 		const merged =
 			'<table><tbody><tr><th colspan="2">Merged</th></tr><tr><td>a</td><td>b</td></tr></tbody></table>'
@@ -69,26 +92,56 @@ describe('tables', () => {
 		expect(result).toContain('Merged')
 	})
 
+	// What copying a range of body cells out of a table puts on the clipboard.
+	it('keeps a table whose header row is empty', () => {
+		const markdown = [
+			'|  |  |',
+			'| --- | --- |',
+			'| Q1 2025 | 1.2M |',
+			'| Q2 2025 | 1.4M |',
+		].join('\n')
+
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
 	it('keeps a header-only table', () => {
 		const markdown = ['| Name | Owner |', '| --- | --- |'].join('\n')
 
 		expect(roundTrip(markdown)).toBe(markdown)
 	})
 
-	it('drops column alignment entirely - it neither renders nor round-trips', () => {
+	it('keeps a left-aligned column', () => {
+		const markdown = ['| Name |', '| :--- |', '| Tables |'].join('\n')
+
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
+	it('keeps a centered column', () => {
+		const markdown = ['| Name |', '| :---: |', '| Tables |'].join('\n')
+
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
+	it('keeps a right-aligned column', () => {
+		const markdown = ['| Name |', '| ---: |', '| Tables |'].join('\n')
+
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
+	it('leaves an unaligned column unaligned', () => {
+		const markdown = ['| Name |', '| --- |', '| Tables |'].join('\n')
+
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
+	it('keeps a mix of alignments across one table', () => {
 		const markdown = [
-			'| Left | Centered | Right |',
-			'| :--- | :---: | ---: |',
-			'| a | b | c |',
+			'| Left | Centered | Right | Plain |',
+			'| :--- | :---: | ---: | --- |',
+			'| a | b | c | d |',
 		].join('\n')
 
-		expect(roundTrip(markdown)).toBe(
-			[
-				'| Left | Centered | Right |',
-				'| --- | --- | --- |',
-				'| a | b | c |',
-			].join('\n')
-		)
+		expect(roundTrip(markdown)).toBe(markdown)
 	})
 })
 
