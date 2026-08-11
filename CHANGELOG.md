@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.18.1] - 2026-08-11
+
+- Changed the extension package to install around 60% smaller
+
 ## [0.18.0] - 2026-08-11
 
 - Added syntax highlighting to code blocks in the live editor, matching your active VS Code color theme
