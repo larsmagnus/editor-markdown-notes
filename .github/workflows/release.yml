@@ -1,0 +1,88 @@
+name: 📦 Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Setup pnpm
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The checks run again here rather than trusting main's green run:
+      # releases are rare, and the tagged tree is what actually ships.
+      - name: 🤖 Run type checks
+        run: pnpm typecheck
+
+      - name: ✨ Run lint and format checks
+        run: pnpm lint:ci
+
+      - name: 🤯 Run code complexity checks
+        run: pnpm run complexity
+
+      # `pnpm test` is avoided here: its `pretest` hook runs `lint`, which is
+      # `oxlint --fix && oxfmt` in write mode. On a release that would package a
+      # tree the tag does not describe. The suites run directly instead, after an
+      # explicit build, since the extension tests need `out/test/**`.
+      - name: 🏗️ Build
+        run: pnpm build
+
+      - name: 🧪 Run Vitest tests
+        run: pnpm test:unit
+
+      - name: 🧪 Run VS Code tests
+        run: xvfb-run --auto-servernum pnpm test:extension
+
+      # The vsix filename and the version users install come from package.json,
+      # while the Release is named for the tag. Nothing else makes them agree.
+      - name: 🔍 Check the tag matches package.json
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          MANIFEST="$(node -p "require('./package.json').version")"
+          test "$VERSION" = "$MANIFEST" || {
+            echo "Tag $GITHUB_REF_NAME does not match package.json version $MANIFEST"
+            exit 1
+          }
+
+      - name: 📦 Package the extension
+        run: pnpm vscode:package
+
+      # The tag is `v0.19.0` but the changelog heading is `## [0.19.0]`, hence the strip.
+      - name: 📝 Extract release notes from the changelog
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" { f = 1; next }
+            /^## \[/ { f = 0 }
+            f
+          ' CHANGELOG.md > NOTES.md
+          # Not `test -s`: awk emits the blank line under the heading, so a
+          # heading whose entries are still sitting under [Unreleased] yields one
+          # byte and would publish a Release with empty notes.
+          grep -q '[^[:space:]]' NOTES.md || {
+            echo "No changelog entries for $VERSION"
+            exit 1
+          }
+
+      - name: 🚀 Create the GitHub Release
+        run: gh release create "$GITHUB_REF_NAME" ./*.vsix --title "$GITHUB_REF_NAME" --notes-file NOTES.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
