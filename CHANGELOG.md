@@ -9,10 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added syntax highlighting to code blocks in the live editor, matching your active VS Code color theme
 - Added a copy button to code blocks in the live editor
 - Added a Text Editor button that reopens the file in VSCode's built-in text editor
-- Added row and column handles to tables in the live editor: click one for a menu that adds, deletes, moves or aligns, or drag it to reorder the row or column
+- Added row and column handles to tables in the live editor, with a menu for adding, deleting, moving and aligning
+- Added dragging a table handle to reorder its row or column
 - Added column alignment to tables, which now survives a save instead of being dropped when the note loads
-- Added copying and pasting tables: copying cells puts a markdown table on the clipboard, and pasting one from another editor or a spreadsheet keeps its rows and columns
-- Added keyboard movement through table cells: arrow keys move between cells and out of the table, Shift+arrow keys select whole cells, and Backspace over selected cells empties them or removes the row or column
+- Added copying table cells as a markdown table
+- Added pasting a table from another editor or a spreadsheet
+- Added arrow key movement between table cells and out of the table
+- Added Shift+arrow keys to select whole table cells
+- Changed Backspace over selected table cells to empty them, or remove the row or column when all of one is selected
 - Changed the raw markdown toggle into three buttons: Text Editor, Raw Editor, Live Editor
 - Fixed a `|` typed into a table cell splitting it into two cells on save
 - Fixed a table cell holding only an image being emptied on save
