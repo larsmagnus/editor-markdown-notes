@@ -2,6 +2,21 @@
 .vscode-test/**
 src/**
 out/test/**
+# Development-only directories. `.vscodeignore` does not inherit `.gitignore`,
+# so untracked local junk ships unless it is listed here — `.playwright-mcp/`
+# alone was 2.7 MB of debugging screenshots inside the .vsix.
+.claude/**
+.github/**
+.playwright-mcp/**
+.storybook/**
+docs/**
+scripts/**
+storybook-static/**
+test-results/**
+playwright-report/**
+blob-report/**
+playwright/**
+**/*.log
 # Demo notes and the workspace-root copy of the icon they resolve to. Only
 # public/icon-editor-markdown-notes.png ships, as the extension's icon.
 public/*.md
@@ -9,11 +24,23 @@ dist/*.md
 icon-editor-markdown-notes.png
 # The readme loads the screenshot over https, so it need not be packaged.
 public/screenshot-*.png
+dist/screenshot-*.png
 .gitignore
 .yarnrc
 vsc-extension-quickstart.md
-**/tsconfig.json
+**/tsconfig*.json
 **/eslint.config.mjs
+# Tooling config, none of which the extension host reads at runtime.
+.oxlintrc.json
+.oxfmtrc.json
+.npmrc
+.mcp.json
+components.json
+fta.json
+knip.jsonc
+index.html
+pnpm-lock.yaml
+*.vsix
 **/*.map
 **/*.ts
 **/.vscode-test.*
