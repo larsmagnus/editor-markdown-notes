@@ -3,6 +3,7 @@ import { EditorConsumer, EditorContent } from '@tiptap/react'
 import { Suspense } from 'react'
 import type { ReactNode } from 'react'
 
+import { TableControls } from '@/editor/table/controls'
 import type { CodeBlockStyle } from '@/hooks/use-syntax-highlight'
 import { cn } from '@/lib/utils'
 
@@ -32,23 +33,27 @@ export function EditorSurface({
 }: EditorSurfaceProps) {
 	return (
 		<div className="flex items-start gap-4" style={codeBlockStyle}>
-			<EditorConsumer>
-				{({ editor }) => (
-					<EditorContent
-						editor={editor}
-						spellCheck={false}
-						className={cn(
-							includeProseBaseClassNames &&
-								'prose dark:prose-invert prose-headings:font-bold prose-headings:text-black dark:prose-headings:text-white',
-							'prose-code:before:content-none prose-code:after:content-none',
-							'prose-headings:first:mt-0 prose-p:first:mt-0',
-							'min-w-0 flex-1',
-							className
-						)}
-						{...rest}
-					/>
-				)}
-			</EditorConsumer>
+			{/* The table handles are positioned against this box, so they measure
+			    the document column rather than the viewport. */}
+			<div className="relative min-w-0 flex-1">
+				<EditorConsumer>
+					{({ editor }) => (
+						<EditorContent
+							editor={editor}
+							spellCheck={false}
+							className={cn(
+								includeProseBaseClassNames &&
+									'prose dark:prose-invert prose-headings:font-bold prose-headings:text-black dark:prose-headings:text-white',
+								'prose-code:before:content-none prose-code:after:content-none',
+								'prose-headings:first:mt-0 prose-p:first:mt-0',
+								className
+							)}
+							{...rest}
+						/>
+					)}
+				</EditorConsumer>
+				<TableControls />
+			</div>
 
 			{panel && <Suspense fallback={null}>{panel}</Suspense>}
 		</div>
