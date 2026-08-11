@@ -35,12 +35,17 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 
 - Styles are a data table, not a dispatch: `text-style-commands.ts`/`list-style-commands.ts` give each style its command, `isActive` name, and `editor.can()` check; `use-editor-styles.ts` reads all three. Replaced three hand-synced switch statements whose bugs — a query that applied the style, two styles falling off the end and reading as permanently disabled — can't happen in a table.
 - A `tiptap-markdown` serializer only activates when a matching TipTap extension is registered, otherwise the schema silently drops the feature and auto-save writes the loss to disk. Registering the node is the whole fix. `markdown-round-trip.test.ts` documents exactly what survives a save — read it before changing the schema.
-- Table cells hold inline content directly (not TipTap's default `block+`), so `extensions.ts` carries its own table serializer; `tiptap-markdown`'s reaches for a paragraph that no longer exists.
+- Table cells hold inline content directly (not TipTap's default `block+`), so `extensions.ts` carries its own table serializer (`table/extension.ts`); `tiptap-markdown`'s reaches for a paragraph that no longer exists. Same reason pasted HTML goes through `table/flatten-pasted-cells.ts` first.
+- `table/alignment.ts`, `table/slice.ts`, `table/commands.ts`, `table/cell-selection.ts`, and `table/caret.ts` each carry the one downstream consequence of that choice they exist to fix — read their doc comments before touching cell-selection or caret behavior.
+- A table whose header row is not row 0 has no GFM syntax, so the serializer writes the whole table out as HTML and auto-save replaces the user's markdown with it. `prosemirror-tables` reaches that shape on its own — "add row above" from the header row builds the new row from plain cells — so `table/header.ts` restores the invariant in an `appendTransaction` rather than at any one call site. `table/shape.ts` decides what GFM can express; it is the thing that rejects the shape.
+- Only `|` is escaped per-cell rather than globally (`markdown-escaping.ts` reads `inTable`), and cells serialize on `content.size`, not on their text — an image-only cell has no text and used to save as empty.
+- The table handles measure cell rectangles rather than using floating-ui (`use-table-anchor.ts`), which is what makes them testable — happy-dom has no layout engine, and `editor.test.tsx` already has to stub `MenuBubble` for exactly that reason.
+- `markdown-clipboard-extension.ts` is also the hook for every paste that carries no `text/html` at all — terminal output, a plain editor — so it reinterprets only text that `looks-like-block-markdown.ts` recognises as block structure. Inline syntax is the paste rules' business (`italic-extension.ts` and its like), not this one's.
 - Mermaid is rendering-only: `codeBlock` keeps its name (so the fenced-block serializer stays attached) while swapping in the `code-block-view.tsx` node view. `render-mermaid.ts` is lazy-imported so a note without diagrams never loads it.
 - Images resolve at render time only (`resolve-image-src.ts`); the saved `src` keeps the author's path. Needs `icon-editor-markdown-notes.png` duplicated between `public/` and the workspace root, since each is a different app's root.
 - YAML frontmatter is stripped before `setContent` and re-attached on save (`frontmatter.ts`), since markdown-it has no concept of it and would parse `---` as an `<hr>`.
 - Syntax highlighting is decorations over the real editable text, never a rendered overlay — code has to stay colored while it is typed into, which is what separates it from mermaid's swap. `shiki-language-map.ts` is a hand-written fence-tag → grammar table because Vite cannot split a templated `import()` and a fence tag is freeform text that must never reach an import specifier; an unmapped tag renders plain, never throws.
-- Not supported: table column alignment, merged cells (fall back to raw HTML), footnotes, underline/highlight/sub/sup.
+- Not supported: merged cells (fall back to raw HTML), footnotes, underline/highlight/sub/sup.
 
 ### Text tools (`src/lib/text-tools/`)
 
@@ -83,6 +88,7 @@ Contributed under `editorMarkdownNotes` in `package.json` (`contributes.configur
 ### File Organization
 
 - `public/*.md` - Demo notes, one per image-resolution rule; kept out of the `.vsix` by `.vscodeignore`
+- A feature cluster that outgrows flat `prefix-*` files gets its own subdirectory with the prefix dropped inside it — `src/editor/table/`, `src/lib/text-tools/`. Hooks stay in `src/hooks/` regardless of which feature they belong to, same as every other feature's hooks.
 
 ## Important Notes
 
