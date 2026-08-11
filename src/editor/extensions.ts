@@ -10,6 +10,7 @@ import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import { TextStyle } from '@tiptap/extension-text-style'
 import type { TextStyleOptions } from '@tiptap/extension-text-style'
+import type { Command } from '@tiptap/pm/state'
 import { mergeAttributes, ReactNodeViewRenderer } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import type { MarkdownStorage } from 'tiptap-markdown'
@@ -17,6 +18,10 @@ import { Markdown } from 'tiptap-markdown'
 
 import { CodeBlockView } from '@/editor/code-block-view'
 import { CodeExtension } from '@/editor/code-extension'
+import {
+	focusImageToolbar,
+	moveToAdjacentImage,
+} from '@/editor/image/keyboard-nav'
 import { ItalicExtension } from '@/editor/italic-extension'
 import { MarkdownClipboard } from '@/editor/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '@/editor/markdown-escaping'
@@ -93,7 +98,12 @@ export const extensions = [
 	TaskItem.configure({ nested: true }),
 	// Inline, so an image sits in a paragraph. As a block node the serializer
 	// never closes the block and the image runs into the text that follows it.
+	// `draggable` (native drag-and-drop reordering) is already the extension's
+	// default. `atom` is not: without it, ProseMirror places a text cursor next
+	// to a click on the image instead of selecting the node, so a click never
+	// produces the `NodeSelection` the bubble menu's image controls key off.
 	Image.configure({ inline: true }).extend({
+		atom: true,
 		// Display only - `src` keeps the author's path, so saving does not
 		// rewrite the file with vscode-resource URIs. Outside VSCode there are
 		// no bases: the notes are served from the site root, so the browser
@@ -108,6 +118,26 @@ export const extensions = [
 					),
 				}),
 			]
+		},
+		// `Tab`/`Shift-Tab` jump between images the way they jump between fields
+		// in a form; arrow keys then move into the selected image's bubble menu,
+		// the same composite-widget pattern the table handles use for their
+		// menus. Declining (returning `false`) hands the key back to the
+		// browser/other extensions - off the last image that means the page's
+		// own next focusable element, not a trap inside the editor.
+		addKeyboardShortcuts() {
+			// The view goes through too: `moveToAdjacentImage` calls `view.focus()`
+			// to keep the bubble menu's `hasFocus()` check satisfied, and
+			// `focusImageToolbar` reads the rendered toolbar off the real DOM.
+			const run = (command: Command) => () =>
+				command(this.editor.state, this.editor.view.dispatch, this.editor.view)
+
+			return {
+				Tab: run(moveToAdjacentImage(1)),
+				'Shift-Tab': run(moveToAdjacentImage(-1)),
+				ArrowRight: run(focusImageToolbar()),
+				ArrowDown: run(focusImageToolbar()),
+			}
 		},
 	}),
 	Markdown.configure({

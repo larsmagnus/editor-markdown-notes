@@ -195,6 +195,13 @@ describe('images and links', () => {
 		expect(roundTrip(markdown)).toBe(markdown)
 	})
 
+	it('keeps an image wrapped in a link', () => {
+		const markdown =
+			'[![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)](https://example.com)'
+
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
 	it('does not linkify prose that merely looks like a domain', () => {
 		expect(roundTrip('# notes.md')).toBe('# notes.md')
 		expect(roundTrip('Open package.json to check.')).toBe(

@@ -122,6 +122,21 @@
 		@apply static!;
 	}
 
+	.ProseMirror img {
+		@apply cursor-grab rounded border border-transparent outline-none
+    hover:border-neutral-300 active:cursor-grabbing dark:hover:border-neutral-700;
+	}
+
+	/*
+	 * A `NodeSelection` never moves real DOM focus onto the `<img>` itself -
+	 * doing so would fail the bubble menu's `hasFocus()` check - so this reads
+	 * ProseMirror's own selection decoration instead of `:focus-visible`. Fires
+	 * for a mouse click and `Tab`-driven selection alike.
+	 */
+	.ProseMirror img.ProseMirror-selectednode {
+		@apply border-ring ring-3 ring-ring/50;
+	}
+
 	/*
 	 * ProseMirror table plumbing. Typography styles the table itself, but the
 	 * fixed layout, cell borders and cell-selection overlay are ours to provide.
