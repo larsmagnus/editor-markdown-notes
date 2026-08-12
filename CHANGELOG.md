@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-08-12
+
 - Added editing images in the live editor: drag to move, edit the source and alt text, add or remove a link, delete, and navigate them by keyboard
 - Added a copy button, a delete button, and syntax highlighting to the frontmatter block in the live editor
 - Added a button to add a frontmatter block to a note that doesn't already have one
