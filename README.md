@@ -1,24 +1,25 @@
 # Editor Markdown Notes
 
-A VS Code markdown WYSIWYG editor with live preview, built on [TipTap](https://tiptap.dev).
+An integrated live markdown editor for VS Code, built for the AI-first era
 
 ![A VSCode window editing markdown with Editor Markdown Notes](https://raw.githubusercontent.com/larsmagnus/editor-markdown-notes/main/public/screenshot-editor-markdown-notes.png)
 
 ## Why
 
-- Plain markdown is ideal for editing but not for reading. I wanted one tool that excels at both without compromising on either.
-- There's more markdown than ever in development—specs, prompts, agent definitions, and config. A better writing and reading experience matters.
+- Markdown is ideal for editing but not for reading. I wanted one tool that excels at both without compromising on either.
+- There's more markdown than ever in development — specs, prompts, agent definitions, and config. A better writing and reading experience matters.
 - I love [Obsidian](https://obsidian.md) but prefer not switching windows.
 
 ## Features
 
-- WYSIWYG markdown editing as a VS Code custom editor for `*.md`
-- Formatting toolbar plus a selection bubble menu (headings, text styles, colors, links)
-- Tables, task lists and images render inline; YAML frontmatter is edited as raw text in its own panel, kept out of the document
-- Mermaid diagrams render for fenced ` ```mermaid ` code blocks
-- Follows the active VS Code color theme
-- Writing checks in a sidebar: passive voice, simpler words, weak words, hard-to-read sentences
-- Toolbar toggles (raw markdown, full width, text tools, theme) persist across tabs and sessions
+- Live markdown editing – easily swap between live, raw and text edit modes
+- Contextual formatting and editing tools
+- Writing checks that flag passive voice, weak words and hard-to-read sentences
+- Dedicated frontmatter management with syntax highlighting and editing tools
+- Code blocks with syntax highlighting – matching your VS Code theme
+- Table and image editing tools
+- Mermaid diagrams render inline
+- Toolbar settings persist across tabs and sessions
 
 ## Usage
 
@@ -47,14 +48,14 @@ You can also set this without editing JSON directly: open a `.md` file, right-cl
 
 Available under Settings → Extensions → Editor Markdown Notes (or the cog on the extension page):
 
-| Setting                                  | Default | Purpose                                                |
-| ---------------------------------------- | ------- | ------------------------------------------------------ |
-| `editorMarkdownNotes.hideToolbar`        | `false` | Hide the editor's toolbar                              |
-| `editorMarkdownNotes.centerContent`      | `false` | Center the content horizontally when full width is off |
-| `editorMarkdownNotes.textToolsTargetAge` | `16`    | Reading age the text tools score sentences against     |
+| Setting                                  | Default | Purpose                                                        |
+| ---------------------------------------- | ------- | -------------------------------------------------------------- |
+| `editorMarkdownNotes.hideToolbar`        | `false` | Hide the editor's toolbar                                      |
+| `editorMarkdownNotes.centerContent`      | `false` | Center the content horizontally when full width is off         |
+| `editorMarkdownNotes.italicMarker`       | `_`     | Marker (`_` or `*`) used when italicizing text from the editor |
+| `editorMarkdownNotes.textToolsTargetAge` | `16`    | Reading age the text tools score sentences against             |
 
-The toolbar toggles are also available from the command palette while the editor
-is focused, so they stay reachable with `hideToolbar` turned on:
+The toolbar toggles are also available from the command palette while the editor is focused, so they stay reachable with `hideToolbar` turned on:
 
 - **Editor Markdown Notes: Toggle raw markdown**
 - **Editor Markdown Notes: Toggle full width**
@@ -79,8 +80,7 @@ All four are shared across open tabs and persist between sessions.
 
 ## Text tools
 
-The text tools sidebar checks the prose as you write, highlighting findings in
-the document and listing them alongside it. Click one to jump to it.
+The text tools sidebar checks the prose as you write, highlighting findings in the document and listing them alongside it. Click one to jump to it.
 
 | Check         | Flags                                                   |
 | ------------- | ------------------------------------------------------- |
@@ -89,19 +89,13 @@ the document and listing them alongside it. Click one to jump to it.
 | Weak words    | Filler, hedges and vague intensifiers                   |
 | Hard to read  | Sentences above `textToolsTargetAge`, in two severities |
 
-Readability is scored by seven algorithms (Dale–Chall, Flesch, SMOG and others).
-A sentence too hard for the target age reads as _hard_; one still too hard six
-years later, _very hard_.
+Readability is scored by seven algorithms (Dale–Chall, Flesch, SMOG and others). A sentence too hard for the target age reads as _hard_; one still too hard six years later, _very hard_.
 
-Individual checks can be switched off in the panel, and the selection persists.
-Nothing is analysed — and none of the analysis code is even downloaded — until
-the panel is opened.
+Individual checks can be switched off in the panel, and the selection persists. Nothing is analysed — and none of the analysis code is even downloaded — until the panel is opened.
 
 ## Troubleshooting
 
-If the editor panel loads blank, run **Editor Markdown Notes: Show logs** from
-the command palette and check the _Editor Markdown Notes_ output channel — the
-webview forwards its errors there.
+If the editor panel loads blank, run **Editor Markdown Notes: Show logs** from the command palette and check the _Editor Markdown Notes_ output channel — the webview forwards its errors there.
 
 ## Requirements
 
@@ -131,10 +125,13 @@ To uninstall: `code --uninstall-extension larsmagnus.editor-markdown-notes`.
 | `pnpm test`           | Run both suites                               |
 | `pnpm test:unit`      | Vitest webview tests                          |
 | `pnpm test:extension` | Extension tests via `vscode-test`             |
+| `pnpm complexity`     | Check file complexity against the FTA budget  |
+| `pnpm knip`           | Find unused files, exports and dependencies   |
+| `pnpm storybook`      | Storybook dev server for components           |
 
 ### Running from source
 
-1. Press <kbd>F5</kbd> in VS Code to launch the Extension Development Host
+1. Press F5 in VS Code to launch the Extension Development Host
 2. In the new window, open a `.md` file
 3. Right-click the file and select **Open with Editor Markdown Notes**
 

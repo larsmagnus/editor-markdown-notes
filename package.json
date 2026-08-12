@@ -1,7 +1,7 @@
 {
 	"name": "editor-markdown-notes",
 	"displayName": "Editor Markdown Notes",
-	"description": "A powerful markdown editor with live preview and rich formatting tools.",
+	"description": "An integrated live markdown editor for VS Code, built for the AI-first era",
 	"publisher": "larsmagnus",
 	"author": "Lars Magnus Klavenes <larsmagnus@gmail.com> (https://larsmagnus.co)",
 	"license": "MIT",
