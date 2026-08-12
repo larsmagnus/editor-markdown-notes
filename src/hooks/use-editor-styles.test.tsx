@@ -1,13 +1,21 @@
 import { act, renderHook } from '@testing-library/react'
 import { Editor, EditorContext } from '@tiptap/react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { extensions } from '@/editor/extensions'
 import { useEditorStyles } from '@/hooks/use-editor-styles'
 
+let currentEditor: Editor | undefined
+
+afterEach(() => {
+	currentEditor?.destroy()
+	currentEditor = undefined
+})
+
 describe('toggleStyle', () => {
 	it('toggles bold', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -24,6 +32,7 @@ describe('toggleStyle', () => {
 
 	it('toggles italic', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -40,6 +49,7 @@ describe('toggleStyle', () => {
 
 	it('toggles strike', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -56,6 +66,7 @@ describe('toggleStyle', () => {
 
 	it('toggles code', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -72,6 +83,7 @@ describe('toggleStyle', () => {
 
 	it('toggles codeBlock', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -88,6 +100,7 @@ describe('toggleStyle', () => {
 
 	it('toggles blockquote', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -104,6 +117,7 @@ describe('toggleStyle', () => {
 
 	it('turns a heading back into a paragraph', () => {
 		const editor = new Editor({ extensions, content: '## Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -120,6 +134,7 @@ describe('toggleStyle', () => {
 
 	it('clears every mark and the heading level for "none"', () => {
 		const editor = new Editor({ extensions, content: '## **Some notes**' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 1, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -137,6 +152,7 @@ describe('toggleStyle', () => {
 
 	it('toggles an ordered list', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -153,6 +169,7 @@ describe('toggleStyle', () => {
 
 	it('toggles an unordered list', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -174,6 +191,7 @@ describe('hasStyle', () => {
 			extensions,
 			content: '> **Some** _notes_ and `code`',
 		})
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 2, to: 6 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -200,6 +218,7 @@ describe('canToggleStyle', () => {
 	 */
 	it('leaves the document untouched when asked about blockquote', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -219,6 +238,7 @@ describe('canToggleStyle', () => {
 
 	it('leaves the document untouched when asked about the other styles', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -246,6 +266,7 @@ describe('canToggleStyle', () => {
 	 */
 	it('allows the styles that cannot be queried', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -262,6 +283,7 @@ describe('canToggleStyle', () => {
 
 	it('allows the list styles unconditionally', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
 				<EditorContext.Provider value={{ editor }}>

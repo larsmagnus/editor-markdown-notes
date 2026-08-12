@@ -1,10 +1,17 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Editor, EditorContext } from '@tiptap/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { BubbleMenuContent } from '@/editor/bubble-menu-content'
 import { extensions } from '@/editor/extensions'
+
+let currentEditor: Editor | undefined
+
+afterEach(() => {
+	currentEditor?.destroy()
+	currentEditor = undefined
+})
 
 /**
  * These render `BubbleMenuContent` directly rather than `MenuBubble`. The bubble
@@ -19,6 +26,7 @@ import { extensions } from '@/editor/extensions'
 describe('headings', () => {
 	it('turns the selected paragraph into a heading', async () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -36,6 +44,7 @@ describe('headings', () => {
 describe('text styles', () => {
 	it('bolds the selection', async () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -50,6 +59,7 @@ describe('text styles', () => {
 
 	it('italicises the selection', async () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -64,6 +74,7 @@ describe('text styles', () => {
 
 	it('strikes through the selection', async () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -80,6 +91,7 @@ describe('text styles', () => {
 describe('links', () => {
 	it('applies the typed URL to the selection', async () => {
 		const editor = new Editor({ extensions, content: 'Read the notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 10, to: 15 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -101,6 +113,7 @@ describe('links', () => {
 			extensions,
 			content: 'Read the [notes](https://example.com)',
 		})
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 10, to: 15 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -119,6 +132,7 @@ describe('links', () => {
 			extensions,
 			content: 'Read the [notes](https://example.com)',
 		})
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 10, to: 15 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -135,6 +149,7 @@ describe('links', () => {
 describe('colours', () => {
 	it('sets the colour of the selection', async () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -151,6 +166,7 @@ describe('colours', () => {
 
 	it('clears the colour when the same swatch is picked again', async () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -173,6 +189,7 @@ describe('images', () => {
 			extensions,
 			content: '<img src="./diagram.png" alt="Diagram">',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -191,6 +208,7 @@ describe('images', () => {
 			extensions,
 			content: '<img src="./diagram.png" alt="Diagram">',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -209,6 +227,7 @@ describe('images', () => {
 			extensions,
 			content: '<img src="./diagram.png" alt="Diagram">',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -232,6 +251,7 @@ describe('images', () => {
 			extensions,
 			content: '<img src="./diagram.png" alt="Diagram">',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -249,6 +269,7 @@ describe('images', () => {
 			extensions,
 			content: '<img src="./diagram.png" alt="Diagram">',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -271,6 +292,7 @@ describe('images', () => {
 			content:
 				'<a href="https://example.com"><img src="./diagram.png" alt="Diagram"></a>',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -292,6 +314,7 @@ describe('image keyboard navigation', () => {
 			extensions,
 			content: '<img src="./diagram.png" alt="Diagram">',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -309,6 +332,7 @@ describe('image keyboard navigation', () => {
 			extensions,
 			content: '<img src="./diagram.png" alt="Diagram">',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -339,6 +363,7 @@ describe('image keyboard navigation', () => {
 			content:
 				'<img src="./first.png" alt="First"><img src="./second.png" alt="Second">',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -357,6 +382,7 @@ describe('image keyboard navigation', () => {
 			extensions,
 			content: '<img src="./diagram.png" alt="Diagram">',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -380,6 +406,7 @@ describe('image keyboard navigation', () => {
 			extensions,
 			content: '<img src="./diagram.png" alt="Diagram">',
 		})
+		currentEditor = editor
 		editor.commands.setNodeSelection(1)
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -398,6 +425,7 @@ describe('image keyboard navigation', () => {
 describe('reset', () => {
 	it('clears marks and heading level from the selection', async () => {
 		const editor = new Editor({ extensions, content: '## Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		editor.commands.setMark('bold')
 		render(

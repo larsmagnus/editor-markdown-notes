@@ -1,13 +1,21 @@
 import { act, renderHook } from '@testing-library/react'
 import { Editor, EditorContext } from '@tiptap/react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { extensions } from '@/editor/extensions'
 import { useEditorHistory } from '@/hooks/use-editor-history'
 
+let currentEditor: Editor | undefined
+
+afterEach(() => {
+	currentEditor?.destroy()
+	currentEditor = undefined
+})
+
 describe('history', () => {
 	it('undoes and redoes an edit', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
+		currentEditor = editor
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorHistory(), {
 			wrapper: ({ children }) => (

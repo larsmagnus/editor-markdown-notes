@@ -1,8 +1,15 @@
 import { Editor } from '@tiptap/core'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { extensions } from '@/editor/extensions'
 import { getDocumentText } from '@/lib/text-tools/document-text'
+
+let currentEditor: Editor | undefined
+
+afterEach(() => {
+	currentEditor?.destroy()
+	currentEditor = undefined
+})
 
 /**
  * The flat text retext analyses, built from the same schema the editor runs on
@@ -14,6 +21,7 @@ describe('getDocumentText', () => {
 			extensions,
 			content: 'First one\n\nSecond one',
 		})
+		currentEditor = editor
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'First one\n\nSecond one'
@@ -26,6 +34,7 @@ describe('getDocumentText', () => {
 			content:
 				'Real prose here.\n\n```js\nconst utilize = 1\n```\n\nMore prose.',
 		})
+		currentEditor = editor
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'Real prose here.\n\nMore prose.'
@@ -34,6 +43,7 @@ describe('getDocumentText', () => {
 
 	it('reads each frontmatter line as its own block rather than one run-on line', () => {
 		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
 		editor.commands.setContent('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
@@ -50,6 +60,7 @@ describe('getDocumentText', () => {
 
 	it('drops a blank line inside frontmatter rather than emitting an empty block', () => {
 		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
 		editor.commands.setContent('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
@@ -63,6 +74,7 @@ describe('getDocumentText', () => {
 
 	it('reads nothing out of an empty frontmatter block', () => {
 		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
 		editor.commands.setContent('Real prose here.')
 		editor.commands.insertContentAt(0, { type: 'frontmatter' })
 
@@ -74,6 +86,7 @@ describe('getDocumentText', () => {
 			extensions,
 			content: 'The **report** was written.',
 		})
+		currentEditor = editor
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'The report was written.'
@@ -86,6 +99,7 @@ describe('getDocumentText', () => {
 			extensions,
 			content: 'first line  \nsecond line',
 		})
+		currentEditor = editor
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'first line\nsecond line'
@@ -97,6 +111,7 @@ describe('getDocumentText', () => {
 			extensions,
 			content: 'see![shot](/a.png)here',
 		})
+		currentEditor = editor
 
 		expect(getDocumentText(editor.state.doc).text).toBe('see here')
 	})
@@ -106,6 +121,7 @@ describe('getDocumentText', () => {
 			extensions,
 			content: '# A heading\n\n- One item\n- Another',
 		})
+		currentEditor = editor
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'A heading\n\nOne item\n\nAnother'

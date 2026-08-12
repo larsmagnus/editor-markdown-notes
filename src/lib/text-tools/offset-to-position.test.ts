@@ -1,11 +1,18 @@
 import { Editor } from '@tiptap/core'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { extensions } from '@/editor/extensions'
 import {
 	getDocumentText,
 	offsetToPosition,
 } from '@/lib/text-tools/document-text'
+
+let currentEditor: Editor | undefined
+
+afterEach(() => {
+	currentEditor?.destroy()
+	currentEditor = undefined
+})
 
 /**
  * Mapping a retext offset back to a ProseMirror position. Each case asserts on
@@ -18,6 +25,7 @@ describe('offsetToPosition', () => {
 			extensions,
 			content: 'The report was written.',
 		})
+		currentEditor = editor
 		const documentText = getDocumentText(editor.state.doc)
 		const start = documentText.text.indexOf('written')
 
@@ -32,6 +40,7 @@ describe('offsetToPosition', () => {
 			extensions,
 			content: 'First one\n\nSecond one',
 		})
+		currentEditor = editor
 		const documentText = getDocumentText(editor.state.doc)
 		const start = documentText.text.indexOf('Second')
 
@@ -46,6 +55,7 @@ describe('offsetToPosition', () => {
 			extensions,
 			content: 'The **report** was written.',
 		})
+		currentEditor = editor
 		const documentText = getDocumentText(editor.state.doc)
 		const start = documentText.text.indexOf('report was')
 
@@ -60,6 +70,7 @@ describe('offsetToPosition', () => {
 			extensions,
 			content: 'Before.\n\n```js\nconst x = 1\n```\n\nAfter the code.',
 		})
+		currentEditor = editor
 		const documentText = getDocumentText(editor.state.doc)
 		const start = documentText.text.indexOf('After')
 
@@ -71,6 +82,7 @@ describe('offsetToPosition', () => {
 
 	it('has nothing to map in an empty document', () => {
 		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
 
 		expect(offsetToPosition(getDocumentText(editor.state.doc), 0)).toBeNull()
 	})
