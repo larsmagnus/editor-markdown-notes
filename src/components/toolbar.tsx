@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 
+import { ButtonCopy } from '@/components/button-copy'
 import type { DevFileSelectorProps } from '@/components/dev-file-selector'
 import {
 	editModeFromViewOptions,
@@ -23,9 +24,10 @@ type ToolbarProps = {
 	files: DevFileSelectorProps['values']
 	fileName: string
 	setFileName: DevFileSelectorProps['setValue']
+	content: string
 }
 
-function Toolbar({ files, fileName, setFileName }: ToolbarProps) {
+function Toolbar({ files, fileName, setFileName, content }: ToolbarProps) {
 	const { viewOptions, setViewOptions, isVSCodeContext } = useSettings()
 
 	const editModeOptions = isVSCodeContext
@@ -94,6 +96,10 @@ function Toolbar({ files, fileName, setFileName }: ToolbarProps) {
 			</ToggleGroup>
 
 			<ThemeToggle />
+
+			<div className="ml-auto">
+				<ButtonCopy content={content} />
+			</div>
 		</div>
 	)
 }

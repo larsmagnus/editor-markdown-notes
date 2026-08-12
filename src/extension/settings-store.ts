@@ -1,6 +1,10 @@
 import * as vscode from 'vscode'
 
-import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '../shared/messages'
+import {
+	CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH,
+	DEFAULT_SETTINGS,
+	DEFAULT_VIEW_OPTIONS,
+} from '../shared/messages'
 import type {
 	Config,
 	ExtensionSettings,
@@ -63,6 +67,15 @@ export class SettingsStore {
 				'italicMarker',
 				DEFAULT_SETTINGS.italicMarker
 			),
+			// `maxLength` in package.json only validates settings.json edits made
+			// through the Settings UI - clamped again here since a value typed
+			// directly into settings.json isn't blocked from exceeding it.
+			claudePromptTemplate: config
+				.get<string>(
+					'claudePromptTemplate',
+					DEFAULT_SETTINGS.claudePromptTemplate
+				)
+				.slice(0, CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH),
 		}
 	}
 

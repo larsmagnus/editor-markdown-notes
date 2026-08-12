@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added a copy button to the toolbar for copying the note as markdown or plain text, and for opening it in Claude
+- Added `editorMarkdownNotes.claudePromptTemplate` to customize the prompt sent when opening a note in Claude
+
 ## [0.19.0] - 2026-08-12
 
 - Added editing images in the live editor: drag to move, edit the source and alt text, add or remove a link, delete, and navigate them by keyboard

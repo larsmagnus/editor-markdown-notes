@@ -36,6 +36,13 @@ export type ViewOptions = {
 
 export type ItalicMarker = '_' | '*'
 
+/**
+ * Matches `maxLength` on `editorMarkdownNotes.claudePromptTemplate` in
+ * `package.json` - JSON has no way to reference this constant, so keep the
+ * two in sync by hand.
+ */
+export const CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH = 500
+
 export type ExtensionSettings = {
 	centerContent: boolean
 	hideToolbar: boolean
@@ -51,6 +58,11 @@ export type ExtensionSettings = {
 	 * written with (see `Italic.extend` in `src/editor/extensions.ts`).
 	 */
 	italicMarker: ItalicMarker
+	/**
+	 * Prompt sent to `claude` by the toolbar's "Open in Claude" action. `%s` is
+	 * replaced with the note's path relative to the workspace root.
+	 */
+	claudePromptTemplate: string
 }
 
 export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
@@ -66,6 +78,7 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
 	hideToolbar: false,
 	textToolsTargetAge: 16,
 	italicMarker: '_',
+	claudePromptTemplate: 'Read @%s so I can ask you questions about it.',
 }
 
 /**
@@ -122,6 +135,13 @@ export type WebviewToHost =
 	 * moment the host acts on it, so there is nothing to persist.
 	 */
 	| { type: 'openInTextEditor' }
+	/**
+	 * Asks the host to open an integrated terminal running `claude`, prompted
+	 * to read this document by path (see `claudePromptTemplate`). No document
+	 * content is sent - the host resolves the path itself from the same
+	 * `vscode.TextDocument` `openInTextEditor` uses.
+	 */
+	| { type: 'openClaudeTerminal' }
 	/**
 	 * Diagnostics from inside the webview. Nothing in there reaches the extension
 	 * host's console, so without this a script that fails to load or throws on

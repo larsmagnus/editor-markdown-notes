@@ -23,7 +23,15 @@ export function useHostDocument() {
 		isVSCodeWebview()
 	)
 
+	// Applying `next` here too, not just posting it, keeps `content` current for
+	// readers like the toolbar's copy actions - the host's own echo of this
+	// write is deliberately suppressed (`DocumentWriter.isWriting`), so without
+	// this, `content` would otherwise sit stale until the next external change.
+	// `saveContent` itself only runs on `useNoteSave`'s 1000ms save debounce, so
+	// `content` can still lag the very latest keystroke by up to that window -
+	// the same latency the file on disk already has, not a new gap this closes.
 	const saveContent = useCallback((next: string) => {
+		setContent(next)
 		getVSCodeApi()?.postMessage({ type: 'save', content: next })
 	}, [])
 

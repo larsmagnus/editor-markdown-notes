@@ -18,5 +18,6 @@ export const Primary: Story = {
 		files: [],
 		fileName: 'asd',
 		setFileName: fn(),
+		content: '# Roadmap\n\nShip it.',
 	},
 }

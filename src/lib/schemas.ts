@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import {
+	CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH,
 	DEFAULT_SETTINGS,
 	DEFAULT_VIEW_OPTIONS,
 	TEXT_TOOL_RULE_IDS,
@@ -109,6 +110,15 @@ const extensionSettingsSchema = z
 			description:
 				'Marker used when italicizing from the editor itself. Maps to `editorMarkdownNotes.italicMarker`.',
 		}),
+		claudePromptTemplate: z
+			.string()
+			.max(CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH)
+			.catch(DEFAULT_SETTINGS.claudePromptTemplate)
+			.meta({
+				title: 'Claude prompt template',
+				description:
+					'Prompt sent to `claude` by the toolbar\'s "Open in Claude" action, with `%s` replaced by the note\'s path. Maps to `editorMarkdownNotes.claudePromptTemplate`.',
+			}),
 	})
 	.catch(DEFAULT_SETTINGS)
 	.meta({

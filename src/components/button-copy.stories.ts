@@ -13,5 +13,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Primary: Story = {
-	args: {},
+	args: {
+		content: '---\ntitle: Roadmap\n---\n\n# Roadmap\n\nShip it.',
+	},
 }

@@ -76,6 +76,13 @@
 					"minimum": 5,
 					"maximum": 30,
 					"description": "Reading age the text tools score sentences against. A sentence too hard for this age reads as \"hard\"; one still too hard six years later, \"very hard\"."
+				},
+				"editorMarkdownNotes.claudePromptTemplate": {
+					"type": "string",
+					"default": "Read @%s so I can ask you questions about it.",
+					"maxLength": 500,
+					"editPresentation": "multilineText",
+					"description": "Prompt sent to `claude` by the toolbar's \"Open in Claude\" action. `%s` is replaced with the note's path relative to the workspace root."
 				}
 			}
 		},
@@ -265,6 +272,7 @@
 		"class-variance-authority": "0.7.1",
 		"clsx": "2.1.1",
 		"lucide-react": "1.31.0",
+		"markdown-it": "15.0.0",
 		"mermaid": "11.16.1",
 		"prosemirror-markdown": "1.13.5",
 		"prosemirror-model": "1.25.11",

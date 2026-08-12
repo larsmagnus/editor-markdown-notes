@@ -29,7 +29,12 @@ describe('view option toggles', () => {
 		)
 		render(
 			<SettingsProvider>
-				<Toolbar files={[]} fileName="notes.md" setFileName={() => {}} />
+				<Toolbar
+					files={[]}
+					fileName="notes.md"
+					setFileName={() => {}}
+					content=""
+				/>
 			</SettingsProvider>
 		)
 
@@ -48,7 +53,12 @@ describe('view option toggles', () => {
 		)
 		render(
 			<SettingsProvider>
-				<Toolbar files={[]} fileName="notes.md" setFileName={() => {}} />
+				<Toolbar
+					files={[]}
+					fileName="notes.md"
+					setFileName={() => {}}
+					content=""
+				/>
 			</SettingsProvider>
 		)
 
@@ -69,7 +79,12 @@ describe('edit mode', () => {
 		)
 		render(
 			<SettingsProvider>
-				<Toolbar files={[]} fileName="notes.md" setFileName={() => {}} />
+				<Toolbar
+					files={[]}
+					fileName="notes.md"
+					setFileName={() => {}}
+					content=""
+				/>
 			</SettingsProvider>
 		)
 
@@ -86,7 +101,12 @@ describe('edit mode', () => {
 		)
 		render(
 			<SettingsProvider>
-				<Toolbar files={[]} fileName="notes.md" setFileName={() => {}} />
+				<Toolbar
+					files={[]}
+					fileName="notes.md"
+					setFileName={() => {}}
+					content=""
+				/>
 			</SettingsProvider>
 		)
 
@@ -103,7 +123,12 @@ describe('edit mode', () => {
 		)
 		render(
 			<SettingsProvider>
-				<Toolbar files={[]} fileName="notes.md" setFileName={() => {}} />
+				<Toolbar
+					files={[]}
+					fileName="notes.md"
+					setFileName={() => {}}
+					content=""
+				/>
 			</SettingsProvider>
 		)
 
@@ -122,7 +147,12 @@ describe('edit mode', () => {
 	it('hides the text editor button in the standalone web app', () => {
 		render(
 			<SettingsProvider>
-				<Toolbar files={[]} fileName="notes.md" setFileName={() => {}} />
+				<Toolbar
+					files={[]}
+					fileName="notes.md"
+					setFileName={() => {}}
+					content=""
+				/>
 			</SettingsProvider>
 		)
 
@@ -138,7 +168,12 @@ describe('edit mode', () => {
 		}
 		render(
 			<SettingsProvider>
-				<Toolbar files={[]} fileName="notes.md" setFileName={() => {}} />
+				<Toolbar
+					files={[]}
+					fileName="notes.md"
+					setFileName={() => {}}
+					content=""
+				/>
 			</SettingsProvider>
 		)
 

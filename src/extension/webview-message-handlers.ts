@@ -10,6 +10,7 @@ import type {
 
 import type { DocumentWriter } from './document-updates'
 import { postDocumentUpdate } from './document-updates'
+import { openClaudeTerminal } from './open-claude-terminal-command'
 import { openInTextEditor } from './open-in-text-editor-command'
 import type { SettingsStore } from './settings-store'
 
@@ -59,6 +60,9 @@ export function createWebviewMessageHandlers({
 		log: (message) => recordWebviewLog(log, message.level, message.message),
 		openInTextEditor: () => {
 			void openInTextEditor(document.uri)
+		},
+		openClaudeTerminal: () => {
+			openClaudeTerminal(document.uri, store.getSettings().claudePromptTemplate)
 		},
 		// Answers the asking panel alone. Broadcasting instead would make every
 		// other open tab reload its theme and re-highlight for a request that

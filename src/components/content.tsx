@@ -35,6 +35,7 @@ function Content({ defaultFileName }: ContentProps) {
 							files={files}
 							fileName={fileName}
 							setFileName={setFileName}
+							content={content}
 						/>
 					</Suspense>
 				</AppErrorBoundary>
