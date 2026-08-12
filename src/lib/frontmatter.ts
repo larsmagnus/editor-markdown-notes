@@ -15,16 +15,3 @@ export function splitFrontmatter(markdown: string): {
 		body: markdown.slice(match[0].length),
 	}
 }
-
-// `null` means "no frontmatter block" and is omitted entirely. Any string -
-// including '' - means the block exists and its fences are preserved, so an
-// intentionally empty block doesn't disappear on the next save.
-export function joinFrontmatter(
-	frontmatter: string | null,
-	body: string
-): string {
-	if (frontmatter === null) return body
-
-	const trimmed = frontmatter.trim()
-	return trimmed ? `---\n${trimmed}\n---\n\n${body}` : `---\n---\n\n${body}`
-}

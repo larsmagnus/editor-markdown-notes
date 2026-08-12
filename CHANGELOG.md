@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 - Added editing images in the live editor: drag to move, edit the source and alt text, add or remove a link, delete, and navigate them by keyboard
+- Added a copy button, a delete button, and syntax highlighting to the frontmatter block in the live editor
+- Added a button to add a frontmatter block to a note that doesn't already have one
+- Added writing a frontmatter block by hand: type `---`, your content, then `---` at the top of a note
+- Changed undo/redo for the frontmatter block to share the same history as the rest of the note
+- Fixed Tab moving focus out of the editor instead of indenting
+- Fixed Ctrl/Cmd+Z sometimes clearing a freshly opened note that has frontmatter
 
 ## [0.18.1] - 2026-08-11
 

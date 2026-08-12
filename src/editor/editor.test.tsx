@@ -37,6 +37,7 @@ beforeEach(() => {
 afterEach(() => {
 	delete window.imageBaseUris
 	vi.clearAllMocks()
+	vi.unstubAllGlobals()
 })
 
 describe('Editor', () => {
@@ -366,57 +367,118 @@ describe('Editor', () => {
 			'Ship it.',
 		].join('\n')
 
-		it('keeps frontmatter keys out of the document body', async () => {
-			const { container } = render(<Editor content={FRONTMATTER_NOTE} />)
+		it('keeps frontmatter keys out of the document heading', async () => {
+			render(<Editor content={FRONTMATTER_NOTE} />)
 
 			expect(
 				await screen.findByRole('heading', { name: 'Roadmap' })
 			).toBeInTheDocument()
-
-			const documentBody = container.querySelector('.ProseMirror')
-			expect(documentBody?.textContent).not.toMatch(/title:/)
-			expect(documentBody?.textContent).not.toMatch(/status:/)
 		})
 
-		it('shows the frontmatter panel with the raw frontmatter text', async () => {
+		// Loading a note that has frontmatter inserts a node right after mount -
+		// undoable like any other transaction unless it opts out, which would put
+		// a phantom step ahead of the user's very first keystroke and let Ctrl+Z
+		// clear a document nobody has touched yet.
+		it('does not clear a freshly loaded document on Ctrl+Z', async () => {
+			const { container } = render(<Editor content={FRONTMATTER_NOTE} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			const before = container.querySelector('.ProseMirror')?.textContent
+
+			await userEvent.keyboard('{Control>}z{/Control}')
+			await userEvent.keyboard('{Control>}z{/Control}')
+			await userEvent.keyboard('{Control>}z{/Control}')
+
+			expect(container.querySelector('.ProseMirror')?.textContent).toBe(before)
+		})
+
+		it('shows the frontmatter block with the raw frontmatter text', async () => {
+			const { container } = render(<Editor content={FRONTMATTER_NOTE} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			const block = container.querySelector('[data-type="frontmatter"]')
+			expect(block?.textContent).toContain('title: Roadmap')
+			expect(block?.textContent).toContain('status: draft')
+		})
+
+		// Frontmatter is always the document's first node, so there is nowhere
+		// for the caret to go above it - it should stay put rather than land
+		// somewhere with nothing rendered to show for it. A single-line block
+		// keeps the click-then-navigate-left setup deterministic in a layout-less
+		// test DOM, where a multi-line block's per-character caret math isn't.
+		it('keeps the caret inside the block when Up/Left is pressed at its start', async () => {
+			const note = ['---', 'title: Roadmap', '---', '', '# Roadmap'].join('\n')
+			const { container } = render(<Editor content={note} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			// Clicking the first token rather than the full line: syntax
+			// highlighting may or may not have split the text into spans by the
+			// time this runs, and 'title' alone is a match either way.
+			await userEvent.click(screen.getByText(/^title/))
+			for (let index = 0; index < 20; index += 1) {
+				await userEvent.keyboard('{ArrowLeft}')
+			}
+			await userEvent.keyboard('{ArrowUp}')
+			await userEvent.keyboard('x')
+
+			expect(
+				container.querySelector('[data-type="frontmatter"]')?.textContent
+			).toBe('Frontmatterxtitle: Roadmap')
+		})
+
+		it('hides the add-frontmatter button for a note that already has one', async () => {
 			render(<Editor content={FRONTMATTER_NOTE} />)
 
-			expect(await screen.findByLabelText('Frontmatter')).toHaveValue(
-				'title: Roadmap\nstatus: draft'
-			)
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			expect(
+				screen.queryByRole('button', { name: 'Add frontmatter' })
+			).not.toBeInTheDocument()
 		})
 
-		it('hides the frontmatter panel for a note without frontmatter', async () => {
+		it('shows the add-frontmatter button for a note without one', async () => {
 			render(<Editor content={'# Roadmap\n\nShip it.'} />)
 
 			await screen.findByRole('heading', { name: 'Roadmap' })
-			expect(screen.queryByLabelText('Frontmatter')).not.toBeInTheDocument()
+			expect(
+				screen.getByRole('button', { name: 'Add frontmatter' })
+			).toBeInTheDocument()
 		})
 
-		// Only the body was deleted, so the fences and their keys have to survive
-		// it - an emptied body is not an emptied file.
+		// Only the "Ship it." paragraph was deleted, so the fences and their keys
+		// have to survive it - an emptied body is not an emptied file. Backspaces
+		// a precise count rather than selecting with Home/End: happy-dom has no
+		// `setSelectionRange` for a contentEditable region, which those keys need.
 		it('saves a body the author has emptied, keeping the frontmatter', async () => {
 			render(<Editor content={FRONTMATTER_NOTE} />)
 
 			await screen.findByRole('heading', { name: 'Roadmap' })
 			await userEvent.click(screen.getByText('Ship it.'))
-			await userEvent.keyboard('{Control>}a{/Control}{Backspace}')
+			await userEvent.keyboard('{Backspace}'.repeat('Ship it.'.length))
 
 			await waitFor(
 				() => {
 					expect(updateNotes).toHaveBeenCalledWith(
-						'---\ntitle: Roadmap\nstatus: draft\n---\n\n'
+						expect.stringContaining('---\ntitle: Roadmap\nstatus: draft\n---')
 					)
 				},
 				{ timeout: 2000 }
 			)
+			expect(updateNotes).toHaveBeenCalledWith(
+				expect.not.stringContaining('Ship it.')
+			)
 		})
 
-		it('saves edits to the panel with the frontmatter fences preserved', async () => {
+		it('saves edits made directly in the frontmatter block, fences preserved', async () => {
 			render(<Editor content={FRONTMATTER_NOTE} />)
 
-			const panel = await screen.findByLabelText('Frontmatter')
-			await userEvent.type(panel, '\npriority: high')
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			// Syntax highlighting splits the block's text into several `<span>`s
+			// ('status', ': ', 'draft') - clicking the last one lands the cursor at
+			// its end, the same place a click already lands in the plain-paragraph
+			// case above, so typing appends right after "draft" with no extra
+			// navigation needed.
+			await userEvent.click(screen.getByText('draft'))
+			await userEvent.keyboard('\npriority: high')
 
 			await waitFor(
 				() => {
@@ -428,6 +490,94 @@ describe('Editor', () => {
 				},
 				{ timeout: 2000 }
 			)
+		})
+
+		it('copies the frontmatter text via its copy button', async () => {
+			render(<Editor content={FRONTMATTER_NOTE} />)
+			await screen.findByRole('heading', { name: 'Roadmap' })
+
+			// Stubbed after the editor mounts: constructing a new `Editor` reads
+			// `navigator.userAgent` (for `isiOS`), which a stub built from
+			// `{ ...navigator, clipboard }` alone does not carry.
+			const writeText = vi.fn().mockResolvedValue(undefined)
+			vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } })
+
+			await userEvent.click(screen.getByLabelText('Copy frontmatter'))
+
+			expect(writeText).toHaveBeenCalledWith('title: Roadmap\nstatus: draft')
+		})
+
+		it('deletes the frontmatter block, undoably', async () => {
+			const { container } = render(<Editor content={FRONTMATTER_NOTE} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			// A real pause, not a scripting convenience: the load and the delete
+			// need to land in separate `prosemirror-history` groups (grouped by
+			// wall-clock proximity, ~500ms) for the later Ctrl+Z to undo only the
+			// delete rather than the load as well.
+			await new Promise((resolve) => setTimeout(resolve, 600))
+			await userEvent.click(screen.getByLabelText('Delete frontmatter'))
+
+			expect(
+				container.querySelector('[data-type="frontmatter"]')
+			).not.toBeInTheDocument()
+
+			await waitFor(
+				() => {
+					expect(updateNotes).toHaveBeenCalledWith('# Roadmap\n\nShip it.')
+				},
+				{ timeout: 2000 }
+			)
+
+			await userEvent.keyboard('{Control>}z{/Control}')
+			expect(
+				container.querySelector('[data-type="frontmatter"]')
+			).toBeInTheDocument()
+		})
+
+		it('adds an empty frontmatter block via the add button', async () => {
+			const { container } = render(<Editor content={'# Roadmap\n\nShip it.'} />)
+
+			await screen.findByRole('heading', { name: 'Roadmap' })
+			await userEvent.click(
+				screen.getByRole('button', { name: 'Add frontmatter' })
+			)
+
+			expect(
+				container.querySelector('[data-type="frontmatter"]')
+			).toBeInTheDocument()
+			await userEvent.keyboard('title: Roadmap')
+
+			await waitFor(
+				() => {
+					expect(updateNotes).toHaveBeenCalledWith(
+						expect.stringContaining('---\ntitle: Roadmap\n---\n\n')
+					)
+				},
+				{ timeout: 2000 }
+			)
+		})
+
+		it('promotes a manually typed --- fence block into a frontmatter block', async () => {
+			// Starts empty rather than clicking into position: happy-dom has no
+			// `setSelectionRange` for a contentEditable region, so `{Home}` can't
+			// be used to reach the start of existing content. An empty document
+			// already autofocuses at position 0.
+			const { container } = render(<Editor content={''} />)
+			await waitFor(() => {
+				expect(container.querySelector('.ProseMirror')).toBeInTheDocument()
+			})
+
+			await userEvent.keyboard('---{Enter}title: Roadmap{Enter}---{Enter}')
+
+			await waitFor(() => {
+				expect(
+					container.querySelector('[data-type="frontmatter"]')
+				).toBeInTheDocument()
+			})
+			expect(
+				container.querySelector('[data-type="frontmatter"]')?.textContent
+			).toContain('title: Roadmap')
 		})
 	})
 })

@@ -26,7 +26,7 @@ export type DocumentText = {
  */
 const BLOCK_SEPARATOR = '\n\n'
 
-/** Code is not prose. Skipping the node also keeps mermaid sources unlinted. */
+/** Code is not prose, and skipping the node also keeps mermaid sources unlinted. */
 const IGNORED_NODES = new Set(['codeBlock'])
 
 /** What an inline node that carries no text of its own stands in as. */
@@ -36,6 +36,49 @@ const INLINE_PLACEHOLDER: Record<string, string> = {
 	hardBreak: '\n',
 }
 
+/**
+ * Splits a frontmatter block into one "block" per YAML line rather than
+ * reading its whole `\n`-joined text as one run.
+ *
+ * A `title:`/`description:` field can hold real prose worth checking, but
+ * retext has no concept of YAML's line-based `key: value` structure - fed the
+ * whole multi-line block as a single run, it finds no sentence-ending
+ * punctuation between lines and scores five unrelated lines as one giant
+ * run-on sentence. Splitting on `\n` first gives each line its own sentence
+ * boundary instead, so a prose value still gets checked and a bare `status:
+ * draft` line - with nothing retext would flag - stays quiet.
+ */
+function appendFrontmatterLines(
+	node: ProseMirrorNode,
+	pos: number,
+	text: string,
+	slices: TextSlice[]
+): string {
+	let result = text
+	let offset = 0
+
+	for (const line of node.textContent.split('\n')) {
+		if (line) {
+			// Reuses the same "already have text" check the block separator uses
+			// everywhere else, so a line joins the block before it exactly the way
+			// the block itself joins whatever textblock came before it.
+			if (result) result += BLOCK_SEPARATOR
+			// `pos` is the frontmatter node itself; its content starts one inside,
+			// and `offset` walks `textContent`, which - `content: 'text*'`, no marks
+			// - lines up with document positions one-for-one.
+			slices.push({
+				offset: result.length,
+				length: line.length,
+				from: pos + 1 + offset,
+			})
+			result += line
+		}
+		offset += line.length + 1
+	}
+
+	return result
+}
+
 export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 	const slices: TextSlice[] = []
 	let text = ''
@@ -43,6 +86,11 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 	doc.descendants((node, pos) => {
 		if (IGNORED_NODES.has(node.type.name)) return false
 		if (!node.isTextblock) return true
+
+		if (node.type.name === 'frontmatter') {
+			text = appendFrontmatterLines(node, pos, text, slices)
+			return false
+		}
 
 		if (text) text += BLOCK_SEPARATOR
 

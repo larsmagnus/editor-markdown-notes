@@ -32,6 +32,43 @@ describe('getDocumentText', () => {
 		)
 	})
 
+	it('reads each frontmatter line as its own block rather than one run-on line', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editor.commands.setContent('Real prose here.')
+		editor.commands.insertContentAt(0, {
+			type: 'frontmatter',
+			content: [{ type: 'text', text: 'title: Roadmap\nstatus: draft' }],
+		})
+
+		// Joined the same way separate blocks are elsewhere - retext has no
+		// concept of YAML's line-based structure, so without this a whole
+		// multi-line frontmatter block reads as one incoherent run-on sentence.
+		expect(getDocumentText(editor.state.doc).text).toBe(
+			'title: Roadmap\n\nstatus: draft\n\nReal prose here.'
+		)
+	})
+
+	it('drops a blank line inside frontmatter rather than emitting an empty block', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editor.commands.setContent('Real prose here.')
+		editor.commands.insertContentAt(0, {
+			type: 'frontmatter',
+			content: [{ type: 'text', text: 'title: Roadmap\n\nstatus: draft' }],
+		})
+
+		expect(getDocumentText(editor.state.doc).text).toBe(
+			'title: Roadmap\n\nstatus: draft\n\nReal prose here.'
+		)
+	})
+
+	it('reads nothing out of an empty frontmatter block', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editor.commands.setContent('Real prose here.')
+		editor.commands.insertContentAt(0, { type: 'frontmatter' })
+
+		expect(getDocumentText(editor.state.doc).text).toBe('Real prose here.')
+	})
+
 	it('joins the text nodes a mark splits a paragraph into', () => {
 		const editor = new Editor({
 			extensions,

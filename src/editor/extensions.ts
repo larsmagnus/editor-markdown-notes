@@ -1,5 +1,6 @@
 import CodeBlock from '@tiptap/extension-code-block'
 import { Color } from '@tiptap/extension-color'
+import Document from '@tiptap/extension-document'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import ListItem from '@tiptap/extension-list-item'
@@ -18,6 +19,7 @@ import { Markdown } from 'tiptap-markdown'
 
 import { CodeBlockView } from '@/editor/code-block-view'
 import { CodeExtension } from '@/editor/code-extension'
+import { Frontmatter } from '@/editor/frontmatter/extension'
 import {
 	focusImageToolbar,
 	moveToAdjacentImage,
@@ -27,6 +29,7 @@ import { MarkdownClipboard } from '@/editor/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '@/editor/markdown-escaping'
 import { StrictLinkify } from '@/editor/strict-linkify-extension'
 import { SyntaxHighlight } from '@/editor/syntax-highlight-extension'
+import { TabIndent } from '@/editor/tab-indent-extension'
 import { TableCommands } from '@/editor/table/commands'
 import { MarkdownTable } from '@/editor/table/extension'
 import { TextTools } from '@/editor/text-tools-extension'
@@ -67,7 +70,16 @@ export const extensions = [
 		// (autolink disabled); underline stays unsupported (see CLAUDE.md).
 		link: false,
 		underline: false,
+		// Replaced below so the top-level content expression can require
+		// frontmatter, if present, to be the document's first node.
+		document: false,
 	}),
+	// `frontmatter?` goes first in the content expression so at most one can
+	// exist and it can only ever be the document's first child - the schema
+	// enforces the position, no `appendTransaction` policing needed for it
+	// the way the table's header row does.
+	Document.extend({ content: 'frontmatter? block+' }),
+	Frontmatter,
 	// The name stays `codeBlock`, which is what keeps `tiptap-markdown`'s fenced
 	// block serializer attached. The node view only changes how a block is drawn:
 	// a `mermaid` one renders its diagram, everything else stays a `<pre>`.
@@ -156,6 +168,11 @@ export const extensions = [
 	TextTools,
 	// Decorations only, and inert until `useSyntaxHighlight` feeds it tokens.
 	SyntaxHighlight,
+	// Otherwise unhandled, Tab is a browser default: it moves focus to the next
+	// focusable element on the page rather than indenting. Declines inside a
+	// table cell and when a node (not a text caret) is selected, so it doesn't
+	// compete with those keys' own meanings elsewhere in this file.
+	TabIndent,
 ]
 
 // `tiptap-markdown` ships no `Storage` module augmentation of its own, so

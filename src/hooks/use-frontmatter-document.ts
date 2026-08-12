@@ -1,36 +1,37 @@
 import type { Editor } from '@tiptap/react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import { splitFrontmatter } from '@/lib/frontmatter'
 
 /**
- * Keeps the note's frontmatter beside the document rather than inside it.
+ * Rebuilds the document whenever the incoming file changes underneath it.
  *
- * markdown-it has no concept of frontmatter and would parse the `---` fence as
- * an `<hr>` followed by headings, so it is split off before `setContent` and
- * stitched back on before saving.
+ * Frontmatter is a real node inside the doc, so `editor.storage.markdown.
+ * getMarkdown()` already reproduces the `---` fences - comparing it to the
+ * whole incoming `content` is what lets this skip a rebuild when nothing
+ * actually changed. markdown-it still has no concept of frontmatter and would
+ * parse `---` as an `<hr>`, so a rebuild still starts with `splitFrontmatter`'s
+ * regex and inserts the extracted text as a node afterward, rather than ever
+ * handing `---` characters to `setContent`.
  */
 export function useFrontmatterDocument(editor: Editor | null, content: string) {
-	const [frontmatter, setFrontmatter] = useState(
-		() => splitFrontmatter(content).frontmatter
-	)
-
 	useEffect(() => {
 		if (!editor || content === undefined) return
+		if (editor.storage.markdown.getMarkdown() === content) return
 
-		const { frontmatter: nextFrontmatter, body } = splitFrontmatter(content)
+		const { frontmatter, body } = splitFrontmatter(content)
 
-		// Compared like for like. This read `editor.getHTML() !== body`, which
-		// weighed rendered HTML against markdown source - never equal, so the guard
-		// never held and every incoming update re-set the document.
-		if (editor.storage.markdown.getMarkdown() !== body) {
-			editor.commands.setContent(body)
+		// One transaction, excluded from history: this is a content sync (initial
+		// load, or an external change echoed back from the host), not a user
+		// edit - left undoable, it put a phantom step ahead of the user's very
+		// first keystroke, so Ctrl+Z on an untouched document cleared it.
+		const chain = editor.chain().setMeta('addToHistory', false).setContent(body)
+		if (frontmatter !== null) {
+			chain.insertContentAt(0, {
+				type: 'frontmatter',
+				content: frontmatter ? [{ type: 'text', text: frontmatter }] : [],
+			})
 		}
-
-		setFrontmatter((current) =>
-			nextFrontmatter !== current ? nextFrontmatter : current
-		)
+		chain.run()
 	}, [content, editor])
-
-	return { frontmatter, setFrontmatter }
 }

@@ -1,11 +1,6 @@
 import { Copy } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { NodeActionButton } from '@/editor/node-action-button'
 
 type CodeBlockCopyButtonProps = { code: string }
 
@@ -16,23 +11,13 @@ export function CodeBlockCopyButton({ code }: CodeBlockCopyButtonProps) {
 	}
 
 	return (
-		<Tooltip>
-			<TooltipTrigger
-				render={
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon"
-						contentEditable={false}
-						aria-label="Copy code"
-						className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-						onClick={handleClick}
-					>
-						<Copy />
-					</Button>
-				}
-			/>
-			<TooltipContent>Copy</TooltipContent>
-		</Tooltip>
+		<NodeActionButton
+			icon={<Copy />}
+			label="Copy code"
+			tooltip="Copy"
+			size="icon"
+			className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+			onClick={handleClick}
+		/>
 	)
 }

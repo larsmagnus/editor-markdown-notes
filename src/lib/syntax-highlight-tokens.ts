@@ -16,11 +16,20 @@ export type RelativeToken = {
 	fontStyle?: number
 }
 
-/** Every highlightable (non-mermaid, tagged) fenced code block in the doc. */
+/**
+ * Every highlightable block in the doc: tagged, non-mermaid fenced code
+ * blocks, plus the frontmatter block (always `yaml` - it has no language
+ * attribute of its own to read).
+ */
 export function collectCodeBlocks(doc: ProseMirrorNode): CodeBlockSnapshot[] {
 	const blocks: CodeBlockSnapshot[] = []
 
 	doc.descendants((node, pos) => {
+		if (node.type.name === 'frontmatter') {
+			blocks.push({ text: node.textContent, language: 'yaml', from: pos + 1 })
+			return
+		}
+
 		if (node.type.name !== 'codeBlock') return
 		const language = String(node.attrs.language ?? '')
 		if (!language || language === MERMAID_LANGUAGE) return

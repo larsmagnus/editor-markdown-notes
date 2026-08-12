@@ -15,8 +15,9 @@ interface RawMarkdownEditorProps {
  * The note as plain markdown source, editable and autosaving.
  *
  * Writes the file verbatim - frontmatter included - because this view shows the
- * whole file. The rich editor's `splitFrontmatter`/`joinFrontmatter` round trip
- * would re-fence a block that is already fenced here.
+ * whole file. The rich editor keeps frontmatter as its own node and reads it
+ * out through `splitFrontmatter`, which would re-fence a block that is already
+ * fenced here.
  */
 export function RawMarkdownEditor({
 	content,
