@@ -7,6 +7,8 @@
  * (creating the terminal, resolving the document's path) and stays thin.
  */
 
+import { CLAUDE_PROMPT_CONTENT_MAX_LENGTH } from '../shared/messages'
+
 /**
  * Escapes a double-quoted argument for POSIX shells (bash/zsh/fish - the
  * default on macOS/Linux, and common on Windows via Git Bash or WSL).
@@ -25,19 +27,84 @@ export function escapeForPowerShell(value: string): string {
 }
 
 /**
- * Whether `shellPath` (`vscode.env.shell`) is PowerShell - the only non-POSIX
- * shell this module knows how to escape for. `cmd.exe` isn't handled (no
- * reliable literal-string escaping for it); out of scope for now.
+ * Drops what cmd.exe would still act on inside a double-quoted argument,
+ * rather than escaping it: `"`, which cmd has no way to escape (`\"` leaves
+ * the backslash and closes the string), and `%`, which expands `%VAR%` even
+ * while quoted.
+ *
+ * Everything else - `&`, `|`, `<`, `>` - is literal for as long as the quotes
+ * hold, which removing `"` is what guarantees. That matters here: they are
+ * also mermaid's arrows, and the excerpt is only useful while it still looks
+ * like the diagram it points at.
  */
-export function isPowerShell(shellPath: string): boolean {
-	const shellName = shellPath.split(/[\\/]/).pop() ?? ''
-	return /^(pwsh|powershell)(\.exe)?$/i.test(shellName)
+export function stripForCmd(value: string): string {
+	return value.replace(/["%]/g, '')
 }
 
-export function buildPrompt(template: string, relativePath: string): string {
-	return template.includes('%s')
-		? template.replaceAll('%s', relativePath)
-		: template
+/** The escaping rules `shellPath` (`vscode.env.shell`) needs. */
+export type ShellFamily = 'posix' | 'powershell' | 'cmd'
+
+/** Whether `shellPath` (`vscode.env.shell`) is PowerShell. */
+export function isPowerShell(shellPath: string): boolean {
+	return /^(pwsh|powershell)(\.exe)?$/i.test(basename(shellPath))
+}
+
+/**
+ * Which rules apply to `shellPath` (`vscode.env.shell`) - POSIX for anything
+ * unrecognized, since that covers bash, zsh, fish, and a Windows user's Git
+ * Bash or WSL alike.
+ */
+export function shellFamily(shellPath: string): ShellFamily {
+	if (isPowerShell(shellPath)) return 'powershell'
+
+	return /^cmd(\.exe)?$/i.test(basename(shellPath)) ? 'cmd' : 'posix'
+}
+
+function basename(shellPath: string): string {
+	return shellPath.split(/[\\/]/).pop() ?? ''
+}
+
+export type PromptTokens = {
+	/** The note's path relative to the workspace root. */
+	path: string
+	/** The part of the note being asked about, when it is not the whole note. */
+	content?: string
+}
+
+/**
+ * Fills a prompt template's tokens: `%@` the note as an at-reference, `%s` its
+ * bare path, `%c` the excerpt being asked about.
+ *
+ * One pass over the template rather than a token-at-a-time `replaceAll`, so a
+ * path or an excerpt that itself contains `%s` is never substituted into a
+ * second time.
+ */
+export function buildPrompt(template: string, tokens: PromptTokens): string {
+	const values: Record<string, string> = {
+		'%@': `@${tokens.path}`,
+		'%s': tokens.path,
+		'%c': toExcerpt(tokens.content ?? ''),
+	}
+
+	return template.replace(/%[@sc]/g, (token) => values[token] ?? token)
+}
+
+/**
+ * Trims an excerpt down to what a prompt can carry: one line (see
+ * `toSingleLine`), collapsed whitespace, and no longer than
+ * `CLAUDE_PROMPT_CONTENT_MAX_LENGTH`.
+ *
+ * The result is a locator - enough for Claude to find this part of a file it
+ * is separately being told to read - not a faithful copy. Mermaid source in
+ * particular is newline-delimited and does not survive the flattening as
+ * valid source, which is fine: nothing re-parses it.
+ */
+function toExcerpt(content: string): string {
+	const flattened = toSingleLine(content).replace(/\s+/g, ' ').trim()
+
+	return flattened.length > CLAUDE_PROMPT_CONTENT_MAX_LENGTH
+		? `${flattened.slice(0, CLAUDE_PROMPT_CONTENT_MAX_LENGTH).trimEnd()}...`
+		: flattened
 }
 
 /**
@@ -61,13 +128,16 @@ function toSingleLine(value: string): string {
  */
 export function buildClaudeCommand(
 	promptTemplate: string,
-	relativePath: string,
+	tokens: PromptTokens,
 	shellPath: string
 ): string {
-	const prompt = toSingleLine(buildPrompt(promptTemplate, relativePath))
-	const escapedPrompt = isPowerShell(shellPath)
-		? escapeForPowerShell(prompt)
-		: escapeForPosixShell(prompt)
+	const escapers: Record<ShellFamily, (value: string) => string> = {
+		posix: escapeForPosixShell,
+		powershell: escapeForPowerShell,
+		cmd: stripForCmd,
+	}
 
-	return `claude "${escapedPrompt}"`
+	const prompt = toSingleLine(buildPrompt(promptTemplate, tokens))
+
+	return `claude "${escapers[shellFamily(shellPath)](prompt)}"`
 }

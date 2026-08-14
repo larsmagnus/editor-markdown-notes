@@ -76,6 +76,12 @@ export class SettingsStore {
 					DEFAULT_SETTINGS.claudePromptTemplate
 				)
 				.slice(0, CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH),
+			claudeInlinePromptTemplate: config
+				.get<string>(
+					'claudeInlinePromptTemplate',
+					DEFAULT_SETTINGS.claudeInlinePromptTemplate
+				)
+				.slice(0, CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH),
 		}
 	}
 

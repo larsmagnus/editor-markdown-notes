@@ -1,7 +1,7 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { HighlighterCore } from 'shiki'
 
-import { MERMAID_LANGUAGE } from '@/editor/mermaid-language'
+import { MERMAID_LANGUAGE } from '@/editor/mermaid/language'
 import type { PlacedToken } from '@/editor/syntax-highlight-extension'
 import { ensureLanguage } from '@/lib/shiki-highlighter'
 

@@ -79,10 +79,17 @@
 				},
 				"editorMarkdownNotes.claudePromptTemplate": {
 					"type": "string",
-					"default": "Read @%s so I can ask you questions about it.",
+					"default": "Read %@ so I can ask you questions about it.",
 					"maxLength": 500,
 					"editPresentation": "multilineText",
-					"description": "Prompt sent to `claude` by the toolbar's \"Open in Claude\" action. `%s` is replaced with the note's path relative to the workspace root."
+					"description": "Prompt sent to `claude` by the toolbar's \"Open in Claude\" action. `%@` is replaced with the note as an at-reference (`@notes/roadmap.md`), `%s` with its bare path relative to the workspace root."
+				},
+				"editorMarkdownNotes.claudeInlinePromptTemplate": {
+					"type": "string",
+					"default": "Read %@, then focus on the part of it that starts with \"%c\" so I can ask you questions about that.",
+					"maxLength": 500,
+					"editPresentation": "multilineText",
+					"description": "Prompt sent to `claude` by \"Open in Claude\" on one part of a note, such as a diagram. Takes the same `%@` and `%s` tokens as the note-wide template, plus `%c` for the source of the part in question (flattened to one line and truncated)."
 				}
 			}
 		},
@@ -279,6 +286,7 @@
 		"react": "19.1.0",
 		"react-dom": "19.1.0",
 		"react-error-boundary": "6.1.2",
+		"react-zoom-pan-pinch": "4.0.4",
 		"retext-english": "5.0.0",
 		"retext-intensify": "7.0.0",
 		"retext-passive": "5.0.0",

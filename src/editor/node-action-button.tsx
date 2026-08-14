@@ -19,6 +19,7 @@ type NodeActionButtonProps = {
 	tooltip?: string
 	size?: VariantProps<typeof buttonVariants>['size']
 	className?: string
+	disabled?: boolean
 	onClick: () => void
 }
 
@@ -36,6 +37,7 @@ export function NodeActionButton({
 	tooltip = label,
 	size = 'icon-sm',
 	className,
+	disabled,
 	onClick,
 }: NodeActionButtonProps) {
 	return (
@@ -48,6 +50,7 @@ export function NodeActionButton({
 						size={size}
 						contentEditable={false}
 						aria-label={label}
+						disabled={disabled}
 						className={className}
 						onClick={onClick}
 					>

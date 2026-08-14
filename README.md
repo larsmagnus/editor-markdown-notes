@@ -48,13 +48,16 @@ You can also set this without editing JSON directly: open a `.md` file, right-cl
 
 Available under Settings → Extensions → Editor Markdown Notes (or the cog on the extension page):
 
-| Setting                                    | Default                                         | Purpose                                                                                   |
-| ------------------------------------------ | ----------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `editorMarkdownNotes.hideToolbar`          | `false`                                         | Hide the editor's toolbar                                                                 |
-| `editorMarkdownNotes.centerContent`        | `false`                                         | Center the content horizontally when full width is off                                    |
-| `editorMarkdownNotes.italicMarker`         | `_`                                             | Marker (`_` or `*`) used when italicizing text from the editor                            |
-| `editorMarkdownNotes.textToolsTargetAge`   | `16`                                            | Reading age the text tools score sentences against                                        |
-| `editorMarkdownNotes.claudePromptTemplate` | `Read @%s so I can ask you questions about it.` | Prompt sent to `claude` by the toolbar's "Open in Claude" action; `%s` is the note's path |
+| Setting                                          | Default                                                                                              | Purpose                                                                  |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `editorMarkdownNotes.hideToolbar`                | `false`                                                                                              | Hide the editor's toolbar                                                |
+| `editorMarkdownNotes.centerContent`              | `false`                                                                                              | Center the content horizontally when full width is off                   |
+| `editorMarkdownNotes.italicMarker`               | `_`                                                                                                  | Marker (`_` or `*`) used when italicizing text from the editor           |
+| `editorMarkdownNotes.textToolsTargetAge`         | `16`                                                                                                 | Reading age the text tools score sentences against                       |
+| `editorMarkdownNotes.claudePromptTemplate`       | `Read %@ so I can ask you questions about it.`                                                       | Prompt sent to `claude` by the toolbar's "Open in Claude" action         |
+| `editorMarkdownNotes.claudeInlinePromptTemplate` | `Read %@, then focus on the part of it that starts with "%c" so I can ask you questions about that.` | Prompt sent by "Open in Claude" on one part of a note, such as a diagram |
+
+Both templates take the same tokens: `%@` the note as an at-reference (`@notes/roadmap.md`), `%s` its bare path, and `%c` the source of the part being asked about — a diagram's, for the inline template, and nothing for the note-wide one.
 
 The toolbar toggles are also available from the command palette while the editor is focused, so they stay reachable with `hideToolbar` turned on:
 

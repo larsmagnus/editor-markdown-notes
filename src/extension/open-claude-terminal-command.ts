@@ -1,25 +1,47 @@
 import * as vscode from 'vscode'
 
+import type { ExtensionSettings } from '../shared/messages'
+
 import { buildClaudeCommand } from './claude-prompt'
 
 /**
- * Opens an integrated terminal running `claude`, prompted with `promptTemplate`
- * (`%s` replaced by `uri`'s path relative to the workspace root - the terminal's
- * own default cwd, so `@relativePath` resolves for `claude` without change).
+ * Opens an integrated terminal running `claude`, prompted about `uri` by its
+ * path relative to the workspace root - the terminal's own default cwd, so
+ * `@relativePath` resolves for `claude` without change.
  *
- * The prompt is escaped rather than trusted verbatim because the template
- * itself is user-configured free text, even though it never carries the
- * document's actual content.
+ * `content` is an excerpt of the document to narrow the prompt to (a diagram's
+ * source, so far); passing one switches to the inline template. The prompt is
+ * escaped rather than trusted verbatim: the templates are user-configured free
+ * text, and `content` arrives from the webview.
  */
-export function openClaudeTerminal(uri: vscode.Uri, promptTemplate: string) {
-	const relativePath = vscode.workspace.asRelativePath(uri, false)
+export function openClaudeTerminal(
+	uri: vscode.Uri,
+	settings: ExtensionSettings,
+	content?: string
+) {
+	// Typed as a string, but it crosses the webview boundary as JSON, and the
+	// host has no zod (it ships without `node_modules`) to insist on that.
+	const excerpt = typeof content === 'string' ? content : undefined
+
+	const template =
+		excerpt === undefined
+			? settings.claudePromptTemplate
+			: settings.claudeInlinePromptTemplate
+
+	const path = vscode.workspace.asRelativePath(uri, false)
 	const command = buildClaudeCommand(
-		promptTemplate,
-		relativePath,
+		template,
+		{ path, content: excerpt },
 		vscode.env.shell
 	)
 
-	const terminal = vscode.window.createTerminal('Claude')
+	// A terminal defaults to the *first* workspace folder, while the path above
+	// is relative to the one holding this note - the two differ in a multi-root
+	// workspace, leaving `@relativePath` pointing at nothing.
+	const terminal = vscode.window.createTerminal({
+		name: 'Claude',
+		cwd: vscode.workspace.getWorkspaceFolder(uri)?.uri,
+	})
 	terminal.show()
 	terminal.sendText(command, true)
 }

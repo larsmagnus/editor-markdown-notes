@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added a copy button to the toolbar for copying the note as markdown or plain text, and for opening it in Claude
 - Added `editorMarkdownNotes.claudePromptTemplate` to customize the prompt sent when opening a note in Claude
+- Added zoom and pan controls to mermaid diagrams in the live editor: Ctrl/Cmd+scroll or the toolbar to zoom, drag to pan
+- Added a diagram toolbar for copying a diagram's source or its rendered SVG, opening it in Claude, and editing its source
+- Added `editorMarkdownNotes.claudeInlinePromptTemplate` for the prompt sent when opening a single diagram in Claude
+- Changed the Claude prompt templates to take `%@` for the note as an at-reference, alongside the existing `%s`
 
 ## [0.19.0] - 2026-08-12
 

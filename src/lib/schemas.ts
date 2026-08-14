@@ -117,7 +117,16 @@ const extensionSettingsSchema = z
 			.meta({
 				title: 'Claude prompt template',
 				description:
-					'Prompt sent to `claude` by the toolbar\'s "Open in Claude" action, with `%s` replaced by the note\'s path. Maps to `editorMarkdownNotes.claudePromptTemplate`.',
+					'Prompt sent to `claude` by the toolbar\'s "Open in Claude" action, with `%@` replaced by the note as an at-reference. Maps to `editorMarkdownNotes.claudePromptTemplate`.',
+			}),
+		claudeInlinePromptTemplate: z
+			.string()
+			.max(CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH)
+			.catch(DEFAULT_SETTINGS.claudeInlinePromptTemplate)
+			.meta({
+				title: 'Claude inline prompt template',
+				description:
+					'Prompt sent to `claude` by "Open in Claude" on one part of the note, with `%c` replaced by that part\'s source. Maps to `editorMarkdownNotes.claudeInlinePromptTemplate`.',
 			}),
 	})
 	.catch(DEFAULT_SETTINGS)

@@ -3,8 +3,8 @@ import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 
 import { AppErrorBoundary } from '@/components/app-error-boundary'
 import { CodeBlockCopyButton } from '@/editor/code-block-copy-button'
-import { MermaidBlock } from '@/editor/mermaid-block'
-import { MERMAID_LANGUAGE } from '@/editor/mermaid-language'
+import { MermaidBlock } from '@/editor/mermaid/block'
+import { MERMAID_LANGUAGE } from '@/editor/mermaid/language'
 
 /**
  * The node view every code block renders through.

@@ -1,7 +1,9 @@
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 
-import { MERMAID_LANGUAGE } from '@/editor/mermaid-language'
+import { PanZoom } from '@/components/pan-zoom'
+import { MERMAID_LANGUAGE } from '@/editor/mermaid/language'
+import { MermaidToolbar } from '@/editor/mermaid/toolbar'
 import { useCaretInside } from '@/hooks/use-caret-inside'
 import { useIsDark } from '@/hooks/use-is-dark'
 import { useMermaidRender } from '@/hooks/use-mermaid-render'
@@ -38,16 +40,32 @@ export function MermaidBlock({ node, editor, getPos }: MermaidBlockProps) {
 	}
 
 	return (
-		<NodeViewWrapper className="relative not-prose my-4">
+		<NodeViewWrapper className="group relative not-prose my-4">
 			{!showSource && result && 'svg' in result ? (
-				<button
-					type="button"
-					contentEditable={false}
-					onClick={startEditing}
-					aria-label="Mermaid diagram, click to edit the source"
-					className="flex w-full cursor-pointer justify-center rounded border border-transparent p-2 hover:border-neutral-300 dark:hover:border-neutral-700"
-					dangerouslySetInnerHTML={{ __html: result.svg }}
-				/>
+				// Everything the viewport draws is generated, not authored, so it
+				// stays outside what ProseMirror treats as editable content.
+				<div contentEditable={false}>
+					<PanZoom
+						// The border is always drawn, unlike the rest of the editor's
+						// hover affordances: a diagram taller than the cap is clipped,
+						// and an edge is what says so rather than leaving it looking
+						// like the diagram simply ends there.
+						className="max-h-[32rem] rounded border border-border/50 p-2 hover:border-border"
+						controls={
+							<MermaidToolbar
+								code={node.textContent}
+								svg={result.svg}
+								onEdit={startEditing}
+							/>
+						}
+					>
+						<div
+							role="img"
+							aria-label="Mermaid diagram"
+							dangerouslySetInnerHTML={{ __html: result.svg }}
+						/>
+					</PanZoom>
+				</div>
 			) : null}
 
 			{failed ? (

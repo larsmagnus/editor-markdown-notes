@@ -145,7 +145,7 @@ describe('Editor', () => {
 		// Queried fresh rather than held onto: loading the content remounts the
 		// node view, so an earlier reference is detached by the time it is read.
 		await waitFor(() => {
-			const diagram = screen.getByRole('button', { name: /diagram/i })
+			const diagram = screen.getByRole('img', { name: /diagram/i })
 			expect(diagram.querySelector('svg')).toBeInTheDocument()
 		})
 
@@ -172,25 +172,26 @@ describe('Editor', () => {
 	it('keeps the source open while it is being edited', async () => {
 		render(<Editor content={MERMAID_NOTE} />)
 
-		await userEvent.click(
-			await screen.findByRole('button', { name: /diagram/i })
-		)
+		await screen.findByRole('img', { name: /diagram/i })
+		await userEvent.click(screen.getByLabelText('Edit diagram source'))
 		await userEvent.keyboard('  C --> D')
 
 		expect(
-			screen.queryByRole('button', { name: /diagram/i })
+			screen.queryByRole('img', { name: /diagram/i })
 		).not.toBeInTheDocument()
 		expect(screen.getByText(/C --> D/)).toBeInTheDocument()
 	})
 
-	it('swaps the diagram for its source when clicked', async () => {
+	// Clicking the diagram itself pans it, so opening the source is the
+	// toolbar's job - and the only way in.
+	it('swaps the diagram for its source from the toolbar', async () => {
 		render(<Editor content={MERMAID_NOTE} />)
 
-		const diagram = await screen.findByRole('button', { name: /diagram/i })
-		await userEvent.click(diagram)
+		await screen.findByRole('img', { name: /diagram/i })
+		await userEvent.click(screen.getByLabelText('Edit diagram source'))
 
 		expect(
-			screen.queryByRole('button', { name: /diagram/i })
+			screen.queryByRole('img', { name: /diagram/i })
 		).not.toBeInTheDocument()
 		expect(screen.getByText(/graph TD/)).toBeInTheDocument()
 	})
@@ -201,17 +202,16 @@ describe('Editor', () => {
 	it('renders the diagram again once the caret leaves the block', async () => {
 		render(<Editor content={`${MERMAID_NOTE}\n\nA paragraph below.`} />)
 
-		await userEvent.click(
-			await screen.findByRole('button', { name: /diagram/i })
-		)
+		await screen.findByRole('img', { name: /diagram/i })
+		await userEvent.click(screen.getByLabelText('Edit diagram source'))
 		expect(
-			screen.queryByRole('button', { name: /diagram/i })
+			screen.queryByRole('img', { name: /diagram/i })
 		).not.toBeInTheDocument()
 
 		await userEvent.click(screen.getByText('A paragraph below.'))
 
 		expect(
-			await screen.findByRole('button', { name: /diagram/i })
+			await screen.findByRole('img', { name: /diagram/i })
 		).toBeInTheDocument()
 	})
 
@@ -298,18 +298,14 @@ describe('Editor', () => {
 			const { rerender } = render(<Editor content={twoDiagrams} />)
 
 			await waitFor(() => {
-				expect(
-					screen.getAllByRole('button', { name: /diagram/i })
-				).toHaveLength(2)
+				expect(screen.getAllByRole('img', { name: /diagram/i })).toHaveLength(2)
 			})
 
 			rerender(<Editor content={`${MERMAID_NOTE}\n\nOne diagram left.`} />)
 
 			expect(await screen.findByText('One diagram left.')).toBeInTheDocument()
 			await waitFor(() => {
-				expect(
-					screen.getAllByRole('button', { name: /diagram/i })
-				).toHaveLength(1)
+				expect(screen.getAllByRole('img', { name: /diagram/i })).toHaveLength(1)
 			})
 		})
 	})

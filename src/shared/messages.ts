@@ -37,11 +37,18 @@ export type ViewOptions = {
 export type ItalicMarker = '_' | '*'
 
 /**
- * Matches `maxLength` on `editorMarkdownNotes.claudePromptTemplate` in
+ * Matches `maxLength` on both `claudePromptTemplate` settings in
  * `package.json` - JSON has no way to reference this constant, so keep the
  * two in sync by hand.
  */
 export const CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH = 500
+
+/**
+ * How much of a `%c` excerpt reaches the prompt. It is there to point Claude
+ * at one part of a file it is also being told to read, so a locator's worth is
+ * enough - and the whole prompt is typed into a terminal a character at a time.
+ */
+export const CLAUDE_PROMPT_CONTENT_MAX_LENGTH = 300
 
 export type ExtensionSettings = {
 	centerContent: boolean
@@ -59,10 +66,17 @@ export type ExtensionSettings = {
 	 */
 	italicMarker: ItalicMarker
 	/**
-	 * Prompt sent to `claude` by the toolbar's "Open in Claude" action. `%s` is
-	 * replaced with the note's path relative to the workspace root.
+	 * Prompt sent to `claude` by the toolbar's "Open in Claude" action.
+	 * Tokens: `%@` the note as an at-reference, `%s` its bare path relative to
+	 * the workspace root, `%c` the excerpt being asked about (nothing here).
 	 */
 	claudePromptTemplate: string
+	/**
+	 * Prompt sent to `claude` by "Open in Claude" on one part of the note - a
+	 * diagram, so far. Same tokens as `claudePromptTemplate`, but `%c` carries
+	 * that part's source, which is what narrows Claude to it.
+	 */
+	claudeInlinePromptTemplate: string
 }
 
 export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
@@ -78,7 +92,9 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
 	hideToolbar: false,
 	textToolsTargetAge: 16,
 	italicMarker: '_',
-	claudePromptTemplate: 'Read @%s so I can ask you questions about it.',
+	claudePromptTemplate: 'Read %@ so I can ask you questions about it.',
+	claudeInlinePromptTemplate:
+		'Read %@, then focus on the part of it that starts with "%c" so I can ask you questions about that.',
 }
 
 /**
@@ -137,11 +153,15 @@ export type WebviewToHost =
 	| { type: 'openInTextEditor' }
 	/**
 	 * Asks the host to open an integrated terminal running `claude`, prompted
-	 * to read this document by path (see `claudePromptTemplate`). No document
-	 * content is sent - the host resolves the path itself from the same
-	 * `vscode.TextDocument` `openInTextEditor` uses.
+	 * to read this document by path (see `claudePromptTemplate`). The path is
+	 * never sent - the host resolves it from the same `vscode.TextDocument`
+	 * `openInTextEditor` uses.
+	 *
+	 * `content` is an excerpt to point Claude at within that document (a
+	 * diagram's source, so far). Sending it switches the host to
+	 * `claudeInlinePromptTemplate`; only the excerpt travels, never the note.
 	 */
-	| { type: 'openClaudeTerminal' }
+	| { type: 'openClaudeTerminal'; content?: string }
 	/**
 	 * Diagnostics from inside the webview. Nothing in there reaches the extension
 	 * host's console, so without this a script that fails to load or throws on
