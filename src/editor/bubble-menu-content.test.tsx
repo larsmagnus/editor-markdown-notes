@@ -306,6 +306,108 @@ describe('images', () => {
 		expect(editor.getHTML()).not.toContain('href=')
 		expect(editor.getHTML()).toContain('<img')
 	})
+
+	// The slash command's "image" action inserts exactly this shape outside
+	// VS Code - an empty, selected image - since there is no file dialog to
+	// fill the src in first.
+	describe('an image with no src yet', () => {
+		it('opens the edit popover on its own', () => {
+			const editor = new Editor({
+				extensions,
+				content: '<img src="" alt="">',
+			})
+			currentEditor = editor
+			editor.commands.setNodeSelection(1)
+			render(
+				<EditorContext.Provider value={{ editor }}>
+					<BubbleMenuContent />
+				</EditorContext.Provider>
+			)
+
+			expect(screen.getByLabelText('Src')).toBeInTheDocument()
+		})
+
+		it('deletes the image if the popover closes without a src', async () => {
+			const editor = new Editor({
+				extensions,
+				content: '<img src="" alt="">',
+			})
+			currentEditor = editor
+			editor.commands.setNodeSelection(1)
+			render(
+				<EditorContext.Provider value={{ editor }}>
+					<BubbleMenuContent />
+				</EditorContext.Provider>
+			)
+			expect(screen.getByLabelText('Src')).toBeInTheDocument()
+
+			await userEvent.keyboard('{Escape}')
+
+			expect(editor.getHTML()).not.toContain('<img')
+		})
+
+		it('keeps the image once a src has been typed and applied', async () => {
+			const editor = new Editor({
+				extensions,
+				content: '<img src="" alt="">',
+			})
+			currentEditor = editor
+			editor.commands.setNodeSelection(1)
+			render(
+				<EditorContext.Provider value={{ editor }}>
+					<BubbleMenuContent />
+				</EditorContext.Provider>
+			)
+
+			await userEvent.type(screen.getByLabelText('Src'), './diagram.png')
+			await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
+
+			expect(editor.getHTML()).toContain('src="./diagram.png"')
+		})
+
+		// `useImagePopover` re-checks on every `selectionUpdate` rather than only
+		// on mount: the bubble menu stays mounted across a Tab between two
+		// images (both stay `isActive('image')`), so a mount-only check would
+		// never see the second one.
+		it('auto-opens for a second, empty-src image reached without leaving the bubble menu mounted', () => {
+			const editor = new Editor({
+				extensions,
+				content: '<img src="./diagram.png" alt="Diagram"><img src="" alt="">',
+			})
+			currentEditor = editor
+			editor.commands.setNodeSelection(1)
+			render(
+				<EditorContext.Provider value={{ editor }}>
+					<BubbleMenuContent />
+				</EditorContext.Provider>
+			)
+			expect(screen.queryByLabelText('Src')).not.toBeInTheDocument()
+
+			fireEvent.keyDown(editor.view.dom, { key: 'Tab' })
+
+			expect(screen.getByLabelText('Src')).toBeInTheDocument()
+		})
+	})
+
+	it('does not delete an existing image when its manually opened edit is cancelled with the src cleared', async () => {
+		const editor = new Editor({
+			extensions,
+			content: '<img src="./diagram.png" alt="Diagram">',
+		})
+		currentEditor = editor
+		editor.commands.setNodeSelection(1)
+		render(
+			<EditorContext.Provider value={{ editor }}>
+				<BubbleMenuContent />
+			</EditorContext.Provider>
+		)
+
+		await userEvent.click(screen.getByTitle('Edit image'))
+		await userEvent.clear(screen.getByLabelText('Src'))
+		await userEvent.keyboard('{Escape}')
+
+		expect(editor.getHTML()).toContain('src="./diagram.png"')
+	})
 })
 
 describe('image keyboard navigation', () => {

@@ -27,6 +27,7 @@ import {
 import { ItalicExtension } from '@/editor/italic-extension'
 import { MarkdownClipboard } from '@/editor/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '@/editor/markdown-escaping'
+import { SlashCommand } from '@/editor/slash-command/extension'
 import { StrictLinkify } from '@/editor/strict-linkify-extension'
 import { SyntaxHighlight } from '@/editor/syntax-highlight-extension'
 import { TabIndent } from '@/editor/tab-indent-extension'
@@ -173,6 +174,8 @@ export const extensions = [
 	// table cell and when a node (not a text caret) is selected, so it doesn't
 	// compete with those keys' own meanings elsewhere in this file.
 	TabIndent,
+	// A plugin + keyboard handling only, no schema node, so it can sit anywhere.
+	SlashCommand,
 ]
 
 // `tiptap-markdown` ships no `Storage` module augmentation of its own, so

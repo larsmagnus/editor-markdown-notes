@@ -243,6 +243,37 @@ describe('Editor', () => {
 		expect(link).toHaveAttribute('href', 'https://example.com')
 	})
 
+	describe('slash command', () => {
+		it('opens a menu and inserts a table', async () => {
+			const { container } = render(<Editor content={''} />)
+			await waitFor(() => {
+				expect(container.querySelector('.ProseMirror')).toBeInTheDocument()
+			})
+
+			await userEvent.keyboard('/table')
+
+			await userEvent.click(
+				await screen.findByRole('option', { name: 'Table' })
+			)
+
+			expect(await screen.findByRole('table')).toBeInTheDocument()
+		})
+
+		it('closes without inserting anything on Escape', async () => {
+			const { container } = render(<Editor content={''} />)
+			await waitFor(() => {
+				expect(container.querySelector('.ProseMirror')).toBeInTheDocument()
+			})
+
+			await userEvent.keyboard('/table')
+			await screen.findByRole('option', { name: 'Table' })
+			await userEvent.keyboard('{Escape}')
+
+			expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+			expect(screen.queryByRole('table')).not.toBeInTheDocument()
+		})
+	})
+
 	describe('syncing the content prop', () => {
 		/**
 		 * In VSCode the host echoes each autosave back as an `update`, so the

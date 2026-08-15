@@ -128,6 +128,14 @@ const extensionSettingsSchema = z
 				description:
 					'Prompt sent to `claude` by "Open in Claude" on one part of the note, with `%c` replaced by that part\'s source. Maps to `editorMarkdownNotes.claudeInlinePromptTemplate`.',
 			}),
+		imageCopyDirectory: z
+			.string()
+			.catch(DEFAULT_SETTINGS.imageCopyDirectory)
+			.meta({
+				title: 'Image copy directory',
+				description:
+					'Where the slash command\'s "image" action copies a file picked from outside the workspace, relative to the document\'s folder. Maps to `editorMarkdownNotes.imageCopyDirectory`.',
+			}),
 	})
 	.catch(DEFAULT_SETTINGS)
 	.meta({
@@ -174,6 +182,18 @@ export const configMessageSchema = z
 		title: 'Config broadcast',
 		description:
 			"Posted by the host to every open panel whenever the settings or the stored view options change. Unlike the schemas above this one has no `.catch()` — a message that fails to parse is another extension's traffic and must be ignored, not defaulted.",
+	})
+
+export const imagePickedMessageSchema = z
+	.object({
+		type: z.literal('imagePicked'),
+		path: z.string().nullable(),
+	})
+	.meta({
+		id: 'ImagePickedMessage',
+		title: 'Image picked',
+		description:
+			"Posted by the host in reply to `pickImage`, once. Unlike the schemas above this one has no `.catch()` - a message that fails to parse is another extension's traffic and must be ignored, not defaulted.",
 	})
 
 export const shikiThemeMessageSchema = z

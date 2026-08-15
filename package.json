@@ -90,6 +90,11 @@
 					"maxLength": 500,
 					"editPresentation": "multilineText",
 					"description": "Prompt sent to `claude` by \"Open in Claude\" on one part of a note, such as a diagram. Takes the same `%@` and `%s` tokens as the note-wide template, plus `%c` for the source of the part in question (flattened to one line and truncated)."
+				},
+				"editorMarkdownNotes.imageCopyDirectory": {
+					"type": "string",
+					"default": "assets",
+					"description": "Where the slash command's \"image\" action copies a file picked from outside the workspace, relative to the open document's folder. A file already inside the workspace is referenced in place instead of being copied."
 				}
 			}
 		},
@@ -276,6 +281,7 @@
 		"@tiptap/pm": "3.29.2",
 		"@tiptap/react": "3.29.2",
 		"@tiptap/starter-kit": "3.29.2",
+		"@tiptap/suggestion": "3.29.2",
 		"class-variance-authority": "0.7.1",
 		"clsx": "2.1.1",
 		"lucide-react": "1.31.0",

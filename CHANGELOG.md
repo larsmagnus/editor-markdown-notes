@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added a slash command menu: type `/` on an empty line to insert a mermaid diagram, code block, task list, table, or image
+- Added `editorMarkdownNotes.imageCopyDirectory` for where the slash command's image action copies a file picked from outside the workspace
 - Added a copy button to the toolbar for copying the note as markdown or plain text, and for opening it in Claude
 - Added `editorMarkdownNotes.claudePromptTemplate` to customize the prompt sent when opening a note in Claude
 - Added zoom and pan controls to mermaid diagrams in the live editor: Ctrl/Cmd+scroll or the toolbar to zoom, drag to pan

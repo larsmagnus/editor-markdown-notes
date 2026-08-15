@@ -12,6 +12,7 @@ import type { DocumentWriter } from './document-updates'
 import { postDocumentUpdate } from './document-updates'
 import { openClaudeTerminal } from './open-claude-terminal-command'
 import { openInTextEditor } from './open-in-text-editor-command'
+import { pickImagePath } from './pick-image-command'
 import type { SettingsStore } from './settings-store'
 
 type WebviewMessageHandlers = {
@@ -73,6 +74,12 @@ export function createWebviewMessageHandlers({
 				...readShikiTheme(),
 			}
 
+			void panel.webview.postMessage(message)
+		},
+		// Also answers the asking panel alone.
+		pickImage: async () => {
+			const path = await pickImagePath(document, store, log)
+			const message: HostToWebview = { type: 'imagePicked', path }
 			void panel.webview.postMessage(message)
 		},
 	}

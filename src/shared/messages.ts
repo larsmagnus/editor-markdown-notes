@@ -77,6 +77,13 @@ export type ExtensionSettings = {
 	 * that part's source, which is what narrows Claude to it.
 	 */
 	claudeInlinePromptTemplate: string
+	/**
+	 * Where the slash command's "image" action copies a file picked from
+	 * outside the open document's workspace folder, relative to the
+	 * document's own folder. A file already inside the workspace is
+	 * referenced in place instead of being copied.
+	 */
+	imageCopyDirectory: string
 }
 
 export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
@@ -95,6 +102,7 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
 	claudePromptTemplate: 'Read %@ so I can ask you questions about it.',
 	claudeInlinePromptTemplate:
 		'Read %@, then focus on the part of it that starts with "%c" so I can ask you questions about that.',
+	imageCopyDirectory: 'assets',
 }
 
 /**
@@ -172,6 +180,9 @@ export type WebviewToHost =
 	 *  a resolved theme is tens of kilobytes of JSON, and inlining that into
 	 *  every panel's HTML would cost every note, code blocks or not. */
 	| { type: 'getShikiTheme' }
+	/** Asks the host to show its native file-open dialog for an image, for the
+	 *  slash command's "image" action. Answered once, by `imagePicked`. */
+	| { type: 'pickImage' }
 
 export type HostToWebview =
 	| { type: 'update'; content: string; fileName: string }
@@ -179,3 +190,7 @@ export type HostToWebview =
 	/** Sent in reply to `getShikiTheme`, and again whenever the user switches
 	 *  their active VS Code color theme. */
 	| ({ type: 'shikiTheme' } & ShikiThemePayload)
+	/** Sent in reply to `pickImage`. `path` is relative to the document's own
+	 *  folder (the same base `resolveImageSrc` resolves a relative `src`
+	 *  against), or `null` if the dialog was cancelled. */
+	| { type: 'imagePicked'; path: string | null }

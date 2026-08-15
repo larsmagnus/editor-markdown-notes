@@ -82,6 +82,10 @@ export class SettingsStore {
 					DEFAULT_SETTINGS.claudeInlinePromptTemplate
 				)
 				.slice(0, CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH),
+			imageCopyDirectory: config.get<string>(
+				'imageCopyDirectory',
+				DEFAULT_SETTINGS.imageCopyDirectory
+			),
 		}
 	}
 

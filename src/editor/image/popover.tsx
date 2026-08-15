@@ -1,5 +1,4 @@
 import { ImageIcon } from 'lucide-react'
-import { useState } from 'react'
 
 import Header from '@/components/header'
 import { PopoverArrow } from '@/components/popover-arrow'
@@ -11,25 +10,27 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover'
-import { useEditorImage } from '@/hooks/use-editor-image'
+import { useImagePopover } from '@/hooks/use-image-popover'
 
-/** Edits the selected image's src and alt text, seeded from its current attributes. */
+/**
+ * Edits the selected image's src and alt text, seeded from its current
+ * attributes. See `useImagePopover` for the auto-open/auto-delete behavior
+ * around an image with no src yet.
+ */
 export function ImagePopover() {
-	const { src, setSrc, alt, setAlt, selectedImage, updateImage } =
-		useEditorImage()
-	const [open, setOpen] = useState(false)
-
-	const openWithCurrentImage = () => {
-		const current = selectedImage()
-		setSrc(current.src)
-		setAlt(current.alt)
-		setOpen(true)
-	}
-
-	const apply = () => updateImage(() => setOpen(false))
+	const {
+		src,
+		setSrc,
+		alt,
+		setAlt,
+		open,
+		openWithCurrentImage,
+		handleOpenChange,
+		apply,
+	} = useImagePopover()
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
+		<Popover open={open} onOpenChange={handleOpenChange}>
 			<PopoverTrigger
 				render={
 					<Button
