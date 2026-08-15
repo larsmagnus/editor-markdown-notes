@@ -1,9 +1,5 @@
+import { copyToClipboard } from '@/lib/clipboard'
 import { getVSCodeApi } from '@/lib/vscode-api'
-
-/** Copies `text`, tolerating a webview with no clipboard permission. */
-export function copyToClipboard(text: string) {
-	void navigator.clipboard?.writeText(text)
-}
 
 /**
  * Hands one diagram to Claude: inside VS Code by asking the host to open a

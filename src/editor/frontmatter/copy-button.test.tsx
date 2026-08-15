@@ -4,19 +4,19 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { FrontmatterCopyButton } from '@/editor/frontmatter/copy-button'
+import { copyToClipboard } from '@/lib/clipboard'
+
+// Mocked at the module rather than at `navigator`, which is the app's one seam
+// onto the clipboard. Tolerating a missing clipboard is that module's job and
+// is tested there.
+vi.mock('@/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
 
 afterEach(() => {
-	vi.unstubAllGlobals()
+	vi.clearAllMocks()
 })
 
 describe('FrontmatterCopyButton', () => {
 	it('should copy the frontmatter text to the clipboard when clicked', async () => {
-		const writeText = vi.fn().mockResolvedValue(undefined)
-		vi.stubGlobal('navigator', {
-			...navigator,
-			clipboard: { writeText },
-		})
-
 		render(
 			<TooltipProvider>
 				<FrontmatterCopyButton frontmatter="title: Roadmap" />
@@ -24,7 +24,7 @@ describe('FrontmatterCopyButton', () => {
 		)
 		await userEvent.click(screen.getByLabelText('Copy frontmatter'))
 
-		expect(writeText).toHaveBeenCalledWith('title: Roadmap')
+		expect(copyToClipboard).toHaveBeenCalledWith('title: Roadmap')
 	})
 
 	it('should show a "Copy" tooltip when hovering the button', async () => {
@@ -37,19 +37,5 @@ describe('FrontmatterCopyButton', () => {
 		await userEvent.hover(screen.getByLabelText('Copy frontmatter'))
 
 		expect(await screen.findByText('Copy')).toBeInTheDocument()
-	})
-
-	it('should not throw when clicked without clipboard access', async () => {
-		vi.stubGlobal('navigator', { ...navigator, clipboard: undefined })
-
-		render(
-			<TooltipProvider>
-				<FrontmatterCopyButton frontmatter="title: Roadmap" />
-			</TooltipProvider>
-		)
-
-		await expect(
-			userEvent.click(screen.getByLabelText('Copy frontmatter'))
-		).resolves.not.toThrow()
 	})
 })

@@ -1,6 +1,7 @@
 import { Copy } from 'lucide-react'
 
 import { NodeActionButton } from '@/editor/node-action-button'
+import { copyToClipboard } from '@/lib/clipboard'
 
 type FrontmatterCopyButtonProps = { frontmatter: string }
 
@@ -9,7 +10,7 @@ export function FrontmatterCopyButton({
 	frontmatter,
 }: FrontmatterCopyButtonProps) {
 	function handleClick() {
-		void navigator.clipboard?.writeText(frontmatter)
+		copyToClipboard(frontmatter)
 	}
 
 	return (

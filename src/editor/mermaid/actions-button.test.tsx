@@ -5,6 +5,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SettingsProvider } from '@/components/settings-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { MermaidActionsButton } from '@/editor/mermaid/actions-button'
+import { copyToClipboard } from '@/lib/clipboard'
+
+// Mocked at the module rather than at `navigator`, which is the app's one seam
+// onto the clipboard. Tolerating a missing clipboard is that module's job and
+// is tested there.
+vi.mock('@/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
 
 const DIAGRAM_CODE = 'flowchart LR\n  A[Start] --> B[Ship it]'
 const DIAGRAM_SVG = '<svg aria-roledescription="flowchart-v2"></svg>'
@@ -18,9 +24,6 @@ afterEach(() => {
 
 describe('MermaidActionsButton', () => {
 	it('copies the diagram source when the copy button is clicked', async () => {
-		const writeText = vi.fn().mockResolvedValue(undefined)
-		vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } })
-
 		render(
 			<SettingsProvider>
 				<TooltipProvider>
@@ -31,13 +34,10 @@ describe('MermaidActionsButton', () => {
 
 		await userEvent.click(screen.getByLabelText('Copy diagram code'))
 
-		expect(writeText).toHaveBeenCalledWith(DIAGRAM_CODE)
+		expect(copyToClipboard).toHaveBeenCalledWith(DIAGRAM_CODE)
 	})
 
 	it('copies the rendered SVG from the menu', async () => {
-		const writeText = vi.fn().mockResolvedValue(undefined)
-		vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } })
-
 		render(
 			<SettingsProvider>
 				<TooltipProvider>
@@ -49,7 +49,7 @@ describe('MermaidActionsButton', () => {
 		await userEvent.click(screen.getByLabelText('Diagram actions'))
 		await userEvent.click(await screen.findByText('Copy SVG'))
 
-		expect(writeText).toHaveBeenCalledWith(DIAGRAM_SVG)
+		expect(copyToClipboard).toHaveBeenCalledWith(DIAGRAM_SVG)
 	})
 
 	// The host knows which file this is but nothing about which of its diagrams
@@ -78,8 +78,6 @@ describe('MermaidActionsButton', () => {
 	// Standalone there is no host to ask, so the source travels by clipboard -
 	// the same fallback the whole-note "Open in Claude" takes.
 	it('copies the source and opens claude.ai outside VS Code', async () => {
-		const writeText = vi.fn().mockResolvedValue(undefined)
-		vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } })
 		const open = vi.fn()
 		vi.stubGlobal('open', open)
 
@@ -94,7 +92,7 @@ describe('MermaidActionsButton', () => {
 		await userEvent.click(screen.getByLabelText('Diagram actions'))
 		await userEvent.click(await screen.findByText('Open in Claude'))
 
-		expect(writeText).toHaveBeenCalledWith(DIAGRAM_CODE)
+		expect(copyToClipboard).toHaveBeenCalledWith(DIAGRAM_CODE)
 		expect(open).toHaveBeenCalledWith(
 			'https://claude.ai',
 			'_blank',

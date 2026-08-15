@@ -10,10 +10,11 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { copyToClipboard, openDiagramInClaude } from '@/editor/mermaid/actions'
+import { openDiagramInClaude } from '@/editor/mermaid/actions'
 import { NodeCopyButton } from '@/editor/node-copy-button'
 import { useCopiedFeedback } from '@/hooks/use-copied-feedback'
 import { useSettings } from '@/hooks/use-settings'
+import { copyToClipboard } from '@/lib/clipboard'
 
 type MermaidActionsButtonProps = {
 	/** The block's mermaid source. */

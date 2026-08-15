@@ -19,6 +19,8 @@ A VSCode extension for editing markdown in a live preview powered by a React web
 
 Vitest runs `src/**/*.test.{ts,tsx}` except `src/test/**`, which `tsconfig.extension.json` compiles without a DOM lib — keep webview tests out of it.
 
+Never replace `navigator` wholesale in a test that also mounts an editor: a stub built as `{ ...navigator, clipboard }` drops the prototype getters ProseMirror reads to detect the browser, and the editor then silently never mounts. Mock `src/lib/clipboard.ts` — the app's only route to the clipboard — or let `userEvent.setup()` install its own stub.
+
 #### Complexity budget
 
 `pnpm complexity` gates CI at an FTA score of 50 (`fta.json` holds the cap and exclusions). Aim for ≤45 on files you're already editing so the next unrelated change doesn't tip it over CI — a score near the cap alone isn't a reason to touch a file. When branching gets in the way of the budget, prefer a data-table/lookup (e.g. a `Record`) over a `switch`. Check with `npx fta src -c fta.json -s 1000 --format json` — a capped run stops at the first breach in walk order, not the worst one.

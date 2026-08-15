@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useCopiedFeedback } from '@/hooks/use-copied-feedback'
 import { useSettings } from '@/hooks/use-settings'
+import { copyToClipboard } from '@/lib/clipboard'
 import { markdownToPlainText } from '@/lib/markdown-to-text'
 import { getVSCodeApi } from '@/lib/vscode-api'
 
@@ -29,12 +30,12 @@ export function ButtonCopy({ content }: ButtonCopyProps) {
 	const [copied, showCopiedFeedback] = useCopiedFeedback()
 
 	function copyMarkdown() {
-		void navigator.clipboard?.writeText(content)
+		copyToClipboard(content)
 		showCopiedFeedback()
 	}
 
 	function copyPlainText() {
-		void navigator.clipboard?.writeText(markdownToPlainText(content))
+		copyToClipboard(markdownToPlainText(content))
 		showCopiedFeedback()
 	}
 
@@ -45,7 +46,7 @@ export function ButtonCopy({ content }: ButtonCopyProps) {
 		}
 		// Acknowledged like any other copy: this replaces whatever the reader had
 		// on their clipboard, which is not something to do silently.
-		void navigator.clipboard?.writeText(content)
+		copyToClipboard(content)
 		showCopiedFeedback()
 		window.open('https://claude.ai', '_blank', 'noopener,noreferrer')
 	}

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import Editor from '@/editor/editor'
+import { copyToClipboard } from '@/lib/clipboard'
 import { updateNotes } from '@/lib/update-notes'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`
@@ -25,6 +26,11 @@ vi.mock('@/lib/render-mermaid', () => ({ renderMermaid }))
 // and throws in happy-dom the moment anything moves the selection. Nothing
 // here tests the menu, so it is stubbed out.
 vi.mock('@/editor/menu-bubble', () => ({ MenuBubble: () => null }))
+
+// The app's one seam onto the clipboard, mocked here so no test has to replace
+// `navigator` - a stub built from `{ ...navigator, clipboard }` drops the
+// prototype getters ProseMirror reads when it constructs an editor.
+vi.mock('@/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
 
 const MERMAID_NOTE = ['```mermaid', 'graph TD', '  A --> B', '```'].join('\n')
 
@@ -492,15 +498,11 @@ describe('Editor', () => {
 			render(<Editor content={FRONTMATTER_NOTE} />)
 			await screen.findByRole('heading', { name: 'Roadmap' })
 
-			// Stubbed after the editor mounts: constructing a new `Editor` reads
-			// `navigator.userAgent` (for `isiOS`), which a stub built from
-			// `{ ...navigator, clipboard }` alone does not carry.
-			const writeText = vi.fn().mockResolvedValue(undefined)
-			vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } })
-
 			await userEvent.click(screen.getByLabelText('Copy frontmatter'))
 
-			expect(writeText).toHaveBeenCalledWith('title: Roadmap\nstatus: draft')
+			expect(copyToClipboard).toHaveBeenCalledWith(
+				'title: Roadmap\nstatus: draft'
+			)
 		})
 
 		it('deletes the frontmatter block, undoably', async () => {
