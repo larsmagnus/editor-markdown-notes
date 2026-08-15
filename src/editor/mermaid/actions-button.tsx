@@ -42,7 +42,7 @@ export function MermaidActionsButton({ code, svg }: MermaidActionsButtonProps) {
 	}
 
 	function openInClaude() {
-		openDiagramInClaude(code, isVSCodeContext)
+		if (openDiagramInClaude(code, isVSCodeContext)) showCopiedFeedback()
 	}
 
 	return (

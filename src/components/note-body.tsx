@@ -33,6 +33,7 @@ export function NoteBody({
 		<AppErrorBoundary title="The editor" resetKeys={[content]}>
 			<Editor
 				content={content}
+				saveContent={saveContent}
 				includeProseBaseClassNames
 				className={className}
 			/>

@@ -10,18 +10,23 @@ import { useMarkdownEditor } from '@/hooks/use-markdown-editor'
 
 interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 	content: string
+	/** Where autosave writes. Only the VS Code path has one. */
+	saveContent?: (content: string) => void
 	showMenu?: boolean
 	includeProseBaseClassNames?: boolean
 }
 
 function Editor({
 	content,
+	saveContent,
 	showMenu,
 	includeProseBaseClassNames,
 	...props
 }: EditorProps) {
-	const { editor, analysis, isAnalyzing, codeBlockStyle } =
-		useMarkdownEditor(content)
+	const { editor, analysis, isAnalyzing, codeBlockStyle } = useMarkdownEditor(
+		content,
+		saveContent
+	)
 
 	if (!editor) return null
 

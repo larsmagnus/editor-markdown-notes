@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added a diagram toolbar for copying a diagram's source or its rendered SVG, opening it in Claude, and editing its source
 - Added `editorMarkdownNotes.claudeInlinePromptTemplate` for the prompt sent when opening a single diagram in Claude
 - Changed the Claude prompt templates to take `%@` for the note as an at-reference, alongside the existing `%s`
+- Fixed the toolbar's copy actions handing back the note as it was when the tab was opened, rather than as edited
+- Fixed "Open in Claude" replacing the clipboard without saying so, outside VS Code
 
 ## [0.19.0] - 2026-08-12
 

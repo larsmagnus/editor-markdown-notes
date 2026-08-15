@@ -100,5 +100,10 @@ describe('MermaidActionsButton', () => {
 			'_blank',
 			'noopener,noreferrer'
 		)
+		// That branch replaces the reader's clipboard, so it owes them the same
+		// acknowledgement an explicit copy gets.
+		expect(screen.getByLabelText('Copy diagram code')).toContainHTML(
+			'lucide-check'
+		)
 	})
 })

@@ -3,6 +3,9 @@ import { useEffect } from 'react'
 
 import { splitFrontmatter } from '@/lib/frontmatter'
 
+/** Stable, so the default does not re-run the effect on every render. */
+const neverOwnSave = () => false
+
 /**
  * Rebuilds the document whenever the incoming file changes underneath it.
  *
@@ -13,11 +16,24 @@ import { splitFrontmatter } from '@/lib/frontmatter'
  * parse `---` as an `<hr>`, so a rebuild still starts with `splitFrontmatter`'s
  * regex and inserts the extracted text as a node afterward, rather than ever
  * handing `---` characters to `setContent`.
+ *
+ * `isOwnSave` tells an incoming change the editor caused from one it did not;
+ * without it, every autosave would read as an external change.
  */
-export function useFrontmatterDocument(editor: Editor | null, content: string) {
+export function useFrontmatterDocument(
+	editor: Editor | null,
+	content: string,
+	isOwnSave: (content: string) => boolean = neverOwnSave
+) {
 	useEffect(() => {
 		if (!editor || content === undefined) return
 		if (editor.storage.markdown.getMarkdown() === content) return
+		// `content` catches up to the editor by way of its own autosave, and by
+		// then the author has usually typed on - so the doc no longer matches
+		// what it saved a second ago, and the check above no longer covers it.
+		// Rebuilding there would throw away those keystrokes and the caret with
+		// them, for a change the editor is the source of.
+		if (isOwnSave(content)) return
 
 		const { frontmatter, body } = splitFrontmatter(content)
 
@@ -33,5 +49,5 @@ export function useFrontmatterDocument(editor: Editor | null, content: string) {
 			})
 		}
 		chain.run()
-	}, [content, editor])
+	}, [content, editor, isOwnSave])
 }

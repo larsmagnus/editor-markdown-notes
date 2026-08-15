@@ -12,13 +12,21 @@ export function copyToClipboard(text: string) {
  *
  * The source travels with the host message because the host knows which file
  * this is but nothing about which of its diagrams was asked about.
+ *
+ * Returns whether the clipboard was written, which the caller owes the reader
+ * an acknowledgement of - replacing what someone has copied is not something
+ * to do silently.
  */
-export function openDiagramInClaude(code: string, isVSCodeContext: boolean) {
+export function openDiagramInClaude(
+	code: string,
+	isVSCodeContext: boolean
+): boolean {
 	if (isVSCodeContext) {
 		getVSCodeApi()?.postMessage({ type: 'openClaudeTerminal', content: code })
-		return
+		return false
 	}
 
 	copyToClipboard(code)
 	window.open('https://claude.ai', '_blank', 'noopener,noreferrer')
+	return true
 }

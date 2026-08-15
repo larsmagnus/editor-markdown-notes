@@ -43,7 +43,10 @@ export function ButtonCopy({ content }: ButtonCopyProps) {
 			getVSCodeApi()?.postMessage({ type: 'openClaudeTerminal' })
 			return
 		}
+		// Acknowledged like any other copy: this replaces whatever the reader had
+		// on their clipboard, which is not something to do silently.
 		void navigator.clipboard?.writeText(content)
+		showCopiedFeedback()
 		window.open('https://claude.ai', '_blank', 'noopener,noreferrer')
 	}
 
