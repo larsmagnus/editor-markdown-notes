@@ -25,22 +25,24 @@ export function TextToolsPanel({
 	return (
 		<aside
 			aria-label="Text tools"
-			className="sticky top-16 flex max-h-[calc(100vh-5rem)] w-72 shrink-0 flex-col gap-4 overflow-auto rounded-md border bg-muted/30 p-3 text-sm"
+			className="sticky top-16 flex max-h-[calc(100vh-5rem)] w-72 shrink-0 flex-col overflow-auto rounded-md border bg-muted/30 text-sm"
 		>
-			<div>
+			<div className="flex items-center justify-between gap-2 border-b p-3 py-1.5 min-h-10 bg-muted/50">
 				<h2 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
 					Text tools
 				</h2>
 				<TextToolsStatus isAnalyzing={isAnalyzing} total={summary.total} />
 			</div>
 
-			<TextToolsReadabilityLines lines={summary.readability} />
+			<div className="flex flex-col gap-3 p-3">
+				<TextToolsReadabilityLines lines={summary.readability} />
 
-			<TextToolsRuleCheckboxes rules={rules} setRules={setRules} />
+				<TextToolsRuleCheckboxes rules={rules} setRules={setRules} />
 
-			{summary.groups.map((group) => (
-				<TextToolsIssueGroup key={group.ruleId} group={group} />
-			))}
+				{summary.groups.map((group) => (
+					<TextToolsIssueGroup key={group.ruleId} group={group} />
+				))}
+			</div>
 		</aside>
 	)
 }

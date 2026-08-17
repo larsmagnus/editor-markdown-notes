@@ -24,3 +24,68 @@ export const Primary: Story = {
 		setRules: fn(),
 	},
 }
+
+export const Analyzing: Story = {
+	args: {
+		analysis: {
+			issues: [],
+			sentenceCount: 5,
+		},
+		isAnalyzing: true,
+		rules: [],
+		setRules: fn(),
+	},
+}
+
+export const Suggestion: Story = {
+	args: {
+		analysis: {
+			issues: [
+				{
+					ruleId: 'passive',
+					severity: 'hard',
+					message: 'asd',
+					actual: 'asd',
+					expected: [''],
+					start: 1,
+					end: 2,
+				},
+			],
+			sentenceCount: 5,
+		},
+		isAnalyzing: false,
+		rules: ['passive'],
+		setRules: fn(),
+	},
+}
+
+export const Suggestions: Story = {
+	args: {
+		analysis: {
+			issues: [
+				{
+					ruleId: 'passive',
+					severity: 'hard',
+					message: 'asd',
+					actual: 'asd',
+					expected: [''],
+					start: 1,
+					end: 2,
+				},
+				{
+					ruleId: 'intensify',
+					severity: 'hard',
+					message: 'asd',
+					actual: 'asd',
+					expected: [''],
+					start: 1,
+					end: 2,
+				},
+			],
+			sentenceCount: 5,
+		},
+		isAnalyzing: false,
+		rules: ['passive', 'intensify'],
+		setRules: fn(),
+	},
+}

@@ -194,7 +194,7 @@ describe('text tools', () => {
 		analyze.mockResolvedValue(analysisOf([]))
 		renderWithTextTools()
 
-		expect(await screen.findByText('Nothing to flag.')).toBeInTheDocument()
+		expect(await screen.findByText('No issues')).toBeInTheDocument()
 	})
 
 	// A failed analysis used to leave the panel on "Checking…" for good, because
