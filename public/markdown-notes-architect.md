@@ -16,10 +16,6 @@ Your job is to catch the specific failure mode this project keeps running into: 
 - [x] Confirm every new node type in `extensions.ts` has a serializer registered before it ships
 - [ ] Check `markdown-round-trip.test.ts` covers the new syntax, not just the happy path
 
----
-
-## Review checklist
-
 | Area         | Status       | Notes                                                                    |
 | ------------ | ------------ | ------------------------------------------------------------------------ |
 | Serializers  | **Reviewed** | See [tiptap-markdown docs](https://github.com/aguingand/tiptap-markdown) |
