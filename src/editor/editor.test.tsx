@@ -180,15 +180,21 @@ describe('Editor', () => {
 
 		await screen.findByRole('img', { name: /diagram/i })
 		await userEvent.click(screen.getByLabelText('Edit diagram source'))
-		await userEvent.keyboard('  C --> D')
 
-		// Awaited because `focus()` lands the caret on the next animation frame,
-		// so the swap out of the diagram is always a frame behind the click.
+		// Waited for before typing, not after: `focus()` lands the caret on the
+		// next animation frame, and until it has there is no open source for the
+		// keystrokes below to reach.
 		await waitFor(() =>
 			expect(
 				screen.queryByRole('img', { name: /diagram/i })
 			).not.toBeInTheDocument()
 		)
+
+		await userEvent.keyboard('  C --> D')
+
+		expect(
+			screen.queryByRole('img', { name: /diagram/i })
+		).not.toBeInTheDocument()
 		expect(screen.getByText(/C --> D/)).toBeInTheDocument()
 	})
 
@@ -594,6 +600,11 @@ describe('Editor', () => {
 			expect(
 				container.querySelector('[data-type="frontmatter"]')
 			).toBeInTheDocument()
+
+			// The button's `focus()` reaches the DOM on the next animation frame,
+			// and keystrokes sent before it land nowhere.
+			await waitFor(() => expect(screen.getByRole('textbox')).toHaveFocus())
+
 			await userEvent.keyboard('title: Roadmap')
 
 			await waitFor(
