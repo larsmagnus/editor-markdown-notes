@@ -13,9 +13,15 @@ CLEAN="/tmp/vscode-clean"
 USER_DIR="$CLEAN/user"
 EXT_DIR="$CLEAN/ext"
 
-# Always start from nothing. VSCode remembers window layout per workspace, and
-# restored state beats the *.defaultVisibility settings below - reusing the
-# profile is what leaves the Chat sidebar on screen.
+# Always start from nothing. VSCode remembers window layout per workspace,
+# and restored state beats the *.defaultVisibility settings below - reusing
+# the profile is what leaves the Chat sidebar on screen.
+#
+# Kill any process still running against this profile first: `code` talks to
+# an already-running instance over a socket keyed by --user-data-dir, and
+# that socket outlives `rm -rf` - a prior run that errored out before its own
+# cleanup leaves a zombie instance later runs would silently reattach to.
+pkill -f "$USER_DIR" 2>/dev/null || true
 rm -rf "$CLEAN"
 
 command -v code >/dev/null || {
@@ -52,14 +58,16 @@ cat > "$USER_DIR/User/settings.json" <<'JSON'
 }
 JSON
 
-# Optional hook for callers (scripts/screenshot.sh) that need the extension's
-# own view-option toggles (full width, text tools) pre-set - those live in
-# globalState, not settings.json, so they're not reachable from the block
-# above. Set to an INSERT statement for the same sqlite store VSCode itself
-# reads on startup. VSCode keys this by the extension's id, not by the
-# individual memento key the extension passes to `globalState.update()` -
-# see the caller for how that key/value is actually shaped.
+# Optional hook for callers (screenshot.sh) that need the extension's own
+# view-option toggles (full width, text tools) pre-set - those live in
+# globalState, not settings.json. Set to an INSERT for the same sqlite store
+# VSCode reads on startup, keyed by extension id (see the caller for the
+# key/value shape), not by the individual memento key.
 if [ -n "${SEED_GLOBAL_STATE_SQL:-}" ]; then
+  command -v sqlite3 >/dev/null || {
+    echo "SEED_GLOBAL_STATE_SQL is set but the 'sqlite3' CLI is not on PATH." >&2
+    exit 1
+  }
   mkdir -p "$USER_DIR/User/globalStorage"
   sqlite3 "$USER_DIR/User/globalStorage/state.vscdb" "
     CREATE TABLE IF NOT EXISTS ItemTable (key TEXT UNIQUE ON CONFLICT REPLACE, value BLOB);

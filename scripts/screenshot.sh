@@ -1,53 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Regenerates public/screenshot-editor-markdown-notes.png without a human
-# driving VSCode: launches the same throwaway profile as
-# open-clean-vscode-profile.sh, opens public/markdown-notes-architect.md
-# (the fixture written to look good above the fold), then captures the
-# window - traffic lights, rounded corners, drop shadow and all, the same
-# look as Cmd+Shift+4 -> Space -> click - non-interactively.
+# Regenerates public/screenshot-editor-markdown-notes.png headlessly: opens
+# the fixture note in the clean profile, then captures the window natively
+# (traffic lights, shadow) the way a manual Cmd+Shift+4 capture would.
 #
-# The clean-profile window is found by PID, never by window title or
-# "window 1" of the Code process. If you have a real VSCode window open on
-# this same repo/file, its title is indistinguishable from the clean
-# profile's - title matching picked the wrong window twice during
-# development and sent keystrokes into a real session. A PID match is
-# unambiguous because the clean profile always launches as its own Electron
-# process (separate --user-data-dir). For the same reason this script closes
-# only that one process at the end (Cmd+Q sent to it specifically), never a
-# blanket `quit` of the Code application, which would close every window.
+# Targets the window by PID, never title/"window 1" - a real VSCode window on
+# the same file has an identical title, and title matching once sent
+# keystrokes into a real session. Only this PID gets Cmd+Q'd at the end.
 #
-# Full width and Text Tools are set by seeding the extension's own
-# globalState (see SEED_GLOBAL_STATE_SQL below) rather than driving the
-# command palette - typing a command name and hitting Return there proved
-# unreliable (focus/timing races repeatedly sent the keystrokes to Quick
-# Open or even the Dock instead). VSCode stores every globalState key an
-# extension has ever set as ONE JSON blob under a row keyed by the
-# extension's id (publisher.name, "larsmagnus.editor-markdown-notes" here) -
-# not one row per key - confirmed by toggling a real setting through the UI
-# and inspecting the resulting state.vscdb; a row keyed by our own memento
-# key name (the first thing tried) left the real key untouched and, for
-# reasons never fully pinned down, made the custom editor fail to load
-# entirely (files opened in the plain text editor instead). Only closing the
-# Explorer sidebar still goes through a keystroke (Cmd+B), because there is
-# no setting for it (see open-clean-vscode-profile.sh) - that one keystroke
-# has been reliable across every run so far.
+# fullWidth/Text Tools are set by seeding globalState directly
+# (SEED_GLOBAL_STATE_SQL) - the command palette route was flaky. See
+# open-clean-vscode-profile.sh for the storage shape.
 #
-# One-time prerequisite: the terminal running this script needs Accessibility
-# permission (System Settings -> Privacy & Security -> Accessibility) so
-# System Events can move the VSCode window and send it keystrokes.
-# There's no way to grant this from the script itself.
+# One-time prerequisite: the terminal needs Accessibility and Screen
+# Recording (System Settings -> Privacy & Security) - neither can be granted
+# from here. Missing Screen Recording fails as "Could not find a Quartz
+# window id", not as a permission error.
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/public/screenshot-editor-markdown-notes.png"
 # Must match CLEAN/USER_DIR/EXT_DIR in open-clean-vscode-profile.sh.
 USER_DIR="/tmp/vscode-clean/user"
 EXT_DIR="/tmp/vscode-clean/ext"
-WINDOW_TITLE_MARKER="markdown-notes-architect.md"
+FIXTURE="$ROOT/public/markdown-notes-architect.md"
+WINDOW_TITLE_MARKER="$(basename "$FIXTURE")"
 
-# Fixed window position (points). Left as-is if it doesn't fit the current
-# display - screencapture -l crops to the window's actual frame regardless.
+# Fixed window position (points); screencapture -l crops to the window's
+# actual frame regardless, so this doesn't need to fit every display.
 WIN_X=80
 WIN_Y=80
 WIN_W=1600
@@ -60,16 +40,17 @@ export SEED_GLOBAL_STATE_SQL="
   );
 "
 
-"$ROOT/scripts/open-clean-vscode-profile.sh" "$ROOT/public/markdown-notes-architect.md"
+"$ROOT/scripts/open-clean-vscode-profile.sh" "$FIXTURE"
 
-# Find the clean profile's own Electron process - the one line whose argv
-# has --user-data-dir set to our throwaway profile and no --type= flag
-# (helper/renderer/gpu processes inherit --user-data-dir too, but only the
-# main process is what owns the window).
+# Matched on the main binary (.../MacOS/Code) + --user-data-dir, not just PID
+# order: the crashpad handler also carries our profile path (via --database=)
+# with no --type= of its own, so PID ordering alone could pick it instead.
 echo "Waiting for the clean-profile VSCode process..."
 PID=""
 for _ in $(seq 1 30); do
-  PID="$(ps -eo pid,command | grep -- "--user-data-dir $USER_DIR" | grep -v -- "--type=" | grep -v grep | awk '{print $1}' | head -1)"
+  # `|| true`: a bare assignment failing here would kill the script outright
+  # under set -e + pipefail on the first "no match" iteration.
+  PID="$(ps -eo pid,command | grep -E "/MacOS/(Code|Electron) .*--user-data-dir" | grep -- "vscode-clean/user" | grep -v -- "--type=" | grep -v grep | awk '{print $1}' | head -1 || true)"
   [ -n "$PID" ] && break
   sleep 1
 done
@@ -78,50 +59,54 @@ done
   exit 1
 }
 
-# Poll until that process actually owns a window (webview render takes a
-# moment past process start).
-for _ in $(seq 1 30); do
-  hasWindow="$(osascript -e "
+# stderr is captured, not discarded, so a real osascript failure is visible
+# instead of looking identical to "still rendering".
+lastErr=""
+hasWindow=false
+for _ in $(seq 1 45); do
+  if out="$(osascript -e "
     tell application \"System Events\"
       return (count of windows of (first process whose unix id is $PID)) > 0
     end tell
-  " 2>/dev/null || echo false)"
-  [ "$hasWindow" = "true" ] && break
+  " 2>&1)"; then
+    hasWindow="$out"
+    [ "$hasWindow" = "true" ] && break
+  else
+    lastErr="$out"
+  fi
   sleep 1
 done
 [ "$hasWindow" = "true" ] || {
   echo "Timed out waiting for the clean-profile window (pid $PID) to render" >&2
+  [ -n "$lastErr" ] && echo "Last osascript error: $lastErr" >&2
   exit 1
 }
 
 # Give the extension host a head start before touching the window at all.
 sleep 5
 
-# A file can open in VSCode's plain text editor if the window is still
-# resolving `workbench.editorAssociations` before the extension has finished
-# registering its custom editor - a one-time decision for that tab that
-# doesn't retroactively swap once activation completes later, no matter how
-# long you then wait. Only reproduces with the seed above in place (a
-# heavier first render - full width layout plus an immediate Text Tools
-# pass - apparently makes the window more likely to lose that race).
-# Closing the tab and reopening the same file against the now-definitely-
-# activated extension is what actually fixes it, deterministically, instead
-# of guessing at a long-enough sleep.
+# Closing and reopening the tab guards against the file having opened before
+# the extension finished activating - a one-time, non-retroactive decision.
 osascript -e "
   tell application \"System Events\"
     set targetProcess to first process whose unix id is $PID
     set frontmost of targetProcess to true
     tell targetProcess to keystroke \"w\" using command down
   end tell
-"
+" || {
+  echo "Failed to send Cmd+W to pid $PID" >&2
+  exit 1
+}
 sleep 1
 code --user-data-dir "$USER_DIR" --extensions-dir "$EXT_DIR" \
-  --reuse-window "$ROOT" "$ROOT/public/markdown-notes-architect.md"
+  --reuse-window "$ROOT" "$FIXTURE" || {
+  echo "'code --reuse-window' failed" >&2
+  exit 1
+}
 sleep 5
 
-# Written to temp files rather than piped straight into $(osascript <<OSA):
-# bash's command-substitution parser mis-scans an apostrophe inside a heredoc
-# nested in $(...) as starting a quoted string, breaking the whole script.
+# Written to temp files, not piped into $(osascript <<OSA): an apostrophe in
+# a heredoc nested in $(...) breaks bash's parser.
 POSITION_SCRIPT="$(mktemp -t screenshot-position.scpt)"
 WINDOW_ID_SCRIPT="$(mktemp -t screenshot-window-id.js)"
 trap 'rm -f "$POSITION_SCRIPT" "$WINDOW_ID_SCRIPT"' EXIT
@@ -138,44 +123,26 @@ tell application "System Events"
   delay 0.5
 
   tell targetProcess
-    -- Close the Explorer sidebar; there is no setting for this, only the
-    -- keybinding (see open-clean-vscode-profile.sh).
+    -- No setting for closing the Explorer; only the keybinding.
     keystroke "b" using command down
     delay 0.3
-  end tell
-
-  -- A plain keystroke here lands on the window, not necessarily inside the
-  -- webview's contentEditable - Cmd+Up silently did nothing until a real
-  -- click established focus on the editor content first.
-  click at {$WIN_X + 400, $WIN_Y + 300}
-  delay 0.3
-
-  tell targetProcess
-    -- Scroll the note back to the top - the editor otherwise keeps whatever
-    -- scroll/cursor position the file last had. Cmd+Up is the macOS "move
-    -- to start of document" shortcut Chromium webviews honor.
-    key code 126 using command down
   end tell
 end tell
 OSA
 
-osascript "$POSITION_SCRIPT"
+positionErr="$(osascript "$POSITION_SCRIPT" 2>&1)" || {
+  echo "Failed to position/resize the window or close the Explorer sidebar" >&2
+  echo "osascript error: $positionErr" >&2
+  exit 1
+}
 
-# Let the webview settle after the scroll/resize before capturing.
+# Let the webview settle after the resize before capturing.
 sleep 2
 
-# System Events' AX tree doesn't expose a window number on this VSCode
-# build (no AXWindowNumber attribute), so the CGWindowID screencapture -l
-# needs comes from Quartz's own window list instead. Plain JXA array
-# bridging (ObjC.deepUnwrap on the list itself) silently returns a
-# non-array object here; going through CFArrayGetCount/CFArrayGetValueAtIndex
-# and casting each element explicitly is what actually works.
-#
-# Electron registers several same-PID, same-layer helper surfaces alongside
-# the real window (a small transparent one was the first layer-0 match by
-# PID alone, producing a blank 1000x1000 capture) - matching on the window
-# title too, not just PID, is what actually isolates the real document
-# window.
+# No AXWindowNumber on this VSCode build, so the CGWindowID comes from
+# Quartz's window list instead (ObjC.deepUnwrap on the list itself silently
+# returns a non-array object). Matched on title too, not just PID: Electron
+# also registers same-PID helper surfaces alongside the real window.
 cat > "$WINDOW_ID_SCRIPT" <<JS
 ObjC.import('CoreGraphics')
 ObjC.import('CoreFoundation')
@@ -183,28 +150,36 @@ var pid = $PID
 var windowList = \$.CGWindowListCopyWindowInfo(0, 0)
 var count = \$.CFArrayGetCount(windowList)
 var found = null
+var candidates = []
 for (var i = 0; i < count; i++) {
   var info = ObjC.deepUnwrap(ObjC.castRefToObject(\$.CFArrayGetValueAtIndex(windowList, i)))
-  var name = info ? info['kCGWindowName'] : null
-  if (info && info['kCGWindowOwnerPID'] === pid && info['kCGWindowLayer'] === 0 && name && name.indexOf('$WINDOW_TITLE_MARKER') !== -1) {
+  if (!info || info['kCGWindowOwnerPID'] !== pid) continue
+  var name = info['kCGWindowName'] || ''
+  candidates.push('layer=' + info['kCGWindowLayer'] + ' id=' + info['kCGWindowNumber'] + ' name="' + name + '"')
+  if (info['kCGWindowLayer'] === 0 && name.indexOf('$WINDOW_TITLE_MARKER') !== -1) {
     found = info['kCGWindowNumber']
     break
   }
 }
-found
+JSON.stringify({ found: found, candidates: candidates })
 JS
 
-WINDOW_ID="$(osascript -l JavaScript "$WINDOW_ID_SCRIPT")"
+WINDOW_LOOKUP="$(osascript -l JavaScript "$WINDOW_ID_SCRIPT")" || {
+  echo "Failed to look up Quartz windows for pid $PID" >&2
+  echo "osascript error: $WINDOW_LOOKUP" >&2
+  exit 1
+}
+WINDOW_ID="$(node -e "process.stdout.write(String(JSON.parse(process.argv[1]).found ?? ''))" "$WINDOW_LOOKUP")"
 [ -n "$WINDOW_ID" ] && [ "$WINDOW_ID" != "null" ] || {
   echo "Could not find a Quartz window id for pid $PID" >&2
+  echo "Windows owned by that pid: $WINDOW_LOOKUP" >&2
   exit 1
 }
 
 echo "Capturing $OUT (window id: $WINDOW_ID)"
 screencapture -x -l"$WINDOW_ID" "$OUT"
 
-# Quit only this process (Cmd+Q sent while it's frontmost) - never the whole
-# Code application, which would also close any real windows you have open.
+# Quit only this process, never a blanket `quit` of Code (see header).
 osascript -e "
   tell application \"System Events\"
     set targetProcess to first process whose unix id is $PID
