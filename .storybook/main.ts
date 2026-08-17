@@ -5,7 +5,7 @@ const config: StorybookConfig = {
 	core: {
 		disableTelemetry: true,
 	},
-	addons: ['@storybook/addon-mcp'],
+	addons: ['@storybook/addon-mcp', '@storybook/addon-themes'],
 	framework: '@storybook/react-vite',
 }
 export default config
