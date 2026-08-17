@@ -6,8 +6,16 @@ import * as vscode from 'vscode'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 
-const MARKDOWN_IMAGE = /!\[[^\]]*\]\(([^)\s]+)\)/g
-
+/**
+ * The two demo notes that exist to document an image-resolution rule, named
+ * rather than swept up by a scan of `public/*.md`: a note added for any other
+ * reason has no image to check, and a scan reported that as a failure of the
+ * rules these cover. Naming them also makes losing one to an edit fail here,
+ * which a scan over whatever happens to be on disk cannot.
+ *
+ * The icon is deliberately duplicated between `public/` and the workspace root
+ * - each is a different app's root, and each note documents one of them.
+ */
 suite('Sample note images', () => {
 	suiteSetup(async () => {
 		const extension = vscode.extensions.getExtension(EXTENSION_ID)
@@ -15,49 +23,51 @@ suite('Sample note images', () => {
 		await extension.activate()
 	})
 
-	test('every image in the sample notes points at a file that exists', async () => {
+	test('notes.md documents a document-relative image that exists', async () => {
 		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
 		assert.ok(workspaceRoot, 'the tests must run with the repo as a workspace')
 
-		const contentDirectory = path.join(workspaceRoot, 'public')
-		const notes = (await fs.readdir(contentDirectory)).filter((name) =>
-			name.endsWith('.md')
-		)
-		assert.ok(notes.length > 0, 'there should be sample notes to check')
+		const note = vscode.Uri.file(path.join(workspaceRoot, 'public', 'notes.md'))
+		const document = await vscode.workspace.openTextDocument(note)
 
-		const checked: string[] = []
-
-		for (const note of notes) {
-			const file = vscode.Uri.file(path.join(contentDirectory, note))
-			const document = await vscode.workspace.openTextDocument(file)
-
-			const sources = [...document.getText().matchAll(MARKDOWN_IMAGE)].map(
-				([, src]) => src
-			)
-			assert.ok(sources.length > 0, `${note} should document an image`)
-			checked.push(...sources)
-
-			for (const src of sources) {
-				const expected = src.startsWith('/')
-					? path.join(workspaceRoot, src)
-					: path.resolve(path.dirname(document.uri.fsPath), src)
-
-				await assert.doesNotReject(
-					fs.access(expected),
-					`${note} points at ${src}, which resolves to ${expected} — no such file`
-				)
-			}
-		}
-
-		// The samples are the only end-to-end coverage of either branch, so losing
-		// one to an edit should fail here rather than go unnoticed.
 		assert.ok(
-			checked.some((src) => src.startsWith('/')),
-			'a sample note should document a workspace-root path'
+			document
+				.getText()
+				.includes(
+					'![Editor Markdown Notes icon](./icon-editor-markdown-notes.png)'
+				),
+			'notes.md is the demo note for a document-relative image and should keep documenting one'
 		)
+
+		await assert.doesNotReject(
+			fs.access(
+				path.join(workspaceRoot, 'public', 'icon-editor-markdown-notes.png')
+			),
+			'a document-relative image resolves out of the note folder, so the copy in public/ is the one it needs'
+		)
+	})
+
+	test('other-note.md documents a workspace-root image that exists', async () => {
+		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
+		assert.ok(workspaceRoot, 'the tests must run with the repo as a workspace')
+
+		const note = vscode.Uri.file(
+			path.join(workspaceRoot, 'public', 'other-note.md')
+		)
+		const document = await vscode.workspace.openTextDocument(note)
+
 		assert.ok(
-			checked.some((src) => !src.startsWith('/')),
-			'a sample note should document a document-relative path'
+			document
+				.getText()
+				.includes(
+					'![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)'
+				),
+			'other-note.md is the demo note for a workspace-root image and should keep documenting one'
+		)
+
+		await assert.doesNotReject(
+			fs.access(path.join(workspaceRoot, 'icon-editor-markdown-notes.png')),
+			'a root-absolute image resolves out of the workspace root, so the copy there is the one it needs'
 		)
 	})
 })

@@ -1,5 +1,4 @@
 import * as assert from 'assert'
-import * as fs from 'fs/promises'
 import * as path from 'path'
 
 import * as vscode from 'vscode'
@@ -8,8 +7,11 @@ import { getDocumentResourceRoots } from '../extension/image-base-uris'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 
-const MARKDOWN_IMAGE = /!\[[^\]]*\]\(([^)\s]+)\)/g
-
+/**
+ * A webview refuses any file outside `localResourceRoots`, however correct the
+ * `src` is - and it fails silently, as a broken image. One test per demo note,
+ * so each image-resolution rule is covered by the roots its own note needs.
+ */
 suite('Sample note resource roots', () => {
 	suiteSetup(async () => {
 		const extension = vscode.extensions.getExtension(EXTENSION_ID)
@@ -17,43 +19,45 @@ suite('Sample note resource roots', () => {
 		await extension.activate()
 	})
 
-	/**
-	 * A webview refuses any file outside `localResourceRoots`, however correct
-	 * the `src` is - and it fails silently, as a broken image.
-	 */
-	test('every sample image sits inside the roots the webview is given', async () => {
+	test("notes.md's image sits inside the roots the webview is given", async () => {
 		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
 		assert.ok(workspaceRoot, 'the tests must run with the repo as a workspace')
 
-		const contentDirectory = path.join(workspaceRoot, 'public')
-		const notes = (await fs.readdir(contentDirectory)).filter((name) =>
-			name.endsWith('.md')
+		const note = vscode.Uri.file(path.join(workspaceRoot, 'public', 'notes.md'))
+		const document = await vscode.workspace.openTextDocument(note)
+		const roots = getDocumentResourceRoots(document)
+		const image = path.join(
+			workspaceRoot,
+			'public',
+			'icon-editor-markdown-notes.png'
 		)
-		assert.ok(notes.length > 0, 'there should be sample notes to check')
 
-		for (const note of notes) {
-			const file = vscode.Uri.file(path.join(contentDirectory, note))
-			const document = await vscode.workspace.openTextDocument(file)
-			const roots = getDocumentResourceRoots(document)
+		assert.ok(
+			roots.some(
+				(root) =>
+					image === root.fsPath || image.startsWith(root.fsPath + path.sep)
+			),
+			`${image} is outside localResourceRoots, so the webview would refuse it`
+		)
+	})
 
-			const sources = [...document.getText().matchAll(MARKDOWN_IMAGE)].map(
-				([, src]) => src
-			)
+	test("other-note.md's image sits inside the roots the webview is given", async () => {
+		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
+		assert.ok(workspaceRoot, 'the tests must run with the repo as a workspace')
 
-			for (const src of sources) {
-				const expected = src.startsWith('/')
-					? path.join(workspaceRoot, src)
-					: path.resolve(path.dirname(document.uri.fsPath), src)
+		const note = vscode.Uri.file(
+			path.join(workspaceRoot, 'public', 'other-note.md')
+		)
+		const document = await vscode.workspace.openTextDocument(note)
+		const roots = getDocumentResourceRoots(document)
+		const image = path.join(workspaceRoot, 'icon-editor-markdown-notes.png')
 
-				assert.ok(
-					roots.some(
-						(root) =>
-							expected === root.fsPath ||
-							expected.startsWith(root.fsPath + path.sep)
-					),
-					`${expected} is outside localResourceRoots, so the webview would refuse it`
-				)
-			}
-		}
+		assert.ok(
+			roots.some(
+				(root) =>
+					image === root.fsPath || image.startsWith(root.fsPath + path.sep)
+			),
+			`${image} is outside localResourceRoots, so the webview would refuse it`
+		)
 	})
 })
