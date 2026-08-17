@@ -8,6 +8,7 @@ import type { ShikiThemePayload, WebviewToHost } from '../shared/messages'
 import { onDocumentChanged } from './document-change-subscription'
 import { DocumentWriter, postDocumentUpdate } from './document-updates'
 import { getDocumentResourceRoots } from './image-base-uris'
+import type { ScrollPositionStore } from './scroll-position-store'
 import type { SettingsStore } from './settings-store'
 import { buildWebviewDocument } from './webview-document'
 import {
@@ -20,6 +21,8 @@ type PanelSessionOptions = {
 	document: vscode.TextDocument
 	extensionPath: string
 	store: SettingsStore
+	/** Shared across panels, so a reopened tab finds its own note's offset. */
+	scrollPositions: ScrollPositionStore
 	log: Logger
 	/** Re-broadcasts to every open panel, not just this one. */
 	broadcastConfig: () => void
@@ -38,6 +41,7 @@ export function attachPanelSession({
 	document,
 	extensionPath,
 	store,
+	scrollPositions,
 	log,
 	broadcastConfig,
 	readShikiTheme,
@@ -58,6 +62,7 @@ export function attachPanelSession({
 		document,
 		extensionPath,
 		config: store.getConfig(),
+		initialScrollTop: scrollPositions.get(document.uri.toString()),
 		log,
 	})
 
@@ -66,6 +71,7 @@ export function attachPanelSession({
 		document,
 		writer,
 		store,
+		scrollPositions,
 		log,
 		broadcastConfig,
 		readShikiTheme,

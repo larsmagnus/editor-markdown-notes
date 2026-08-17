@@ -19,6 +19,8 @@ export type WebviewHtmlInput = {
 		initialContent: string
 		fileName: string
 		initialConfig: Config
+		/** Where this note was left this session; `0` if it has not been open. */
+		initialScrollTop: number
 		imageBaseUris: ImageBaseUris
 	}
 }
@@ -58,6 +60,7 @@ export function buildWebviewHtml({
             window.initialContent = ${toScriptLiteral(globals.initialContent)};
             window.fileName = ${toScriptLiteral(globals.fileName)};
             window.initialConfig = ${toScriptLiteral(globals.initialConfig)};
+            window.initialScrollTop = ${toScriptLiteral(globals.initialScrollTop)};
             window.imageBaseUris = ${toScriptLiteral(globals.imageBaseUris)};
         </script>
         <script type="module" crossorigin src="${scriptUri}" nonce="${nonce}"></script>

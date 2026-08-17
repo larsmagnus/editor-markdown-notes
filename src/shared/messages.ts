@@ -154,6 +154,14 @@ export type WebviewToHost =
 	| { type: 'getContent' }
 	| { type: 'setViewOptions'; viewOptions: ViewOptions }
 	/**
+	 * Where this note is scrolled to, so reopening it lands in the same place.
+	 *
+	 * Not part of `ViewOptions`: those are one shared set of toggles broadcast to
+	 * every panel, while this is per-document and belongs to this one. The host
+	 * keeps it in memory only (`ScrollPositionStore`), so it lasts the session.
+	 */
+	| { type: 'setScrollTop'; scrollTop: number }
+	/**
 	 * Asks the host to reopen this document with VSCode's built-in text editor.
 	 * Deliberately not part of `ViewOptions` - the webview may be disposed the
 	 * moment the host acts on it, so there is nothing to persist.

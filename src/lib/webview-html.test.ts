@@ -17,6 +17,7 @@ const INPUT = {
 			settings: DEFAULT_SETTINGS,
 			viewOptions: DEFAULT_VIEW_OPTIONS,
 		},
+		initialScrollTop: 0,
 		imageBaseUris: {
 			document: 'https://cdn.example/',
 			workspace: 'https://cdn.example/',
@@ -111,6 +112,15 @@ describe('buildWebviewHtml', () => {
 		})
 
 		expect(html).toContain('window.fileName = "\\u003c/script>.md";')
+	})
+
+	it("injects the note's remembered scroll offset", () => {
+		const html = buildWebviewHtml({
+			...INPUT,
+			globals: { ...INPUT.globals, initialScrollTop: 1840 },
+		})
+
+		expect(html).toContain('window.initialScrollTop = 1840;')
 	})
 
 	it('gives the app its mount point', () => {

@@ -17,6 +17,9 @@ type WebviewDocumentOptions = {
 	document: vscode.TextDocument
 	extensionPath: string
 	config: Config
+	/** This note's remembered scroll offset, injected rather than requested so
+	 *  the first paint is already in the right place. */
+	initialScrollTop: number
 	log: Logger
 }
 
@@ -31,6 +34,7 @@ export function buildWebviewDocument({
 	document,
 	extensionPath,
 	config,
+	initialScrollTop,
 	log,
 }: WebviewDocumentOptions): string {
 	const distPath = path.join(extensionPath, 'dist')
@@ -58,6 +62,7 @@ export function buildWebviewDocument({
 			initialContent: document.getText(),
 			fileName: path.basename(document.fileName),
 			initialConfig: config,
+			initialScrollTop,
 			imageBaseUris: getImageBaseUris(webview, document),
 		},
 	})
