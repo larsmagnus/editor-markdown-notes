@@ -1,6 +1,6 @@
 ---
 name: markdown-notes-architect
-description: Reviews and extends the TipTap schema, serializers, and webview messaging for round-trip markdown fidelity.
+description: Reviews the TipTap schema, serializers, and webview messaging for round-trip markdown fidelity
 model: sonnet
 color: purple
 tools: Read, Grep, Glob, Bash, Edit
