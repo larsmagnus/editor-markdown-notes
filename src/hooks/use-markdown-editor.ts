@@ -57,7 +57,13 @@ export function useMarkdownEditor(
 		// inserts the frontmatter node right after mount, the same way it
 		// rebuilds the doc for any later incoming change.
 		content: splitFrontmatter(content).body,
-		autofocus: 'end',
+		// A note has to open where the reader left it (`useScrollPosition`), and
+		// any autofocus scrolls its caret into view over that. `'end'` also put a
+		// freshly opened note at the bottom of the document rather than the top,
+		// and `'start'` would open a note beginning with a diagram or code block
+		// showing that block's source - `useCaretInside` reveals whichever block
+		// holds the caret.
+		autofocus: false,
 	})
 
 	useFrontmatterDocument(editor, content, isOwnSave)

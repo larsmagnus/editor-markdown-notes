@@ -39,8 +39,9 @@ export function useCaretInside({
 		}
 
 		// Deliberately not called for the selection the block mounts with. The
-		// editor autofocuses its end, so a note finishing with a diagram would
-		// otherwise open showing source nobody asked to edit.
+		// editor does not autofocus, but a document replaced in place carries its
+		// old selection over, and a block that inherits it would open showing
+		// source nobody asked to edit.
 		editor.on('selectionUpdate', update)
 		editor.on('focus', update)
 		editor.on('blur', update)

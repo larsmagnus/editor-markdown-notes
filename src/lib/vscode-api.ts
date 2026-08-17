@@ -12,6 +12,7 @@ declare global {
 		initialContent?: string
 		fileName?: string
 		initialConfig?: Config
+		initialScrollTop?: number
 		imageBaseUris?: ImageBaseUris
 	}
 }
