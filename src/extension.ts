@@ -10,6 +10,7 @@ import * as vscode from 'vscode'
 // activation.
 import { registerCommands } from './extension/commands'
 import { MarkdownEditorProvider } from './extension/markdown-editor-provider'
+import { ScrollPositionStore } from './extension/scroll-position-store'
 import { SettingsStore } from './extension/settings-store'
 import { ShikiThemeStore } from './extension/shiki-theme-store'
 
@@ -26,10 +27,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const store = new SettingsStore(context)
 	const shikiThemeStore = new ShikiThemeStore(log)
+	const scrollPositions = new ScrollPositionStore()
 	const provider = new MarkdownEditorProvider(
 		context,
 		store,
 		shikiThemeStore,
+		scrollPositions,
 		log
 	)
 

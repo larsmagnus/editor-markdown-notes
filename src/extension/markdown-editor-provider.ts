@@ -6,6 +6,7 @@ import type { HostToWebview } from '../shared/messages'
 import { broadcastToPanels } from './broadcast'
 import { CONFIG_SECTION, VIEW_TYPE } from './constants'
 import { attachPanelSession } from './panel-session'
+import type { ScrollPositionStore } from './scroll-position-store'
 import type { SettingsStore } from './settings-store'
 import type { ShikiThemeStore } from './shiki-theme-store'
 
@@ -17,6 +18,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 	private readonly context: vscode.ExtensionContext
 	private readonly store: SettingsStore
 	private readonly shikiThemeStore: ShikiThemeStore
+	private readonly scrollPositions: ScrollPositionStore
 	private readonly log: Logger
 	private readonly panels = new Set<vscode.WebviewPanel>()
 
@@ -24,11 +26,13 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 		context: vscode.ExtensionContext,
 		store: SettingsStore,
 		shikiThemeStore: ShikiThemeStore,
+		scrollPositions: ScrollPositionStore,
 		log: Logger
 	) {
 		this.context = context
 		this.store = store
 		this.shikiThemeStore = shikiThemeStore
+		this.scrollPositions = scrollPositions
 		this.log = log
 	}
 
@@ -78,6 +82,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			document,
 			extensionPath: this.context.extensionPath,
 			store: this.store,
+			scrollPositions: this.scrollPositions,
 			log: this.log,
 			broadcastConfig: this.broadcastConfig,
 			readShikiTheme: () => this.shikiThemeStore.getTheme(),

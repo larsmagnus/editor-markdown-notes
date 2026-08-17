@@ -14,6 +14,7 @@ import { postDocumentUpdate } from './document-updates'
 import { openClaudeTerminal } from './open-claude-terminal-command'
 import { openInTextEditor } from './open-in-text-editor-command'
 import { pickImagePath } from './pick-image-command'
+import type { ScrollPositionStore } from './scroll-position-store'
 import type { SettingsStore } from './settings-store'
 
 type WebviewMessageHandlers = {
@@ -27,6 +28,7 @@ type HandlerDependencies = {
 	document: vscode.TextDocument
 	writer: DocumentWriter
 	store: SettingsStore
+	scrollPositions: ScrollPositionStore
 	log: Logger
 	broadcastConfig: () => void
 	readShikiTheme: () => ShikiThemePayload
@@ -54,6 +56,7 @@ export function createWebviewMessageHandlers({
 	document,
 	writer,
 	store,
+	scrollPositions,
 	log,
 	broadcastConfig,
 	readShikiTheme,
@@ -74,6 +77,11 @@ export function createWebviewMessageHandlers({
 		setViewOptions: async (message) => {
 			await store.updateViewOptions(message.viewOptions)
 			broadcastConfig()
+		},
+		// Nothing is broadcast back: the offset belongs to this document, and the
+		// panel that sent it is already there.
+		setScrollTop: (message) => {
+			scrollPositions.set(document.uri.toString(), message.scrollTop)
 		},
 		log: (message) => recordWebviewLog(log, message.level, message.message),
 		openInTextEditor: () => {
