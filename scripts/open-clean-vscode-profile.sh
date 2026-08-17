@@ -45,11 +45,27 @@ cat > "$USER_DIR/User/settings.json" <<'JSON'
   "editor.minimap.enabled": false,
   "security.workspace.trust.enabled": false,
   "window.zoomLevel": 1,
+  "extensions.ignoreRecommendations": true,
   "workbench.editorAssociations": {
     "*.md": "editor-markdown-notes.markdownEditor"
   }
 }
 JSON
+
+# Optional hook for callers (scripts/screenshot.sh) that need the extension's
+# own view-option toggles (full width, text tools) pre-set - those live in
+# globalState, not settings.json, so they're not reachable from the block
+# above. Set to an INSERT statement for the same sqlite store VSCode itself
+# reads on startup. VSCode keys this by the extension's id, not by the
+# individual memento key the extension passes to `globalState.update()` -
+# see the caller for how that key/value is actually shaped.
+if [ -n "${SEED_GLOBAL_STATE_SQL:-}" ]; then
+  mkdir -p "$USER_DIR/User/globalStorage"
+  sqlite3 "$USER_DIR/User/globalStorage/state.vscdb" "
+    CREATE TABLE IF NOT EXISTS ItemTable (key TEXT UNIQUE ON CONFLICT REPLACE, value BLOB);
+    $SEED_GLOBAL_STATE_SQL
+  "
+fi
 
 cd "$ROOT"
 pnpm build
@@ -66,7 +82,11 @@ VSIX="$ROOT/editor-markdown-notes-$VERSION.vsix"
 code --user-data-dir "$USER_DIR" --extensions-dir "$EXT_DIR" \
   --install-extension "$VSIX" --force
 
+# Which note to open defaults to the general markdown-syntax fixture; pass a
+# path (e.g. from scripts/screenshot.sh) to open a different one instead.
+NOTE="${1:-$ROOT/public/notes.md}"
+
 # Open the repo as the workspace folder - root-absolute image paths in the demo
 # notes resolve against it - with a note already open in the custom editor.
 code --user-data-dir "$USER_DIR" --extensions-dir "$EXT_DIR" \
-  --new-window "$ROOT" "$ROOT/public/notes.md"
+  --new-window "$ROOT" "$NOTE"
