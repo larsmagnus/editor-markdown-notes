@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-08-17
+
 - Added remembering where each note is scrolled to, restoring it when the note is reopened in the same VS Code session
 - Fixed a note opening scrolled into the middle of itself instead of at the top
 - Changed a note to open with no cursor placed in it, so click into the note before typing
