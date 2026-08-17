@@ -45,6 +45,41 @@ suite('Webview startup', () => {
 		}
 	})
 
+	/**
+	 * Every panel is built with the scroll offset the host remembers for that
+	 * document, injected into the page as a global. A second open is where a
+	 * remembered offset first reaches the HTML, and a global that failed to
+	 * serialise would take the whole inline script - and the app with it - down
+	 * with it, so the reopen needs the same clean-startup check as the first.
+	 */
+	test('reopens a note it has already shown once', async function () {
+		this.timeout(20_000)
+
+		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))
+		const file = vscode.Uri.file(path.join(directory, 'notes.md'))
+		await fs.writeFile(file.fsPath, '# Hello\n\nA note worth returning to.\n')
+
+		try {
+			await vscode.commands.executeCommand(
+				'editor-markdown-notes.openFile',
+				file
+			)
+			await new Promise((resolve) => setTimeout(resolve, 3000))
+			await vscode.commands.executeCommand('workbench.action.closeAllEditors')
+
+			await vscode.commands.executeCommand(
+				'editor-markdown-notes.openFile',
+				file
+			)
+			await new Promise((resolve) => setTimeout(resolve, 3000))
+
+			assert.deepStrictEqual(getWebviewProblems(), [])
+		} finally {
+			await vscode.commands.executeCommand('workbench.action.closeAllEditors')
+			await fs.rm(directory, { recursive: true, force: true })
+		}
+	})
+
 	// The analyser runs in a worker booted from a blob URL. If `worker-src` were
 	// missing from the CSP the panel would still render and only the checks would
 	// silently never appear - so the failure has to be caught here, where the log
