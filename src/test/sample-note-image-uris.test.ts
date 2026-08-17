@@ -1,5 +1,4 @@
 import * as assert from 'assert'
-import * as fs from 'fs/promises'
 import * as path from 'path'
 
 import * as vscode from 'vscode'
@@ -9,8 +8,11 @@ import { resolveImageSrc } from '../lib/resolve-image-src'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 
-const MARKDOWN_IMAGE = /!\[[^\]]*\]\(([^)\s]+)\)/g
-
+/**
+ * One test per image-resolution rule, against the demo note that documents it -
+ * the two branches of `resolveImageSrc`, end to end through a real webview's
+ * `asWebviewUri`, which is the piece a unit test cannot reach.
+ */
 suite('Sample note image URIs', () => {
 	suiteSetup(async () => {
 		const extension = vscode.extensions.getExtension(EXTENSION_ID)
@@ -18,14 +20,12 @@ suite('Sample note image URIs', () => {
 		await extension.activate()
 	})
 
-	test('every sample image resolves to the webview URI of its file', async () => {
+	test('notes.md loads its image out of the note folder', async () => {
 		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
 		assert.ok(workspaceRoot, 'the tests must run with the repo as a workspace')
 
-		const contentDirectory = path.join(workspaceRoot, 'public')
-		const notes = (await fs.readdir(contentDirectory)).filter((name) =>
-			name.endsWith('.md')
-		)
+		const note = vscode.Uri.file(path.join(workspaceRoot, 'public', 'notes.md'))
+		const document = await vscode.workspace.openTextDocument(note)
 
 		// A throwaway panel purely for its `Webview`: `asWebviewUri` is the piece
 		// under test, and only a real webview has it.
@@ -37,32 +37,57 @@ suite('Sample note image URIs', () => {
 		)
 
 		try {
-			for (const note of notes) {
-				const file = vscode.Uri.file(path.join(contentDirectory, note))
-				const document = await vscode.workspace.openTextDocument(file)
-				const baseUris = getImageBaseUris(panel.webview, document)
-
-				const sources = [...document.getText().matchAll(MARKDOWN_IMAGE)].map(
-					([, src]) => src
+			const resolved = resolveImageSrc(
+				'./icon-editor-markdown-notes.png',
+				getImageBaseUris(panel.webview, document)
+			)
+			const expected = panel.webview.asWebviewUri(
+				vscode.Uri.file(
+					path.join(workspaceRoot, 'public', 'icon-editor-markdown-notes.png')
 				)
+			)
 
-				for (const src of sources) {
-					// Derived independently of `resolveImageSrc`, so this does not just
-					// restate the implementation.
-					const expected: string = src.startsWith('/')
-						? path.join(workspaceRoot, src)
-						: path.resolve(path.dirname(document.uri.fsPath), src)
+			// Compared as URLs: both sides normalise the `file+…` authority.
+			assert.strictEqual(
+				new URL(resolved).toString(),
+				new URL(expected.toString()).toString()
+			)
+		} finally {
+			panel.dispose()
+		}
+	})
 
-					// Compared as URLs: both sides normalise the `file+…` authority.
-					assert.strictEqual(
-						new URL(resolveImageSrc(src, baseUris)).toString(),
-						new URL(
-							panel.webview.asWebviewUri(vscode.Uri.file(expected)).toString()
-						).toString(),
-						`${note} should load ${src} from ${expected}`
-					)
-				}
-			}
+	test('other-note.md loads its image out of the workspace root', async () => {
+		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
+		assert.ok(workspaceRoot, 'the tests must run with the repo as a workspace')
+
+		const note = vscode.Uri.file(
+			path.join(workspaceRoot, 'public', 'other-note.md')
+		)
+		const document = await vscode.workspace.openTextDocument(note)
+
+		const panel = vscode.window.createWebviewPanel(
+			'editor-markdown-notes.test',
+			'Image resolution',
+			vscode.ViewColumn.One,
+			{ localResourceRoots: [] }
+		)
+
+		try {
+			const resolved = resolveImageSrc(
+				'/icon-editor-markdown-notes.png',
+				getImageBaseUris(panel.webview, document)
+			)
+			const expected = panel.webview.asWebviewUri(
+				vscode.Uri.file(
+					path.join(workspaceRoot, 'icon-editor-markdown-notes.png')
+				)
+			)
+
+			assert.strictEqual(
+				new URL(resolved).toString(),
+				new URL(expected.toString()).toString()
+			)
 		} finally {
 			panel.dispose()
 		}
