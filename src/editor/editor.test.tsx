@@ -245,10 +245,16 @@ describe('Editor', () => {
 
 	describe('slash command', () => {
 		it('opens a menu and inserts a table', async () => {
-			const { container } = render(<Editor content={''} />)
-			await waitFor(() => {
-				expect(container.querySelector('.ProseMirror')).toBeInTheDocument()
-			})
+			render(<Editor content={''} />)
+
+			// Clicked into rather than typed into straight away: the editor no
+			// longer autofocuses, so that a note opens where it was last scrolled
+			// to. The empty paragraph and not the editable region around it -
+			// happy-dom has no layout for `posAtCoords` to read, so a click landing
+			// anywhere but on a textblock leaves the selection somewhere the
+			// keystrokes below never reach.
+			const editable = await screen.findByRole('textbox')
+			await userEvent.click(editable.querySelector('p') ?? editable)
 
 			await userEvent.keyboard('/table')
 
@@ -260,10 +266,11 @@ describe('Editor', () => {
 		})
 
 		it('closes without inserting anything on Escape', async () => {
-			const { container } = render(<Editor content={''} />)
-			await waitFor(() => {
-				expect(container.querySelector('.ProseMirror')).toBeInTheDocument()
-			})
+			render(<Editor content={''} />)
+
+			// Clicked into for the same reason as above.
+			const editable = await screen.findByRole('textbox')
+			await userEvent.click(editable.querySelector('p') ?? editable)
 
 			await userEvent.keyboard('/table')
 			await screen.findByRole('option', { name: 'Table' })
@@ -588,14 +595,16 @@ describe('Editor', () => {
 		})
 
 		it('promotes a manually typed --- fence block into a frontmatter block', async () => {
-			// Starts empty rather than clicking into position: happy-dom has no
-			// `setSelectionRange` for a contentEditable region, so `{Home}` can't
-			// be used to reach the start of existing content. An empty document
-			// already autofocuses at position 0.
+			// Starts empty rather than navigating to the top of existing content:
+			// happy-dom has no `setSelectionRange` for a contentEditable region, so
+			// `{Home}` can't be used, and position 0 is the only place frontmatter
+			// can be typed. The click lands there, on the empty paragraph itself -
+			// with no layout for `posAtCoords` to read, a click anywhere but on a
+			// textblock leaves the selection where the input rule below, which is
+			// what turns `---` into a horizontal rule, never sees it.
 			const { container } = render(<Editor content={''} />)
-			await waitFor(() => {
-				expect(container.querySelector('.ProseMirror')).toBeInTheDocument()
-			})
+			const editable = await screen.findByRole('textbox')
+			await userEvent.click(editable.querySelector('p') ?? editable)
 
 			await userEvent.keyboard('---{Enter}title: Roadmap{Enter}---{Enter}')
 

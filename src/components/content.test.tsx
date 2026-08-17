@@ -13,6 +13,7 @@ afterEach(() => {
 	delete window.vscode
 	delete window.initialContent
 	delete window.fileName
+	delete window.initialScrollTop
 	localStorage.clear()
 	vi.clearAllMocks()
 })
@@ -42,7 +43,10 @@ describe('Content', () => {
 			</SettingsProvider>
 		)
 
-		await screen.findByText('Ship it.')
+		// Clicked into rather than typed into straight away: the editor does not
+		// autofocus, so that a note opens where it was last scrolled to rather
+		// than wherever a caret puts itself.
+		await user.click(await screen.findByText('Ship it.'))
 		await user.keyboard(' Today.')
 
 		// The copy reads whatever `content` holds, so it has to happen after the
@@ -60,5 +64,35 @@ describe('Content', () => {
 		await user.click(screen.getByRole('button', { name: 'Copy page' }))
 
 		expect(await navigator.clipboard.readText()).toBe('Ship it. Today.')
+	})
+
+	/**
+	 * The host is the only thing that outlives the panel - VSCode disposes the
+	 * webview both when the tab closes and whenever it is backgrounded - so a
+	 * note only reopens where it was left if every scroll reaches it.
+	 */
+	it('tells the host where the reader has scrolled to', async () => {
+		const postMessage = vi.fn()
+		window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
+		window.initialContent = 'Ship it.'
+		window.fileName = 'notes.md'
+
+		const { container } = render(
+			<SettingsProvider>
+				<Content defaultFileName="notes.md" />
+			</SettingsProvider>
+		)
+
+		await screen.findByText('Ship it.')
+
+		const scrollable = container.firstElementChild
+		if (!scrollable) throw new Error('The note has no scroll container')
+		scrollable.scrollTop = 1840
+		scrollable.dispatchEvent(new Event('scroll'))
+
+		expect(postMessage).toHaveBeenCalledWith({
+			type: 'setScrollTop',
+			scrollTop: 1840,
+		})
 	})
 })

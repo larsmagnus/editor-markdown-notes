@@ -158,6 +158,24 @@ export const configSchema = z
 			'Injected into the page as `window.initialConfig` before the bundle runs, so the first render already has the right theme and width.',
 	})
 
+export const scrollTopSchema = z.number().nonnegative().catch(0).meta({
+	id: 'ScrollTop',
+	title: 'Scroll offset',
+	description:
+		'How far down a note was last scrolled. Injected as `window.initialScrollTop` in VS Code, or read back from `sessionStorage` in the standalone app; `0` is the top, and the fallback for anything unusable.',
+})
+
+export const webviewScrollStateSchema = z
+	.object({ scrollTop: z.number().nonnegative() })
+	.nullable()
+	.catch(null)
+	.meta({
+		id: 'WebviewScrollState',
+		title: 'Webview scroll state',
+		description:
+			'What this panel last recorded through `vscode.setState`, or `null` if it has none. Unlike the schemas above the absence of a value matters and cannot degrade to a default: `null` is what says to fall back to the offset the host injected, and a `0` would be a panel restored at the top.',
+	})
+
 export const updateMessageSchema = z
 	.object({
 		type: z.literal('update'),
