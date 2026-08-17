@@ -67,7 +67,7 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 
 ### UI Components (`src/components/`)
 
-- `content.tsx` - Layout: renders the toolbar and `note-body.tsx`, which picks the raw markdown textarea or the TipTap editor. `src/hooks/use-note-source.ts` picks the content source (VSCode vs. local)
+- `content.tsx` - Layout: renders the toolbar and `note-body.tsx`, which picks the raw markdown textarea or the TipTap editor. `src/hooks/use-note-source.ts` picks the content source (VSCode vs. local). Its one `overflow-auto` div is the app's scroll container, where `use-scroll-position.ts` reopens each note where it was left — which is why nothing in the editor may autofocus, TipTap scrolling its caret into view over that
 - `raw-markdown-editor.tsx` - The raw view, which saves the file **verbatim, frontmatter included**, because it shows the whole file. `use-note-save.ts` is the debounce and Cmd/Ctrl+S path both it and the TipTap editor share; the frontmatter split is the TipTap side's business and has already happened by the time text reaches that hook
 - `app-error-boundary.tsx` - Every failable seam wraps in this. Boundaries must report explicitly (`report-error.ts` → `console.error` → the log bridge) — the startup watchdog only fires while `#root` is empty, and a rendered fallback fills it. The mermaid boundary sits in `src/editor/code-block-view.tsx`, not around the editor, because TipTap mounts each node view as its own React root
 - `toolbar.tsx` - The `ToggleGroup` rebuilds every key from the selected array, so both directions are derived from the one table in `view-toggle-options.ts` - a toggle listed in only one of them used to be silently reset the next time any other was used
