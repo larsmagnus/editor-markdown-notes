@@ -182,9 +182,13 @@ describe('Editor', () => {
 		await userEvent.click(screen.getByLabelText('Edit diagram source'))
 		await userEvent.keyboard('  C --> D')
 
-		expect(
-			screen.queryByRole('img', { name: /diagram/i })
-		).not.toBeInTheDocument()
+		// Awaited because `focus()` lands the caret on the next animation frame,
+		// so the swap out of the diagram is always a frame behind the click.
+		await waitFor(() =>
+			expect(
+				screen.queryByRole('img', { name: /diagram/i })
+			).not.toBeInTheDocument()
+		)
 		expect(screen.getByText(/C --> D/)).toBeInTheDocument()
 	})
 
@@ -196,9 +200,13 @@ describe('Editor', () => {
 		await screen.findByRole('img', { name: /diagram/i })
 		await userEvent.click(screen.getByLabelText('Edit diagram source'))
 
-		expect(
-			screen.queryByRole('img', { name: /diagram/i })
-		).not.toBeInTheDocument()
+		// Awaited because `focus()` lands the caret on the next animation frame,
+		// so the swap out of the diagram is always a frame behind the click.
+		await waitFor(() =>
+			expect(
+				screen.queryByRole('img', { name: /diagram/i })
+			).not.toBeInTheDocument()
+		)
 		expect(screen.getByText(/graph TD/)).toBeInTheDocument()
 	})
 
@@ -210,9 +218,13 @@ describe('Editor', () => {
 
 		await screen.findByRole('img', { name: /diagram/i })
 		await userEvent.click(screen.getByLabelText('Edit diagram source'))
-		expect(
-			screen.queryByRole('img', { name: /diagram/i })
-		).not.toBeInTheDocument()
+		// Awaited because `focus()` lands the caret on the next animation frame,
+		// so the swap out of the diagram is always a frame behind the click.
+		await waitFor(() =>
+			expect(
+				screen.queryByRole('img', { name: /diagram/i })
+			).not.toBeInTheDocument()
+		)
 
 		await userEvent.click(screen.getByText('A paragraph below.'))
 
