@@ -18,9 +18,6 @@
 		"src/components/ui/**": ["exports", "types"],
 	},
 	"ignoreDependencies": [
-		// Ambient `suite`/`test` globals for the @vscode/test-cli suite; there is
-		// no import to trace.
-		"@types/mocha",
 		// Downloads and runs VS Code for `pnpm test:extension`. Driven by
 		// @vscode/test-cli, never imported.
 		"@vscode/test-electron",
