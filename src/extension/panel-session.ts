@@ -61,7 +61,7 @@ export function attachPanelSession({
 		log,
 	})
 
-	const handlers = createWebviewMessageHandlers({
+	const { handlers, disposable } = createWebviewMessageHandlers({
 		panel,
 		document,
 		writer,
@@ -77,6 +77,7 @@ export function attachPanelSession({
 		),
 		panel.webview.onDidReceiveMessage((message: WebviewToHost) =>
 			dispatchWebviewMessage(handlers, message)
-		)
+		),
+		disposable
 	)
 }

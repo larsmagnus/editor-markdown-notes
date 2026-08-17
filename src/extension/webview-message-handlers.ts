@@ -8,6 +8,7 @@ import type {
 	WebviewToHost,
 } from '../shared/messages'
 
+import { createAskClaudeHandlers } from './ask-claude-handlers'
 import type { DocumentWriter } from './document-updates'
 import { postDocumentUpdate } from './document-updates'
 import { openClaudeTerminal } from './open-claude-terminal-command'
@@ -37,6 +38,17 @@ type HandlerDependencies = {
  * A record rather than a switch so the mapped type makes a missing case a
  * compile error the moment `WebviewToHost` gains a member.
  */
+export type WebviewMessageHandlerSession = {
+	handlers: WebviewMessageHandlers
+	/**
+	 * Covers whatever per-panel state a handler group above needed its own
+	 * closure for (currently just `askClaude`'s in-flight request tracking) -
+	 * the general contract a handler group with teardown to do returns,
+	 * instead of a one-off function `attachPanelSession` has to know by name.
+	 */
+	disposable: vscode.Disposable
+}
+
 export function createWebviewMessageHandlers({
 	panel,
 	document,
@@ -45,8 +57,13 @@ export function createWebviewMessageHandlers({
 	log,
 	broadcastConfig,
 	readShikiTheme,
-}: HandlerDependencies): WebviewMessageHandlers {
-	return {
+}: HandlerDependencies): WebviewMessageHandlerSession {
+	const { askClaude, cancelAsk, disposable } = createAskClaudeHandlers({
+		panel,
+		document,
+	})
+
+	const handlers: WebviewMessageHandlers = {
 		save: (message) => writer.save(document, message.content),
 		getContent: () => {
 			postDocumentUpdate(panel, document)
@@ -82,7 +99,11 @@ export function createWebviewMessageHandlers({
 			const message: HostToWebview = { type: 'imagePicked', path }
 			void panel.webview.postMessage(message)
 		},
+		askClaude,
+		cancelAsk,
 	}
+
+	return { handlers, disposable }
 }
 
 /**

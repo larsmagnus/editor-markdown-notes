@@ -65,3 +65,18 @@ export const LongMessage: Story = {
 		resetErrorBoundary: fn(),
 	},
 }
+
+/**
+ * The X in the top-right corner: a second escape hatch, for a subtree holding
+ * state retry alone can't clear - an in-flight ask proposal, a stuck loading
+ * indicator.
+ */
+export const WithDismissButton: Story = {
+	args: {
+		title: 'Ask Claude',
+		error: new Error('Cannot read properties of undefined (reading "text")'),
+		resetErrorBoundary: fn(),
+		onRemove: fn(),
+		removeLabel: 'Discard proposal',
+	},
+}

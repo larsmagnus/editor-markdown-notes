@@ -11,6 +11,9 @@ type AppErrorBoundaryProps = PropsWithChildren<{
 	title: string
 	/** Values whose change clears the fallback, typically the note on screen. */
 	resetKeys?: unknown[]
+	/** See `ErrorFallback`'s prop of the same name. */
+	onRemove?: () => void
+	removeLabel?: string
 }>
 
 /**
@@ -22,11 +25,20 @@ type AppErrorBoundaryProps = PropsWithChildren<{
 export function AppErrorBoundary({
 	title,
 	resetKeys,
+	onRemove,
+	removeLabel,
 	children,
 }: AppErrorBoundaryProps) {
 	const renderFallback = useCallback(
-		(props: FallbackProps) => <ErrorFallback title={title} {...props} />,
-		[title]
+		(props: FallbackProps) => (
+			<ErrorFallback
+				title={title}
+				onRemove={onRemove}
+				removeLabel={removeLabel}
+				{...props}
+			/>
+		),
+		[title, onRemove, removeLabel]
 	)
 
 	return (

@@ -4,11 +4,13 @@ import {
 	GitBranch,
 	Image as ImageIcon,
 	ListTodo,
+	Sparkles,
 	Table2,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import { MERMAID_LANGUAGE } from '@/editor/mermaid/language'
+import { runAskCommand } from '@/editor/slash-command/ask-command'
 import { runInsertImageCommand } from '@/editor/slash-command/insert-image-command'
 
 export type SlashCommandItem = {
@@ -19,6 +21,12 @@ export type SlashCommandItem = {
 	icon: LucideIcon
 	/** Replaces `range` (the `/query` text) with this action's result. */
 	run: (editor: Editor, range: Range) => void
+	/**
+	 * Needs the extension host (a local `claude` CLI, filesystem access) - not
+	 * offered by the standalone web app, where nothing is listening on the
+	 * other end of the message it would post. See `extension.ts`'s `filterCommands`.
+	 */
+	vscodeOnly?: boolean
 }
 
 /**
@@ -88,5 +96,13 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
 		keywords: ['picture', 'photo', 'file'],
 		icon: ImageIcon,
 		run: runInsertImageCommand,
+	},
+	{
+		id: 'ask',
+		label: 'Ask Claude',
+		keywords: ['ai', 'claude', 'prompt'],
+		icon: Sparkles,
+		run: runAskCommand,
+		vscodeOnly: true,
 	},
 ]

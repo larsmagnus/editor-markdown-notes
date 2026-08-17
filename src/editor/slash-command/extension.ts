@@ -4,15 +4,32 @@ import Suggestion from '@tiptap/suggestion'
 import { SLASH_COMMANDS } from '@/editor/slash-command/commands'
 import type { SlashCommandItem } from '@/editor/slash-command/commands'
 import { createSlashCommandRender } from '@/editor/slash-command/render'
+import { isVSCodeWebview } from '@/lib/vscode-api'
 
-function filterCommands(query: string): SlashCommandItem[] {
+/**
+ * Lower ranks first: a label starting with the query ("Ask Claude" for "ask")
+ * beats one only matching because a keyword happens to contain it as a
+ * substring ("task-list"'s `task` keyword also contains "ask") - without this,
+ * `SLASH_COMMANDS`' declaration order would surface the coincidental match first.
+ */
+function rank(item: SlashCommandItem, search: string): number {
+	const label = item.label.toLowerCase()
+	if (label.startsWith(search)) return 0
+	if (item.keywords.some((keyword) => keyword.startsWith(search))) return 1
+	if (label.includes(search)) return 2
+	return 3
+}
+
+/** Exported for `extension.test.ts` - hiding a `vscodeOnly` command has no other observable seam. */
+export function filterCommands(query: string): SlashCommandItem[] {
 	const search = query.toLowerCase()
 
 	return SLASH_COMMANDS.filter(
 		(item) =>
-			item.label.toLowerCase().includes(search) ||
-			item.keywords.some((keyword) => keyword.includes(search))
-	)
+			(!item.vscodeOnly || isVSCodeWebview()) &&
+			(item.label.toLowerCase().includes(search) ||
+				item.keywords.some((keyword) => keyword.includes(search)))
+	).sort((a, b) => rank(a, search) - rank(b, search))
 }
 
 /**

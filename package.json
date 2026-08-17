@@ -205,8 +205,9 @@
 	"scripts": {
 		"vscode:prepublish": "pnpm run build",
 		"vscode:sentinel": "mkdir -p out && echo '{\"type\":\"commonjs\"}' > out/package.json",
-		"vscode:compile": "tsc -p ./tsconfig.extension.json && pnpm vscode:sentinel",
-		"vscode:watch": "pnpm vscode:sentinel && tsc -watch -p ./tsconfig.extension.json",
+		"vscode:bundle-agent-sdk": "esbuild src/extension/agent-sdk-bundle.ts --bundle --platform=node --format=esm --outfile=out/extension/agent-sdk-bundle.mjs --external:vscode && cp src/extension/load-agent-sdk.cjs out/extension/load-agent-sdk.cjs",
+		"vscode:compile": "tsc -p ./tsconfig.extension.json && pnpm vscode:bundle-agent-sdk && pnpm vscode:sentinel",
+		"vscode:watch": "pnpm vscode:sentinel && pnpm vscode:bundle-agent-sdk && tsc -watch -p ./tsconfig.extension.json",
 		"vscode:package": "pnpm dlx @vscode/vsce@3.9.2 package --no-dependencies",
 		"vscode:install": "pnpm install && pnpm vscode:package && code --install-extension editor-markdown-notes-$npm_package_version.vsix",
 		"watch": "pnpm vscode:watch",
@@ -246,6 +247,7 @@
 		"@vitejs/plugin-react-swc": "4.3.3",
 		"@vscode/test-cli": "0.0.15",
 		"@vscode/test-electron": "3.1.0",
+		"esbuild": "0.28.2",
 		"fta-cli": "3.0.0",
 		"happy-dom": "20.11.1",
 		"knip": "6.32.0",
@@ -259,6 +261,7 @@
 		"vitest": "4.1.10"
 	},
 	"dependencies": {
+		"@anthropic-ai/claude-agent-sdk": "0.3.233",
 		"@base-ui/react": "1.7.0",
 		"@shikijs/langs": "4.4.3",
 		"@shikijs/themes": "4.4.3",

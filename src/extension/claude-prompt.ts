@@ -99,7 +99,7 @@ export function buildPrompt(template: string, tokens: PromptTokens): string {
  * particular is newline-delimited and does not survive the flattening as
  * valid source, which is fine: nothing re-parses it.
  */
-function toExcerpt(content: string): string {
+export function toExcerpt(content: string): string {
 	const flattened = toSingleLine(content).replace(/\s+/g, ' ').trim()
 
 	return flattened.length > CLAUDE_PROMPT_CONTENT_MAX_LENGTH

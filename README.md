@@ -20,6 +20,7 @@ An integrated live markdown editor for VS Code, built for the AI-first era
 - Table and image editing tools
 - Mermaid diagrams render inline
 - Toolbar settings persist across tabs and sessions
+- Claude Code integration for opening, asking and rewriting
 
 ## Usage
 
@@ -104,7 +105,8 @@ If the editor panel loads blank, run **Editor Markdown Notes: Show logs** from t
 
 ## Requirements
 
-VS Code `^1.101.0`.
+- VS Code `^1.101.0`.
+- (Optional) [Claude Code CLI](https://claude.com/product/claude-code) installed and signed in on `$PATH`
 
 ## Install locally
 

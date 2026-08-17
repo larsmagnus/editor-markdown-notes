@@ -17,6 +17,8 @@ import StarterKit from '@tiptap/starter-kit'
 import type { MarkdownStorage } from 'tiptap-markdown'
 import { Markdown } from 'tiptap-markdown'
 
+import { AskInlineStatus } from '@/editor/ask-inline-status-extension'
+import { AskSuggestion } from '@/editor/ask-suggestion-extension'
 import { CodeBlockView } from '@/editor/code-block-view'
 import { CodeExtension } from '@/editor/code-extension'
 import { Frontmatter } from '@/editor/frontmatter/extension'
@@ -169,6 +171,12 @@ export const extensions = [
 	TextTools,
 	// Decorations only, and inert until `useSyntaxHighlight` feeds it tokens.
 	SyntaxHighlight,
+	// Decorations only, and inert until the bubble menu's sparkles popover
+	// starts a proposal. Registered unconditionally for the same reason as
+	// `TextTools` and `SyntaxHighlight` above: the editor is built once.
+	AskSuggestion,
+	// Decorations only, and inert until the `/ask` slash command starts one.
+	AskInlineStatus,
 	// Otherwise unhandled, Tab is a browser default: it moves focus to the next
 	// focusable element on the page rather than indenting. Declines inside a
 	// table cell and when a node (not a text caret) is selected, so it doesn't

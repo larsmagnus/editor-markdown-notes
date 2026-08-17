@@ -34,5 +34,10 @@
 		"src/lib/webview-diagnostics.ts",
 		"src/lib/webview-html.ts"
 	],
-	"exclude": ["node_modules", "out"]
+	"exclude": [
+		"node_modules",
+		"out",
+		// esbuild's entry point, never tsc's - see the file's own comment.
+		"src/extension/agent-sdk-bundle.ts"
+	]
 }

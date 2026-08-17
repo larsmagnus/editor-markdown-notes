@@ -2,6 +2,7 @@ import { useEditor } from '@tiptap/react'
 import { useCallback, useRef } from 'react'
 
 import { extensions } from '@/editor/extensions'
+import { useAskProposal } from '@/hooks/use-ask-proposal'
 import { useFrontmatterDocument } from '@/hooks/use-frontmatter-document'
 import { useItalicMarker } from '@/hooks/use-italic-marker'
 import { useMarkdownAutosave } from '@/hooks/use-markdown-autosave'
@@ -72,6 +73,7 @@ export function useMarkdownEditor(
 
 	useItalicMarker(editor, settings.italicMarker)
 	const codeBlockStyle = useSyntaxHighlight(editor)
+	useAskProposal(editor)
 
 	return {
 		editor,

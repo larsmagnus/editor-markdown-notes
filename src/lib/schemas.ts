@@ -196,6 +196,44 @@ export const imagePickedMessageSchema = z
 			"Posted by the host in reply to `pickImage`, once. Unlike the schemas above this one has no `.catch()` - a message that fails to parse is another extension's traffic and must be ignored, not defaulted.",
 	})
 
+export const askChunkMessageSchema = z
+	.object({
+		type: z.literal('askChunk'),
+		requestId: z.string(),
+		text: z.string(),
+	})
+	.meta({
+		id: 'AskChunkMessage',
+		title: 'Ask chunk',
+		description:
+			"Posted by the host as the Claude Agent SDK streams a reply. Unlike the schemas above this one has no `.catch()` - a message that fails to parse is another extension's traffic and must be ignored, not defaulted.",
+	})
+
+export const askDoneMessageSchema = z
+	.object({
+		type: z.literal('askDone'),
+		requestId: z.string(),
+	})
+	.meta({
+		id: 'AskDoneMessage',
+		title: 'Ask done',
+		description:
+			'Posted by the host once an `askClaude` request finishes successfully. No `.catch()`, same reason as `askChunk`.',
+	})
+
+export const askErrorMessageSchema = z
+	.object({
+		type: z.literal('askError'),
+		requestId: z.string(),
+		error: z.string(),
+	})
+	.meta({
+		id: 'AskErrorMessage',
+		title: 'Ask error',
+		description:
+			'Posted by the host when an `askClaude` request fails. No `.catch()`, same reason as `askChunk`.',
+	})
+
 export const shikiThemeMessageSchema = z
 	.object({
 		type: z.literal('shikiTheme'),

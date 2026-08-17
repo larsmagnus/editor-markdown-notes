@@ -183,6 +183,22 @@ export type WebviewToHost =
 	/** Asks the host to show its native file-open dialog for an image, for the
 	 *  slash command's "image" action. Answered once, by `imagePicked`. */
 	| { type: 'pickImage' }
+	/**
+	 * Asks the host to run `prompt` through the Claude Agent SDK, pointed at
+	 * this document by path the same way `openClaudeTerminal` is - the path is
+	 * never sent, the host resolves it from its own `vscode.TextDocument`.
+	 * `selectedText` is the excerpt being asked about (bubble menu only; the
+	 * `/ask` slash command has none). `requestId` is webview-generated so
+	 * replies for more than one in-flight ask can be told apart.
+	 */
+	| {
+			type: 'askClaude'
+			requestId: string
+			prompt: string
+			selectedText?: string
+	  }
+	/** Stops a running `askClaude` request; no reply is sent for it. */
+	| { type: 'cancelAsk'; requestId: string }
 
 export type HostToWebview =
 	| { type: 'update'; content: string; fileName: string }
@@ -194,3 +210,10 @@ export type HostToWebview =
 	 *  folder (the same base `resolveImageSrc` resolves a relative `src`
 	 *  against), or `null` if the dialog was cancelled. */
 	| { type: 'imagePicked'; path: string | null }
+	/** Streamed reply to `askClaude`: one chunk of the response's text delta. */
+	| { type: 'askChunk'; requestId: string; text: string }
+	/** Sent once an `askClaude` request finishes successfully. */
+	| { type: 'askDone'; requestId: string }
+	/** Sent once an `askClaude` request fails - a bad/missing `claude` CLI,
+	 *  an auth failure, or the request being aborted. */
+	| { type: 'askError'; requestId: string; error: string }

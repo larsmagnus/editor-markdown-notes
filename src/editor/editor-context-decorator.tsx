@@ -4,7 +4,8 @@ import type { ReactNode } from 'react'
 import { extensions } from '@/editor/extensions'
 
 interface EditorContextMountProps {
-	children: ReactNode
+	/** Optional, for stories that only need the mounted content itself. */
+	children?: ReactNode
 	/** The note to mount, for the stories that need something specific in it. */
 	content?: string
 }

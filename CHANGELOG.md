@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added an "Ask Claude" slash command: type `/ask` followed by a prompt to have Claude rewrite that part of the note in place, with a spinner while it works and an error card with retry and dismiss if it fails
+- Added a sparkles button to the bubble menu that asks Claude to simplify, shorten, improve, or otherwise rewrite the selected text, showing the proposed rewrite alongside the original as editable text with accept, decline, retry, and an option to keep both
+- Changed the "Ask Claude" slash command and bubble menu button to hide in the standalone web app, where there is no extension host to ask
 - Added a slash command menu: type `/` on an empty line to insert a mermaid diagram, code block, task list, table, or image
 - Added `editorMarkdownNotes.imageCopyDirectory` for where the slash command's image action copies a file picked from outside the workspace
 - Added a copy button to the toolbar for copying the note as markdown or plain text, and for opening it in Claude
