@@ -17,7 +17,7 @@ A VSCode extension for editing markdown in a live preview powered by a React web
 
 `knip.jsonc` must include `.css` in `project`, or Tailwind v4's `@plugin` directives in `src/globals.css` don't count as usage and those plugins read as unused deps. `src/components/ui/**` exports are exempt, keeping vendored shadcn files a clean overwrite.
 
-Vitest runs `src/**/*.test.{ts,tsx}` except `src/test/**`, which `tsconfig.extension.json` compiles without a DOM lib — keep webview tests out of it.
+Vitest runs `src/**/*.test.{ts,tsx}` except `src/test/**`, which `tsconfig.extension.json` compiles without a DOM lib — keep webview tests out of it. Those suites are `pnpm test:extension`, which boots a real VS Code and is the only way to check host behaviour.
 
 Never replace `navigator` wholesale in a test that also mounts an editor: a stub built as `{ ...navigator, clipboard }` drops the prototype getters ProseMirror reads to detect the browser, and the editor then silently never mounts. Mock `src/lib/clipboard.ts` — the app's only route to the clipboard — or let `userEvent.setup()` install its own stub.
 
