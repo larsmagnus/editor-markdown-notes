@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 - Added scrolling to the matched text when a note is opened from a search result, with every occurrence of that text highlighted
+- Added an info button to each writing tools check, explaining what it looks for and showing an example of the fix marked the way the editor marks it
 
 ## [0.20.0] - 2026-08-17
 

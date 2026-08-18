@@ -190,6 +190,35 @@ describe('text tools', () => {
 		})
 	})
 
+	it('explains what a check looks for when its info button is pressed', async () => {
+		const user = userEvent.setup()
+		renderWithTextTools()
+
+		const panel = await screen.findByRole('complementary', {
+			name: 'Text tools',
+		})
+
+		// One button per place the rule appears - the checkbox list and the
+		// heading of the group it found something in.
+		const [info] = await within(panel).findAllByRole('button', {
+			name: 'About Passive voice',
+		})
+		await user.click(info)
+
+		const explanation = await screen.findByRole('dialog', {
+			name: 'Passive voice',
+		})
+
+		expect(explanation).toHaveTextContent(/puts the thing acted on first/)
+		expect(explanation).toHaveTextContent('The committee wrote the report.')
+
+		// The flawed example wears the same marker the document would draw on it,
+		// which is what tells the reader what the marker means.
+		expect(within(explanation).getByText('written')).toHaveClass(
+			'text-tools-issue--warning'
+		)
+	})
+
 	it('says so when it finds nothing', async () => {
 		analyze.mockResolvedValue(analysisOf([]))
 		renderWithTextTools()

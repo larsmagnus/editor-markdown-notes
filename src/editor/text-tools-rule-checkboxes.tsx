@@ -1,5 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
+import { TextToolsRuleInfo } from '@/editor/text-tools-rule-info'
 import { RULES } from '@/lib/text-tools/rules'
 import type { TextToolRuleId } from '@/shared/messages'
 import { TEXT_TOOL_RULE_IDS } from '@/shared/messages'
@@ -39,6 +40,7 @@ export function TextToolsRuleCheckboxes({
 						onCheckedChange={(checked) => toggleRule(ruleId, !!checked)}
 					/>
 					<FieldLabel htmlFor={ruleId}>{RULES[ruleId].label}</FieldLabel>
+					<TextToolsRuleInfo ruleId={ruleId} />
 				</Field>
 			))}
 		</fieldset>

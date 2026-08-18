@@ -1,6 +1,7 @@
 import { useCurrentEditor } from '@tiptap/react'
 
 import { findIssueRange } from '@/editor/text-tools-extension'
+import { TextToolsRuleInfo } from '@/editor/text-tools-rule-info'
 import type { RuleGroup } from '@/lib/text-tools/summarize'
 import type { TextIssue } from '@/lib/text-tools/types'
 
@@ -31,9 +32,12 @@ export function TextToolsIssueGroup({ group }: TextToolsIssueGroupProps) {
 
 	return (
 		<section className="flex flex-col gap-1">
-			<h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-				{group.label} ({group.issues.length})
-			</h3>
+			<div className="flex items-center gap-1">
+				<h3 className="flex-auto text-xs font-medium tracking-wide text-muted-foreground uppercase">
+					{group.label} ({group.issues.length})
+				</h3>
+				<TextToolsRuleInfo ruleId={group.ruleId} />
+			</div>
 			<ul className="flex flex-col gap-1">
 				{group.issues.map((issue) => (
 					<li key={`${issue.start}-${issue.ruleId}-${issue.actual}`}>
