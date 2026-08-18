@@ -123,7 +123,7 @@
 	}
 
 	.ProseMirror img {
-		@apply cursor-grab rounded border border-transparent outline-none
+		@apply cursor-grab rounded-md border border-transparent outline-none
     hover:border-neutral-300 active:cursor-grabbing dark:hover:border-neutral-700;
 	}
 
@@ -137,17 +137,46 @@
 		@apply border-ring ring-3 ring-ring/50;
 	}
 
+	.tableWrapper {
+		@apply rounded-md overflow-hidden border border-border;
+	}
+
 	/*
 	 * ProseMirror table plumbing. Typography styles the table itself, but the
 	 * fixed layout, cell borders and cell-selection overlay are ours to provide.
 	 */
 	.ProseMirror table {
-		@apply w-full table-fixed border-collapse overflow-hidden;
+		@apply w-full table-fixed border-collapse overflow-hidden m-0;
 	}
 
-	.ProseMirror th,
-	.ProseMirror td {
-		@apply relative border border-border px-3 py-2 align-top;
+	.ProseMirror {
+		th:first-child {
+			@apply rounded-tl-md;
+		}
+		th:last-child {
+			@apply rounded-tr-md;
+		}
+
+		tr:last-child td:first-child {
+			@apply rounded-bl-md;
+		}
+		tr:last-child td:last-child {
+			@apply rounded-br-md;
+		}
+		th,
+		td {
+			@apply border-b border-border;
+		}
+
+		tr:last-child th,
+		tr:last-child td {
+			@apply border-b-0;
+		}
+
+		th,
+		td {
+			@apply relative px-3 py-2 align-top border-r border-border last:border-r-0;
+		}
 	}
 
 	.ProseMirror th {

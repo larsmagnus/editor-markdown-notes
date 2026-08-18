@@ -50,7 +50,7 @@ export function MermaidBlock({ node, editor, getPos }: MermaidBlockProps) {
 						// hover affordances: a diagram taller than the cap is clipped,
 						// and an edge is what says so rather than leaving it looking
 						// like the diagram simply ends there.
-						className="max-h-[32rem] rounded border border-border/50 p-2 hover:border-border"
+						className="max-h-[32rem] rounded-md border border-border/50 p-2 hover:border-border"
 						controls={
 							<MermaidToolbar
 								code={node.textContent}
