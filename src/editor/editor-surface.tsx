@@ -1,6 +1,5 @@
 import type { EditorContentProps } from '@tiptap/react'
 import { EditorConsumer, EditorContent } from '@tiptap/react'
-import { Suspense } from 'react'
 import type { ReactNode } from 'react'
 
 import { TableControls } from '@/editor/table/controls'
@@ -9,7 +8,13 @@ import { cn } from '@/lib/utils'
 
 type EditorSurfaceProps = Omit<EditorContentProps, 'editor'> & {
 	includeProseBaseClassNames?: boolean
-	/** Rendered beside the document; omitted entirely when the tools are off. */
+	/**
+	 * Rendered beside the document; omitted entirely when the tools are off.
+	 *
+	 * Must not suspend. A boundary here would sit above `EditorContent`, and
+	 * unwinding to it re-renders the editor, whose mount `flushSync`s straight
+	 * back into the render that suspended — see `text-tools-aside.tsx`.
+	 */
 	panel?: ReactNode
 	/** The resolved Shiki theme's colors; undefined until one has loaded. */
 	codeBlockStyle?: CodeBlockStyle
@@ -55,7 +60,7 @@ export function EditorSurface({
 				<TableControls />
 			</div>
 
-			{panel && <Suspense fallback={null}>{panel}</Suspense>}
+			{panel}
 		</div>
 	)
 }
