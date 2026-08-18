@@ -7,6 +7,7 @@ import { broadcastToPanels } from './broadcast'
 import { CONFIG_SECTION, VIEW_TYPE } from './constants'
 import { attachPanelSession } from './panel-session'
 import { probePanel } from './probe-panel'
+import { readSearchReveal } from './read-search-reveal'
 import type { ScrollPositionStore } from './scroll-position-store'
 import type { SettingsStore } from './settings-store'
 import type { ShikiThemeStore } from './shiki-theme-store'
@@ -76,17 +77,23 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 	public async resolveCustomTextEditor(
 		document: vscode.TextDocument,
 		webviewPanel: vscode.WebviewPanel,
-		_token: vscode.CancellationToken
+		token: vscode.CancellationToken
 	): Promise<void> {
+		// Before the panel's HTML is built, since the reveal is injected into it -
+		// this is the only moment a search-result click is observable at all.
+		const searchReveal = await readSearchReveal(document, this.log)
+
 		const session = attachPanelSession({
 			panel: webviewPanel,
 			document,
 			extensionPath: this.context.extensionPath,
 			store: this.store,
 			scrollPositions: this.scrollPositions,
+			searchReveal,
 			log: this.log,
 			broadcastConfig: this.broadcastConfig,
 			readShikiTheme: () => this.shikiThemeStore.getTheme(),
+			token,
 		})
 
 		const probe = probePanel(webviewPanel, document, this.log)

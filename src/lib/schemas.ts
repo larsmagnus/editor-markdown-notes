@@ -165,15 +165,32 @@ export const scrollTopSchema = z.number().nonnegative().catch(0).meta({
 		'How far down a note was last scrolled. Injected as `window.initialScrollTop` in VS Code, or read back from `sessionStorage` in the standalone app; `0` is the top, and the fallback for anything unusable.',
 })
 
-export const webviewScrollStateSchema = z
-	.object({ scrollTop: z.number().nonnegative() })
-	.nullable()
-	.catch(null)
+export const searchRevealSchema = z
+	.object({
+		line: z.number().int().nonnegative().catch(0),
+		column: z.number().int().nonnegative().catch(0),
+		text: z.string().catch(''),
+		lineOffset: z.number().int().nonnegative().catch(0),
+	})
+	.catch({ line: 0, column: 0, text: '', lineOffset: 0 })
 	.meta({
-		id: 'WebviewScrollState',
-		title: 'Webview scroll state',
+		id: 'SearchReveal',
+		title: 'Search reveal',
 		description:
-			'What this panel last recorded through `vscode.setState`, or `null` if it has none. Unlike the schemas above the absence of a value matters and cannot degrade to a default: `null` is what says to fall back to the offset the host injected, and a `0` would be a panel restored at the top.',
+			'Injected as `window.searchReveal` when a note opens from a search result, naming the match to scroll to in *body* coordinates - the host has already subtracted the frontmatter, and `lineOffset` says how much, for raw mode to add back. Absent on an ordinary open. `text` is the matched source text, which the live editor looks for in the rendered document to place this match and highlight every other occurrence.',
+	})
+
+export const webviewPanelStateSchema = z
+	.object({
+		scrollTop: z.number().nonnegative().optional().catch(undefined),
+		searchRevealConsumed: z.boolean().optional().catch(undefined),
+	})
+	.catch({})
+	.meta({
+		id: 'WebviewPanelState',
+		title: 'Webview panel state',
+		description:
+			'What this panel last recorded through `vscode.setState`, which is the only thing VS Code preserves when it tears the webview down for a backgrounded tab and rebuilds it from the HTML it already holds. Both fields are optional because their absence is meaningful and must not degrade to a default: no `scrollTop` says to fall back to the offset the host injected, where a `0` would be a panel restored at the top, and no `searchRevealConsumed` says the injected reveal has not been acted on yet.',
 	})
 
 export const updateMessageSchema = z

@@ -123,6 +123,30 @@ describe('buildWebviewHtml', () => {
 		expect(html).toContain('window.initialScrollTop = 1840;')
 	})
 
+	it('injects the search reveal when the note opens from a search result', () => {
+		const html = buildWebviewHtml({
+			...INPUT,
+			globals: {
+				...INPUT.globals,
+				searchReveal: {
+					line: 58,
+					column: 1,
+					text: '<input',
+					lineOffset: 8,
+				},
+			},
+		})
+
+		expect(html).toContain(
+			'window.searchReveal = {"line":58,"column":1,"text":"\\u003cinput","lineOffset":8};'
+		)
+	})
+
+	/** Its absence is what the webview reads as "an ordinary open". */
+	it('leaves the search reveal out entirely when there is none', () => {
+		expect(buildWebviewHtml(INPUT)).not.toContain('window.searchReveal')
+	})
+
 	it('gives the app its mount point', () => {
 		expect(buildWebviewHtml(INPUT)).toContain('<div id="root"></div>')
 	})

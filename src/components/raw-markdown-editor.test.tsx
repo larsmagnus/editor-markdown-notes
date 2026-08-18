@@ -23,6 +23,7 @@ const NOTE_WITH_FRONTMATTER = [
 
 afterEach(() => {
 	delete window.vscode
+	delete window.searchReveal
 	localStorage.clear()
 	vi.clearAllMocks()
 })
@@ -175,5 +176,53 @@ describe('RawMarkdownEditor', () => {
 		)
 
 		expect(screen.getByLabelText('Raw markdown')).toHaveValue('# Roadmap 2026')
+	})
+
+	/**
+	 * A textarea can highlight nothing but its own selection, so selecting the
+	 * match is the highlight here. The position needs no searching, only the
+	 * frontmatter the host subtracted added back - this view shows the whole
+	 * file, fences included.
+	 */
+	it('selects the revealed match, frontmatter included', async () => {
+		window.searchReveal = {
+			// Body line 2, which is source line 7 once the frontmatter is added on.
+			line: 2,
+			column: 0,
+			text: 'Ship',
+			lineOffset: 5,
+		}
+
+		render(
+			<SettingsProvider>
+				<RawMarkdownEditor
+					content={NOTE_WITH_FRONTMATTER}
+					saveContent={vi.fn()}
+				/>
+			</SettingsProvider>
+		)
+
+		const textarea = screen.getByLabelText<HTMLTextAreaElement>('Raw markdown')
+
+		await waitFor(() => {
+			expect(
+				textarea.value.slice(textarea.selectionStart, textarea.selectionEnd)
+			).toBe('Ship')
+		})
+	})
+
+	it('selects nothing on an ordinary open', async () => {
+		render(
+			<SettingsProvider>
+				<RawMarkdownEditor
+					content={NOTE_WITH_FRONTMATTER}
+					saveContent={vi.fn()}
+				/>
+			</SettingsProvider>
+		)
+
+		const textarea = screen.getByLabelText<HTMLTextAreaElement>('Raw markdown')
+
+		expect(textarea.selectionStart).toBe(textarea.selectionEnd)
 	})
 })

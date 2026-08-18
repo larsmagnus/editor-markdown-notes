@@ -3,6 +3,8 @@ import type { ChangeEvent } from 'react'
 
 import { useNoteSave } from '@/hooks/use-note-save'
 import { useSettings } from '@/hooks/use-settings'
+import { findRawSearchRange } from '@/lib/raw-search-reveal'
+import { takeSearchReveal } from '@/lib/search-reveal'
 import { cn } from '@/lib/utils'
 
 interface RawMarkdownEditorProps {
@@ -47,6 +49,26 @@ export function RawMarkdownEditor({
 
 		setDraft(content)
 	}, [content])
+
+	// A textarea can highlight nothing but its own selection, so selecting the
+	// match *is* the highlight here - and focusing is what scrolls the container
+	// to it. The usual "nothing may autofocus" rule is about not fighting the
+	// remembered scroll position, which a reveal deliberately overrides anyway.
+	const revealed = useRef(false)
+	useEffect(() => {
+		const textarea = textareaRef.current
+		if (!textarea || revealed.current) return
+
+		const reveal = takeSearchReveal()
+		if (!reveal) return
+
+		const range = findRawSearchRange(draftRef.current, reveal)
+		if (!range) return
+
+		revealed.current = true
+		textarea.focus()
+		textarea.setSelectionRange(range.start, range.end)
+	}, [])
 
 	const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
 		setDraft(event.target.value)

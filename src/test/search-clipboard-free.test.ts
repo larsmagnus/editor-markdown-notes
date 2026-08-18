@@ -2,10 +2,7 @@ import * as assert from 'assert'
 
 import * as vscode from 'vscode'
 
-import {
-	readOnlySearchMatch,
-	readSearchMatches,
-} from '../extension/read-search-match'
+import { readSearchMatches } from '../extension/read-search-match'
 
 import { runSearch } from './probe-support'
 
@@ -30,7 +27,7 @@ suite('Clipboard-free search match', function () {
 		await vscode.commands.executeCommand('workbench.action.closeAllEditors')
 	})
 
-	test('identifies the sole match in a note without reading the clipboard', async () => {
+	test("identifies a note's matches without reading the clipboard", async () => {
 		assert.ok(workspace, 'expected a workspace folder')
 		const note = vscode.Uri.joinPath(workspace.uri, 'public', 'other-note.md')
 
@@ -38,9 +35,10 @@ suite('Clipboard-free search match', function () {
 		await vscode.env.clipboard.writeText(clipboardBefore)
 
 		await runSearch('<input')
-		const match = await readOnlySearchMatch(note)
+		const [match, ...rest] = await readSearchMatches(note)
 
-		assert.ok(match, 'other-note.md holds exactly one `<input`')
+		assert.ok(match, 'other-note.md holds a `<input` match')
+		assert.strictEqual(rest.length, 0, 'and only the one')
 		// `<input` sits on line 67, column 2 (1-based) of the fixture note.
 		assert.strictEqual(match.line, 66, 'line, 0-based')
 		assert.strictEqual(match.column, 1, 'column, 0-based')
@@ -51,21 +49,17 @@ suite('Clipboard-free search match', function () {
 		)
 	})
 
-	test('declines to guess when a note holds several matches', async () => {
+	test('reports every match when a note holds several', async () => {
 		assert.ok(workspace, 'expected a workspace folder')
 		const note = vscode.Uri.joinPath(workspace.uri, 'public', 'other-note.md')
 
 		await runSearch('email')
 
 		const matches = await readSearchMatches(note)
+
 		assert.ok(
 			matches.length > 1,
 			`expected several matches, got ${matches.length}`
-		)
-		assert.strictEqual(
-			await readOnlySearchMatch(note),
-			undefined,
-			'several matches are ambiguous without the focused one'
 		)
 	})
 

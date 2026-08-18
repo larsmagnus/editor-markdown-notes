@@ -14,7 +14,7 @@ import { reflect, snapshotWorkbench } from './reveal-probe-describe'
  * would name the focused one: the probe runs on *every* panel of every suite,
  * and a clipboard save/restore there both races itself and clobbers the
  * clipboard assertions in `search-clipboard-free.test.ts`. Which match was
- * focused is already answered - see `docs/search-reveal-investigation.md`.
+ * focused is already answered.
  */
 export function probePanel(
 	panel: vscode.WebviewPanel,

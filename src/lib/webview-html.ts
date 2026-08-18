@@ -1,6 +1,6 @@
 // Relative, not `@/`: this module is also compiled by `tsconfig.extension.json`,
 // which has no `paths` mapping precisely so aliases cannot reach the host build.
-import type { Config, ImageBaseUris } from '../shared/messages'
+import type { Config, ImageBaseUris, SearchReveal } from '../shared/messages'
 
 import { toScriptLiteral } from './script-literal'
 
@@ -22,6 +22,8 @@ export type WebviewHtmlInput = {
 		/** Where this note was left this session; `0` if it has not been open. */
 		initialScrollTop: number
 		imageBaseUris: ImageBaseUris
+		/** Only when this note is opening from a search result, which is rare. */
+		searchReveal?: SearchReveal
 	}
 }
 
@@ -62,10 +64,21 @@ export function buildWebviewHtml({
             window.initialConfig = ${toScriptLiteral(globals.initialConfig)};
             window.initialScrollTop = ${toScriptLiteral(globals.initialScrollTop)};
             window.imageBaseUris = ${toScriptLiteral(globals.imageBaseUris)};
+            ${searchRevealAssignment(globals.searchReveal)}
         </script>
         <script type="module" crossorigin src="${scriptUri}" nonce="${nonce}"></script>
     </body>
     </html>`
+}
+
+/**
+ * Assigned only when there is a reveal, so the page an ordinary open produces is
+ * unchanged and `'searchReveal' in window` reads as the answer on its own.
+ */
+function searchRevealAssignment(reveal: SearchReveal | undefined): string {
+	if (!reveal) return ''
+
+	return `window.searchReveal = ${toScriptLiteral(reveal)};`
 }
 
 /**

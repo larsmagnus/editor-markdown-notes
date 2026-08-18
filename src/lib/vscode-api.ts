@@ -1,4 +1,9 @@
-import type { Config, ImageBaseUris, WebviewToHost } from '@/shared/messages'
+import type {
+	Config,
+	ImageBaseUris,
+	SearchReveal,
+	WebviewToHost,
+} from '@/shared/messages'
 
 interface VSCodeAPI {
 	postMessage: (message: WebviewToHost) => void
@@ -14,6 +19,8 @@ declare global {
 		initialConfig?: Config
 		initialScrollTop?: number
 		imageBaseUris?: ImageBaseUris
+		/** Absent on an ordinary open, which is what makes it the trigger. */
+		searchReveal?: SearchReveal
 	}
 }
 

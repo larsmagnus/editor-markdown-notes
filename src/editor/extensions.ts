@@ -29,6 +29,7 @@ import {
 import { ItalicExtension } from '@/editor/italic-extension'
 import { MarkdownClipboard } from '@/editor/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '@/editor/markdown-escaping'
+import { SearchRevealHighlight } from '@/editor/search-reveal/extension'
 import { SlashCommand } from '@/editor/slash-command/extension'
 import { StrictLinkify } from '@/editor/strict-linkify-extension'
 import { SyntaxHighlight } from '@/editor/syntax-highlight-extension'
@@ -169,6 +170,9 @@ export const extensions = [
 	// Decorations only, and inert until the text tools panel feeds it issues.
 	// Registered unconditionally because the editor is built once.
 	TextTools,
+	// Decorations only, and inert unless the note was opened from a search
+	// result - which is what `useSearchReveal` feeds it.
+	SearchRevealHighlight,
 	// Decorations only, and inert until `useSyntaxHighlight` feeds it tokens.
 	SyntaxHighlight,
 	// Decorations only, and inert until the bubble menu's sparkles popover

@@ -1,4 +1,5 @@
-import { scrollTopSchema, webviewScrollStateSchema } from '@/lib/schemas'
+import { readPanelState, updatePanelState } from '@/lib/panel-state'
+import { scrollTopSchema } from '@/lib/schemas'
 import { getVSCodeApi, isVSCodeWebview } from '@/lib/vscode-api'
 
 const STORAGE_KEY_PREFIX = 'editor-markdown-notes:scroll-top:'
@@ -21,8 +22,8 @@ export function readScrollTop(fileName: string): number {
 	if (!isVSCodeWebview())
 		return scrollTopSchema.parse(readStoredScrollTop(fileName))
 
-	const restored = webviewScrollStateSchema.parse(getVSCodeApi()?.getState())
-	if (restored) return restored.scrollTop
+	const { scrollTop } = readPanelState()
+	if (scrollTop !== undefined) return scrollTop
 
 	return scrollTopSchema.parse(window.initialScrollTop)
 }
@@ -32,7 +33,7 @@ export function writeScrollTop(fileName: string, scrollTop: number) {
 		// Both sides, since neither survives what the other does: `setState` dies
 		// with the tab, and the host's copy is only re-read when a panel is built
 		// from scratch.
-		getVSCodeApi()?.setState({ scrollTop })
+		updatePanelState({ scrollTop })
 		getVSCodeApi()?.postMessage({ type: 'setScrollTop', scrollTop })
 		return
 	}

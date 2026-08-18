@@ -50,6 +50,8 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 - `image/keyboard-nav.ts` focuses `view`, never the `<img>` itself — the bubble menu's `shouldShow` requires `activeElement === view.dom` exactly, and focusing a descendant fails that check silently. The selection ring is CSS on `.ProseMirror-selectednode` for the same reason, not `:focus-visible`.
 - YAML frontmatter is stripped before `setContent` and re-attached on save (`frontmatter.ts`), since markdown-it has no concept of it and would parse `---` as an `<hr>`.
 - Syntax highlighting is decorations over the real editable text, never a rendered overlay — code has to stay colored while it is typed into, which is what separates it from mermaid's swap. `shiki-language-map.ts` is a hand-written fence-tag → grammar table because Vite cannot split a templated `import()` and a fence tag is freeform text that must never reach an import specifier; an unmapped tag renders plain, never throws.
+- `search-reveal/` matches by searching the rendered text — no source map exists. First match only: just `search.action.copyMatch` knows which was clicked, and it costs the clipboard.
+- Mount-time decorations must map through transactions, not clear on `docChanged` — startup transactions wipe them. Run-once state belongs on the editor instance and in `panel-state.ts`: TipTap rebuilds the editor, a backgrounded tab rebuilds the webview from frozen HTML.
 - Not supported: merged cells (fall back to raw HTML), footnotes, underline/highlight/sub/sup.
 
 ### Text tools (`src/lib/text-tools/`)

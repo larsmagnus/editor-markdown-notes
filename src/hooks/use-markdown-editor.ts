@@ -6,6 +6,7 @@ import { useAskProposal } from '@/hooks/use-ask-proposal'
 import { useFrontmatterDocument } from '@/hooks/use-frontmatter-document'
 import { useItalicMarker } from '@/hooks/use-italic-marker'
 import { useMarkdownAutosave } from '@/hooks/use-markdown-autosave'
+import { useSearchReveal } from '@/hooks/use-search-reveal'
 import { useSettings } from '@/hooks/use-settings'
 import { useSyntaxHighlight } from '@/hooks/use-syntax-highlight'
 import { useTextTools } from '@/hooks/use-text-tools'
@@ -67,6 +68,11 @@ export function useMarkdownEditor(
 	})
 
 	useFrontmatterDocument(editor, content, isOwnSave)
+
+	// After the rebuild above, which is what puts the note's real text in the
+	// document - searching the doc it was constructed with would miss the
+	// frontmatter and race the only content sync this note ever gets for free.
+	useSearchReveal(editor)
 
 	useMarkdownAutosave({ editor, isVSCodeContext, saveContent: save })
 

@@ -6,6 +6,22 @@ import { parseFocusedMatch, parseSearchResults } from './search-match'
 import type { SearchMatch } from './search-match'
 
 /**
+ * Every current search match, keyed by file, newest search only.
+ *
+ * The whole set rather than one file's, because the query's own length is only
+ * recoverable by comparing matches against each other and matches in unrelated
+ * files are what sharpen that - see `deriveQueryLength`.
+ */
+export async function readSearchResults(): Promise<Map<string, SearchMatch[]>> {
+	const results = await vscode.commands.executeCommand<string>(
+		'search.action.getSearchResults'
+	)
+	if (typeof results !== 'string') return new Map()
+
+	return parseSearchResults(results)
+}
+
+/**
  * Every current search match in this file, newest search only.
  *
  * Clipboard-free, which is what makes it safe on the ordinary open path: a note
@@ -14,24 +30,7 @@ import type { SearchMatch } from './search-match'
 export async function readSearchMatches(
 	uri: vscode.Uri
 ): Promise<SearchMatch[]> {
-	const results = await vscode.commands.executeCommand<string>(
-		'search.action.getSearchResults'
-	)
-	if (typeof results !== 'string') return []
-
-	return parseSearchResults(results).get(uri.fsPath) ?? []
-}
-
-/**
- * The match to reveal when the file holds exactly one, where no disambiguation
- * is needed and so no clipboard read is warranted.
- */
-export async function readOnlySearchMatch(
-	uri: vscode.Uri
-): Promise<SearchMatch | undefined> {
-	const matches = await readSearchMatches(uri)
-
-	return matches.length === 1 ? matches[0] : undefined
+	return (await readSearchResults()).get(uri.fsPath) ?? []
 }
 
 /**
@@ -108,12 +107,7 @@ async function belongsTo(
 	uri: vscode.Uri,
 	focused: SearchMatch
 ): Promise<boolean> {
-	const results = await vscode.commands.executeCommand<string>(
-		'search.action.getSearchResults'
-	)
-	if (typeof results !== 'string') return false
-
-	const matches = parseSearchResults(results).get(uri.fsPath)
+	const matches = (await readSearchResults()).get(uri.fsPath)
 
 	return (
 		matches?.some(

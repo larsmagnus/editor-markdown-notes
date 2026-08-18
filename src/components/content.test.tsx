@@ -14,6 +14,7 @@ afterEach(() => {
 	delete window.initialContent
 	delete window.fileName
 	delete window.initialScrollTop
+	delete window.searchReveal
 	localStorage.clear()
 	vi.clearAllMocks()
 })

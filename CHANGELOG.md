@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added scrolling to the matched text when a note is opened from a search result, with every occurrence of that text highlighted
+
 ## [0.20.0] - 2026-08-17
 
 - Added remembering where each note is scrolled to, restoring it when the note is reopened in the same VS Code session

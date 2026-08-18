@@ -7,7 +7,7 @@ import { createNonce } from '../lib/nonce'
 import { WEBVIEW_LOG_BRIDGE } from '../lib/webview-diagnostics'
 import { buildMissingAssetsHtml, buildWebviewHtml } from '../lib/webview-html'
 import type { Logger } from '../shared/logger'
-import type { Config } from '../shared/messages'
+import type { Config, SearchReveal } from '../shared/messages'
 
 import { getImageBaseUris } from './image-base-uris'
 import { readEntryChunk } from './read-vite-manifest'
@@ -20,6 +20,8 @@ type WebviewDocumentOptions = {
 	/** This note's remembered scroll offset, injected rather than requested so
 	 *  the first paint is already in the right place. */
 	initialScrollTop: number
+	/** Where this note's search match sits, when it is opening from a search. */
+	searchReveal?: SearchReveal
 	log: Logger
 }
 
@@ -35,6 +37,7 @@ export function buildWebviewDocument({
 	extensionPath,
 	config,
 	initialScrollTop,
+	searchReveal,
 	log,
 }: WebviewDocumentOptions): string {
 	const distPath = path.join(extensionPath, 'dist')
@@ -64,6 +67,7 @@ export function buildWebviewDocument({
 			initialConfig: config,
 			initialScrollTop,
 			imageBaseUris: getImageBaseUris(webview, document),
+			searchReveal,
 		},
 	})
 }

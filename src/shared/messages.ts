@@ -127,6 +127,41 @@ export type ImageBaseUris = {
 	workspace: string
 }
 
+/**
+ * Where to scroll a note opened from a search result, and what to highlight.
+ *
+ * Injected as `window.searchReveal` rather than posted, so the first paint
+ * already knows where to go. Absent on an ordinary open, which is most of them.
+ *
+ * Positions are in *body* coordinates: search reports source lines, the editor
+ * is given the markdown with its frontmatter stripped, and the host subtracts
+ * `splitFrontmatter`'s `lineOffset` before any of this leaves it. The webview
+ * never sees a source line and so cannot get that subtraction wrong.
+ */
+export type SearchReveal = {
+	/** 0-based, relative to the body the editor holds. */
+	line: number
+	/** 0-based. */
+	column: number
+	/**
+	 * The matched source text, which is what the live editor looks for in the
+	 * rendered document - no markdown source map exists, so finding the text
+	 * again is what places the match, and every other place it occurs.
+	 *
+	 * Its extent is an upper bound rather than a measurement (see
+	 * `deriveQueryLength`), so it can carry a few characters of the surrounding
+	 * line. That makes it fail to match rather than match the wrong place, which
+	 * is the safe direction.
+	 */
+	text: string
+	/**
+	 * Source lines the frontmatter occupies, already subtracted from `line`. Raw
+	 * mode adds it back, since the textarea holds the whole file including the
+	 * frontmatter.
+	 */
+	lineOffset: number
+}
+
 export type LogLevel = 'error' | 'warn' | 'info'
 
 export type ShikiThemeKind =
