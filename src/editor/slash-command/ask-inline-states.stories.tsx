@@ -40,7 +40,7 @@ function SeedAskError() {
 /**
  * The `/ask` slash command's interstitial states, none of which are their own
  * standalone component - both the loading spinner and the error card render
- * inline via a decoration (`ask-inline-loading-widget.stories.tsx` and
+ * inline via a decoration (`badge-loading.stories.tsx` and
  * `ask-inline-error-widget.stories.tsx` show each in isolation; this shows
  * them composited into real content, which is where their layout actually
  * matters - the spinner sits mid-paragraph at the cursor, not on its own line).

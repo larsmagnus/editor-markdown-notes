@@ -2,7 +2,7 @@ import { createElement } from 'react'
 
 import { AppErrorBoundary } from '@/components/app-error-boundary'
 import { AskInlineErrorWidget } from '@/editor/ask-inline-error-widget'
-import { AskInlineLoadingWidget } from '@/editor/ask-inline-loading-widget'
+import { BadgeLoading } from '@/editor/badge-loading'
 import { createWidgetMount } from '@/editor/decoration-widget-mount'
 
 // Two mounts, not one: the loading spinner sits mid-paragraph at the cursor
@@ -32,7 +32,7 @@ export function renderLoadingWidget(id: string, onRemove: () => void) {
 		createElement(
 			AppErrorBoundary,
 			{ title: 'Ask Claude', resetKeys: [id], onRemove },
-			createElement(AskInlineLoadingWidget)
+			createElement(BadgeLoading, {}, 'Asking Claude...')
 		)
 	)
 }

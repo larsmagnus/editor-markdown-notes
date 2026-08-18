@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { Spinner } from '@/components/ui/spinner'
+import { BadgeLoading } from '@/editor/badge-loading'
 import { cn } from '@/lib/utils'
 
 type TextToolsStatusProps = {
@@ -26,19 +26,21 @@ function statusText(isAnalyzing: boolean, total: number): string {
 /** How the checks are going, announced as it changes. */
 export function TextToolsStatus({ isAnalyzing, total }: TextToolsStatusProps) {
 	const status = getStatusVariant(isAnalyzing, total)
+	const text = statusText(isAnalyzing, total)
+
+	if (status === 'pending') {
+		return <BadgeLoading>{text}</BadgeLoading>
+	}
 
 	return (
 		<Badge
 			className={cn(
 				status === 'none' &&
-					'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300',
-				status === 'pending' && 'animate-pulse'
+					'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
 			)}
-			variant={status === 'pending' ? 'secondary' : 'default'}
 			aria-live="polite"
 		>
-			{status === 'pending' && <Spinner />}
-			{statusText(isAnalyzing, total)}
+			{text}
 		</Badge>
 	)
 }
