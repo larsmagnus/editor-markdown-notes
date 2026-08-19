@@ -4,13 +4,16 @@ import { TextToolsRuleCheckboxes } from '@/editor/text-tools-rule-checkboxes'
 import { TextToolsStatus } from '@/editor/text-tools-status'
 import { summarize } from '@/lib/text-tools/summarize'
 import type { Analysis } from '@/lib/text-tools/types'
-import type { TextToolRuleId } from '@/shared/messages'
+import type { SpellingLanguage, TextToolRuleId } from '@/shared/messages'
 
 type TextToolsPanelProps = {
 	analysis: Analysis
 	isAnalyzing: boolean
 	rules: TextToolRuleId[]
 	setRules: (rules: TextToolRuleId[]) => void
+	spellingLanguage: SpellingLanguage
+	setSpellingLanguage: (language: SpellingLanguage) => void
+	hasSpellingFailed: boolean
 }
 
 /** The writing checks, beside the document. */
@@ -19,6 +22,9 @@ export function TextToolsPanel({
 	isAnalyzing,
 	rules,
 	setRules,
+	spellingLanguage,
+	setSpellingLanguage,
+	hasSpellingFailed,
 }: TextToolsPanelProps) {
 	const summary = summarize(analysis, rules)
 
@@ -37,7 +43,13 @@ export function TextToolsPanel({
 			<div className="flex flex-col gap-3 p-3 scroll-fade overflow-y-auto">
 				<TextToolsReadabilityLines lines={summary.readability} />
 
-				<TextToolsRuleCheckboxes rules={rules} setRules={setRules} />
+				<TextToolsRuleCheckboxes
+					rules={rules}
+					setRules={setRules}
+					spellingLanguage={spellingLanguage}
+					setSpellingLanguage={setSpellingLanguage}
+					hasSpellingFailed={hasSpellingFailed}
+				/>
 
 				{summary.groups.map((group) => (
 					<TextToolsIssueGroup key={group.ruleId} group={group} />

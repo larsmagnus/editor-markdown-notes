@@ -3,8 +3,9 @@ import type {
 	Analysis,
 	AnalyzeRequest,
 	AnalyzeResponse,
+	PipelineOptions,
 } from '@/lib/text-tools/types'
-import type { TextToolRuleId } from '@/shared/messages'
+import type { SpellingLanguage } from '@/shared/messages'
 
 /**
  * Owns the analysis worker. Only ever reached through `await import()`, which
@@ -17,12 +18,14 @@ import type { TextToolRuleId } from '@/shared/messages'
  * boots it from a blob URL instead, which inherits the document's origin. That
  * blob is why the host's CSP carries `worker-src blob:`.
  */
+
 export type Analyzer = {
-	analyze: (
-		text: string,
-		rules: TextToolRuleId[],
-		targetAge: number
-	) => Promise<Analysis>
+	/**
+	 * `options.dictionary` is the fully-loaded language, handed over on every
+	 * call - deciding when the worker actually needs the bytes is this module's
+	 * job, not the caller's.
+	 */
+	analyze: (text: string, options: PipelineOptions) => Promise<Analysis>
 	dispose: () => void
 }
 
@@ -35,6 +38,13 @@ export function createAnalyzer(): Analyzer {
 	const worker = new AnalyzeWorker()
 	const pending = new Map<number, Pending>()
 	let lastId = 0
+
+	// Which languages the worker has been given, so the ~575kB payload is cloned
+	// once each rather than on every keystroke. A set, not the last one sent:
+	// the worker caches every language it builds, so switching away and back
+	// must not re-send. Safe because this module owns the worker outright - a
+	// replaced worker comes with a fresh analyzer, and so a fresh record.
+	const sentLanguages = new Set<SpellingLanguage>()
 
 	worker.addEventListener('message', (event: MessageEvent<AnalyzeResponse>) => {
 		const response = event.data
@@ -56,18 +66,29 @@ export function createAnalyzer(): Analyzer {
 	// never replies to anything, so every waiting request has to be failed here
 	// or the panel hangs on "Checking…".
 	worker.addEventListener('error', (event: ErrorEvent) => {
+		// Whatever the worker had cached died with it.
+		sentLanguages.clear()
 		const error = new Error(event.message || 'The analysis worker failed')
 		for (const entry of pending.values()) entry.reject(error)
 		pending.clear()
 	})
 
-	const analyze = (
-		text: string,
-		rules: TextToolRuleId[],
-		targetAge: number
-	) => {
+	const analyze = (text: string, options: PipelineOptions) => {
 		lastId += 1
-		const request: AnalyzeRequest = { id: lastId, text, rules, targetAge }
+
+		// Gated on the rule, not just on holding the bytes: the worker only
+		// caches a dictionary inside the spelling pass, which it skips when the
+		// rule is off. Recording one it discarded would leave the next run that
+		// does want spelling sending nothing, and the worker throwing for the
+		// rest of the session.
+		const isWanted = options.rules.includes('spelling')
+		const dictionary =
+			isWanted && !sentLanguages.has(options.spellingLanguage)
+				? options.dictionary
+				: undefined
+
+		const request: AnalyzeRequest = { id: lastId, text, ...options, dictionary }
+		if (dictionary) sentLanguages.add(options.spellingLanguage)
 
 		return new Promise<Analysis>((resolve, reject) => {
 			pending.set(request.id, { resolve, reject })

@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added scrolling to the matched text when a note is opened from a search result, with every occurrence of that text highlighted
 - Added an info button to each writing tools check, explaining what it looks for and showing an example of the fix marked the way the editor marks it
+- Added a spelling check to the writing tools, underlining unrecognised words in red and listing them with suggested corrections. Switch it on in the panel; it is off by default
+- Added a choice of American, British or Australian English for the spelling check, beside the check itself or from the "Select spelling language" command
+- Changed the writing tools to skip inline code spans and the keys in YAML frontmatter, which were never prose worth checking
 
 ## [0.20.0] - 2026-08-17
 

@@ -1,13 +1,35 @@
+import dictionaryEn from 'dictionary-en'
 import { describe, expect, it } from 'vitest'
 
 import { RULES } from '@/lib/text-tools/rules'
 import { runPipeline } from '@/lib/text-tools/run-pipeline'
+import type { PipelineOptions } from '@/lib/text-tools/types'
 import { TEXT_TOOL_RULE_IDS } from '@/shared/messages'
 
 const ALL_RULES = [...TEXT_TOOL_RULE_IDS]
 
 /** The default the `editorMarkdownNotes.textToolsTargetAge` setting ships with. */
 const TARGET_AGE = 16
+
+const decoder = new TextDecoder()
+
+/**
+ * The real American dictionary, read straight from the package - under Node it
+ * loads itself off disk, where the browser build hands the worker `?raw` text.
+ * Decoded to strings because that is what nspell can actually parse.
+ */
+const DICTIONARY = {
+	aff: decoder.decode(dictionaryEn.aff),
+	dic: decoder.decode(dictionaryEn.dic),
+}
+
+/** Everything `runPipeline` needs beyond the rules under test. */
+const BASE_OPTIONS: Omit<PipelineOptions, 'rules'> = {
+	targetAge: TARGET_AGE,
+	spellingLanguage: 'en-US',
+	dictionary: DICTIONARY,
+	ignoreWords: [],
+}
 
 /**
  * The info popover marks its "instead of" example with the same decorations the
@@ -20,7 +42,10 @@ describe('rule examples', () => {
 		const { example } = RULES[id]
 		const before = example.before.map((segment) => segment.text).join('')
 
-		const { issues } = await runPipeline(before, ALL_RULES, TARGET_AGE)
+		const { issues } = await runPipeline(before, {
+			rules: ALL_RULES,
+			...BASE_OPTIONS,
+		})
 		const found = issues.filter((issue) => issue.ruleId === id)
 
 		expect(found.map((issue) => issue.actual)).toEqual(
@@ -32,11 +57,10 @@ describe('rule examples', () => {
 	})
 
 	it.each(ALL_RULES)('%s clears every check once rewritten', async (id) => {
-		const { issues } = await runPipeline(
-			RULES[id].example.after,
-			ALL_RULES,
-			TARGET_AGE
-		)
+		const { issues } = await runPipeline(RULES[id].example.after, {
+			rules: ALL_RULES,
+			...BASE_OPTIONS,
+		})
 
 		expect(issues).toEqual([])
 	})

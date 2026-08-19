@@ -9,8 +9,10 @@ export type Theme = 'dark' | 'light' | 'system'
 /**
  * The writing checks the text tools panel can run. Adding one here is the first
  * of three steps - `RULES` in `src/lib/text-tools/rules.ts` carries its label,
- * and `RULE_PLUGINS` in `src/lib/text-tools/run-pipeline.ts` the retext plugin
+ * and `RULE_PLUGINS` in `src/lib/text-tools/word-issues.ts` the retext plugin
  * behind it. Both are keyed by this union, so neither compiles until updated.
+ * `RULE_SOURCES` in `src/lib/text-tools/vfile-message-to-issue.ts` is the
+ * fourth, and the one a miss does not fail to compile on.
  *
  * These ids are persisted in the host's `globalState`, so renaming one silently
  * drops that rule from a user's saved selection.
@@ -20,9 +22,29 @@ export const TEXT_TOOL_RULE_IDS = [
 	'simplify',
 	'intensify',
 	'readability',
+	'spelling',
 ] as const
 
 export type TextToolRuleId = (typeof TEXT_TOOL_RULE_IDS)[number]
+
+/**
+ * The English dictionaries spelling can check against, one Hunspell dictionary
+ * each. Ordered as the panel's picker lists them.
+ */
+export const SPELLING_LANGUAGES = ['en-US', 'en-GB', 'en-AU'] as const
+
+export type SpellingLanguage = (typeof SPELLING_LANGUAGES)[number]
+
+/**
+ * What each language is called, rather than its tag. Shared because the panel's
+ * picker and the host's "Select spelling language" quick pick offer the same
+ * three choices and should name them the same way.
+ */
+export const SPELLING_LANGUAGE_LABELS: Record<SpellingLanguage, string> = {
+	'en-US': 'American',
+	'en-GB': 'British',
+	'en-AU': 'Australian',
+}
 
 export type ViewOptions = {
 	raw: boolean
@@ -32,6 +54,17 @@ export type ViewOptions = {
 	textTools: boolean
 	/** Which checks that sidebar runs. */
 	textToolRules: TextToolRuleId[]
+	/** Which English dictionary the spelling check uses. */
+	spellingLanguage: SpellingLanguage
+	/**
+	 * Words the spelling check accepts on top of its dictionary.
+	 *
+	 * Nothing writes to this yet. It is here so that adding "add to dictionary"
+	 * is a matter of giving the panel a button, rather than threading a new
+	 * field through the host, the schema, the worker contract and the pipeline
+	 * after the fact.
+	 */
+	spellingIgnoreWords: string[]
 }
 
 export type ItalicMarker = '_' | '*'
@@ -91,7 +124,13 @@ export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
 	fullWidth: false,
 	theme: 'system',
 	textTools: false,
-	textToolRules: [...TEXT_TOOL_RULE_IDS],
+	// Listed rather than spread from `TEXT_TOOL_RULE_IDS`: spelling is the one
+	// check that has to load a dictionary, and is the noisiest on a technical
+	// note, so it is opt-in. A spread would quietly enable every rule added
+	// after it too.
+	textToolRules: ['passive', 'simplify', 'intensify', 'readability'],
+	spellingLanguage: 'en-US',
+	spellingIgnoreWords: [],
 }
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {

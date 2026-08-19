@@ -17,13 +17,13 @@ declare const self: DedicatedWorkerGlobalScope
 self.addEventListener(
 	'message',
 	async (event: MessageEvent<AnalyzeRequest>) => {
-		const { id, text, rules, targetAge } = event.data
+		const { id, text, ...options } = event.data
 
 		// Every path has to post something back: the client resolves on the
 		// reply, so a request that produces none never settles and the panel
 		// sits on "Checking…" for the rest of the session.
 		try {
-			const analysis = await runPipeline(text, rules, targetAge)
+			const analysis = await runPipeline(text, options)
 			const response: AnalyzeResponse = { id, ok: true, ...analysis }
 			self.postMessage(response)
 		} catch (error) {

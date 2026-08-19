@@ -29,6 +29,15 @@ const BLOCK_SEPARATOR = '\n\n'
 /** Code is not prose, and skipping the node also keeps mermaid sources unlinted. */
 const IGNORED_NODES = new Set(['codeBlock'])
 
+/**
+ * Marks whose text is not prose either.
+ *
+ * An inline `code` span holds identifiers, commands and paths - `useEffect`,
+ * `pnpm run build` - which no writing check has an opinion worth hearing about,
+ * and which the speller would flag almost without exception.
+ */
+const IGNORED_MARKS = new Set(['code'])
+
 /** What an inline node that carries no text of its own stands in as. */
 const INLINE_PLACEHOLDER: Record<string, string> = {
 	// A line break ends a sentence as far as retext is concerned, which is what
@@ -47,6 +56,10 @@ const INLINE_PLACEHOLDER: Record<string, string> = {
  * run-on sentence. Splitting on `\n` first gives each line its own sentence
  * boundary instead, so a prose value still gets checked and a bare `status:
  * draft` line - with nothing retext would flag - stays quiet.
+ *
+ * The key itself is dropped along with its separator. Keys are identifiers, not
+ * prose - `og_image`, `slug`, `draft` - and the speller would flag most of them
+ * on every note in the workspace.
  */
 function appendFrontmatterLines(
 	node: ProseMirrorNode,
@@ -58,7 +71,9 @@ function appendFrontmatterLines(
 	let offset = 0
 
 	for (const line of node.textContent.split('\n')) {
-		if (line) {
+		const value = frontmatterValueOf(line)
+
+		if (value.text) {
 			// Reuses the same "already have text" check the block separator uses
 			// everywhere else, so a line joins the block before it exactly the way
 			// the block itself joins whatever textblock came before it.
@@ -68,15 +83,40 @@ function appendFrontmatterLines(
 			// - lines up with document positions one-for-one.
 			slices.push({
 				offset: result.length,
-				length: line.length,
-				from: pos + 1 + offset,
+				length: value.text.length,
+				from: pos + 1 + offset + value.start,
 			})
-			result += line
+			result += value.text
 		}
 		offset += line.length + 1
 	}
 
 	return result
+}
+
+/**
+ * A YAML key, up to and including its colon.
+ *
+ * Requires whitespace or end-of-line after the colon, so a `url: https://…`
+ * value is not mistaken for a second key.
+ */
+const FRONTMATTER_KEY = /^\s*[\w.$-]+:(?=\s|$)/
+
+/**
+ * The prose half of one frontmatter line, and where in the line it starts.
+ *
+ * A line with no `key:` prefix - a list item, or a wrapped continuation - is
+ * prose all the way through. Leading whitespace is skipped by advancing `start`
+ * rather than by trimming, because the caller turns it back into a document
+ * position.
+ */
+function frontmatterValueOf(line: string) {
+	const key = FRONTMATTER_KEY.exec(line)
+	const afterKey = key ? key[0].length : 0
+	const rest = line.slice(afterKey)
+	const start = afterKey + rest.length - rest.trimStart().length
+
+	return { text: line.slice(start).trimEnd(), start }
 }
 
 export function getDocumentText(doc: ProseMirrorNode): DocumentText {
@@ -98,6 +138,14 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 		// paragraph split by marks holds several text nodes and only their own
 		// positions place them correctly.
 		node.forEach((child, childOffset) => {
+			// Stood in for rather than dropped, for the same reason an image is:
+			// `the `code` span` would otherwise reach retext as `the span`, and
+			// text on either side of a bare `` `x` `` would weld into one word.
+			if (child.marks.some((mark) => IGNORED_MARKS.has(mark.type.name))) {
+				text += ' '
+				return
+			}
+
 			if (!child.isText || !child.text) {
 				// An unmapped separator, so the text on either side of an image or a
 				// hard break is not welded into one word. `line<br>second` would
@@ -120,39 +168,4 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 	})
 
 	return { text, slices }
-}
-
-/**
- * Converts an offset in the flattened text back to a document position.
- *
- * Offsets landing in a gap between slices - a block separator, or an inline
- * image - resolve to the end of the preceding slice, so a range never collapses
- * onto the wrong block.
- */
-export function offsetToPosition(
-	{ slices }: DocumentText,
-	offset: number
-): number | null {
-	if (slices.length === 0) return null
-
-	let low = 0
-	let high = slices.length - 1
-	let candidate = slices[0]
-
-	while (low <= high) {
-		const middle = (low + high) >> 1
-		const slice = slices[middle]
-
-		if (slice.offset <= offset) {
-			candidate = slice
-			low = middle + 1
-		} else {
-			high = middle - 1
-		}
-	}
-
-	if (offset < candidate.offset) return null
-
-	const within = Math.min(offset - candidate.offset, candidate.length)
-	return candidate.from + within
 }

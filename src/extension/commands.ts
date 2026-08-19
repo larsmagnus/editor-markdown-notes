@@ -1,13 +1,13 @@
 import * as vscode from 'vscode'
 
-import { DEFAULT_SETTINGS } from '../shared/messages'
 import type { ViewOptions } from '../shared/messages'
 
-import { CONFIG_SECTION } from './constants'
 import { openFile } from './open-file-command'
 import { openInTextEditor } from './open-in-text-editor-command'
 import type { SettingsStore } from './settings-store'
+import { pickSpellingLanguage } from './spelling-picker'
 import { pickTheme } from './theme-picker'
+import { toggleHideToolbar } from './toggle-hide-toolbar-command'
 
 /** The view options a command can flip, keyed by the command that flips them. */
 const VIEW_OPTION_TOGGLES = {
@@ -15,21 +15,6 @@ const VIEW_OPTION_TOGGLES = {
 	'editor-markdown-notes.toggleFullWidth': 'fullWidth',
 	'editor-markdown-notes.toggleTextTools': 'textTools',
 } as const satisfies Record<string, keyof ViewOptions>
-
-/**
- * `hideToolbar` is a workspace/user setting rather than a persisted view option,
- * so it is flipped through the configuration API. The provider picks the change
- * up through `onDidChangeConfiguration` and rebroadcasts on its own.
- */
-async function toggleHideToolbar() {
-	const config = vscode.workspace.getConfiguration(CONFIG_SECTION)
-
-	await config.update(
-		'hideToolbar',
-		!config.get<boolean>('hideToolbar', DEFAULT_SETTINGS.hideToolbar),
-		vscode.ConfigurationTarget.Global
-	)
-}
 
 /**
  * Resolves the active tab's document, needed because `activeTextEditor` is
@@ -65,6 +50,8 @@ export function registerCommands(
 		'editor-markdown-notes.openMarkdownEditor': openFile,
 		'editor-markdown-notes.selectTheme': () =>
 			pickTheme(store, broadcastConfig),
+		'editor-markdown-notes.selectSpellingLanguage': () =>
+			pickSpellingLanguage(store, broadcastConfig),
 		'editor-markdown-notes.openInTextEditor': openActiveTabInTextEditor,
 		'editor-markdown-notes.toggleHideToolbar': toggleHideToolbar,
 		'editor-markdown-notes.showLogs': () => log.show(),

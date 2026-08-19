@@ -24,6 +24,14 @@ vi.mock('@/lib/text-tools/analyze-client', () => ({
 	createAnalyzer: () => ({ analyze, dispose: vi.fn() }),
 }))
 
+// The analyzer is mocked, so nothing here would read the real ~575kB word list
+// - but the hook still waits for it before it counts spelling as enabled.
+const loadDictionary = vi.hoisted(() =>
+	vi.fn(async () => ({ aff: '', dic: '' }))
+)
+
+vi.mock('@/lib/text-tools/load-dictionary', () => ({ loadDictionary }))
+
 const STORAGE_KEY = 'editor-markdown-notes:view-options'
 
 const NOTE = 'The report was written by the committee.'
@@ -59,14 +67,24 @@ const READABILITY_ISSUE: TextIssue = {
 	end: NOTE.length,
 }
 
+const SPELLING_ISSUE: TextIssue = {
+	ruleId: 'spelling',
+	severity: 'misspelling',
+	message: '`committee` is misspelt',
+	actual: 'committee',
+	expected: ['committees'],
+	start: NOTE.indexOf('committee'),
+	end: NOTE.indexOf('committee') + 'committee'.length,
+}
+
 function analysisOf(issues: TextIssue[], sentenceCount = 1): Analysis {
 	return { issues, sentenceCount }
 }
 
-function renderWithTextTools(open = true) {
+function renderWithTextTools(open = true, viewOptions = {}) {
 	localStorage.setItem(
 		STORAGE_KEY,
-		JSON.stringify({ ...DEFAULT_VIEW_OPTIONS, textTools: open })
+		JSON.stringify({ ...DEFAULT_VIEW_OPTIONS, textTools: open, ...viewOptions })
 	)
 
 	return render(
@@ -143,6 +161,60 @@ describe('text tools', () => {
 				container.querySelector('.text-tools-issue--very-hard')
 			).toBeInTheDocument()
 		})
+	})
+
+	it('marks a misspelling differently again, so it does not read as advice', async () => {
+		analyze.mockResolvedValue(analysisOf([SPELLING_ISSUE]))
+		const { container } = renderWithTextTools(true, {
+			textToolRules: ['spelling'],
+		})
+
+		await waitFor(() => {
+			expect(
+				container.querySelector('.text-tools-issue--misspelling')
+			).toBeInTheDocument()
+		})
+
+		expect(container.querySelector('.text-tools-issue--warning')).toBeNull()
+	})
+
+	it('offers the spelling language beside the spelling check', async () => {
+		const user = userEvent.setup()
+		renderWithTextTools(true, { textToolRules: ['spelling'] })
+
+		const panel = await screen.findByRole('complementary', {
+			name: 'Text tools',
+		})
+
+		await user.click(
+			await within(panel).findByRole('button', { name: /American/ })
+		)
+		await user.click(await screen.findByRole('menuitem', { name: 'British' }))
+
+		await waitFor(() => {
+			expect(
+				within(panel).getByRole('button', { name: /British/ })
+			).toBeInTheDocument()
+		})
+	})
+
+	it('says so when the dictionary cannot be loaded', async () => {
+		const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+		loadDictionary.mockRejectedValueOnce(new Error('chunk 404'))
+
+		renderWithTextTools(true, { textToolRules: ['spelling'] })
+
+		const panel = await screen.findByRole('complementary', {
+			name: 'Text tools',
+		})
+
+		// The alternative is a ticked box reporting no misspellings, which reads
+		// as a clean document rather than as a broken check.
+		expect(
+			await within(panel).findByText(/American dictionary could not be loaded/)
+		).toBeInTheDocument()
+
+		consoleError.mockRestore()
 	})
 
 	it('reports the readability count as a fraction of the document', async () => {

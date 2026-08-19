@@ -245,6 +245,13 @@
 		@apply underline decoration-sky-500 decoration-wavy underline-offset-4;
 	}
 
+	/* Red and wavy, the universal spell-check marker: a misspelling is an error,
+	   where every other word-level finding is an opinion, and the two should not
+	   read as the same kind of thing. */
+	.text-tools-issue--misspelling {
+		@apply underline decoration-red-500 decoration-wavy underline-offset-4;
+	}
+
 	.text-tools-issue--hard {
 		@apply bg-amber-500/15;
 	}

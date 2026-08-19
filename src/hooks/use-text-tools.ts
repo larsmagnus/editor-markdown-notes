@@ -1,12 +1,13 @@
 import type { Editor } from '@tiptap/react'
 import { useEffect, useRef, useState } from 'react'
 
+import { useAnalysisOptions } from '@/hooks/use-analysis-options'
+import { useAnalyzer } from '@/hooks/use-analyzer'
 import { useDocumentRevision } from '@/hooks/use-document-revision'
-import type { Analyzer } from '@/lib/text-tools/analyze-client'
 import { getDocumentText } from '@/lib/text-tools/document-text'
 import { placeIssues } from '@/lib/text-tools/place-issues'
 import type { Analysis } from '@/lib/text-tools/types'
-import type { TextToolRuleId } from '@/shared/messages'
+import type { SpellingLanguage, TextToolRuleId } from '@/shared/messages'
 
 const EMPTY_ANALYSIS: Analysis = { issues: [], sentenceCount: 0 }
 
@@ -15,6 +16,8 @@ type UseTextToolsOptions = {
 	enabled: boolean
 	rules: TextToolRuleId[]
 	targetAge: number
+	spellingLanguage: SpellingLanguage
+	spellingIgnoreWords: string[]
 }
 
 /**
@@ -29,20 +32,24 @@ export function useTextTools({
 	enabled,
 	rules,
 	targetAge,
+	spellingLanguage,
+	spellingIgnoreWords,
 }: UseTextToolsOptions) {
 	const [analysis, setAnalysis] = useState<Analysis>(EMPTY_ANALYSIS)
 	const [isAnalyzing, setIsAnalyzing] = useState(false)
-	const analyzerRef = useRef<Analyzer | null>(null)
+	const { getAnalyzer, disposeAnalyzer } = useAnalyzer()
 
 	const debouncedRevision = useDocumentRevision(editor)
 
-	// Re-run when the rules or the target age change, not just when the text
-	// does. A string, because `viewOptions.textToolRules` is rebuilt by its zod
-	// `.transform` on every config broadcast - depending on the array itself
-	// would re-analyse every time any *other* view option changed, in every tab.
-	const ruleKey = rules.join(',')
-	const rulesRef = useRef(rules)
-	rulesRef.current = rules
+	const { options, key, hasSpellingFailed } = useAnalysisOptions({
+		enabled,
+		rules,
+		targetAge,
+		spellingLanguage,
+		spellingIgnoreWords,
+	})
+	const optionsRef = useRef(options)
+	optionsRef.current = options
 
 	// Split from the analysis effect below so it runs on the transition only.
 	// Sharing that effect's dependencies would dispatch a no-op transaction
@@ -50,34 +57,25 @@ export function useTextTools({
 	useEffect(() => {
 		if (enabled || !editor) return
 
-		analyzerRef.current?.dispose()
-		analyzerRef.current = null
+		disposeAnalyzer()
 		setAnalysis(EMPTY_ANALYSIS)
 		setIsAnalyzing(false)
 		editor.commands.setTextToolIssues([])
-	}, [editor, enabled])
+	}, [editor, enabled, disposeAnalyzer])
 
 	useEffect(() => {
 		if (!editor || !enabled) return
 
-		const rules = rulesRef.current
+		const options = optionsRef.current
 		let cancelled = false
 		setIsAnalyzing(true)
 
 		const run = async () => {
-			if (!analyzerRef.current) {
-				const { createAnalyzer } =
-					await import('@/lib/text-tools/analyze-client')
-				if (cancelled) return
-				analyzerRef.current = createAnalyzer()
-			}
+			const analyzer = await getAnalyzer()
+			if (!analyzer || cancelled) return
 
 			const documentText = getDocumentText(editor.state.doc)
-			const result = await analyzerRef.current.analyze(
-				documentText.text,
-				rules,
-				targetAge
-			)
+			const result = await analyzer.analyze(documentText.text, options)
 
 			// The document may have moved on while the worker was busy. Positions
 			// derived from the old snapshot would land in the wrong place, and the
@@ -87,7 +85,7 @@ export function useTextTools({
 			setAnalysis(result)
 			setIsAnalyzing(false)
 			editor.commands.setTextToolIssues(
-				placeIssues(result.issues, documentText, new Set(rules))
+				placeIssues(result.issues, documentText, new Set(options.rules))
 			)
 		}
 
@@ -102,15 +100,7 @@ export function useTextTools({
 		return () => {
 			cancelled = true
 		}
-	}, [editor, enabled, ruleKey, targetAge, debouncedRevision])
+	}, [editor, enabled, key, debouncedRevision, getAnalyzer])
 
-	// Tear the worker down for good when the editor unmounts.
-	useEffect(() => {
-		return () => {
-			analyzerRef.current?.dispose()
-			analyzerRef.current = null
-		}
-	}, [])
-
-	return { analysis, isAnalyzing }
+	return { analysis, isAnalyzing, hasSpellingFailed }
 }

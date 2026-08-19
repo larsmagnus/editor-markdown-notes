@@ -77,6 +77,23 @@ export const RULES: Record<TextToolRuleId, TextToolRule> = {
 			severity: 'warning',
 		},
 	},
+	spelling: {
+		label: 'Spelling',
+		description: 'Words your dictionary does not recognise.',
+		explanation:
+			'Every word here is missing from the dictionary you picked; the suggestions are its nearest entries. Names and jargon land here too - it has no way to know them. If the flags are all British spellings, switch the language.',
+		example: {
+			after: 'We received the report and filed it separately.',
+			before: [
+				{ text: 'We ' },
+				{ text: 'recieved', flagged: true },
+				{ text: ' the report and filed it ' },
+				{ text: 'seperately', flagged: true },
+				{ text: '.' },
+			],
+			severity: 'misspelling',
+		},
+	},
 	readability: {
 		label: 'Hard to read',
 		description: 'Sentences above the target reading age.',

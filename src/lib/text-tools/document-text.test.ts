@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 
 import { extensions } from '@/editor/extensions'
 import { getDocumentText } from '@/lib/text-tools/document-text'
+import { offsetToPosition } from '@/lib/text-tools/offset-to-position'
 
 let currentEditor: Editor | undefined
 
@@ -41,6 +42,40 @@ describe('getDocumentText', () => {
 		)
 	})
 
+	it('stands a space in for an inline code span', () => {
+		const editor = new Editor({
+			extensions,
+			content: 'Run `pnpm build`, then `pnpm test`.',
+		})
+		currentEditor = editor
+
+		// A space rather than nothing, so the words on either side of a span with
+		// no whitespace around it are not welded into one.
+		expect(getDocumentText(editor.state.doc).text).toBe('Run  , then  .')
+	})
+
+	it('places text after an inline code span at its real position', () => {
+		const editor = new Editor({
+			extensions,
+			content: 'Call the `useEffect` hook.',
+		})
+		currentEditor = editor
+
+		const documentText = getDocumentText(editor.state.doc)
+		const from = offsetToPosition(
+			documentText,
+			documentText.text.indexOf('hook')
+		)
+
+		// The span it stands in for is nine characters longer than the space that
+		// replaced it, so the word after it only lands right if the slice table
+		// carries the real document position rather than a running count.
+		expect(from).not.toBeNull()
+		expect(editor.state.doc.textBetween(from ?? 0, (from ?? 0) + 4)).toBe(
+			'hook'
+		)
+	})
+
 	it('reads each frontmatter line as its own block rather than one run-on line', () => {
 		const editor = new Editor({ extensions, content: '' })
 		currentEditor = editor
@@ -53,8 +88,10 @@ describe('getDocumentText', () => {
 		// Joined the same way separate blocks are elsewhere - retext has no
 		// concept of YAML's line-based structure, so without this a whole
 		// multi-line frontmatter block reads as one incoherent run-on sentence.
+		// The keys are dropped: they are identifiers, and the speller would flag
+		// most of them on every note in the workspace.
 		expect(getDocumentText(editor.state.doc).text).toBe(
-			'title: Roadmap\n\nstatus: draft\n\nReal prose here.'
+			'Roadmap\n\ndraft\n\nReal prose here.'
 		)
 	})
 
@@ -68,7 +105,23 @@ describe('getDocumentText', () => {
 		})
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
-			'title: Roadmap\n\nstatus: draft\n\nReal prose here.'
+			'Roadmap\n\ndraft\n\nReal prose here.'
+		)
+	})
+
+	it('keeps a frontmatter line that is not a key/value pair whole', () => {
+		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
+		editor.commands.setContent('Real prose here.')
+		editor.commands.insertContentAt(0, {
+			type: 'frontmatter',
+			content: [{ type: 'text', text: 'tags:\n  - Some prose in a list' }],
+		})
+
+		// A bare `tags:` has no value to keep, so it contributes nothing; the
+		// list item below it has no key, so it survives whole.
+		expect(getDocumentText(editor.state.doc).text).toBe(
+			'- Some prose in a list\n\nReal prose here.'
 		)
 	})
 

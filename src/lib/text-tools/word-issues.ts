@@ -11,10 +11,16 @@ import type { TextIssue } from '@/lib/text-tools/types'
 import { toIssue } from '@/lib/text-tools/vfile-message-to-issue'
 import type { TextToolRuleId } from '@/shared/messages'
 
-/** The plugin behind each rule. Keyed by `TextToolRuleId`, so a new rule
- * does not compile until it is listed here. */
+/**
+ * The plugin behind each rule. Keyed by `TextToolRuleId`, so a new rule does not
+ * compile until it is listed here.
+ *
+ * Readability and spelling are excluded because each needs a processor of its
+ * own - readability is run twice with different options, and the speller's is
+ * cached across runs.
+ */
 const RULE_PLUGINS: Record<
-	Exclude<TextToolRuleId, 'readability'>,
+	Exclude<TextToolRuleId, 'readability' | 'spelling'>,
 	Plugin<[], Root>
 > = {
 	passive: retextPassive,

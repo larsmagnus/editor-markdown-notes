@@ -76,11 +76,13 @@ export function useMarkdownEditor(
 
 	useMarkdownAutosave({ editor, isVSCodeContext, saveContent: save })
 
-	const { analysis, isAnalyzing } = useTextTools({
+	const { analysis, isAnalyzing, hasSpellingFailed } = useTextTools({
 		editor,
 		enabled: viewOptions.textTools,
 		rules: viewOptions.textToolRules,
 		targetAge: settings.textToolsTargetAge,
+		spellingLanguage: viewOptions.spellingLanguage,
+		spellingIgnoreWords: viewOptions.spellingIgnoreWords,
 	})
 
 	useItalicMarker(editor, settings.italicMarker)
@@ -91,6 +93,7 @@ export function useMarkdownEditor(
 		editor,
 		analysis,
 		isAnalyzing,
+		hasSpellingFailed,
 		codeBlockStyle,
 	}
 }

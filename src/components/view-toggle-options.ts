@@ -1,4 +1,4 @@
-import { Maximize2, Minimize2, SpellCheck } from 'lucide-react'
+import { Maximize2, Minimize2, PencilRuler } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import type { ViewOptions } from '@/shared/messages'
@@ -31,9 +31,11 @@ export const VIEW_TOGGLES: {
 	{
 		value: 'text-tools',
 		key: 'textTools',
+		// Not `SpellCheck`, which belongs to the one check inside the panel that
+		// is actually about spelling - the panel itself is five writing checks.
 		label: 'Toggle text tools',
-		on: SpellCheck,
-		off: SpellCheck,
+		on: PencilRuler,
+		off: PencilRuler,
 	},
 ]
 

@@ -6,6 +6,7 @@ import type { Analysis } from '@/lib/text-tools/types'
 type TextToolsAsideProps = {
 	analysis: Analysis
 	isAnalyzing: boolean
+	hasSpellingFailed: boolean
 }
 
 /**
@@ -21,7 +22,11 @@ type TextToolsAsideProps = {
  * demand — mermaid, shiki — uses `await import()` inside an effect for the same
  * reason.
  */
-export function TextToolsAside({ analysis, isAnalyzing }: TextToolsAsideProps) {
+export function TextToolsAside({
+	analysis,
+	isAnalyzing,
+	hasSpellingFailed,
+}: TextToolsAsideProps) {
 	const { viewOptions, setViewOptions } = useSettings()
 
 	if (!viewOptions.textTools) return null
@@ -31,8 +36,13 @@ export function TextToolsAside({ analysis, isAnalyzing }: TextToolsAsideProps) {
 			<TextToolsPanel
 				analysis={analysis}
 				isAnalyzing={isAnalyzing}
+				hasSpellingFailed={hasSpellingFailed}
 				rules={viewOptions.textToolRules}
 				setRules={(textToolRules) => setViewOptions({ textToolRules })}
+				spellingLanguage={viewOptions.spellingLanguage}
+				setSpellingLanguage={(spellingLanguage) =>
+					setViewOptions({ spellingLanguage })
+				}
 			/>
 		</AppErrorBoundary>
 	)

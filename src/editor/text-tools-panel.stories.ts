@@ -22,6 +22,9 @@ export const Primary: Story = {
 		isAnalyzing: false,
 		rules: [],
 		setRules: fn(),
+		spellingLanguage: 'en-US',
+		setSpellingLanguage: fn(),
+		hasSpellingFailed: false,
 	},
 }
 
@@ -34,6 +37,9 @@ export const Analyzing: Story = {
 		isAnalyzing: true,
 		rules: [],
 		setRules: fn(),
+		spellingLanguage: 'en-US',
+		setSpellingLanguage: fn(),
+		hasSpellingFailed: false,
 	},
 }
 
@@ -56,6 +62,9 @@ export const Suggestion: Story = {
 		isAnalyzing: false,
 		rules: ['passive'],
 		setRules: fn(),
+		spellingLanguage: 'en-US',
+		setSpellingLanguage: fn(),
+		hasSpellingFailed: false,
 	},
 }
 
@@ -87,5 +96,8 @@ export const Suggestions: Story = {
 		isAnalyzing: false,
 		rules: ['passive', 'intensify'],
 		setRules: fn(),
+		spellingLanguage: 'en-US',
+		setSpellingLanguage: fn(),
+		hasSpellingFailed: false,
 	},
 }

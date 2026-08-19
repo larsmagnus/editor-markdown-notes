@@ -61,4 +61,19 @@ suite('View options', () => {
 			await fs.rm(directory, { recursive: true, force: true })
 		}
 	})
+
+	test('offers the spelling languages without leaving the quick pick hanging', async () => {
+		// Not awaited up front: the command resolves only once the quick pick
+		// closes, so awaiting it here would deadlock the test.
+		const picked = vscode.commands.executeCommand(
+			'editor-markdown-notes.selectSpellingLanguage'
+		)
+
+		await new Promise((resolve) => setTimeout(resolve, 200))
+		await vscode.commands.executeCommand('workbench.action.closeQuickOpen')
+
+		// Dismissed rather than chosen, so nothing is written and the command
+		// settles - the failure this guards against is it rejecting instead.
+		assert.strictEqual(await picked, undefined)
+	})
 })

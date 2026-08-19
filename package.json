@@ -59,7 +59,7 @@
 				"editorMarkdownNotes.hideToolbar": {
 					"type": "boolean",
 					"default": false,
-					"description": "Hide the editor's toolbar. The raw, full width, text tools and theme toggles remain available from the command palette."
+					"description": "Hide the editor's toolbar. The raw, full width, text tools, theme and spelling language toggles remain available from the command palette."
 				},
 				"editorMarkdownNotes.italicMarker": {
 					"type": "string",
@@ -129,6 +129,11 @@
 				"category": "Editor Markdown Notes"
 			},
 			{
+				"command": "editor-markdown-notes.selectSpellingLanguage",
+				"title": "Select spelling language",
+				"category": "Editor Markdown Notes"
+			},
+			{
 				"command": "editor-markdown-notes.openInTextEditor",
 				"title": "Open in text editor",
 				"category": "Editor Markdown Notes"
@@ -189,6 +194,10 @@
 				},
 				{
 					"command": "editor-markdown-notes.selectTheme",
+					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+				},
+				{
+					"command": "editor-markdown-notes.selectSpellingLanguage",
 					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
 				},
 				{
@@ -289,6 +298,9 @@
 		"@tiptap/suggestion": "3.29.2",
 		"class-variance-authority": "0.7.1",
 		"clsx": "2.1.1",
+		"dictionary-en": "4.0.0",
+		"dictionary-en-au": "3.0.0",
+		"dictionary-en-gb": "3.0.0",
 		"lucide-react": "1.31.0",
 		"markdown-it": "15.0.0",
 		"mermaid": "11.16.1",
@@ -303,6 +315,7 @@
 		"retext-passive": "5.0.0",
 		"retext-readability": "8.0.0",
 		"retext-simplify": "8.0.0",
+		"retext-spell": "6.1.0",
 		"shadcn": "4.18.0",
 		"shiki": "4.4.3",
 		"tailwind-merge": "3.6.0",

@@ -25,6 +25,7 @@ const RULE_SOURCES: Record<TextToolRuleId, string> = {
 	simplify: 'retext-simplify',
 	intensify: 'retext-intensify',
 	readability: 'retext-readability',
+	spelling: 'retext-spell',
 }
 
 const SOURCE_TO_RULE = new Map(

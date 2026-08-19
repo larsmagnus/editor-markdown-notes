@@ -4,6 +4,7 @@ import {
 	CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH,
 	DEFAULT_SETTINGS,
 	DEFAULT_VIEW_OPTIONS,
+	SPELLING_LANGUAGES,
 	TEXT_TOOL_RULE_IDS,
 } from '@/shared/messages'
 
@@ -73,13 +74,29 @@ export const viewOptionsSchema = z
 				description:
 					'Which checks the sidebar runs. Normalised to the canonical rule order, with ids this build does not know dropped.',
 			}),
+		spellingLanguage: z
+			.enum(SPELLING_LANGUAGES)
+			.catch(DEFAULT_VIEW_OPTIONS.spellingLanguage)
+			.meta({
+				title: 'Spelling language',
+				description:
+					'Which English dictionary the spelling check loads. Also settable from the "Select spelling language" command.',
+			}),
+		spellingIgnoreWords: z
+			.array(z.string())
+			.catch(DEFAULT_VIEW_OPTIONS.spellingIgnoreWords)
+			.meta({
+				title: 'Spelling ignore words',
+				description:
+					'Words the spelling check accepts on top of its dictionary. Nothing writes to this yet.',
+			}),
 	})
 	.catch(DEFAULT_VIEW_OPTIONS)
 	.meta({
 		id: 'ViewOptions',
 		title: 'View options',
 		description:
-			'User-toggleable view state. Persisted in the host\'s globalState and broadcast to every open editor tab, so it survives reloads and stays in sync across tabs. Also settable from the "Toggle raw markdown", "Toggle full width", "Toggle text tools" and "Select theme" commands.',
+			'User-toggleable view state. Persisted in the host\'s globalState and broadcast to every open editor tab, so it survives reloads and stays in sync across tabs. Also settable from the "Toggle raw markdown", "Toggle full width", "Toggle text tools", "Select theme" and "Select spelling language" commands.',
 	})
 
 const extensionSettingsSchema = z

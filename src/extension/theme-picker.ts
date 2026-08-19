@@ -1,37 +1,28 @@
-import * as vscode from 'vscode'
-
 import type { Theme } from '../shared/messages'
 
 import type { SettingsStore } from './settings-store'
+import type { ViewOptionChoice } from './view-option-picker'
+import { pickViewOption } from './view-option-picker'
 
-const THEME_CHOICES: { label: string; value: Theme }[] = [
+const THEME_CHOICES: ViewOptionChoice<Theme>[] = [
 	{ label: 'Light', value: 'light' },
 	{ label: 'Dark', value: 'dark' },
 	{ label: 'System', value: 'system' },
 ]
 
 /** Mirrors the toolbar's theme toggle, so it stays reachable when it is hidden. */
-export async function pickTheme(
+export function pickTheme(
 	store: SettingsStore,
 	onPicked: () => void
 ): Promise<void> {
-	const current = store.getViewOptions().theme
-	const items: vscode.QuickPickItem[] = THEME_CHOICES.map(
-		({ label, value }) => ({
-			label,
-			description: value === current ? 'current' : undefined,
-		})
+	return pickViewOption(
+		store,
+		{
+			key: 'theme',
+			title: 'Editor Markdown Notes: theme',
+			placeHolder: 'Select a theme',
+			choices: THEME_CHOICES,
+		},
+		onPicked
 	)
-
-	const picked = await vscode.window.showQuickPick(items, {
-		title: 'Editor Markdown Notes: theme',
-		placeHolder: 'Select a theme',
-	})
-	if (!picked) return
-
-	const choice = THEME_CHOICES.find(({ label }) => label === picked.label)
-	if (!choice) return
-
-	await store.updateViewOptions({ theme: choice.value })
-	onPicked()
 }

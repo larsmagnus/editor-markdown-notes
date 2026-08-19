@@ -23,10 +23,8 @@ function Editor({
 	includeProseBaseClassNames,
 	...props
 }: EditorProps) {
-	const { editor, analysis, isAnalyzing, codeBlockStyle } = useMarkdownEditor(
-		content,
-		saveContent
-	)
+	const { editor, analysis, isAnalyzing, hasSpellingFailed, codeBlockStyle } =
+		useMarkdownEditor(content, saveContent)
 
 	if (!editor) return null
 
@@ -37,7 +35,13 @@ function Editor({
 			<EditorSurface
 				includeProseBaseClassNames={includeProseBaseClassNames}
 				codeBlockStyle={codeBlockStyle}
-				panel={<TextToolsAside analysis={analysis} isAnalyzing={isAnalyzing} />}
+				panel={
+					<TextToolsAside
+						analysis={analysis}
+						isAnalyzing={isAnalyzing}
+						hasSpellingFailed={hasSpellingFailed}
+					/>
+				}
 				{...props}
 			/>
 			<div>
