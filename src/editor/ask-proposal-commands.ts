@@ -1,7 +1,35 @@
 import type { RawCommands } from '@tiptap/core'
+import type { EditorState, Transaction } from '@tiptap/pm/state'
 
 import { askProposalPluginKey } from '@/editor/ask-suggestion-extension'
 import type { AskProposalState } from '@/editor/ask-suggestion-extension'
+
+/**
+ * Looks up the in-flight proposal, gated to the command's own id (a stale
+ * command for a since-replaced or closed proposal must be a no-op) and
+ * optionally its status.
+ */
+function currentProposal(
+	state: EditorState,
+	id: string,
+	status?: AskProposalState['status']
+): AskProposalState | undefined {
+	const current = askProposalPluginKey.getState(state)
+	if (!current || current.id !== id) return undefined
+	if (status && current.status !== status) return undefined
+	return current
+}
+
+/** Merges `updates` into the proposal state, for commands that only patch fields. */
+function updateProposal(
+	dispatch: ((tr: Transaction) => void) | undefined,
+	tr: Transaction,
+	current: AskProposalState,
+	updates: Partial<AskProposalState>
+) {
+	if (dispatch)
+		dispatch(tr.setMeta(askProposalPluginKey, { ...current, ...updates }))
+}
 
 /**
  * The `askSuggestion` extension's commands, pulled out of
@@ -39,52 +67,32 @@ export const askProposalCommands: Pick<
 	appendAskProposalChunk:
 		({ id, text }: { id: string; text: string }) =>
 		({ tr, dispatch, state }) => {
-			const current = askProposalPluginKey.getState(state)
-			if (!current || current.id !== id) return false
-			if (dispatch) {
-				dispatch(
-					tr.setMeta(askProposalPluginKey, {
-						...current,
-						text: current.text + text,
-					})
-				)
-			}
+			const current = currentProposal(state, id)
+			if (!current) return false
+			updateProposal(dispatch, tr, current, { text: current.text + text })
 			return true
 		},
 	finishAskProposal:
 		({ id }: { id: string }) =>
 		({ tr, dispatch, state }) => {
-			const current = askProposalPluginKey.getState(state)
-			if (!current || current.id !== id) return false
-			if (dispatch) {
-				dispatch(
-					tr.setMeta(askProposalPluginKey, { ...current, status: 'done' })
-				)
-			}
+			const current = currentProposal(state, id)
+			if (!current) return false
+			updateProposal(dispatch, tr, current, { status: 'done' })
 			return true
 		},
 	failAskProposal:
 		({ id, error }: { id: string; error: string }) =>
 		({ tr, dispatch, state }) => {
-			const current = askProposalPluginKey.getState(state)
-			if (!current || current.id !== id) return false
-			if (dispatch) {
-				dispatch(
-					tr.setMeta(askProposalPluginKey, {
-						...current,
-						status: 'error',
-						error,
-					})
-				)
-			}
+			const current = currentProposal(state, id)
+			if (!current) return false
+			updateProposal(dispatch, tr, current, { status: 'error', error })
 			return true
 		},
 	acceptAskProposal:
 		({ id }: { id: string }) =>
 		({ tr, dispatch, state }) => {
-			const current = askProposalPluginKey.getState(state)
-			if (!current || current.id !== id || current.status !== 'done')
-				return false
+			const current = currentProposal(state, id, 'done')
+			if (!current) return false
 			if (dispatch) {
 				tr.insertText(current.text, current.from, current.to)
 				tr.setMeta(askProposalPluginKey, null)
@@ -95,17 +103,16 @@ export const askProposalCommands: Pick<
 	declineAskProposal:
 		({ id }: { id: string }) =>
 		({ tr, dispatch, state }) => {
-			const current = askProposalPluginKey.getState(state)
-			if (!current || current.id !== id) return false
+			const current = currentProposal(state, id)
+			if (!current) return false
 			if (dispatch) dispatch(tr.setMeta(askProposalPluginKey, null))
 			return true
 		},
 	closeAskProposal:
 		({ id }: { id: string }) =>
 		({ tr, dispatch, state }) => {
-			const current = askProposalPluginKey.getState(state)
-			if (!current || current.id !== id || current.status !== 'done')
-				return false
+			const current = currentProposal(state, id, 'done')
+			if (!current) return false
 			if (dispatch) {
 				const paragraph = state.schema.nodes.paragraph.create(
 					undefined,
@@ -120,12 +127,9 @@ export const askProposalCommands: Pick<
 	editAskProposalText:
 		({ id, text }: { id: string; text: string }) =>
 		({ tr, dispatch, state }) => {
-			const current = askProposalPluginKey.getState(state)
-			if (!current || current.id !== id || current.status !== 'done')
-				return false
-			if (dispatch) {
-				dispatch(tr.setMeta(askProposalPluginKey, { ...current, text }))
-			}
+			const current = currentProposal(state, id, 'done')
+			if (!current) return false
+			updateProposal(dispatch, tr, current, { text })
 			return true
 		},
 }
