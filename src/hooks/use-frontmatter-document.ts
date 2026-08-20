@@ -7,6 +7,17 @@ import { splitFrontmatter } from '@/lib/frontmatter'
 const neverOwnSave = () => false
 
 /**
+ * Marks the transaction below as a sync rather than an edit.
+ *
+ * `setContent` emits `update` like any other change, so without this the
+ * auto-save cannot tell the host's own text from something the author typed,
+ * and writes an external edit back as the editor's re-serialization of it -
+ * escaping whatever the round-trip does not support, over a file nobody
+ * touched. Read by `useMarkdownAutosave`.
+ */
+export const CONTENT_SYNC_META = 'contentSync'
+
+/**
  * Rebuilds the document whenever the incoming file changes underneath it.
  *
  * Frontmatter is a real node inside the doc, so `editor.storage.markdown.
@@ -41,7 +52,11 @@ export function useFrontmatterDocument(
 		// load, or an external change echoed back from the host), not a user
 		// edit - left undoable, it put a phantom step ahead of the user's very
 		// first keystroke, so Ctrl+Z on an untouched document cleared it.
-		const chain = editor.chain().setMeta('addToHistory', false).setContent(body)
+		const chain = editor
+			.chain()
+			.setMeta('addToHistory', false)
+			.setMeta(CONTENT_SYNC_META, true)
+			.setContent(body)
 		if (frontmatter !== null) {
 			chain.insertContentAt(0, {
 				type: 'frontmatter',

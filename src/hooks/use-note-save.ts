@@ -63,5 +63,5 @@ export function useNoteSave({
 		})
 	}, [debouncedValue, isVSCodeContext, saveContent])
 
-	return { queueSave }
+	return { queueSave, cancelQueuedSave: queueSave.cancel }
 }

@@ -54,6 +54,7 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 - Syntax highlighting is decorations over the real editable text, never a rendered overlay — code has to stay colored while it is typed into, which is what separates it from mermaid's swap. `shiki-language-map.ts` is a hand-written fence-tag → grammar table because Vite cannot split a templated `import()` and a fence tag is freeform text that must never reach an import specifier; an unmapped tag renders plain, never throws.
 - `search-reveal/` matches by searching the rendered text — no source map exists. First match only: just `search.action.copyMatch` knows which was clicked, and it costs the clipboard.
 - Mount-time decorations must map through transactions, not clear on `docChanged` — startup transactions wipe them. Run-once state belongs on the editor instance and in `panel-state.ts`: TipTap rebuilds the editor, a backgrounded tab rebuilds the webview from frozen HTML.
+- Catching a rebuilt page up on the document is the webview's job (`getContent` on boot), never a host-side push on `onDidChangeViewState` — that also hits pages whose context survived, discarding a save debounce of unsaved keystrokes. Tests pass either way; only the handshake is safe.
 - Not supported: merged cells (fall back to raw HTML), footnotes, underline/highlight/sub/sup.
 
 ### Text tools (`src/lib/text-tools/`)

@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Changed the writing tools to skip inline code spans and the keys in YAML frontmatter, which were never prose worth checking
 - Added a zero-config MCP server, so AI agents in the editor can run the same writing checks as the text tools against your target reading age, language and custom words list.
 - Added an "Add words to dictionary" command for teaching the spelling check project vocabulary it should stop flagging
+- Fixed a note reverting to older content after its tab had been in the background, while the file on disk kept the newer text
+- Fixed an open note overwriting its own file after another tab, git or a formatter changed it. The note saved a reformatted copy over the change, which could break footnotes and merged table cells
 
 ## [0.20.0] - 2026-08-17
 

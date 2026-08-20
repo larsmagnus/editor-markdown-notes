@@ -1,6 +1,7 @@
-import type { Editor } from '@tiptap/react'
+import type { Editor, EditorEvents } from '@tiptap/react'
 import { useCallback, useEffect } from 'react'
 
+import { CONTENT_SYNC_META } from '@/hooks/use-frontmatter-document'
 import { useNoteSave } from '@/hooks/use-note-save'
 
 type UseMarkdownAutosaveOptions = {
@@ -28,7 +29,7 @@ export function useMarkdownAutosave({
 		[editor]
 	)
 
-	const { queueSave } = useNoteSave({
+	const { queueSave, cancelQueuedSave } = useNoteSave({
 		isVSCodeContext,
 		saveContent,
 		currentFile,
@@ -37,12 +38,21 @@ export function useMarkdownAutosave({
 	useEffect(() => {
 		if (!editor) return
 
-		const queueCurrentDocument = () =>
+		const queueCurrentDocument = ({ transaction }: EditorEvents['update']) => {
+			// The host's own text, not the author's. Writing it back would replace
+			// the file with this editor's re-serialization of it, and any save
+			// queued before it is now about a document that no longer exists.
+			if (transaction.getMeta(CONTENT_SYNC_META)) {
+				cancelQueuedSave()
+				return
+			}
+
 			queueSave(editor.storage?.markdown?.getMarkdown() ?? '')
+		}
 
 		editor.on('update', queueCurrentDocument)
 		return () => {
 			editor.off('update', queueCurrentDocument)
 		}
-	}, [editor, queueSave])
+	}, [cancelQueuedSave, editor, queueSave])
 }

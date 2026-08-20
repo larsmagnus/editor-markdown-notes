@@ -34,10 +34,27 @@ export function RawMarkdownEditor({
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+	// The text this view last agreed with the host about, from either direction:
+	// what it took from `content`, or what it wrote back. A draft that still
+	// matches it has nothing of the author's to lose.
+	//
+	// Both directions matter because `useHostDocument` applies each save locally,
+	// so `content` follows this view's own writes as well as outside edits -
+	// tracking only what arrived would read an author who undid their way back
+	// to the earlier text as having nothing pending.
+	const adoptedRef = useRef(content)
+
 	const currentFile = useCallback(() => draftRef.current, [])
+	const rememberSave = useCallback(
+		(next: string) => {
+			adoptedRef.current = next
+			saveContent(next)
+		},
+		[saveContent]
+	)
 	const { queueSave } = useNoteSave({
 		isVSCodeContext,
-		saveContent,
+		saveContent: rememberSave,
 		currentFile,
 	})
 
@@ -47,8 +64,19 @@ export function RawMarkdownEditor({
 	useEffect(() => {
 		if (document.activeElement === textareaRef.current) return
 
+		adoptedRef.current = content
 		setDraft(content)
 	}, [content])
+
+	// `content` will not change a second time, so the effect above never gets
+	// another chance at a change that landed while the caret was here. Without
+	// this the note shows text nobody wrote until it is closed and reopened.
+	const handleBlur = () => {
+		if (draftRef.current !== adoptedRef.current) return
+
+		adoptedRef.current = content
+		setDraft(content)
+	}
 
 	// A textarea can highlight nothing but its own selection, so selecting the
 	// match *is* the highlight here - and focusing is what scrolls the container
@@ -80,6 +108,7 @@ export function RawMarkdownEditor({
 			ref={textareaRef}
 			value={draft}
 			onChange={handleChange}
+			onBlur={handleBlur}
 			spellCheck={false}
 			aria-label="Raw markdown"
 			className={cn(
