@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-08-20
+
 - Added scrolling to the matched text when a note is opened from a search result, with every occurrence of that text highlighted
 - Added an info button to each writing tools check, explaining what it looks for and showing an example of the fix marked the way the editor marks it
 - Added a spelling check to the writing tools, underlining unrecognised words in red and listing them with suggested corrections. Switch it on in the panel; it is off by default
