@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 
 import { readSearchReveal } from '../extension/read-search-reveal'
 
-import { runSearch } from './probe-support'
+import { runSearch } from './search-test-support'
 
 /**
  * What the host hands the webview when a note opens from a search result.

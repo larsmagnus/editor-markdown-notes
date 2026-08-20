@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 
 import { readSearchMatches } from '../extension/read-search-match'
 
-import { runSearch } from './probe-support'
+import { runSearch } from './search-test-support'
 
 /**
  * The clipboard-free reveal path, which is the one meant to run on every open.

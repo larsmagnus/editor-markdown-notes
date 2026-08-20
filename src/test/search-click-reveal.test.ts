@@ -13,7 +13,7 @@ import {
 	runSearch,
 	setEditorAssociations,
 	VIEW_TYPE,
-} from './probe-support'
+} from './search-test-support'
 
 /**
  * The end-to-end answer: does activating a search result tell the custom editor

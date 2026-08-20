@@ -1,11 +1,9 @@
 import * as vscode from 'vscode'
 
 import { readFocusedSearchMatch } from '../extension/read-search-match'
-import { readProbeEvents } from '../extension/reveal-probe'
-import { describe } from '../extension/reveal-probe-describe'
 import type { Logger } from '../shared/logger'
 
-/** Helpers for `search-reveal-probe.test.ts`. Temporary, alongside the probe. */
+/** Shared fixtures and helpers for the search-reveal integration suites. */
 
 export const VIEW_TYPE = 'editor-markdown-notes.markdownEditor'
 
@@ -23,33 +21,6 @@ Filler paragraph one.
 
 Trailing paragraph.
 `
-
-/** The 0-based line holding both \`<input\` matches. */
-export const MATCH_LINE = 7
-
-export async function waitForCustomEditorTab() {
-	for (let attempt = 0; attempt < 50; attempt++) {
-		const tab = vscode.window.tabGroups.activeTabGroup.activeTab
-		if (
-			tab?.input instanceof vscode.TabInputCustom &&
-			tab.input.viewType === VIEW_TYPE
-		) {
-			return tab
-		}
-
-		await new Promise((resolve) => setTimeout(resolve, 100))
-	}
-
-	return undefined
-}
-
-export function dumpProbe(heading: string) {
-	console.log(`\n===== ${heading} =====`)
-	for (const event of readProbeEvents()) {
-		console.log(`  +${event.at}ms ${event.name} ${describe(event.data)}`)
-	}
-	console.log(`===== end ${heading} =====\n`)
-}
 
 export function pause(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms))

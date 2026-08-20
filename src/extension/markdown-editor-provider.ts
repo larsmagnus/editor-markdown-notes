@@ -6,7 +6,6 @@ import type { HostToWebview } from '../shared/messages'
 import { broadcastToPanels } from './broadcast'
 import { CONFIG_SECTION, VIEW_TYPE } from './constants'
 import { attachPanelSession } from './panel-session'
-import { probePanel } from './probe-panel'
 import { readSearchReveal } from './read-search-reveal'
 import type { ScrollPositionStore } from './scroll-position-store'
 import type { SettingsStore } from './settings-store'
@@ -96,14 +95,11 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			token,
 		})
 
-		const probe = probePanel(webviewPanel, document, this.log)
-
 		this.panels.add(webviewPanel)
 
 		webviewPanel.onDidDispose(() => {
 			this.panels.delete(webviewPanel)
 			session.dispose()
-			probe.dispose()
 		})
 	}
 }
