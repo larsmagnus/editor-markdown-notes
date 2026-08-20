@@ -40,5 +40,8 @@ jobs:
       - name: 🤯 Run code complexity checks
         run: pnpm run complexity
 
+      - name: 🧬 Run duplication checks
+        run: pnpm run duplication:ci
+
       - name: 🧪 Run VS Code tests and Vitest tests
         run: xvfb-run --auto-servernum pnpm test

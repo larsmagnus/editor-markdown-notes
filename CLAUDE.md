@@ -19,6 +19,8 @@ A VSCode extension for editing markdown in a live preview powered by a React web
 
 Vitest runs `src/**/*.test.{ts,tsx}` except `src/test/**`, which `tsconfig.extension.json` compiles without a DOM lib — keep webview tests out of it. Those suites are `pnpm test:extension`, which boots a real VS Code and is the only way to check host behaviour.
 
+jscpd v5 has no Node API (Rust rewrite) — shell out to the `cpd`/`jscpd` binary, don't `import` it.
+
 Never replace `navigator` wholesale in a test that also mounts an editor: a stub built as `{ ...navigator, clipboard }` drops the prototype getters ProseMirror reads to detect the browser, and the editor then silently never mounts. Mock `src/lib/clipboard.ts` — the app's only route to the clipboard — or let `userEvent.setup()` install its own stub.
 
 #### Complexity budget

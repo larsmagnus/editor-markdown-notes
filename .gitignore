@@ -33,6 +33,9 @@ dist-ssr
 *storybook.log
 storybook-static
 
+# jscpd
+report
+
 # Playwright
 test-results/
 playwright-report/

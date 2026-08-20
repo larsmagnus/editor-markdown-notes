@@ -3,6 +3,10 @@
 		"playwright": {
 			"command": "pnpm",
 			"args": ["dlx", "@playwright/mcp@latest"]
+		},
+		"jscpd": {
+			"command": "pnpm",
+			"args": ["exec", "cpd", "--mcp", "-c", ".jscpd.json", "src"]
 		}
 	}
 }
