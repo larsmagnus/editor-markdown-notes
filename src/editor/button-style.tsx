@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { ButtonToggle } from '@/editor/button-toggle'
 import { useEditorStyles } from '@/hooks/use-editor-styles'
 import type { Style } from '@/hooks/use-editor-styles'
 import { cn } from '@/lib/utils'
@@ -16,21 +16,15 @@ export function ButtonStyle({
 	const { toggleStyle, hasStyle, canToggleStyle } = useEditorStyles()
 
 	return (
-		<Button
-			type="button"
-			variant="ghost"
-			size="sm"
+		<ButtonToggle
+			active={hasStyle(style)}
 			title={style}
 			onClick={() => toggleStyle(style)}
-			className={cn(
-				'capitalize',
-				className,
-				hasStyle(style) ? 'is-active' : ''
-			)}
+			className={cn('capitalize', className)}
 			disabled={!canToggleStyle(style)}
 			{...rest}
 		>
 			{children ?? style}
-		</Button>
+		</ButtonToggle>
 	)
 }

@@ -2,9 +2,10 @@ import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 
 import { AppErrorBoundary } from '@/components/app-error-boundary'
-import { ButtonCopyCodeBlock } from '@/editor/button-copy-code-block'
+import { ButtonCopy } from '@/editor/button-copy'
 import { MermaidBlock } from '@/editor/mermaid/block'
 import { MERMAID_LANGUAGE } from '@/editor/mermaid/language'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 
 /**
  * The node view every code block renders through.
@@ -21,6 +22,7 @@ import { MERMAID_LANGUAGE } from '@/editor/mermaid/language'
  */
 export function CodeBlockView({ node, editor, getPos }: NodeViewProps) {
 	const language = String(node.attrs.language ?? '')
+	const [copied, handleCopy] = useCopyToClipboard(node.textContent)
 
 	// TipTap mounts each node view as its own React root, so this is the only
 	// place a boundary can contain one diagram without taking the document with
@@ -35,7 +37,13 @@ export function CodeBlockView({ node, editor, getPos }: NodeViewProps) {
 
 	return (
 		<NodeViewWrapper as="pre" className="group relative">
-			<ButtonCopyCodeBlock code={node.textContent} />
+			<ButtonCopy
+				copied={copied}
+				label="Copy code"
+				size="icon"
+				className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+				onClick={handleCopy}
+			/>
 			<NodeViewContent<'code'>
 				as="code"
 				className={language ? `language-${language}` : undefined}

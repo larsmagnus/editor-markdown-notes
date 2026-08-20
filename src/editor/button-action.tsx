@@ -9,7 +9,7 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
 
-type ButtonNodeActionProps = {
+type ButtonActionProps = {
 	icon: ReactNode
 	/** The button's accessible name, and - unless `tooltip` overrides it - what
 	 *  the tooltip shows. */
@@ -31,7 +31,7 @@ type ButtonNodeActionProps = {
  * view, and without it the cursor/selection would treat the button as
  * editable document content.
  */
-export function ButtonNodeAction({
+export function ButtonAction({
 	icon,
 	label,
 	tooltip = label,
@@ -39,7 +39,7 @@ export function ButtonNodeAction({
 	className,
 	disabled,
 	onClick,
-}: ButtonNodeActionProps) {
+}: ButtonActionProps) {
 	return (
 		<Tooltip>
 			<TooltipTrigger

@@ -2,7 +2,7 @@ import { Code, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
 import type { ReactZoomPanPinchContextState } from 'react-zoom-pan-pinch'
 import { useControls, useTransformComponent } from 'react-zoom-pan-pinch'
 
-import { ButtonNodeAction } from '@/editor/button-node-action'
+import { ButtonAction } from '@/editor/button-action'
 import { ButtonActions } from '@/editor/mermaid/button-actions'
 
 /** `useTransformComponent` keeps its callback in a dependency array, so this
@@ -51,24 +51,20 @@ export function MermaidToolbar({ code, svg, onEdit }: MermaidToolbarProps) {
 			contentEditable={false}
 			className="absolute top-2 right-2 flex items-center gap-0.5 rounded-lg border border-border bg-background/90 p-0.5 opacity-0 shadow-sm backdrop-blur-xs transition-opacity group-hover:opacity-100 focus-within:opacity-100"
 		>
-			<ButtonNodeAction
+			<ButtonAction
 				icon={<ZoomOut />}
 				label="Zoom out"
 				disabled={!isZoomed}
 				onClick={handleZoomOut}
 			/>
-			<ButtonNodeAction
-				icon={<ZoomIn />}
-				label="Zoom in"
-				onClick={handleZoomIn}
-			/>
-			<ButtonNodeAction
+			<ButtonAction icon={<ZoomIn />} label="Zoom in" onClick={handleZoomIn} />
+			<ButtonAction
 				icon={<RotateCcw />}
 				label="Reset zoom"
 				disabled={!isZoomed}
 				onClick={handleReset}
 			/>
-			<ButtonNodeAction
+			<ButtonAction
 				icon={<Code />}
 				label="Edit diagram source"
 				tooltip="Edit source"

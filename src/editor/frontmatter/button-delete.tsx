@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/react'
 import { Trash2 } from 'lucide-react'
 
-import { ButtonNodeAction } from '@/editor/button-node-action'
+import { ButtonAction } from '@/editor/button-action'
 
 type ButtonDeleteProps = {
 	editor: Editor
@@ -34,7 +34,7 @@ export function ButtonDelete({ editor, getPos }: ButtonDeleteProps) {
 	}
 
 	return (
-		<ButtonNodeAction
+		<ButtonAction
 			icon={<Trash2 />}
 			label="Delete frontmatter"
 			tooltip="Delete"

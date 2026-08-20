@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ButtonCopy } from './button-copy'
+import { ButtonCopyPage } from './button-copy-page'
 
 const meta = {
-	component: ButtonCopy,
+	component: ButtonCopyPage,
 	parameters: {
 		layout: 'centered',
 	},
-} satisfies Meta<typeof ButtonCopy>
+} satisfies Meta<typeof ButtonCopyPage>
 
 export default meta
 type Story = StoryObj<typeof meta>

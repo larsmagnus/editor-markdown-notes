@@ -1,15 +1,11 @@
 import { ChevronDown, Code, Copy, FileType } from 'lucide-react'
 
 import { CopiedBadge } from '@/components/copied-badge'
-import { IconClaude } from '@/components/icons/icon-claude'
+import { CopyActionsMenu } from '@/components/copy-actions-menu'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import {
 	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useCopiedFeedback } from '@/hooks/use-copied-feedback'
@@ -18,14 +14,14 @@ import { copyToClipboard } from '@/lib/clipboard'
 import { markdownToPlainText } from '@/lib/markdown-to-text'
 import { getVSCodeApi } from '@/lib/vscode-api'
 
-type ButtonCopyProps = { content: string }
+type ButtonCopyPageProps = { content: string }
 
 /**
  * Toolbar action for getting the current note out of the editor: copy as
  * markdown or plain text (both include any frontmatter), or hand it to
  * Claude.
  */
-export function ButtonCopy({ content }: ButtonCopyProps) {
+export function ButtonCopyPage({ content }: ButtonCopyPageProps) {
 	const { isVSCodeContext } = useSettings()
 	const [copied, showCopiedFeedback] = useCopiedFeedback()
 
@@ -75,22 +71,17 @@ export function ButtonCopy({ content }: ButtonCopyProps) {
 							</Button>
 						}
 					/>
-					<DropdownMenuContent className="w-52">
-						<DropdownMenuGroup>
-							<DropdownMenuItem onClick={copyMarkdown}>
-								<Code /> Copy markdown
-							</DropdownMenuItem>
-							<DropdownMenuItem onClick={copyPlainText}>
-								<FileType /> Copy plain text
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-						<DropdownMenuSeparator />
-						<DropdownMenuGroup>
-							<DropdownMenuItem onClick={openInClaude}>
-								<IconClaude /> Open in Claude
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-					</DropdownMenuContent>
+					<CopyActionsMenu
+						copyItems={[
+							{ icon: <Code />, label: 'Copy markdown', onClick: copyMarkdown },
+							{
+								icon: <FileType />,
+								label: 'Copy plain text',
+								onClick: copyPlainText,
+							},
+						]}
+						onOpenInClaude={openInClaude}
+					/>
 				</DropdownMenu>
 			</ButtonGroup>
 

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { ButtonCopy } from '@/components/button-copy'
+import { ButtonCopyPage } from '@/components/button-copy-page'
 import { SettingsProvider } from '@/components/settings-provider'
 
 const NOTE = ['# Roadmap', '', 'Ship it.'].join('\n')
@@ -14,13 +14,13 @@ afterEach(() => {
 	vi.clearAllMocks()
 })
 
-describe('ButtonCopy', () => {
+describe('ButtonCopyPage', () => {
 	it('copies the note as markdown', async () => {
 		const user = userEvent.setup()
 
 		render(
 			<SettingsProvider>
-				<ButtonCopy content={NOTE} />
+				<ButtonCopyPage content={NOTE} />
 			</SettingsProvider>
 		)
 
@@ -37,7 +37,7 @@ describe('ButtonCopy', () => {
 
 		render(
 			<SettingsProvider>
-				<ButtonCopy content={NOTE} />
+				<ButtonCopyPage content={NOTE} />
 			</SettingsProvider>
 		)
 
@@ -55,7 +55,7 @@ describe('ButtonCopy', () => {
 
 		render(
 			<SettingsProvider>
-				<ButtonCopy content={NOTE} />
+				<ButtonCopyPage content={NOTE} />
 			</SettingsProvider>
 		)
 

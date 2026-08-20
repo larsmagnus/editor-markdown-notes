@@ -1,16 +1,12 @@
 import { ChevronDown, Code, FileCode } from 'lucide-react'
 
-import { IconClaude } from '@/components/icons/icon-claude'
+import { CopyActionsMenu } from '@/components/copy-actions-menu'
 import { Button } from '@/components/ui/button'
 import {
 	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ButtonNodeCopy } from '@/editor/button-node-copy'
+import { ButtonCopy } from '@/editor/button-copy'
 import { openDiagramInClaude } from '@/editor/mermaid/actions'
 import { useCopiedFeedback } from '@/hooks/use-copied-feedback'
 import { useSettings } from '@/hooks/use-settings'
@@ -48,12 +44,13 @@ export function ButtonActions({ code, svg }: ButtonActionsProps) {
 
 	return (
 		<>
-			{/* `CopiedBadge`, which `ButtonCopy` uses, floats to the left of its
-			    anchor - it would land over the diagram here. The icon carries the
-			    feedback instead. */}
-			<ButtonNodeCopy
+			{/* The button sits at the toolbar's left edge, over the diagram - `left`
+			    (the badge's default) or `bottom` would land the badge on top of it,
+			    so it floats above the toolbar instead. */}
+			<ButtonCopy
 				copied={copied}
 				label="Copy diagram code"
+				badgeSide="top"
 				onClick={copyCode}
 			/>
 
@@ -70,22 +67,13 @@ export function ButtonActions({ code, svg }: ButtonActionsProps) {
 						</Button>
 					}
 				/>
-				<DropdownMenuContent className="w-52">
-					<DropdownMenuGroup>
-						<DropdownMenuItem onClick={copyCode}>
-							<Code /> Copy diagram code
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={copySvg}>
-							<FileCode /> Copy SVG
-						</DropdownMenuItem>
-					</DropdownMenuGroup>
-					<DropdownMenuSeparator />
-					<DropdownMenuGroup>
-						<DropdownMenuItem onClick={openInClaude}>
-							<IconClaude /> Open in Claude
-						</DropdownMenuItem>
-					</DropdownMenuGroup>
-				</DropdownMenuContent>
+				<CopyActionsMenu
+					copyItems={[
+						{ icon: <Code />, label: 'Copy diagram code', onClick: copyCode },
+						{ icon: <FileCode />, label: 'Copy SVG', onClick: copySvg },
+					]}
+					onOpenInClaude={openInClaude}
+				/>
 			</DropdownMenu>
 		</>
 	)

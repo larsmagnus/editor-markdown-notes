@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { ButtonToggle } from '@/editor/button-toggle'
 import { useEditorColor } from '@/hooks/use-editor-color'
 import { cn } from '@/lib/utils'
 
@@ -15,20 +15,14 @@ export function ButtonColor({
 	const { toggleTextColor, hasTextColor } = useEditorColor()
 
 	return (
-		<Button
-			type="button"
-			variant="ghost"
+		<ButtonToggle
+			active={hasTextColor(color)}
 			title="Set color"
-			size="sm"
 			onClick={() => toggleTextColor(color)}
-			className={cn(
-				'w-5 h-5 p-0',
-				className,
-				hasTextColor(color) ? 'is-active' : ''
-			)}
+			className={cn('w-5 h-5 p-0', className)}
 			{...rest}
 		>
 			{children}
-		</Button>
+		</ButtonToggle>
 	)
 }

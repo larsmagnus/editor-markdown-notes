@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 
-import { ButtonCopy } from '@/components/button-copy'
+import { ButtonCopyPage } from '@/components/button-copy-page'
 import type { DevFileSelectorProps } from '@/components/dev-file-selector'
 import {
 	editModeFromViewOptions,
@@ -98,7 +98,7 @@ function Toolbar({ files, fileName, setFileName, content }: ToolbarProps) {
 			<ThemeToggle />
 
 			<div className="ml-auto">
-				<ButtonCopy content={content} />
+				<ButtonCopyPage content={content} />
 			</div>
 		</div>
 	)

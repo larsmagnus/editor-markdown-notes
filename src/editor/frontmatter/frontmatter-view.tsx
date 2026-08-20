@@ -1,8 +1,9 @@
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 
-import { ButtonCopy } from '@/editor/frontmatter/button-copy'
+import { ButtonCopy } from '@/editor/button-copy'
 import { ButtonDelete } from '@/editor/frontmatter/button-delete'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 
 /**
  * The node view every `frontmatter` block renders through.
@@ -13,6 +14,8 @@ import { ButtonDelete } from '@/editor/frontmatter/button-delete'
  * uses, not a parallel implementation.
  */
 export function FrontmatterView({ node, editor, getPos }: NodeViewProps) {
+	const [copied, handleCopy] = useCopyToClipboard(node.textContent)
+
 	return (
 		<NodeViewWrapper
 			data-type="frontmatter"
@@ -26,7 +29,11 @@ export function FrontmatterView({ node, editor, getPos }: NodeViewProps) {
 					Frontmatter
 				</span>
 				<div className="flex items-center gap-1">
-					<ButtonCopy frontmatter={node.textContent} />
+					<ButtonCopy
+						copied={copied}
+						label="Copy frontmatter"
+						onClick={handleCopy}
+					/>
 					<ButtonDelete editor={editor} getPos={getPos} />
 				</div>
 			</div>

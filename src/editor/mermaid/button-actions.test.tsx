@@ -100,8 +100,6 @@ describe('ButtonActions', () => {
 		)
 		// That branch replaces the reader's clipboard, so it owes them the same
 		// acknowledgement an explicit copy gets.
-		expect(screen.getByLabelText('Copy diagram code')).toContainHTML(
-			'lucide-check'
-		)
+		expect(screen.getByRole('status')).toHaveTextContent('Copied')
 	})
 })

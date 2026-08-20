@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { useState } from 'react'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { ButtonCopy } from '@/editor/frontmatter/button-copy'
+import { ButtonCopy } from '@/editor/button-copy'
 
 const meta = {
 	component: ButtonCopy,
@@ -19,5 +20,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Primary: Story = {
-	args: { frontmatter: 'title: Roadmap\nstatus: draft' },
+	args: { label: 'Copy frontmatter', copied: false, onClick: () => {} },
+	render: function Render(args) {
+		const [copied, setCopied] = useState(false)
+		return (
+			<ButtonCopy {...args} copied={copied} onClick={() => setCopied(true)} />
+		)
+	},
 }
