@@ -59,10 +59,8 @@ export type ViewOptions = {
 	/**
 	 * Words the spelling check accepts on top of its dictionary.
 	 *
-	 * Nothing writes to this yet. It is here so that adding "add to dictionary"
-	 * is a matter of giving the panel a button, rather than threading a new
-	 * field through the host, the schema, the worker contract and the pipeline
-	 * after the fact.
+	 * Written by `dictionary-words-command.ts`'s "Add words to dictionary"
+	 * command and forwarded to the MCP server as `EMN_IGNORE_WORDS`.
 	 */
 	spellingIgnoreWords: string[]
 }

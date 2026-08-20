@@ -40,6 +40,7 @@ export function alignedSlices(
 	let cursor = 0
 	let runStart = 0
 	let runSource = 0
+	let index = 0
 
 	const closeRun = (end: number) => {
 		if (end <= runStart) return
@@ -50,18 +51,48 @@ export function alignedSlices(
 		})
 	}
 
-	for (let index = 0; index < value.length; index += 1) {
-		if (source[cursor] !== value[index]) {
-			closeRun(index)
-			// Skip whatever the decode consumed - a backslash, or the body of an
-			// entity - until the source lines up with the decoded character again.
+	while (index < value.length) {
+		if (source[cursor] === value[index]) {
+			cursor += 1
+			index += 1
+			continue
+		}
+
+		closeRun(index)
+
+		if (source[cursor] === '&') {
+			// A character reference decodes to characters that never appear in the
+			// source at all (`&mdash;` -> `—`), so scanning for a literal match -
+			// what a backslash escape needs - runs off the end of the source
+			// instead. Map the whole decoded run to where the reference starts.
+			const entityEnd = source.indexOf(';', cursor)
+			const after = entityEnd === -1 ? source.length : entityEnd + 1
+			let length = 1
+			while (
+				index + length < value.length &&
+				after < source.length &&
+				value[index + length] !== source[after]
+			) {
+				length += 1
+			}
+			slices.push({
+				offset: proseOffset + index,
+				length,
+				source: sourceOffset + cursor,
+			})
+			index += length
+			cursor = after
+		} else {
+			// A backslash escape: the escaped character is still literally present
+			// right after it, so skip the backslash and resync on that.
+			if (source[cursor] === '\\') cursor += 1
 			while (cursor < source.length && source[cursor] !== value[index]) {
 				cursor += 1
 			}
-			runStart = index
-			runSource = cursor
 		}
-		cursor += 1
+
+		runStart = index
+		runSource = cursor
 	}
 
 	closeRun(value.length)

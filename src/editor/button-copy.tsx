@@ -37,7 +37,10 @@ export function ButtonCopy({
 	onClick,
 }: ButtonCopyProps) {
 	return (
-		<div className={cn('relative inline-flex', className)}>
+		<div
+			className={cn('relative inline-flex', className)}
+			contentEditable={false}
+		>
 			<ButtonAction
 				icon={<Copy />}
 				label={label}

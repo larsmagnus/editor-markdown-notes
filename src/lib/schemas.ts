@@ -88,7 +88,7 @@ export const viewOptionsSchema = z
 			.meta({
 				title: 'Spelling ignore words',
 				description:
-					'Words the spelling check accepts on top of its dictionary. Nothing writes to this yet.',
+					'Words the spelling check accepts on top of its dictionary. Written by the "Add words to dictionary" command.',
 			}),
 	})
 	.catch(DEFAULT_VIEW_OPTIONS)

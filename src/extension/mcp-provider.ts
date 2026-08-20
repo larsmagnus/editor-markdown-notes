@@ -25,6 +25,18 @@ export function registerMcpProvider(
 	store: SettingsStore,
 	log: Logger
 ): vscode.Disposable {
+	// `engines` pins the editor's own minimum version, but a fork can report
+	// that version without shipping this 1.101 API. Calling it unguarded would
+	// throw out of `activate`, and since that throw happens before
+	// `context.subscriptions.push(...)` runs, nothing else registered in the
+	// same call - commands, the custom editor - would ever get disposed either.
+	if (typeof vscode.lm?.registerMcpServerDefinitionProvider !== 'function') {
+		log.warn(
+			'MCP server not registered: vscode.lm.registerMcpServerDefinitionProvider is unavailable on this build'
+		)
+		return vscode.Disposable.from()
+	}
+
 	const didChange = new vscode.EventEmitter<void>()
 
 	const entry = vscode.Uri.joinPath(

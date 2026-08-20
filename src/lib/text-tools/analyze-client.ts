@@ -32,6 +32,10 @@ export type Analyzer = {
 type Pending = {
 	resolve: (analysis: Analysis) => void
 	reject: (error: Error) => void
+	language: SpellingLanguage
+	/** Whether this request sent the dictionary - only then does a successful
+	 *  response mean the worker actually cached it. */
+	dictionarySent: boolean
 }
 
 export function createAnalyzer(): Analyzer {
@@ -57,6 +61,8 @@ export function createAnalyzer(): Analyzer {
 			entry.reject(new Error(response.error))
 			return
 		}
+
+		if (entry.dictionarySent) sentLanguages.add(entry.language)
 
 		const { id: _id, ok: _ok, ...analysis } = response
 		entry.resolve(analysis)
@@ -88,10 +94,14 @@ export function createAnalyzer(): Analyzer {
 				: undefined
 
 		const request: AnalyzeRequest = { id: lastId, text, ...options, dictionary }
-		if (dictionary) sentLanguages.add(options.spellingLanguage)
 
 		return new Promise<Analysis>((resolve, reject) => {
-			pending.set(request.id, { resolve, reject })
+			pending.set(request.id, {
+				resolve,
+				reject,
+				language: options.spellingLanguage,
+				dictionarySent: Boolean(dictionary),
+			})
 			worker.postMessage(request)
 		})
 	}

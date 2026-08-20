@@ -10,10 +10,15 @@ import type { AnalyzeRequest, PipelineOptions } from '@/lib/text-tools/types'
  * spend a ~575kB structured clone on the dictionary.
  */
 const posted = vi.hoisted(() => [] as AnalyzeRequest[])
+const listeners = vi.hoisted(
+	() => new Map<string, (event: MessageEvent) => void>()
+)
 
 vi.mock('@/lib/text-tools/analyze.worker.ts?worker&inline', () => ({
 	default: class {
-		addEventListener() {}
+		addEventListener(type: string, handler: (event: MessageEvent) => void) {
+			listeners.set(type, handler)
+		}
 		terminate() {}
 		postMessage(request: AnalyzeRequest) {
 			posted.push(request)
@@ -32,6 +37,7 @@ const BASE: Omit<PipelineOptions, 'rules' | 'dictionary' | 'spellingLanguage'> =
 
 beforeEach(() => {
 	posted.length = 0
+	listeners.clear()
 })
 
 describe('createAnalyzer', () => {
@@ -45,6 +51,9 @@ describe('createAnalyzer', () => {
 		}
 
 		void analyzer.analyze('One.', options)
+		listeners.get('message')?.({
+			data: { id: posted[0].id, ok: true, issues: [], sentenceCount: 1 },
+		} as MessageEvent)
 		void analyzer.analyze('Two.', options)
 
 		expect(posted[0].dictionary).toEqual(AMERICAN)
@@ -85,12 +94,18 @@ describe('createAnalyzer', () => {
 			dictionary: AMERICAN,
 			...BASE,
 		})
+		listeners.get('message')?.({
+			data: { id: posted[0].id, ok: true, issues: [], sentenceCount: 1 },
+		} as MessageEvent)
 		void analyzer.analyze('Two.', {
 			rules: ['spelling'],
 			spellingLanguage: 'en-GB',
 			dictionary: BRITISH,
 			...BASE,
 		})
+		listeners.get('message')?.({
+			data: { id: posted[1].id, ok: true, issues: [], sentenceCount: 1 },
+		} as MessageEvent)
 		void analyzer.analyze('Three.', {
 			rules: ['spelling'],
 			spellingLanguage: 'en-US',
@@ -103,5 +118,27 @@ describe('createAnalyzer', () => {
 		// The worker still holds en-US: its processor cache is keyed by language
 		// and nothing evicts it.
 		expect(posted[2].dictionary).toBeUndefined()
+	})
+
+	it('resends the dictionary after a run that threw before the worker cached it', async () => {
+		const analyzer = createAnalyzer()
+		const options: PipelineOptions = {
+			rules: ['spelling'],
+			spellingLanguage: 'en-US',
+			dictionary: AMERICAN,
+			...BASE,
+		}
+
+		const first = analyzer.analyze('One.', options)
+		// readabilityIssues/wordIssues threw before runPipeline reached the
+		// spelling pass, so the worker never built the en-US processor.
+		listeners.get('message')?.({
+			data: { id: posted[0].id, ok: false, error: 'boom' },
+		} as MessageEvent)
+		await expect(first).rejects.toThrow('boom')
+
+		void analyzer.analyze('Two.', options)
+
+		expect(posted[1].dictionary).toEqual(AMERICAN)
 	})
 })

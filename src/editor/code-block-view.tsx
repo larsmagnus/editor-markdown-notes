@@ -41,7 +41,7 @@ export function CodeBlockView({ node, editor, getPos }: NodeViewProps) {
 				copied={copied}
 				label="Copy code"
 				size="icon"
-				className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+				className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
 				onClick={handleCopy}
 			/>
 			<NodeViewContent<'code'>

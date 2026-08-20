@@ -15,8 +15,13 @@ import type { Analyzer } from '@/lib/text-tools/analyze-client'
 export function useAnalyzer() {
 	const analyzerRef = useRef<Analyzer | null>(null)
 	const isTornDownRef = useRef(false)
+	// Bumped by every disposeAnalyzer() call, so an import in flight when text
+	// tools are switched off mid-load can tell it was disposed - unmount alone
+	// wouldn't catch that, since disposeAnalyzer() also runs on the disable path.
+	const generationRef = useRef(0)
 
 	const disposeAnalyzer = useCallback(() => {
+		generationRef.current += 1
 		analyzerRef.current?.dispose()
 		analyzerRef.current = null
 	}, [])
@@ -24,8 +29,10 @@ export function useAnalyzer() {
 	const getAnalyzer = useCallback(async () => {
 		if (analyzerRef.current) return analyzerRef.current
 
+		const generation = generationRef.current
 		const { createAnalyzer } = await import('@/lib/text-tools/analyze-client')
-		if (isTornDownRef.current) return null
+		if (isTornDownRef.current || generation !== generationRef.current)
+			return null
 
 		analyzerRef.current = createAnalyzer()
 
