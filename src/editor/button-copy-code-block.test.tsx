@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { CodeBlockCopyButton } from '@/editor/code-block-copy-button'
+import { ButtonCopyCodeBlock } from '@/editor/button-copy-code-block'
 import { copyToClipboard } from '@/lib/clipboard'
 
 // Mocked at the module rather than at `navigator`, which is the app's one seam
@@ -15,11 +15,11 @@ afterEach(() => {
 	vi.clearAllMocks()
 })
 
-describe('CodeBlockCopyButton', () => {
+describe('ButtonCopyCodeBlock', () => {
 	it('should copy the code to the clipboard when clicked', async () => {
 		render(
 			<TooltipProvider>
-				<CodeBlockCopyButton code="const greeting = 'hello world'" />
+				<ButtonCopyCodeBlock code="const greeting = 'hello world'" />
 			</TooltipProvider>
 		)
 		await userEvent.click(screen.getByLabelText('Copy code'))
@@ -32,7 +32,7 @@ describe('CodeBlockCopyButton', () => {
 	it('should show a "Copy" tooltip when hovering the button', async () => {
 		render(
 			<TooltipProvider>
-				<CodeBlockCopyButton code="const greeting = 'hello world'" />
+				<ButtonCopyCodeBlock code="const greeting = 'hello world'" />
 			</TooltipProvider>
 		)
 

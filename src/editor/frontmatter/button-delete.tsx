@@ -1,9 +1,9 @@
 import type { Editor } from '@tiptap/react'
 import { Trash2 } from 'lucide-react'
 
-import { NodeActionButton } from '@/editor/node-action-button'
+import { ButtonNodeAction } from '@/editor/button-node-action'
 
-type FrontmatterDeleteButtonProps = {
+type ButtonDeleteProps = {
 	editor: Editor
 	/** The node view's own position getter - the click may not have moved the
 	 *  selection into the block first, so `deleteNode` (which walks up from the
@@ -18,10 +18,7 @@ type FrontmatterDeleteButtonProps = {
  * everything else now, so deleting it is a normal, undoable transaction -
  * Ctrl+Z restores it exactly like deleting any other block would.
  */
-export function FrontmatterDeleteButton({
-	editor,
-	getPos,
-}: FrontmatterDeleteButtonProps) {
+export function ButtonDelete({ editor, getPos }: ButtonDeleteProps) {
 	function handleClick() {
 		const pos = getPos()
 		if (pos === undefined) return
@@ -37,7 +34,7 @@ export function FrontmatterDeleteButton({
 	}
 
 	return (
-		<NodeActionButton
+		<ButtonNodeAction
 			icon={<Trash2 />}
 			label="Delete frontmatter"
 			tooltip="Delete"

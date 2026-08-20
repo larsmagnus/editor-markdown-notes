@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
-
-import { FrontmatterCopyButton } from './copy-button'
+import { ButtonCopy } from '@/editor/frontmatter/button-copy'
 
 const meta = {
-	component: FrontmatterCopyButton,
+	component: ButtonCopy,
 	parameters: { layout: 'centered' },
 	decorators: [
 		(Story) => (
@@ -14,7 +13,7 @@ const meta = {
 			</TooltipProvider>
 		),
 	],
-} satisfies Meta<typeof FrontmatterCopyButton>
+} satisfies Meta<typeof ButtonCopy>
 
 export default meta
 type Story = StoryObj<typeof meta>

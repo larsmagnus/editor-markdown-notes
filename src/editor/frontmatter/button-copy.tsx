@@ -1,20 +1,18 @@
 import { Copy } from 'lucide-react'
 
-import { NodeActionButton } from '@/editor/node-action-button'
+import { ButtonNodeAction } from '@/editor/button-node-action'
 import { copyToClipboard } from '@/lib/clipboard'
 
-type FrontmatterCopyButtonProps = { frontmatter: string }
+type ButtonCopyProps = { frontmatter: string }
 
 /** Copies the frontmatter block's raw text to the clipboard when clicked. */
-export function FrontmatterCopyButton({
-	frontmatter,
-}: FrontmatterCopyButtonProps) {
+export function ButtonCopy({ frontmatter }: ButtonCopyProps) {
 	function handleClick() {
 		copyToClipboard(frontmatter)
 	}
 
 	return (
-		<NodeActionButton
+		<ButtonNodeAction
 			icon={<Copy />}
 			label="Copy frontmatter"
 			tooltip="Copy"

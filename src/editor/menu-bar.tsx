@@ -1,8 +1,8 @@
 import { useCurrentEditor } from '@tiptap/react'
 
 import { Button } from '@/components/ui/button'
+import { ButtonHeadings } from '@/editor/button-headings'
 import { ButtonStyle } from '@/editor/button-style'
-import { HeadingButtons } from '@/editor/heading-buttons'
 import { MENU_BAR_COMMANDS } from '@/editor/menu-bar-commands'
 import { useEditorHistory } from '@/hooks/use-editor-history'
 
@@ -32,7 +32,7 @@ export function MenuBar() {
 				</Button>
 			))}
 
-			<HeadingButtons />
+			<ButtonHeadings />
 
 			<ButtonStyle style="unordered">Bullet list</ButtonStyle>
 			<ButtonStyle style="ordered">Ordered list</ButtonStyle>

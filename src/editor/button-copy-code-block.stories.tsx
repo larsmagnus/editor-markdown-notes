@@ -2,11 +2,10 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { userEvent, within } from 'storybook/test'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
-
-import { CodeBlockCopyButton } from './code-block-copy-button'
+import { ButtonCopyCodeBlock } from '@/editor/button-copy-code-block'
 
 const meta = {
-	component: CodeBlockCopyButton,
+	component: ButtonCopyCodeBlock,
 	parameters: { layout: 'centered' },
 	decorators: [
 		(Story) => (
@@ -19,7 +18,7 @@ const meta = {
 			</TooltipProvider>
 		),
 	],
-} satisfies Meta<typeof CodeBlockCopyButton>
+} satisfies Meta<typeof ButtonCopyCodeBlock>
 
 export default meta
 type Story = StoryObj<typeof meta>

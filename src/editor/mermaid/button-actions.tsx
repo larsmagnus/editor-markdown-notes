@@ -10,13 +10,13 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { ButtonNodeCopy } from '@/editor/button-node-copy'
 import { openDiagramInClaude } from '@/editor/mermaid/actions'
-import { NodeCopyButton } from '@/editor/node-copy-button'
 import { useCopiedFeedback } from '@/hooks/use-copied-feedback'
 import { useSettings } from '@/hooks/use-settings'
 import { copyToClipboard } from '@/lib/clipboard'
 
-type MermaidActionsButtonProps = {
+type ButtonActionsProps = {
 	/** The block's mermaid source. */
 	code: string
 	/** The diagram mermaid rendered from `code`. */
@@ -28,7 +28,7 @@ type MermaidActionsButtonProps = {
  * Claude session pointed at it - the block-level counterpart to the toolbar's
  * `ButtonCopy`, which does the same for the whole note.
  */
-export function MermaidActionsButton({ code, svg }: MermaidActionsButtonProps) {
+export function ButtonActions({ code, svg }: ButtonActionsProps) {
 	const { isVSCodeContext } = useSettings()
 	const [copied, showCopiedFeedback] = useCopiedFeedback()
 
@@ -51,7 +51,7 @@ export function MermaidActionsButton({ code, svg }: MermaidActionsButtonProps) {
 			{/* `CopiedBadge`, which `ButtonCopy` uses, floats to the left of its
 			    anchor - it would land over the diagram here. The icon carries the
 			    feedback instead. */}
-			<NodeCopyButton
+			<ButtonNodeCopy
 				copied={copied}
 				label="Copy diagram code"
 				onClick={copyCode}

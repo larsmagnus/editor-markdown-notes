@@ -7,7 +7,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover'
-import { HeadingButtons } from '@/editor/heading-buttons'
+import { ButtonHeadings } from '@/editor/button-headings'
 
 /** The six heading levels, behind one button in the bubble menu. */
 export function HeadingPopover() {
@@ -25,7 +25,7 @@ export function HeadingPopover() {
 				sideOffset={12}
 				className="w-auto p-2 flex gap-1"
 			>
-				<HeadingButtons withIcons />
+				<ButtonHeadings withIcons />
 				<PopoverArrow />
 			</PopoverContent>
 		</Popover>

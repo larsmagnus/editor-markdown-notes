@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { SettingsProvider } from '@/components/settings-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { MermaidActionsButton } from '@/editor/mermaid/actions-button'
+import { ButtonActions } from '@/editor/mermaid/button-actions'
 import { copyToClipboard } from '@/lib/clipboard'
 
 // Mocked at the module rather than at `navigator`, which is the app's one seam
@@ -22,12 +22,12 @@ afterEach(() => {
 	vi.clearAllMocks()
 })
 
-describe('MermaidActionsButton', () => {
+describe('ButtonActions', () => {
 	it('copies the diagram source when the copy button is clicked', async () => {
 		render(
 			<SettingsProvider>
 				<TooltipProvider>
-					<MermaidActionsButton code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
+					<ButtonActions code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
 				</TooltipProvider>
 			</SettingsProvider>
 		)
@@ -41,7 +41,7 @@ describe('MermaidActionsButton', () => {
 		render(
 			<SettingsProvider>
 				<TooltipProvider>
-					<MermaidActionsButton code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
+					<ButtonActions code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
 				</TooltipProvider>
 			</SettingsProvider>
 		)
@@ -61,7 +61,7 @@ describe('MermaidActionsButton', () => {
 		render(
 			<SettingsProvider>
 				<TooltipProvider>
-					<MermaidActionsButton code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
+					<ButtonActions code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
 				</TooltipProvider>
 			</SettingsProvider>
 		)
@@ -84,7 +84,7 @@ describe('MermaidActionsButton', () => {
 		render(
 			<SettingsProvider>
 				<TooltipProvider>
-					<MermaidActionsButton code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
+					<ButtonActions code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
 				</TooltipProvider>
 			</SettingsProvider>
 		)

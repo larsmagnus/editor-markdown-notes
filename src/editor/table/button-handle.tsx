@@ -5,7 +5,7 @@ import { TABLE_AXES } from '@/editor/table/menu-items'
 import type { TableAxis } from '@/editor/table/menu-items'
 import { cn } from '@/lib/utils'
 
-interface TableHandleButtonProps extends ComponentProps<'button'> {
+interface ButtonHandleProps extends ComponentProps<'button'> {
 	axis: TableAxis
 	/** Whether the handle's menu is open, and whether a drag is under way. */
 	expanded: boolean
@@ -17,12 +17,12 @@ interface TableHandleButtonProps extends ComponentProps<'button'> {
  * `TABLE_AXES` - the row's is the column's turned on its side, so the two read
  * as one control seen from two directions.
  */
-export function TableHandleButton({
+export function ButtonHandle({
 	axis,
 	expanded,
 	dragging,
 	...rest
-}: TableHandleButtonProps) {
+}: ButtonHandleProps) {
 	const { label, icon: Icon, shape } = TABLE_AXES[axis]
 
 	return (

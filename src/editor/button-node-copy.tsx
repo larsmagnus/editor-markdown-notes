@@ -1,8 +1,8 @@
 import { Check, Copy } from 'lucide-react'
 
-import { NodeActionButton } from '@/editor/node-action-button'
+import { ButtonNodeAction } from '@/editor/button-node-action'
 
-type NodeCopyButtonProps = {
+type ButtonNodeCopyProps = {
 	/** Whether the copy just happened - see `useCopiedFeedback`. */
 	copied: boolean
 	/** The button's accessible name, e.g. `"Copy diagram code"`. */
@@ -17,13 +17,13 @@ type NodeCopyButtonProps = {
  * `copied` is a prop rather than internal state so one badge of feedback can
  * cover several ways to copy the same node (a button plus its menu items).
  */
-export function NodeCopyButton({
+export function ButtonNodeCopy({
 	copied,
 	label,
 	onClick,
-}: NodeCopyButtonProps) {
+}: ButtonNodeCopyProps) {
 	return (
-		<NodeActionButton
+		<ButtonNodeAction
 			icon={copied ? <Check /> : <Copy />}
 			label={label}
 			tooltip={copied ? 'Copied' : 'Copy'}

@@ -3,14 +3,14 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { NodeActionButton } from '@/editor/node-action-button'
+import { ButtonNodeAction } from '@/editor/button-node-action'
 
-describe('NodeActionButton', () => {
+describe('ButtonNodeAction', () => {
 	it('uses the label as its accessible name and calls onClick', async () => {
 		const onClick = vi.fn()
 		render(
 			<TooltipProvider>
-				<NodeActionButton icon={<span />} label="Copy code" onClick={onClick} />
+				<ButtonNodeAction icon={<span />} label="Copy code" onClick={onClick} />
 			</TooltipProvider>
 		)
 
@@ -22,7 +22,7 @@ describe('NodeActionButton', () => {
 	it('shows a shorter tooltip when one is given, falling back to the label otherwise', async () => {
 		render(
 			<TooltipProvider>
-				<NodeActionButton
+				<ButtonNodeAction
 					icon={<span />}
 					label="Copy code"
 					tooltip="Copy"
@@ -40,7 +40,7 @@ describe('NodeActionButton', () => {
 	it('is not treated as editable content inside a node view', () => {
 		render(
 			<TooltipProvider>
-				<NodeActionButton icon={<span />} label="Delete" onClick={vi.fn()} />
+				<ButtonNodeAction icon={<span />} label="Delete" onClick={vi.fn()} />
 			</TooltipProvider>
 		)
 

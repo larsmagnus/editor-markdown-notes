@@ -1,18 +1,18 @@
 import { Copy } from 'lucide-react'
 
-import { NodeActionButton } from '@/editor/node-action-button'
+import { ButtonNodeAction } from '@/editor/button-node-action'
 import { copyToClipboard } from '@/lib/clipboard'
 
-type CodeBlockCopyButtonProps = { code: string }
+type ButtonCopyCodeBlockProps = { code: string }
 
 /** Copies a code block's text to the clipboard when clicked. */
-export function CodeBlockCopyButton({ code }: CodeBlockCopyButtonProps) {
+export function ButtonCopyCodeBlock({ code }: ButtonCopyCodeBlockProps) {
 	function handleClick() {
 		copyToClipboard(code)
 	}
 
 	return (
-		<NodeActionButton
+		<ButtonNodeAction
 			icon={<Copy />}
 			label="Copy code"
 			tooltip="Copy"

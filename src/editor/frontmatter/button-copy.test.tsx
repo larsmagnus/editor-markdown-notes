@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { FrontmatterCopyButton } from '@/editor/frontmatter/copy-button'
+import { ButtonCopy } from '@/editor/frontmatter/button-copy'
 import { copyToClipboard } from '@/lib/clipboard'
 
 // Mocked at the module rather than at `navigator`, which is the app's one seam
@@ -15,11 +15,11 @@ afterEach(() => {
 	vi.clearAllMocks()
 })
 
-describe('FrontmatterCopyButton', () => {
+describe('ButtonCopy', () => {
 	it('should copy the frontmatter text to the clipboard when clicked', async () => {
 		render(
 			<TooltipProvider>
-				<FrontmatterCopyButton frontmatter="title: Roadmap" />
+				<ButtonCopy frontmatter="title: Roadmap" />
 			</TooltipProvider>
 		)
 		await userEvent.click(screen.getByLabelText('Copy frontmatter'))
@@ -30,7 +30,7 @@ describe('FrontmatterCopyButton', () => {
 	it('should show a "Copy" tooltip when hovering the button', async () => {
 		render(
 			<TooltipProvider>
-				<FrontmatterCopyButton frontmatter="title: Roadmap" />
+				<ButtonCopy frontmatter="title: Roadmap" />
 			</TooltipProvider>
 		)
 

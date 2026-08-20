@@ -4,7 +4,7 @@ import { Editor } from '@tiptap/react'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { extensions } from '@/editor/extensions'
-import { FrontmatterAddButton } from '@/editor/frontmatter/add-button'
+import { ButtonAdd } from '@/editor/frontmatter/button-add'
 
 const editors: Editor[] = []
 
@@ -13,12 +13,12 @@ afterEach(() => {
 	editors.length = 0
 })
 
-describe('FrontmatterAddButton', () => {
+describe('ButtonAdd', () => {
 	it('renders when the document has no frontmatter block', () => {
 		const editor = new Editor({ extensions, content: '# Roadmap' })
 		editors.push(editor)
 
-		render(<FrontmatterAddButton editor={editor} />)
+		render(<ButtonAdd editor={editor} />)
 
 		expect(
 			screen.getByRole('button', { name: 'Add frontmatter' })
@@ -30,7 +30,7 @@ describe('FrontmatterAddButton', () => {
 		editors.push(editor)
 		editor.commands.insertContentAt(0, { type: 'frontmatter' })
 
-		render(<FrontmatterAddButton editor={editor} />)
+		render(<ButtonAdd editor={editor} />)
 
 		expect(
 			screen.queryByRole('button', { name: 'Add frontmatter' })
@@ -41,7 +41,7 @@ describe('FrontmatterAddButton', () => {
 		const editor = new Editor({ extensions, content: '# Roadmap' })
 		editors.push(editor)
 
-		render(<FrontmatterAddButton editor={editor} />)
+		render(<ButtonAdd editor={editor} />)
 		await userEvent.click(
 			screen.getByRole('button', { name: 'Add frontmatter' })
 		)

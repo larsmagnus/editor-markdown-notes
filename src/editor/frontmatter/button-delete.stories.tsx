@@ -3,8 +3,7 @@ import { Editor } from '@tiptap/react'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { extensions } from '@/editor/extensions'
-
-import { FrontmatterDeleteButton } from './delete-button'
+import { ButtonDelete } from '@/editor/frontmatter/button-delete'
 
 const editor = new Editor({ extensions, content: '' })
 editor.commands.insertContentAt(0, {
@@ -13,7 +12,7 @@ editor.commands.insertContentAt(0, {
 })
 
 const meta = {
-	component: FrontmatterDeleteButton,
+	component: ButtonDelete,
 	parameters: { layout: 'centered' },
 	decorators: [
 		(Story) => (
@@ -22,7 +21,7 @@ const meta = {
 			</TooltipProvider>
 		),
 	],
-} satisfies Meta<typeof FrontmatterDeleteButton>
+} satisfies Meta<typeof ButtonDelete>
 
 export default meta
 type Story = StoryObj<typeof meta>

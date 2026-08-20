@@ -1,8 +1,8 @@
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 
-import { FrontmatterCopyButton } from '@/editor/frontmatter/copy-button'
-import { FrontmatterDeleteButton } from '@/editor/frontmatter/delete-button'
+import { ButtonCopy } from '@/editor/frontmatter/button-copy'
+import { ButtonDelete } from '@/editor/frontmatter/button-delete'
 
 /**
  * The node view every `frontmatter` block renders through.
@@ -26,8 +26,8 @@ export function FrontmatterView({ node, editor, getPos }: NodeViewProps) {
 					Frontmatter
 				</span>
 				<div className="flex items-center gap-1">
-					<FrontmatterCopyButton frontmatter={node.textContent} />
-					<FrontmatterDeleteButton editor={editor} getPos={getPos} />
+					<ButtonCopy frontmatter={node.textContent} />
+					<ButtonDelete editor={editor} getPos={getPos} />
 				</div>
 			</div>
 			<NodeViewContent<'pre'>

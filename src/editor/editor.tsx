@@ -2,7 +2,7 @@ import type { EditorContentProps } from '@tiptap/react'
 import { EditorContext } from '@tiptap/react'
 
 import { EditorSurface } from '@/editor/editor-surface'
-import { FrontmatterAddButton } from '@/editor/frontmatter/add-button'
+import { ButtonAdd } from '@/editor/frontmatter/button-add'
 import { MenuBar } from '@/editor/menu-bar'
 import { MenuBubble } from '@/editor/menu-bubble'
 import { TextToolsAside } from '@/editor/text-tools-aside'
@@ -31,7 +31,7 @@ function Editor({
 	return (
 		<EditorContext.Provider value={{ editor }}>
 			{showMenu ? <MenuBar /> : null}
-			<FrontmatterAddButton editor={editor} />
+			<ButtonAdd editor={editor} />
 			<EditorSurface
 				includeProseBaseClassNames={includeProseBaseClassNames}
 				codeBlockStyle={codeBlockStyle}

@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
-type FrontmatterAddButtonProps = { editor: Editor }
+type ButtonAddProps = { editor: Editor }
 
 /**
  * Inserts an empty frontmatter block at the top of the document.
@@ -15,7 +15,7 @@ type FrontmatterAddButtonProps = { editor: Editor }
  * options don't re-render on transactions, so a direct read would go stale
  * after the very first edit.
  */
-export function FrontmatterAddButton({ editor }: FrontmatterAddButtonProps) {
+export function ButtonAdd({ editor }: ButtonAddProps) {
 	const hasFrontmatter = useEditorState({
 		editor,
 		selector: ({ editor }) =>

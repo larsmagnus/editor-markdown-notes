@@ -4,7 +4,7 @@ import { Editor } from '@tiptap/react'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { extensions } from '@/editor/extensions'
-import { FrontmatterDeleteButton } from '@/editor/frontmatter/delete-button'
+import { ButtonDelete } from '@/editor/frontmatter/button-delete'
 
 const editors: Editor[] = []
 
@@ -13,7 +13,7 @@ afterEach(() => {
 	editors.length = 0
 })
 
-describe('FrontmatterDeleteButton', () => {
+describe('ButtonDelete', () => {
 	it('removes the frontmatter node when clicked', async () => {
 		const editor = new Editor({ extensions, content: '' })
 		editors.push(editor)
@@ -22,7 +22,7 @@ describe('FrontmatterDeleteButton', () => {
 			content: [{ type: 'text', text: 'title: Roadmap' }],
 		})
 
-		render(<FrontmatterDeleteButton editor={editor} getPos={() => 0} />)
+		render(<ButtonDelete editor={editor} getPos={() => 0} />)
 		await userEvent.click(screen.getByLabelText('Delete frontmatter'))
 
 		expect(editor.state.doc.firstChild?.type.name).not.toBe('frontmatter')
@@ -48,7 +48,7 @@ describe('FrontmatterDeleteButton', () => {
 			historyEligible = transaction.getMeta('addToHistory') !== false
 		})
 
-		render(<FrontmatterDeleteButton editor={editor} getPos={() => 0} />)
+		render(<ButtonDelete editor={editor} getPos={() => 0} />)
 		await userEvent.click(screen.getByLabelText('Delete frontmatter'))
 
 		expect(historyEligible).toBe(true)
