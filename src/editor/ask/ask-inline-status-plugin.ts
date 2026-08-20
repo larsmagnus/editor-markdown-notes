@@ -1,12 +1,12 @@
 import type { Editor } from '@tiptap/core'
 
-import type { AskInlineStatusState } from '@/editor/ask-inline-status-state'
-import { askInlineStatusPluginKey } from '@/editor/ask-inline-status-state'
+import type { AskInlineStatusState } from '@/editor/ask/ask-inline-status-state'
+import { askInlineStatusPluginKey } from '@/editor/ask/ask-inline-status-state'
 import {
 	renderErrorWidget,
 	renderLoadingWidget,
 	unmountActiveInlineStatusWidget,
-} from '@/editor/ask-inline-status-widget-mount'
+} from '@/editor/ask/ask-inline-status-widget-mount'
 import { createSingleWidgetDecorationPlugin } from '@/editor/single-widget-decoration-plugin'
 
 function widgetFor(current: NonNullable<AskInlineStatusState>, editor: Editor) {

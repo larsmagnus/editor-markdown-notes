@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 
 import { AppErrorBoundary } from '@/components/app-error-boundary'
-import { AskInlineErrorWidget } from '@/editor/ask-inline-error-widget'
+import { AskInlineErrorWidget } from '@/editor/ask/ask-inline-error-widget'
 import { BadgeLoading } from '@/editor/badge-loading'
 import { createWidgetMount } from '@/editor/decoration-widget-mount'
 

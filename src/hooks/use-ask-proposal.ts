@@ -2,7 +2,7 @@ import type { Editor } from '@tiptap/react'
 import { useEditorState } from '@tiptap/react'
 import { useEffect } from 'react'
 
-import { askProposalPluginKey } from '@/editor/ask-suggestion-extension'
+import { askProposalPluginKey } from '@/editor/ask/ask-suggestion-extension'
 import { getAskClient } from '@/lib/ai-ask/ask-client'
 
 /**

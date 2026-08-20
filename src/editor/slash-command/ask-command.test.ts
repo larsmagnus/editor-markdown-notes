@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/core'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { askInlineStatusPluginKey } from '@/editor/ask-inline-status-extension'
+import { askInlineStatusPluginKey } from '@/editor/ask/ask-inline-status-extension'
 import { extensions } from '@/editor/extensions'
 
 import { runAskCommand, streamAskInto } from './ask-command'

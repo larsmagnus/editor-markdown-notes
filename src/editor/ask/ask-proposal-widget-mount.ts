@@ -2,8 +2,8 @@ import type { Editor } from '@tiptap/core'
 import { createElement } from 'react'
 
 import { AppErrorBoundary } from '@/components/app-error-boundary'
-import { AskProposalWidget } from '@/editor/ask-proposal-widget'
-import type { AskProposalState } from '@/editor/ask-suggestion-extension'
+import { AskProposalWidget } from '@/editor/ask/ask-proposal-widget'
+import type { AskProposalState } from '@/editor/ask/ask-suggestion-extension'
 import { createWidgetMount } from '@/editor/decoration-widget-mount'
 
 const widget = createWidgetMount()

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
-import type { AskProposalState } from '@/editor/ask-suggestion-extension'
+import type { AskProposalState } from '@/editor/ask/ask-suggestion-extension'
 
 import { AskProposalWidget } from './ask-proposal-widget'
 

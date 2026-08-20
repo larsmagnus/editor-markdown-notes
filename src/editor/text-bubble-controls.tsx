@@ -3,7 +3,7 @@
 import { CircleOff } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { AskPopover } from '@/editor/ask-popover'
+import { AskPopover } from '@/editor/ask/ask-popover'
 import { ButtonColor } from '@/editor/button-color'
 import { ButtonStyle } from '@/editor/button-style'
 import { ButtonUnlink } from '@/editor/button-unlink'

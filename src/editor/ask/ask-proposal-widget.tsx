@@ -3,8 +3,8 @@ import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
-import { AskProposalActions } from '@/editor/ask-proposal-actions'
-import type { AskProposalState } from '@/editor/ask-suggestion-extension'
+import { AskProposalActions } from '@/editor/ask/ask-proposal-actions'
+import type { AskProposalState } from '@/editor/ask/ask-suggestion-extension'
 import { cn } from '@/lib/utils'
 
 interface AskProposalWidgetProps {

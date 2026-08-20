@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { AskProposalState } from '@/editor/ask-suggestion-extension'
+import type { AskProposalState } from '@/editor/ask/ask-suggestion-extension'
 
 import { AskProposalWidget } from './ask-proposal-widget'
 

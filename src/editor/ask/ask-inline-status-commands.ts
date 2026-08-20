@@ -1,6 +1,6 @@
 import type { RawCommands } from '@tiptap/core'
 
-import { askInlineStatusPluginKey } from '@/editor/ask-inline-status-state'
+import { askInlineStatusPluginKey } from '@/editor/ask/ask-inline-status-state'
 
 /**
  * The `askInlineStatus` extension's commands, pulled out of

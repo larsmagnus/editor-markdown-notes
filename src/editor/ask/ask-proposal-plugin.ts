@@ -3,8 +3,8 @@ import type { Editor } from '@tiptap/core'
 import {
 	renderWidget,
 	unmountActiveWidget,
-} from '@/editor/ask-proposal-widget-mount'
-import { askProposalPluginKey } from '@/editor/ask-suggestion-extension'
+} from '@/editor/ask/ask-proposal-widget-mount'
+import { askProposalPluginKey } from '@/editor/ask/ask-suggestion-extension'
 import { createSingleWidgetDecorationPlugin } from '@/editor/single-widget-decoration-plugin'
 
 /**
