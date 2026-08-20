@@ -63,7 +63,12 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 - The `dictionary-*` packages hide their `.aff`/`.dic` behind a bare-string `exports`; `dictionaryAliases()` in `vite.config.ts` aliases them beside the resolved entry. The patterns must be regexes ending `(\?.*)?$` — the `?raw` query is part of the id, so an exact-string alias never matches and the build fails on the exports field instead.
 - nspell needs those files as **strings**. `affix()` calls `doc.toString('utf8')`, which on the `Uint8Array` its own types promise returns `"104,101,…"` — no throw, just every word in the note misspelt.
 - `retext-spell` builds nspell when it attaches, so `spelling-issues.ts` caches a processor per language and filters personal words afterwards instead of using its `ignore` option. That cache also makes its `max` suggestion budget last the worker's life rather than one run — left at the default of 30 the panel silently stops offering corrections a minute into typing, so it is set to infinity. Safe because suggestions are memoised per word; the cost that remains is gibberish, which `suggest()` searches ~200ms for against ~15ms for a plausible misspelling.
+- `document-text.ts` has a second implementation in `src/mcp/`, sharing only `prose-policy.ts` — `prose-parity.test.ts` fails if the two walks diverge.
 - Adding a rule touches four places past the id in `src/shared/messages.ts` — `RULES`, `RULE_PLUGINS`, `RULE_SOURCES`, and a test — all keyed by `TextToolRuleId` so a miss fails to compile, except `RULE_SOURCES` (reversed at runtime), where a miss silently reports nothing.
+
+### MCP server (`src/mcp/`)
+
+`src/mcp/README.md` carries the why. The build is the only trap not in it: its own process, so unlike `agent-sdk-bundle.ts` it needs **no** `.cjs` loader shim — that shim exists because the CommonJS host has to reach an ES module, while this is a fresh `node` VSCode starts. Excluded from `tsconfig.extension.json` and bundled with `--alias:@=./src`, so it uses `@/` imports like the webview rather than the host's relative ones.
 
 ### Content Management
 

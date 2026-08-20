@@ -1,5 +1,12 @@
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
+import type { ProseExclusion } from '@/lib/text-tools/prose-policy'
+import {
+	BLOCK_SEPARATOR,
+	frontmatterValueOf,
+	PROSE_SUBSTITUTE,
+} from '@/lib/text-tools/prose-policy'
+
 /**
  * Flattens a ProseMirror document into the plain text retext analyses, keeping
  * enough of a trail to turn the offsets it reports back into positions.
@@ -20,30 +27,34 @@ export type DocumentText = {
 }
 
 /**
- * Blocks are joined by a blank line so retext sees separate sentences. Without
- * it two paragraphs run together and readability scores a sentence that does
- * not exist.
- */
-const BLOCK_SEPARATOR = '\n\n'
-
-/** Code is not prose, and skipping the node also keeps mermaid sources unlinted. */
-const IGNORED_NODES = new Set(['codeBlock'])
-
-/**
- * Marks whose text is not prose either.
+ * This document's own name for each excluded construct.
  *
- * An inline `code` span holds identifiers, commands and paths - `useEffect`,
- * `pnpm run build` - which no writing check has an opinion worth hearing about,
- * and which the speller would flag almost without exception.
+ * Keyed by `ProseExclusion` so a construct added to the shared policy fails to
+ * compile here until this walk handles it too. `atomInline` is empty because it
+ * is the fallback for every inline node that carries no text of its own, and
+ * `inlineCode` names a mark rather than a node.
  */
-const IGNORED_MARKS = new Set(['code'])
+const PROSE_MIRROR_NAMES: Record<ProseExclusion, readonly string[]> = {
+	// Code is not prose, and skipping the node also keeps mermaid sources
+	// unlinted.
+	codeBlock: ['codeBlock'],
+	// An inline `code` span holds identifiers, commands and paths - `useEffect`,
+	// `pnpm run build` - which no writing check has an opinion worth hearing
+	// about, and which the speller would flag almost without exception.
+	inlineCode: ['code'],
+	hardBreak: ['hardBreak'],
+	atomInline: [],
+}
+
+const IGNORED_NODES = new Set(PROSE_MIRROR_NAMES.codeBlock)
+const IGNORED_MARKS = new Set(PROSE_MIRROR_NAMES.inlineCode)
 
 /** What an inline node that carries no text of its own stands in as. */
-const INLINE_PLACEHOLDER: Record<string, string> = {
-	// A line break ends a sentence as far as retext is concerned, which is what
-	// a hard break means in prose.
-	hardBreak: '\n',
-}
+const INLINE_PLACEHOLDER = new Map(
+	PROSE_MIRROR_NAMES.hardBreak.map(
+		(name) => [name, PROSE_SUBSTITUTE.hardBreak] as const
+	)
+)
 
 /**
  * Splits a frontmatter block into one "block" per YAML line rather than
@@ -94,31 +105,6 @@ function appendFrontmatterLines(
 	return result
 }
 
-/**
- * A YAML key, up to and including its colon.
- *
- * Requires whitespace or end-of-line after the colon, so a `url: https://…`
- * value is not mistaken for a second key.
- */
-const FRONTMATTER_KEY = /^\s*[\w.$-]+:(?=\s|$)/
-
-/**
- * The prose half of one frontmatter line, and where in the line it starts.
- *
- * A line with no `key:` prefix - a list item, or a wrapped continuation - is
- * prose all the way through. Leading whitespace is skipped by advancing `start`
- * rather than by trimming, because the caller turns it back into a document
- * position.
- */
-function frontmatterValueOf(line: string) {
-	const key = FRONTMATTER_KEY.exec(line)
-	const afterKey = key ? key[0].length : 0
-	const rest = line.slice(afterKey)
-	const start = afterKey + rest.length - rest.trimStart().length
-
-	return { text: line.slice(start).trimEnd(), start }
-}
-
 export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 	const slices: TextSlice[] = []
 	let text = ''
@@ -142,7 +128,7 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 			// `the `code` span` would otherwise reach retext as `the span`, and
 			// text on either side of a bare `` `x` `` would weld into one word.
 			if (child.marks.some((mark) => IGNORED_MARKS.has(mark.type.name))) {
-				text += ' '
+				text += PROSE_SUBSTITUTE.inlineCode
 				return
 			}
 
@@ -151,7 +137,10 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 				// hard break is not welded into one word. `line<br>second` would
 				// otherwise reach retext as `linesecond`, which it counts as a single
 				// long word and scores the sentence's readability against.
-				if (child.isInline) text += INLINE_PLACEHOLDER[child.type.name] ?? ' '
+				if (child.isInline)
+					text +=
+						INLINE_PLACEHOLDER.get(child.type.name) ??
+						PROSE_SUBSTITUTE.atomInline
 				return
 			}
 

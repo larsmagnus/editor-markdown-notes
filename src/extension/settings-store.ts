@@ -25,8 +25,22 @@ import { CONFIG_SECTION, VIEW_OPTIONS_KEY } from './constants'
 export class SettingsStore {
 	private readonly context: vscode.ExtensionContext
 
+	private readonly changed = new vscode.EventEmitter<void>()
+
+	/**
+	 * Fires whenever the view options are written.
+	 *
+	 * `globalState` raises no event of its own, so anything outside the webviews
+	 * that has to react - the MCP server, which is handed these as environment
+	 * variables when it starts - has no other way to hear about it. Emitted here
+	 * rather than at the call sites because this class is the only writer, and a
+	 * missed call site is a setting that silently stops propagating.
+	 */
+	public readonly onDidChangeViewOptions = this.changed.event
+
 	constructor(context: vscode.ExtensionContext) {
 		this.context = context
+		context.subscriptions.push(this.changed)
 	}
 
 	public getViewOptions(): ViewOptions {
@@ -41,6 +55,7 @@ export class SettingsStore {
 			...this.getViewOptions(),
 			...patch,
 		})
+		this.changed.fire()
 	}
 
 	/**

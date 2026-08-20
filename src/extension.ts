@@ -10,6 +10,7 @@ import * as vscode from 'vscode'
 // activation.
 import { registerCommands } from './extension/commands'
 import { MarkdownEditorProvider } from './extension/markdown-editor-provider'
+import { registerMcpProvider } from './extension/mcp-provider'
 import { installProbeListeners } from './extension/probe-listeners'
 import { ScrollPositionStore } from './extension/scroll-position-store'
 import { SettingsStore } from './extension/settings-store'
@@ -40,7 +41,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		installProbeListeners(log),
 		provider.register(),
-		registerCommands(store, log, provider.broadcastConfig)
+		registerCommands(store, log, provider.broadcastConfig),
+		registerMcpProvider(context, store, log)
 	)
 }
 

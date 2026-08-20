@@ -1,8 +1,9 @@
 import { viewOptionsSchema } from '@/lib/schemas'
+import { EXTENSION_ID } from '@/shared/constants'
 import { DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
 import type { ViewOptions } from '@/shared/messages'
 
-export const VIEW_OPTIONS_STORAGE_KEY = 'editor-markdown-notes:view-options'
+export const VIEW_OPTIONS_STORAGE_KEY = `${EXTENSION_ID}:view-options`
 
 /**
  * The view options the web app persists for itself. Inside VSCode the host owns

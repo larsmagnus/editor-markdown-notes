@@ -1,7 +1,9 @@
 import * as vscode from 'vscode'
 
+import { EXTENSION_ID } from '../shared/constants'
 import type { ViewOptions } from '../shared/messages'
 
+import { addDictionaryWords } from './dictionary-words-command'
 import { openFile } from './open-file-command'
 import { openInTextEditor } from './open-in-text-editor-command'
 import type { SettingsStore } from './settings-store'
@@ -11,9 +13,9 @@ import { toggleHideToolbar } from './toggle-hide-toolbar-command'
 
 /** The view options a command can flip, keyed by the command that flips them. */
 const VIEW_OPTION_TOGGLES = {
-	'editor-markdown-notes.toggleRaw': 'raw',
-	'editor-markdown-notes.toggleFullWidth': 'fullWidth',
-	'editor-markdown-notes.toggleTextTools': 'textTools',
+	[`${EXTENSION_ID}.toggleRaw`]: 'raw',
+	[`${EXTENSION_ID}.toggleFullWidth`]: 'fullWidth',
+	[`${EXTENSION_ID}.toggleTextTools`]: 'textTools',
 } as const satisfies Record<string, keyof ViewOptions>
 
 /**
@@ -46,15 +48,16 @@ export function registerCommands(
 	// ("Editor Markdown Notes: Open file"), `openMarkdownEditor` reads well in
 	// the context menus, where the category is not shown.
 	const simpleCommands: Record<string, () => unknown> = {
-		'editor-markdown-notes.openFile': openFile,
-		'editor-markdown-notes.openMarkdownEditor': openFile,
-		'editor-markdown-notes.selectTheme': () =>
-			pickTheme(store, broadcastConfig),
-		'editor-markdown-notes.selectSpellingLanguage': () =>
+		[`${EXTENSION_ID}.openFile`]: openFile,
+		[`${EXTENSION_ID}.openMarkdownEditor`]: openFile,
+		[`${EXTENSION_ID}.selectTheme`]: () => pickTheme(store, broadcastConfig),
+		[`${EXTENSION_ID}.selectSpellingLanguage`]: () =>
 			pickSpellingLanguage(store, broadcastConfig),
-		'editor-markdown-notes.openInTextEditor': openActiveTabInTextEditor,
-		'editor-markdown-notes.toggleHideToolbar': toggleHideToolbar,
-		'editor-markdown-notes.showLogs': () => log.show(),
+		[`${EXTENSION_ID}.addDictionaryWords`]: () =>
+			addDictionaryWords(store, broadcastConfig),
+		[`${EXTENSION_ID}.openInTextEditor`]: openActiveTabInTextEditor,
+		[`${EXTENSION_ID}.toggleHideToolbar`]: toggleHideToolbar,
+		[`${EXTENSION_ID}.showLogs`]: () => log.show(),
 	}
 	const simple = Object.entries(simpleCommands).map(([command, handler]) =>
 		vscode.commands.registerCommand(command, handler)

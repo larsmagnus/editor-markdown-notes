@@ -39,6 +39,9 @@
 		"node_modules",
 		"out",
 		// esbuild's entry point, never tsc's - see the file's own comment.
-		"src/extension/agent-sdk-bundle.ts"
+		"src/extension/agent-sdk-bundle.ts",
+		// Its own esbuild bundle and its own process, which reaches the retext
+		// stack through `@/` aliases this project deliberately cannot resolve.
+		"src/mcp"
 	]
 }

@@ -1,8 +1,9 @@
 import { readPanelState, updatePanelState } from '@/lib/panel-state'
 import { scrollTopSchema } from '@/lib/schemas'
 import { getVSCodeApi, isVSCodeWebview } from '@/lib/vscode-api'
+import { EXTENSION_ID } from '@/shared/constants'
 
-const STORAGE_KEY_PREFIX = 'editor-markdown-notes:scroll-top:'
+const STORAGE_KEY_PREFIX = `${EXTENSION_ID}:scroll-top:`
 
 /**
  * Where a note was last scrolled to, from whichever side remembers it.

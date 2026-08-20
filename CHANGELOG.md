@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added a spelling check to the writing tools, underlining unrecognised words in red and listing them with suggested corrections. Switch it on in the panel; it is off by default
 - Added a choice of American, British or Australian English for the spelling check, beside the check itself or from the "Select spelling language" command
 - Changed the writing tools to skip inline code spans and the keys in YAML frontmatter, which were never prose worth checking
+- Added a zero-config MCP server, so AI agents in the editor can run the same writing checks as the text tools against your target reading age, language and custom words list.
+- Added an "Add words to dictionary" command for teaching the spelling check project vocabulary it should stop flagging
 
 ## [0.20.0] - 2026-08-17
 

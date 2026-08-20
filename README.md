@@ -22,6 +22,8 @@ An integrated live markdown editor for VS Code, built for the AI-first era
 
 - Writing checks flag passive voice, weak words and hard-to-read sentences
 
+- Text quality checks exposed to AI agents over MCP
+
 - Code blocks and frontmatter editing with syntax highlighting (matches your VS Code theme)
 
 - Table and image editing tools
@@ -84,6 +86,7 @@ All of them are shared across open tabs and persist between sessions.
 | Editor Markdown Notes: Toggle text tools               | `editor-markdown-notes.toggleTextTools`        | Show or hide the writing-checks sidebar (persisted)                     |
 | Editor Markdown Notes: Select theme                    | `editor-markdown-notes.selectTheme`            | Choose the editor color theme (persisted)                               |
 | Editor Markdown Notes: Select spelling language        | `editor-markdown-notes.selectSpellingLanguage` | Choose the English (US, GB, AU) the spelling check uses (persisted)     |
+| Editor Markdown Notes: Add words to dictionary         | `editor-markdown-notes.addDictionaryWords`     | Teach the spelling check custom vocabulary to stop flagging             |
 | Editor Markdown Notes: Open in text editor             | `editor-markdown-notes.openInTextEditor`       | Reopen the current file with VSCode's built-in text editor              |
 | Editor Markdown Notes: Toggle toolbar                  | `editor-markdown-notes.toggleHideToolbar`      | Show or hide the toolbar                                                |
 | Editor Markdown Notes: Show logs                       | `editor-markdown-notes.showLogs`               | Open the output channel used to debug a blank panel                     |
@@ -106,9 +109,17 @@ Spelling is off until you switch it on, and measures against American, British o
 
 Individual checks can be switched off in the panel, and the selection persists. Nothing is analysed — and none of the analysis code is even downloaded — until the panel is opened. The dictionary is a download of its own, fetched the first time spelling is switched on.
 
+### For AI agents
+
+Text quality checks are available to AI agents in the editor over MCP, using your configured reading age, language and custom words list — so an agent judges a note the way the text tools sidebar does. It ships with the extension and needs no setup; accept the editor's prompt to refresh its tools when it first appears.
+
+Ask in plain language ("check this note for passive voice", "which sentences are too hard for a 14-year-old?"). Findings come back with a line number and the sentence they sit in, and the agent makes the edits with its normal tools.
+
+See [`src/mcp/README.md`](src/mcp/README.md) for what it does and why.
+
 ## Troubleshooting
 
-If the editor panel loads blank, run **Editor Markdown Notes: Show logs** from the command palette and check the _Editor Markdown Notes_ output channel — the webview forwards its errors there.
+If you experience issues with the extension, run **Editor Markdown Notes: Show logs** from the command palette and check the _Editor Markdown Notes_ output channel.
 
 ## Requirements
 

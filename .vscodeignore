@@ -2,6 +2,8 @@
 .vscode-test/**
 src/**
 out/test/**
+# Populates out/mcp/dictionaries at build time; by packaging its work is done.
+out/mcp/copy-dictionaries.mjs
 # Development-only directories. `.vscodeignore` does not inherit `.gitignore`,
 # so untracked local junk ships unless it is listed here — `.playwright-mcp/`
 # alone was 2.7 MB of debugging screenshots inside the .vsix.
