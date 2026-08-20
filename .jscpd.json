@@ -1,8 +1,14 @@
 {
 	"path": ["src"],
 	"minLines": 5,
-	"minTokens": 50,
-	"ignore": ["src/components/ui/**", "**/*.test.ts", "**/*.test.tsx"],
+	"minTokens": 20,
+	"ignore": [
+		"src/components/ui/**",
+		"**/*.stories.ts",
+		"**/*.stories.tsx",
+		"**/*.test.ts",
+		"**/*.test.tsx"
+	],
 	"reporters": ["console"],
 	"output": "report",
 	"gitignore": true
