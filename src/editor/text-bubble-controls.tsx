@@ -1,23 +1,21 @@
 'use client'
 
-import { CircleOff, Unlink } from 'lucide-react'
+import { CircleOff } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { AskPopover } from '@/editor/ask-popover'
 import { ButtonColor } from '@/editor/button-color'
 import { ButtonStyle } from '@/editor/button-style'
+import { ButtonUnlink } from '@/editor/button-unlink'
 import { COLOR_SWATCHES } from '@/editor/color-swatches'
 import { HeadingPopover } from '@/editor/heading-popover'
 import { LinkPopover } from '@/editor/link-popover'
-import { useEditorLink } from '@/hooks/use-editor-link'
 import { useEditorStyles } from '@/hooks/use-editor-styles'
 import { useSettings } from '@/hooks/use-settings'
-import { cn } from '@/lib/utils'
 
 /** The bubble menu's controls for a text selection: heading, styles, link, colour, reset. */
 export function TextBubbleControls() {
 	const { reset } = useEditorStyles()
-	const { isLinkActive, unsetLink } = useEditorLink()
 	const { isVSCodeContext } = useSettings()
 
 	return (
@@ -31,16 +29,7 @@ export function TextBubbleControls() {
 
 			<LinkPopover />
 
-			<Button
-				type="button"
-				variant="ghost"
-				size="sm"
-				title="Unlink"
-				onClick={() => unsetLink()}
-				className={cn('font-bold', isLinkActive() ? 'is-active' : '')}
-			>
-				<Unlink className="size-4" />
-			</Button>
+			<ButtonUnlink />
 
 			{COLOR_SWATCHES.map(({ color, className }) => (
 				<ButtonColor key={color} className={className} color={color} />

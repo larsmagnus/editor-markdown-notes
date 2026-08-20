@@ -1,23 +1,21 @@
 'use client'
 
 import { useCurrentEditor } from '@tiptap/react'
-import { Trash2, Unlink } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { useRef } from 'react'
 import type { KeyboardEvent } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { ButtonUnlink } from '@/editor/button-unlink'
 import { exitImageToolbar, IMAGE_TOOLBAR_ID } from '@/editor/image/keyboard-nav'
 import { ImagePopover } from '@/editor/image/popover'
 import { LinkPopover } from '@/editor/link-popover'
 import { useEditorImage } from '@/hooks/use-editor-image'
-import { useEditorLink } from '@/hooks/use-editor-link'
-import { cn } from '@/lib/utils'
 
 /** The bubble menu's controls for a selected image: edit, delete, and link wrap/unwrap. */
 export function ImageBubbleControls() {
 	const { editor } = useCurrentEditor()
 	const { deleteImage } = useEditorImage()
-	const { isLinkActive, unsetLink } = useEditorLink()
 	const toolbarRef = useRef<HTMLDivElement>(null)
 
 	// Roving focus for the arrows, `exitImageToolbar` for `Tab` - the portal
@@ -66,16 +64,7 @@ export function ImageBubbleControls() {
 
 			<LinkPopover />
 
-			<Button
-				type="button"
-				variant="ghost"
-				size="sm"
-				title="Unlink"
-				onClick={() => unsetLink()}
-				className={cn('font-bold', isLinkActive() ? 'is-active' : '')}
-			>
-				<Unlink className="size-4" />
-			</Button>
+			<ButtonUnlink />
 
 			<Button
 				type="button"
