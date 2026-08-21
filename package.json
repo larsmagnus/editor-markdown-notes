@@ -242,7 +242,7 @@
 		"dev": "vite",
 		"build": "tsc -b && vite build && pnpm vscode:compile",
 		"build:web": "vite build",
-		"typecheck": "tsc -b --noEmit && tsc -p ./tsconfig.host.json --noEmit && tsc -p ./e2e/tsconfig.json",
+		"typecheck": "tsc -b --noEmit && tsc -p ./tsconfig.host.json --noEmit",
 		"lint": "pnpm typecheck && oxlint --fix && oxfmt",
 		"lint:ci": "oxlint && oxfmt --check",
 		"release": "pnpm version --message 'chore(release): %s'",

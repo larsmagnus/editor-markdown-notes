@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
 		"target": "ES2023",
 		"lib": ["ES2023", "DOM"],
 		"module": "ESNext",
@@ -8,8 +9,9 @@
 		"noEmit": true,
 		"types": ["@playwright/test", "node"],
 		"paths": {
-			"@/*": ["../src/*"]
+			"@/*": ["./src/*"],
+			"@/e2e/*": ["./e2e/*"]
 		}
 	},
-	"include": ["./**/*.ts", "../src/lib/vscode-api.ts"]
+	"include": ["e2e/**/*.ts", "src/lib/vscode-api.ts"]
 }
