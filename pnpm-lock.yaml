@@ -152,9 +152,6 @@ importers:
       retext-spell:
         specifier: 6.1.0
         version: 6.1.0
-      shadcn:
-        specifier: 4.18.0
-        version: 4.18.0(typescript@7.0.2)
       shiki:
         specifier: 4.4.3
         version: 4.4.3
@@ -264,6 +261,9 @@ importers:
       oxlint:
         specifier: 1.77.0
         version: 1.77.0
+      shadcn:
+        specifier: 4.18.0
+        version: 4.18.0(typescript@7.0.2)
       storybook:
         specifier: 10.5.8
         version: 10.5.8(@types/react@19.1.8)(react@19.1.0)
