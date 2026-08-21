@@ -65,6 +65,10 @@ export function useMarkdownEditor(
 		// showing that block's source - `useCaretInside` reveals whichever block
 		// holds the caret.
 		autofocus: false,
+		editorProps: {
+			// Make space for toolbar + bubble menu
+			scrollMargin: 110,
+		},
 	})
 
 	useFrontmatterDocument(editor, content, isOwnSave)
