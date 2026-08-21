@@ -37,10 +37,14 @@ export function EditorSurface({
 	...rest
 }: EditorSurfaceProps) {
 	return (
-		<div className="flex items-start gap-4" style={codeBlockStyle}>
+		<div className="flex flex-1 items-start gap-4" style={codeBlockStyle}>
 			{/* The table handles are positioned against this box, so they measure
-			    the document column rather than the viewport. */}
-			<div className="relative min-w-0 flex-1">
+			    the document column rather than the viewport. self-stretch (not
+			    the row's default items-start) makes it fill the row's full
+			    height instead of collapsing to the document's own content
+			    height, so the whole column is a click target - not just the
+			    text. The sticky text-tools panel stays top-aligned. */}
+			<div className="relative min-w-0 flex-1 self-stretch">
 				<EditorConsumer>
 					{({ editor }) => (
 						<EditorContent

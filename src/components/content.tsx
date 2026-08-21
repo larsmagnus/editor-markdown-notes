@@ -46,7 +46,7 @@ function Content({ defaultFileName }: ContentProps) {
 				</AppErrorBoundary>
 			)}
 
-			<main className="grid p-3 min-h-screen">
+			<main className="flex flex-col p-3 min-h-screen">
 				<NoteBody
 					content={content}
 					saveContent={saveContent}

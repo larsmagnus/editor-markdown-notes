@@ -119,8 +119,13 @@
     focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
 	}
 
+	/*
+	 * min-h-full makes the whole document column a click target - without it
+	 * the contenteditable box is only as tall as its own content (one empty
+	 * line on a blank note), so clicking anywhere below that line misses it.
+	 */
 	.ProseMirror {
-		@apply static!;
+		@apply static! min-h-full;
 	}
 
 	.ProseMirror img {
