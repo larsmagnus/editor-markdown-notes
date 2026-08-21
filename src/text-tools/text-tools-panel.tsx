@@ -4,6 +4,7 @@ import type { SpellingLanguage, TextToolRuleId } from '@/shared/messages'
 import { TextToolsIssueGroup } from '@/text-tools/text-tools-issue-group'
 import { TextToolsReadabilityLines } from '@/text-tools/text-tools-readability-lines'
 import { TextToolsRuleCheckboxes } from '@/text-tools/text-tools-rule-checkboxes'
+import { TextToolsStats } from '@/text-tools/text-tools-stats'
 import { TextToolsStatus } from '@/text-tools/text-tools-status'
 
 type TextToolsPanelProps = {
@@ -41,6 +42,8 @@ export function TextToolsPanel({
 			</div>
 
 			<div className="flex flex-col gap-3 p-3 scroll-fade overflow-y-auto">
+				<TextToolsStats sentenceCount={analysis.sentenceCount} />
+
 				<TextToolsReadabilityLines lines={summary.readability} />
 
 				<TextToolsRuleCheckboxes

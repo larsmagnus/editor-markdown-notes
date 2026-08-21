@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added a document stats section to the writing tools panel, showing word, character, sentence and paragraph counts alongside estimated reading time
+
 ## [0.21.0] - 2026-08-20
 
 - Added scrolling to the matched text when a note is opened from a search result, with every occurrence of that text highlighted
