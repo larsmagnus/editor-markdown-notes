@@ -46,5 +46,5 @@ jobs:
       - name: 🧬 Run duplication checks
         run: pnpm run duplication:ci
 
-      - name: 🧪 Run VS Code tests and Vitest tests
+      - name: 🧪 Run VS Code, Vitest and Playwright tests
         run: xvfb-run --auto-servernum pnpm test
