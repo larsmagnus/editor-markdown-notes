@@ -7,6 +7,10 @@
 		"jscpd": {
 			"command": "pnpm",
 			"args": ["exec", "cpd", "--mcp", "-c", ".jscpd.json", "src"]
+		},
+		"shadcn": {
+			"command": "pnpm",
+			"args": ["dlx", "shadcn@latest", "mcp"]
 		}
 	}
 }
