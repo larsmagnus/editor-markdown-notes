@@ -2,31 +2,15 @@ import { readFileSync } from 'fs'
 
 import { expect, test } from '@playwright/test'
 
-/**
- * The real VS Code webview injects `window.vscode`/`window.initialContent`
- * before the bundle runs (`webview-html.ts`) - that is what puts the app on
- * the VS Code data path (`useHostDocument`) rather than the standalone demo
- * path (`useContent`, a `fetch()` against `public/`). A plain `pnpm dev`/`vite
- * preview` load never takes that branch, so reproducing a VS-Code-only bug
- * means seeding the same globals before navigation.
- */
+import { openInVSCode } from '@/e2e/helpers'
+
 test.describe('Raw view', () => {
 	test('switching from the live view to the raw view keeps the whole document visible', async ({
 		page,
 	}) => {
 		const content = readFileSync('public/notes.md', 'utf8')
 
-		await page.addInitScript((initialContent) => {
-			window.vscode = {
-				postMessage: () => {},
-				getState: () => undefined,
-				setState: () => {},
-			}
-			window.initialContent = initialContent
-			window.fileName = 'notes.md'
-		}, content)
-
-		await page.goto('/')
+		await openInVSCode(page, content)
 
 		await expect(
 			page.getByRole('heading', { name: 'Editor Markdown Notes', level: 1 })

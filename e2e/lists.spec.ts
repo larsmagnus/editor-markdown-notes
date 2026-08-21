@@ -1,0 +1,171 @@
+import { readFileSync } from 'fs'
+
+import { expect, test } from '@playwright/test'
+
+import { openInVSCode, pasteText } from '@/e2e/helpers'
+
+test.describe('Lists in the live editor', () => {
+	test('typing "- " creates a bullet list item', async ({ page }) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await content.locator('p').click()
+		await page.keyboard.type('- First item')
+
+		await expect(
+			content.locator('ul li', { hasText: 'First item' })
+		).toBeVisible()
+	})
+
+	test('typing "1. " creates an ordered list item', async ({ page }) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await content.locator('p').click()
+		await page.keyboard.type('1. First item')
+
+		await expect(
+			content.locator('ol li', { hasText: 'First item' })
+		).toBeVisible()
+	})
+
+	test('typing "- [ ] " creates a task list item', async ({ page }) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await content.locator('p').click()
+		await page.keyboard.type('- [ ] First item')
+
+		await expect(
+			content.locator('ul[data-type="taskList"] li', { hasText: 'First item' })
+		).toBeVisible()
+	})
+
+	test('pressing Enter in a list item adds a new item on the next line', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await content.locator('p').click()
+		await page.keyboard.type('- First item')
+		await page.keyboard.press('Enter')
+		await page.keyboard.type('Second item')
+
+		const list = content.locator('ul').filter({ hasText: 'First item' })
+		await expect(list.locator('li')).toHaveText(['First item', 'Second item'])
+	})
+
+	test('pressing Enter in a nested list item adds a nested sibling', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await content.locator('p').click()
+		await page.keyboard.type('- First item')
+		await page.keyboard.press('Enter')
+		await page.keyboard.press('Tab')
+		await page.keyboard.type('Nested item')
+		await page.keyboard.press('Enter')
+		await page.keyboard.type('Nested sibling')
+
+		const nestedList = content
+			.locator('li', { hasText: 'First item' })
+			.locator('ul')
+		await expect(nestedList.locator('li')).toHaveText([
+			'Nested item',
+			'Nested sibling',
+		])
+	})
+
+	// Tab fires the moment the caret is naturally at offset 0 (a fresh empty
+	// item), rather than typing text and relocating the caret back there -
+	// the latter races ProseMirror's own pickup of a Selection API move.
+	test('Tab right after the bullet nests the list item', async ({ page }) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await content.locator('p').click()
+		await page.keyboard.type('- First item')
+		await page.keyboard.press('Enter')
+		await page.keyboard.press('Tab')
+		await page.keyboard.type('Second item')
+
+		const nestedList = content
+			.locator('li', { hasText: 'First item' })
+			.locator('ul')
+		await expect(nestedList.locator('li')).toHaveText(['Second item'])
+	})
+
+	test('Shift-Tab right after the bullet un-nests the list item', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await content.locator('p').click()
+		await page.keyboard.type('- First item')
+		await page.keyboard.press('Enter')
+		await page.keyboard.press('Tab')
+		await page.keyboard.press('Shift+Tab')
+		await page.keyboard.type('Second item')
+
+		const topLevelList = content.locator('ul').filter({ hasText: 'First item' })
+		await expect(topLevelList.locator('> li')).toHaveText([
+			'First item',
+			'Second item',
+		])
+	})
+
+	test('checking a task list item updates the raw markdown', async ({
+		page,
+	}) => {
+		const content = readFileSync('public/notes.md', 'utf8')
+		await openInVSCode(page, content)
+
+		await page
+			.getByRole('listitem')
+			.filter({ hasText: 'Incomplete task', hasNotText: 'Another' })
+			.getByRole('checkbox')
+			.click()
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue(/- \[x\] Incomplete task/)
+	})
+
+	test('unchecking a task list item updates the raw markdown', async ({
+		page,
+	}) => {
+		const content = readFileSync('public/notes.md', 'utf8')
+		await openInVSCode(page, content)
+
+		await page
+			.getByRole('listitem')
+			.filter({ hasText: 'Completed task' })
+			.getByRole('checkbox')
+			.click()
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue(/- \[ \] Completed task/)
+	})
+
+	test('pasting a nested markdown list preserves its structure', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await content.locator('p').click()
+		await pasteText(content, ['- First item', '  - Nested item'].join('\n'))
+
+		const nestedList = content
+			.locator('li', { hasText: 'First item' })
+			.locator('ul')
+		await expect(nestedList.locator('li')).toHaveText(['Nested item'])
+	})
+})
