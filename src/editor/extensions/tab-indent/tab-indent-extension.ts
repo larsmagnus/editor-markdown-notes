@@ -4,6 +4,11 @@ import { isInTable } from '@tiptap/pm/tables'
 
 const INDENT = '  '
 
+// `listItem`/`taskItem` bind Tab/Shift-Tab to sink/lift themselves, but
+// `ExtensionManager` runs the last-registered extension's keymap first, so
+// this extension (registered after them) would otherwise always shadow that.
+const NESTABLE_LIST_ITEM_TYPES = ['listItem', 'taskItem']
+
 /**
  * Makes Tab behave like an editor, not a web page, wherever there's a real
  * text caret: it inserts an indent instead of moving focus to the next
@@ -15,6 +20,9 @@ const INDENT = '  '
  * its own Tab meaning elsewhere (`extensions.ts`'s image keyboard shortcuts),
  * and a table cell keeps whatever Tab does there today rather than gaining a
  * competing, unrelated meaning here.
+ *
+ * Right after a list item's bullet, number, or checkbox, Tab/Shift-Tab
+ * nest/un-nest the item instead (see `NESTABLE_LIST_ITEM_TYPES` above).
  */
 export const TabIndent = Extension.create({
 	name: 'tabIndent',
@@ -25,19 +33,51 @@ export const TabIndent = Extension.create({
 			return selection instanceof TextSelection && !isInTable(this.editor.state)
 		}
 
+		// The item's type name, or `null` if the caret isn't right after its
+		// bullet/number/checkbox (i.e. offset 0 of the item's first block).
+		const listItemAtCaretStart = () => {
+			const { selection } = this.editor.state
+			if (!(selection instanceof TextSelection) || !selection.empty) return null
+
+			const { $from } = selection
+			if ($from.parentOffset !== 0 || $from.depth < 1) return null
+
+			const itemDepth = $from.depth - 1
+			const listItem = $from.node(itemDepth)
+
+			if (!NESTABLE_LIST_ITEM_TYPES.includes(listItem.type.name)) return null
+			if ($from.index(itemDepth) !== 0) return null
+
+			return listItem.type.name
+		}
+
+		const insertIndent = () =>
+			// Not `insertContent`: a whitespace-only string is valid markdown for
+			// "nothing" and parses away to a no-op silently. `insertText` writes
+			// the literal characters, bypassing markdown parsing entirely.
+			this.editor.commands.command(({ tr, dispatch }) => {
+				if (dispatch) dispatch(tr.insertText(INDENT))
+				return true
+			})
+
 		return {
 			Tab: () => {
+				const listItemType = listItemAtCaretStart()
+				if (listItemType && this.editor.commands.sinkListItem(listItemType)) {
+					return true
+				}
+
 				if (!canIndent()) return false
 
-				// Not `insertContent`: a whitespace-only string is valid markdown for
-				// "nothing" and parses away to a no-op silently. `insertText` writes
-				// the literal characters, bypassing markdown parsing entirely.
-				return this.editor.commands.command(({ tr, dispatch }) => {
-					if (dispatch) dispatch(tr.insertText(INDENT))
-					return true
-				})
+				return insertIndent()
 			},
 			'Shift-Tab': () => {
+				const listItemType = listItemAtCaretStart()
+				if (listItemType) {
+					this.editor.commands.liftListItem(listItemType)
+					return true
+				}
+
 				if (!canIndent()) return false
 
 				const { from } = this.editor.state.selection

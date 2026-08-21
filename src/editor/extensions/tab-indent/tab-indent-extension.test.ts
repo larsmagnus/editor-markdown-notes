@@ -90,4 +90,56 @@ describe('TabIndent', () => {
 			'Roadmap'
 		)
 	})
+
+	it('nests a bullet list item when Tab is pressed right after the bullet', () => {
+		const editor = documentFrom(['- First', '- Second'].join('\n'))
+		// Position 12 is right after "Second"'s bullet, before its text.
+		editor.commands.setTextSelection(12)
+
+		editor.commands.keyboardShortcut('Tab')
+
+		const list = editor.state.doc.firstChild
+		expect(list?.childCount).toBe(1)
+		const nested = list?.firstChild?.lastChild
+		expect(nested?.type.name).toBe('bulletList')
+		expect(nested?.firstChild?.textContent).toBe('Second')
+	})
+
+	it('un-nests a bullet list item when Shift-Tab is pressed right after the bullet', () => {
+		const editor = documentFrom(['- First', '  - Second'].join('\n'))
+		// Position 12 is right after the nested item's bullet, before its text.
+		editor.commands.setTextSelection(12)
+
+		editor.commands.keyboardShortcut('Shift-Tab')
+
+		const list = editor.state.doc.firstChild
+		expect(list?.childCount).toBe(2)
+		expect(list?.lastChild?.textContent).toBe('Second')
+	})
+
+	it('nests a task list item when Tab is pressed right after the checkbox', () => {
+		const editor = documentFrom(['- [ ] First', '- [ ] Second'].join('\n'))
+		// Position 12 is right after "Second"'s checkbox, before its text.
+		editor.commands.setTextSelection(12)
+
+		editor.commands.keyboardShortcut('Tab')
+
+		const list = editor.state.doc.firstChild
+		expect(list?.childCount).toBe(1)
+		const nested = list?.firstChild?.lastChild
+		expect(nested?.type.name).toBe('taskList')
+		expect(nested?.firstChild?.textContent).toBe('Second')
+	})
+
+	it('still indents text typed into a list item, away from its bullet', () => {
+		const editor = documentFrom(['- First', '- Second'].join('\n'))
+		// Position 15 is mid-word ("Sec|ond"), not right after the bullet.
+		editor.commands.setTextSelection(15)
+
+		editor.commands.keyboardShortcut('Tab')
+
+		const list = editor.state.doc.firstChild
+		expect(list?.childCount).toBe(2)
+		expect(list?.lastChild?.textContent).toContain('  ')
+	})
 })
