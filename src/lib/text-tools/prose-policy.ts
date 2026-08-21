@@ -82,3 +82,30 @@ export function frontmatterValueOf(line: string) {
 
 	return { text: line.slice(start).trimEnd(), start }
 }
+
+/**
+ * Every prose-bearing frontmatter line, each with the offset (into the
+ * frontmatter block's own text) its line starts at.
+ *
+ * Shared by `document-text.ts` and `mcp/frontmatter-prose.ts`, which walk
+ * different trees (a ProseMirror node vs. a flat MCP string) but both need
+ * this same line-by-line split - only what each does with `offset`/`value`
+ * differs, since they convert it to a document position differently.
+ */
+export function frontmatterLineOffsets(
+	text: string
+): { value: ReturnType<typeof frontmatterValueOf>; offset: number }[] {
+	const entries: {
+		value: ReturnType<typeof frontmatterValueOf>
+		offset: number
+	}[] = []
+	let offset = 0
+
+	for (const line of text.split('\n')) {
+		const value = frontmatterValueOf(line)
+		if (value.text) entries.push({ value, offset })
+		offset += line.length + 1
+	}
+
+	return entries
+}

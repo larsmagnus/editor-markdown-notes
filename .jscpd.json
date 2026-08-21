@@ -2,6 +2,7 @@
 	"path": ["src"],
 	"minLines": 5,
 	"minTokens": 20,
+	"ignorePattern": ["^\\s*import\\s.*"],
 	"ignore": [
 		"src/components/ui/**",
 		"**/*.stories.ts",

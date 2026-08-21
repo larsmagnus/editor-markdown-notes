@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { holdInView } from '@/lib/hold-in-view'
+import { scrollHoldInView } from '@/lib/scroll/scroll-hold-in-view'
 
 /**
  * happy-dom has no layout engine and so no real `scrollIntoView`; what matters
@@ -23,11 +23,11 @@ afterEach(() => {
 	document.body.innerHTML = ''
 })
 
-describe('holdInView', () => {
+describe('scrollHoldInView', () => {
 	it('centres the element immediately', () => {
 		const element = createTarget()
 
-		holdInView(() => element)
+		scrollHoldInView(() => element)
 
 		expect(element.scrollIntoView).toHaveBeenCalledWith({
 			block: 'center',
@@ -43,7 +43,7 @@ describe('holdInView', () => {
 	it('keeps re-centring while the page is still settling', () => {
 		const element = createTarget()
 
-		holdInView(() => element)
+		scrollHoldInView(() => element)
 		vi.advanceTimersByTime(500)
 
 		expect(element.scrollIntoView).toHaveBeenCalledTimes(6)
@@ -53,7 +53,7 @@ describe('holdInView', () => {
 		const element = createTarget()
 		const onSettled = vi.fn()
 
-		holdInView(() => element, { onSettled })
+		scrollHoldInView(() => element, { onSettled })
 		vi.advanceTimersByTime(3000)
 		const settledAfter = vi.mocked(element.scrollIntoView).mock.calls.length
 
@@ -67,7 +67,7 @@ describe('holdInView', () => {
 		const element = createTarget()
 		const onSettled = vi.fn()
 
-		holdInView(() => element, { onSettled })
+		scrollHoldInView(() => element, { onSettled })
 		vi.advanceTimersByTime(200)
 		const before = vi.mocked(element.scrollIntoView).mock.calls.length
 
@@ -81,7 +81,7 @@ describe('holdInView', () => {
 	it('stops when torn down, which is what unmounting does', () => {
 		const element = createTarget()
 
-		const settle = holdInView(() => element)
+		const settle = scrollHoldInView(() => element)
 		const before = vi.mocked(element.scrollIntoView).mock.calls.length
 		settle()
 		vi.advanceTimersByTime(1000)
@@ -99,7 +99,7 @@ describe('holdInView', () => {
 		const second = createTarget()
 		let current = first
 
-		holdInView(() => current)
+		scrollHoldInView(() => current)
 		current = second
 		vi.advanceTimersByTime(300)
 

@@ -14,9 +14,9 @@ export function ThemeProvider({ children }: PropsWithChildren) {
 	const theme = viewOptions.theme
 
 	useEffect(() => {
-		// The class goes on <html>, not #root: Radix portals (popovers, dropdowns)
-		// render into document.body, so anything below #root would keep the light
-		// tokens in dark mode.
+		// The class goes on <html>, not #root: portal-based UI primitives
+		// (popovers, dropdowns) render into document.body, so anything below
+		// #root would keep the light tokens in dark mode.
 		const root = document.documentElement
 
 		root.classList.remove('light', 'dark')

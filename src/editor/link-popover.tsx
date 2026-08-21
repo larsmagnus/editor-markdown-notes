@@ -1,11 +1,10 @@
 import { Link } from 'lucide-react'
 import { useState } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Popover, PopoverTrigger } from '@/components/ui/popover'
+import { Popover } from '@/components/ui/popover'
 import { PopoverForm } from '@/editor/popover-form'
+import { PopoverIconTrigger } from '@/editor/popover-icon-trigger'
+import { PopoverTextField } from '@/editor/popover-text-field'
 import { useEditorLink } from '@/hooks/use-editor-link'
 import { cn } from '@/lib/utils'
 
@@ -23,31 +22,20 @@ export function LinkPopover() {
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger
-				render={
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						title="Link"
-						onClick={openWithCurrentLink}
-						className={cn('font-bold', isLinkActive() ? 'is-active' : '')}
-					>
-						<Link className="size-4" />
-					</Button>
-				}
+			<PopoverIconTrigger
+				icon={Link}
+				title="Link"
+				onClick={openWithCurrentLink}
+				className={cn('font-bold', isLinkActive() ? 'is-active' : '')}
 			/>
 			<PopoverForm heading="Link" onApply={apply}>
-				<div className="flex items-center gap-4">
-					<Label htmlFor="url">URL</Label>
-					<Input
-						id="url"
-						value={url}
-						onChange={(event) => setUrl(event.target.value)}
-						placeholder="Enter URL"
-						type="text"
-					/>
-				</div>
+				<PopoverTextField
+					id="url"
+					label="URL"
+					value={url}
+					onChange={setUrl}
+					placeholder="Enter URL"
+				/>
 			</PopoverForm>
 		</Popover>
 	)

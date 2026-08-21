@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { restoreScrollTop } from '@/lib/restore-scroll-top'
+import { scrollRestoreTop } from '@/lib/scroll/scroll-restore-top'
 
 /**
  * happy-dom has no layout engine, so `scrollHeight` and `clientHeight` are
@@ -32,7 +32,7 @@ afterEach(() => {
 	document.body.innerHTML = ''
 })
 
-describe('restoreScrollTop', () => {
+describe('scrollRestoreTop', () => {
 	/**
 	 * Standalone, the file selector swaps notes underneath the one scroll
 	 * container, so a note that has never been opened has to be *put* at the top
@@ -44,7 +44,7 @@ describe('restoreScrollTop', () => {
 		const onSettled = vi.fn()
 		container.scrollTop = 1800
 
-		restoreScrollTop(container, 0, { onSettled })
+		scrollRestoreTop(container, 0, { onSettled })
 
 		expect(container.scrollTop).toBe(0)
 		expect(onSettled).toHaveBeenCalled()
@@ -53,7 +53,7 @@ describe('restoreScrollTop', () => {
 	it('scrolls straight to a target the document is already tall enough for', () => {
 		const { container } = createScrollContainer(4000)
 
-		restoreScrollTop(container, 1200)
+		scrollRestoreTop(container, 1200)
 
 		expect(container.scrollTop).toBe(1200)
 	})
@@ -66,7 +66,7 @@ describe('restoreScrollTop', () => {
 	it('re-applies the target as the document grows to reach it', () => {
 		const { container, grow } = createScrollContainer(1000)
 
-		restoreScrollTop(container, 1800)
+		scrollRestoreTop(container, 1800)
 
 		// Only 400px of scrolling exists yet - as far towards the target as it goes.
 		expect(container.scrollTop).toBe(400)
@@ -87,7 +87,7 @@ describe('restoreScrollTop', () => {
 	it('puts the position back after a later shift', () => {
 		const { container, grow } = createScrollContainer(4000)
 
-		restoreScrollTop(container, 1200)
+		scrollRestoreTop(container, 1200)
 
 		// The toolbar arriving above the viewport, and the anchoring that follows.
 		grow(4056)
@@ -110,7 +110,7 @@ describe('restoreScrollTop', () => {
 		const { container } = createScrollContainer(4000)
 		const onSettled = vi.fn()
 
-		restoreScrollTop(container, 1200, { onSettled })
+		scrollRestoreTop(container, 1200, { onSettled })
 
 		container.scrollTop = 3000
 		container.dispatchEvent(new Event('scroll'))
@@ -125,7 +125,7 @@ describe('restoreScrollTop', () => {
 		const { container } = createScrollContainer(4000)
 		const onSettled = vi.fn()
 
-		restoreScrollTop(container, 1200, { onSettled })
+		scrollRestoreTop(container, 1200, { onSettled })
 		container.dispatchEvent(new Event('wheel'))
 		expect(onSettled).toHaveBeenCalled()
 
@@ -139,7 +139,7 @@ describe('restoreScrollTop', () => {
 		const { container } = createScrollContainer(4000)
 		const onSettled = vi.fn()
 
-		restoreScrollTop(container, 1200, { timeoutMs: 3000, onSettled })
+		scrollRestoreTop(container, 1200, { timeoutMs: 3000, onSettled })
 		vi.advanceTimersByTime(2999)
 		expect(onSettled).not.toHaveBeenCalled()
 

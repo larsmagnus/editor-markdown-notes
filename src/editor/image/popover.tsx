@@ -1,10 +1,9 @@
 import { ImageIcon } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Popover, PopoverTrigger } from '@/components/ui/popover'
+import { Popover } from '@/components/ui/popover'
 import { PopoverForm } from '@/editor/popover-form'
+import { PopoverIconTrigger } from '@/editor/popover-icon-trigger'
+import { PopoverTextField } from '@/editor/popover-text-field'
 import { useImagePopover } from '@/hooks/use-image-popover'
 
 /**
@@ -26,40 +25,26 @@ export function ImagePopover() {
 
 	return (
 		<Popover open={open} onOpenChange={handleOpenChange}>
-			<PopoverTrigger
-				render={
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						title="Edit image"
-						onClick={openWithCurrentImage}
-					>
-						<ImageIcon className="size-4" />
-					</Button>
-				}
+			<PopoverIconTrigger
+				icon={ImageIcon}
+				title="Edit image"
+				onClick={openWithCurrentImage}
 			/>
 			<PopoverForm heading="Image" onApply={apply}>
-				<div className="flex items-center gap-4">
-					<Label htmlFor="image-src">Src</Label>
-					<Input
-						id="image-src"
-						value={src}
-						onChange={(event) => setSrc(event.target.value)}
-						placeholder="Enter URL or path"
-						type="text"
-					/>
-				</div>
-				<div className="flex items-center gap-4">
-					<Label htmlFor="image-alt">Alt</Label>
-					<Input
-						id="image-alt"
-						value={alt}
-						onChange={(event) => setAlt(event.target.value)}
-						placeholder="Describe the image"
-						type="text"
-					/>
-				</div>
+				<PopoverTextField
+					id="image-src"
+					label="Src"
+					value={src}
+					onChange={setSrc}
+					placeholder="Enter URL or path"
+				/>
+				<PopoverTextField
+					id="image-alt"
+					label="Alt"
+					value={alt}
+					onChange={setAlt}
+					placeholder="Describe the image"
+				/>
 			</PopoverForm>
 		</Popover>
 	)

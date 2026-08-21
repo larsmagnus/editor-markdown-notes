@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { restoreScrollTop } from '@/lib/restore-scroll-top'
 import { readScrollTop, writeScrollTop } from '@/lib/scroll-position'
+import { scrollRestoreTop } from '@/lib/scroll/scroll-restore-top'
 import { hasSearchReveal } from '@/lib/search-reveal'
 
 /**
@@ -45,7 +45,7 @@ export function useScrollPosition(fileName: string) {
 				suppressRecordingWhileRevealing(() => {
 					restoring = false
 				})
-			: restoreScrollTop(container, readScrollTop(fileName), {
+			: scrollRestoreTop(container, readScrollTop(fileName), {
 					onSettled: () => {
 						restoring = false
 					},
@@ -73,7 +73,7 @@ export function useScrollPosition(fileName: string) {
 /**
  * How long a reveal is given before the reader's scrolling is recorded again.
  *
- * Matches `holdInView`'s own window, since that is exactly how long the reveal
+ * Matches `scrollHoldInView`'s own window, since that is exactly how long the reveal
  * can still be moving the page.
  */
 const REVEAL_SETTLE_MS = 3000

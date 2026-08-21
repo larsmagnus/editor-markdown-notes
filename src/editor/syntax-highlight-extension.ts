@@ -1,6 +1,8 @@
-import { Plugin, PluginKey } from '@tiptap/pm/state'
+import { PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/react'
+
+import { createDecorationPlugin } from '@/editor/create-decoration-plugin'
 
 /**
  * Draws Shiki's token colors onto fenced code blocks.
@@ -80,30 +82,14 @@ export const SyntaxHighlight = Extension.create({
 	},
 
 	addProseMirrorPlugins() {
+		// Mapping keeps the existing colors roughly in place while the next
+		// tokenize pass is still debounced, instead of flickering back to plain
+		// text on every keystroke.
 		return [
-			new Plugin<DecorationSet>({
-				key: syntaxHighlightPluginKey,
-				state: {
-					init: () => DecorationSet.empty,
-					apply(tr, current) {
-						const tokens = tr.getMeta(syntaxHighlightPluginKey) as
-							| PlacedToken[]
-							| undefined
-
-						if (tokens) return toDecorations(tr.doc, tokens)
-
-						// Mapping keeps the existing colors roughly in place while the
-						// next tokenize pass is still debounced, instead of flickering
-						// back to plain text on every keystroke.
-						return tr.docChanged ? current.map(tr.mapping, tr.doc) : current
-					},
-				},
-				props: {
-					decorations(state) {
-						return syntaxHighlightPluginKey.getState(state)
-					},
-				},
-			}),
+			createDecorationPlugin<PlacedToken[]>(
+				syntaxHighlightPluginKey,
+				toDecorations
+			),
 		]
 	},
 })

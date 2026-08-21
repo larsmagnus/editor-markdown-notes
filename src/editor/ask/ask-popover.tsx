@@ -4,12 +4,9 @@ import { useState } from 'react'
 import Header from '@/components/header'
 import { PopoverArrow } from '@/components/popover-arrow'
 import { Button } from '@/components/ui/button'
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
+import { PopoverIconTrigger } from '@/editor/popover-icon-trigger'
 import { useEditorAsk } from '@/hooks/use-editor-ask'
 
 const ASK_PRESETS = [
@@ -48,13 +45,7 @@ export function AskPopover() {
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger
-				render={
-					<Button type="button" variant="ghost" size="sm" title="Ask Claude">
-						<Sparkles className="size-4" />
-					</Button>
-				}
-			/>
+			<PopoverIconTrigger icon={Sparkles} title="Ask Claude" />
 			<PopoverContent side="top" sideOffset={12} className="w-80">
 				<div className="grid gap-3">
 					<Header level={4} className="leading-none">

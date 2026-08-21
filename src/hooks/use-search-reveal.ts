@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 
 import { SEARCH_REVEAL_TARGET_CLASS } from '@/editor/search-reveal/extension'
 import { findOccurrences } from '@/editor/search-reveal/find-occurrences'
-import { holdInView } from '@/lib/hold-in-view'
+import { scrollHoldInView } from '@/lib/scroll/scroll-hold-in-view'
 import { takeSearchReveal } from '@/lib/search-reveal'
 
 /**
@@ -36,7 +36,7 @@ export function useSearchReveal(editor: Editor | null) {
 
 		editor.commands.setSearchRevealRanges(occurrences)
 
-		return holdInView(() => targetElement(editor))
+		return scrollHoldInView(() => targetElement(editor))
 	}, [editor])
 }
 

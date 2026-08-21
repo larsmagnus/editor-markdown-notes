@@ -13,8 +13,8 @@
 	"project": ["src/**/*.{ts,tsx,css}"],
 	"ignoreIssues": {
 		// Vendored shadcn/ui primitives. They deliberately re-export the full
-		// Radix surface whether or not this app reaches for all of it, so that
-		// `pnpm dlx shadcn add` stays a clean overwrite.
+		// underlying primitive's surface whether or not this app reaches for all
+		// of it, so that `pnpm dlx shadcn add` stays a clean overwrite.
 		"src/components/ui/**": ["exports", "types"],
 	},
 	"ignoreDependencies": [

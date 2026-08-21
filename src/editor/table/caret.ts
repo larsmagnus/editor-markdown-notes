@@ -47,6 +47,23 @@ function leaveTable(
 }
 
 /**
+ * The caret's cell, if the selection is a plain empty text caret sitting
+ * inside a table at all - the entry guard both callers below need before
+ * asking anything direction-specific about where it can go.
+ */
+function resolveTableCaret(
+	state: EditorState
+): { $head: ResolvedPos; $cell: ResolvedPos } | null {
+	const { selection } = state
+	if (!(selection instanceof TextSelection) || !selection.empty) return null
+
+	const $head = selection.$head
+	const $cell = cellAt($head)
+
+	return $cell ? { $head, $cell } : null
+}
+
+/**
  * Moves the caret to the cell above or below, in the same column, or out of the
  * table when there is no such row.
  *
@@ -59,16 +76,14 @@ function leaveTable(
  */
 export function moveCaretToCellBeyond(dir: Direction): Command {
 	return (state, dispatch, view) => {
-		const { selection } = state
-
-		if (!(selection instanceof TextSelection) || !selection.empty) return false
+		const at = resolveTableCaret(state)
+		if (!at) return false
 
 		// The cell first: `outOfText` asks the view about layout, and every arrow
 		// in the document reaches this before it is known to be in a table at all.
-		const $head = selection.$head
-		const $cell = cellAt($head)
+		const { $head, $cell } = at
 
-		if (!$cell || !outOfText($head, 'vert', dir, view)) return false
+		if (!outOfText($head, 'vert', dir, view)) return false
 
 		const $next = nextCell($cell, 'vert', dir)
 
@@ -92,14 +107,12 @@ export function moveCaretToCellBeyond(dir: Direction): Command {
  */
 export function moveCaretPastTable(dir: Direction): Command {
 	return (state, dispatch) => {
-		const { selection } = state
+		const at = resolveTableCaret(state)
+		if (!at) return false
 
-		if (!(selection instanceof TextSelection) || !selection.empty) return false
+		const { $head, $cell } = at
 
-		const $head = selection.$head
-		const $cell = cellAt($head)
-
-		if (!$cell || !outOfText($head, 'horiz', dir)) return false
+		if (!outOfText($head, 'horiz', dir)) return false
 		if (!atTableCorner($cell, dir)) return false
 
 		return leaveTable(state, dispatch, $cell, dir)

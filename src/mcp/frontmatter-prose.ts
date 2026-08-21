@@ -1,4 +1,4 @@
-import { frontmatterValueOf } from '@/lib/text-tools/prose-policy'
+import { frontmatterLineOffsets } from '@/lib/text-tools/prose-policy'
 
 /**
  * One run of prose per frontmatter line, with where each sits in the file.
@@ -11,16 +11,8 @@ import { frontmatterValueOf } from '@/lib/text-tools/prose-policy'
  * instead, matching how `document-text.ts` treats the same block.
  */
 export function frontmatterRuns(frontmatter: string, base: number) {
-	const runs: { text: string; source: number }[] = []
-	let offset = 0
-
-	for (const line of frontmatter.split('\n')) {
-		const value = frontmatterValueOf(line)
-		if (value.text) {
-			runs.push({ text: value.text, source: base + offset + value.start })
-		}
-		offset += line.length + 1
-	}
-
-	return runs
+	return frontmatterLineOffsets(frontmatter).map(({ value, offset }) => ({
+		text: value.text,
+		source: base + offset + value.start,
+	}))
 }

@@ -1,8 +1,9 @@
-import { Plugin, PluginKey } from '@tiptap/pm/state'
+import { PluginKey } from '@tiptap/pm/state'
 import type { EditorView } from '@tiptap/pm/view'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/react'
 
+import { createDecorationPlugin } from '@/editor/create-decoration-plugin'
 import type { Occurrence } from '@/editor/search-reveal/find-occurrences'
 
 /**
@@ -92,41 +93,28 @@ export const SearchRevealHighlight = Extension.create({
 
 	addProseMirrorPlugins() {
 		return [
-			new Plugin<DecorationSet>({
-				key: searchRevealPluginKey,
-				state: {
-					init: () => DecorationSet.empty,
-					apply(tr, current) {
-						const occurrences = tr.getMeta(searchRevealPluginKey) as
-							| Occurrence[]
-							| null
-							| undefined
-
-						if (occurrences === null) return DecorationSet.empty
-						if (occurrences) return toDecorations(tr.doc, occurrences)
-
-						// Mapped rather than dropped on any document change, because the
-						// first thing to change the document after a reveal is not the
-						// reader: the trailing-paragraph and frontmatter housekeeping
-						// transactions both land after mount, and clearing on those
-						// wiped every highlight before it was ever seen. A real edit
-						// clears through `handleDOMEvents` below instead.
-						return tr.docChanged ? current.map(tr.mapping, tr.doc) : current
+			createDecorationPlugin<Occurrence[]>(
+				searchRevealPluginKey,
+				toDecorations,
+				{
+					// The first thing to change the document after a reveal is not the
+					// reader: the trailing-paragraph and frontmatter housekeeping
+					// transactions both land after mount, and clearing on those wiped
+					// every highlight before it was ever seen. A real edit clears
+					// through `handleDOMEvents` below instead - mapping, not dropping,
+					// is what keeps the highlight alive until then.
+					clearable: true,
+					props: {
+						// The reveal answers one click and is finished, so the first thing
+						// the reader does with the note takes it down. Never handles the
+						// event - it only watches for one.
+						handleDOMEvents: {
+							mousedown: clearOnInteraction,
+							keydown: clearOnInteraction,
+						},
 					},
-				},
-				props: {
-					decorations(state) {
-						return searchRevealPluginKey.getState(state)
-					},
-					// The reveal answers one click and is finished, so the first thing
-					// the reader does with the note takes it down. Never handles the
-					// event - it only watches for one.
-					handleDOMEvents: {
-						mousedown: clearOnInteraction,
-						keydown: clearOnInteraction,
-					},
-				},
-			}),
+				}
+			),
 		]
 	},
 })

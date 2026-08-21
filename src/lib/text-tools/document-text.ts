@@ -3,7 +3,7 @@ import type { Node as ProseMirrorNode } from 'prosemirror-model'
 import type { ProseExclusion } from '@/lib/text-tools/prose-policy'
 import {
 	BLOCK_SEPARATOR,
-	frontmatterValueOf,
+	frontmatterLineOffsets,
 	PROSE_SUBSTITUTE,
 } from '@/lib/text-tools/prose-policy'
 
@@ -79,27 +79,21 @@ function appendFrontmatterLines(
 	slices: TextSlice[]
 ): string {
 	let result = text
-	let offset = 0
 
-	for (const line of node.textContent.split('\n')) {
-		const value = frontmatterValueOf(line)
-
-		if (value.text) {
-			// Reuses the same "already have text" check the block separator uses
-			// everywhere else, so a line joins the block before it exactly the way
-			// the block itself joins whatever textblock came before it.
-			if (result) result += BLOCK_SEPARATOR
-			// `pos` is the frontmatter node itself; its content starts one inside,
-			// and `offset` walks `textContent`, which - `content: 'text*'`, no marks
-			// - lines up with document positions one-for-one.
-			slices.push({
-				offset: result.length,
-				length: value.text.length,
-				from: pos + 1 + offset + value.start,
-			})
-			result += value.text
-		}
-		offset += line.length + 1
+	// `pos` is the frontmatter node itself; its content starts one inside, and
+	// `offset` walks `textContent`, which - `content: 'text*'`, no marks - lines
+	// up with document positions one-for-one.
+	for (const { value, offset } of frontmatterLineOffsets(node.textContent)) {
+		// Reuses the same "already have text" check the block separator uses
+		// everywhere else, so a line joins the block before it exactly the way
+		// the block itself joins whatever textblock came before it.
+		if (result) result += BLOCK_SEPARATOR
+		slices.push({
+			offset: result.length,
+			length: value.text.length,
+			from: pos + 1 + offset + value.start,
+		})
+		result += value.text
 	}
 
 	return result

@@ -1,8 +1,9 @@
 import type { EditorState } from '@tiptap/pm/state'
-import { Plugin, PluginKey } from '@tiptap/pm/state'
+import { PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/react'
 
+import { createDecorationPlugin } from '@/editor/create-decoration-plugin'
 import { issueClassName } from '@/lib/text-tools/issue-class-name'
 import type { TextIssue } from '@/lib/text-tools/types'
 
@@ -98,30 +99,11 @@ export const TextTools = Extension.create({
 	},
 
 	addProseMirrorPlugins() {
+		// Mapping keeps the existing highlights roughly in place while the next
+		// analysis is still debounced, instead of flickering off on every
+		// keystroke.
 		return [
-			new Plugin<DecorationSet>({
-				key: textToolsPluginKey,
-				state: {
-					init: () => DecorationSet.empty,
-					apply(tr, current) {
-						const issues = tr.getMeta(textToolsPluginKey) as
-							| PlacedIssue[]
-							| undefined
-
-						if (issues) return toDecorations(tr.doc, issues)
-
-						// Mapping keeps the existing highlights roughly in place while
-						// the next analysis is still debounced, instead of flickering
-						// off on every keystroke.
-						return tr.docChanged ? current.map(tr.mapping, tr.doc) : current
-					},
-				},
-				props: {
-					decorations(state) {
-						return textToolsPluginKey.getState(state)
-					},
-				},
-			}),
+			createDecorationPlugin<PlacedIssue[]>(textToolsPluginKey, toDecorations),
 		]
 	},
 })

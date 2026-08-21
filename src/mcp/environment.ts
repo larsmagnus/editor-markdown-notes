@@ -18,6 +18,9 @@ import {
  * rather than throwing, so a malformed value costs one setting instead of the
  * whole server.
  */
+/** The reading-age scale every check accepts, shared so it's defined once. */
+const TARGET_AGE_RANGE = z.coerce.number().int().min(5).max(30)
+
 const Defaults = z.object({
 	// `.min(1)` so an empty list degrades to the defaults like every other field
 	// here. Left to mean what it says, a user who had switched every check off in
@@ -28,12 +31,7 @@ const Defaults = z.object({
 		.transform((value) => value.split(',').filter(Boolean))
 		.pipe(z.array(z.enum(TEXT_TOOL_RULE_IDS)).min(1))
 		.catch(DEFAULT_VIEW_OPTIONS.textToolRules),
-	EMN_TARGET_AGE: z.coerce
-		.number()
-		.int()
-		.min(5)
-		.max(30)
-		.catch(DEFAULT_SETTINGS.textToolsTargetAge),
+	EMN_TARGET_AGE: TARGET_AGE_RANGE.catch(DEFAULT_SETTINGS.textToolsTargetAge),
 	EMN_SPELLING_LANGUAGE: z
 		.enum(SPELLING_LANGUAGES)
 		.catch(DEFAULT_VIEW_OPTIONS.spellingLanguage),
@@ -68,13 +66,9 @@ export const SOURCE = {
 }
 
 export const OPTIONS = {
-	targetAge: z.coerce
-		.number()
-		.int()
-		.min(5)
-		.max(30)
-		.optional()
-		.describe("Reading age to score against. Defaults to the user's setting."),
+	targetAge: TARGET_AGE_RANGE.optional().describe(
+		"Reading age to score against. Defaults to the user's setting."
+	),
 	language: z
 		.enum(SPELLING_LANGUAGES)
 		.optional()
