@@ -5,13 +5,71 @@
 	"rules": {
 		"consistent-type-specifier-style": "error",
 		"react/rules-of-hooks": "error",
-		"react/only-export-components": ["warn", { "allowConstantExport": true }]
+		"react/only-export-components": ["warn", { "allowConstantExport": true }],
+		"no-restricted-imports": [
+			"error",
+			{
+				"patterns": [
+					{
+						"group": ["./*", "../**", ".", ".."],
+						"message": "Use the `@/*` path alias instead of relative imports."
+					}
+				]
+			}
+		]
 	},
 	"overrides": [
 		{
 			"files": ["src/components/ui/**"],
 			"rules": {
-				"react/only-export-components": "off"
+				"react/only-export-components": "off",
+				"no-restricted-imports": "off"
+			}
+		},
+		{
+			// Compiled by `tsconfig.host.json`, which has no `paths` mapping - `tsc`
+			// emits an `@/` alias verbatim and the extension dies with
+			// MODULE_NOT_FOUND on activation. Ban the alias here rather than merely
+			// allowing relative imports, so there's one way to import and it can't
+			// be gotten wrong.
+			"files": [
+				"src/host.ts",
+				"src/host/**",
+				"src/shared/**",
+				"src/test/**",
+				"src/lib/host/**"
+			],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"patterns": [
+							{
+								"group": ["@/**"],
+								"message": "Use a relative import here - this file compiles under `tsconfig.host.json`, which has no `paths` mapping, so `@/` fails typecheck instead of at runtime."
+							}
+						]
+					}
+				]
+			}
+		},
+		{
+			// Excluded from `tsconfig.host.json` (compiled by the webview project
+			// instead), so these keep the repo-wide `@/*` requirement rather than
+			// the surrounding folder's relative-only override above.
+			"files": ["src/lib/host/**/*.test.ts"],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"patterns": [
+							{
+								"group": ["./*", "../**", ".", ".."],
+								"message": "Use the `@/*` path alias instead of relative imports."
+							}
+						]
+					}
+				]
 			}
 		},
 		{

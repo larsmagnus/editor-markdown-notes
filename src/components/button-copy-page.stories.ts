@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ButtonCopyPage } from './button-copy-page'
+import { ButtonCopyPage } from '@/components/button-copy-page'
 
 const meta = {
 	component: ButtonCopyPage,

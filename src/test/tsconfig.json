@@ -5,11 +5,11 @@
 	// only app and node. Without this these suites land in an inferred project
 	// with no `types` and no `vscode`, so every `suite`, `test` and `assert`
 	// reads as undefined in the editor while `pnpm typecheck`, which points tsc
-	// at `tsconfig.extension.json` by hand, stays green.
+	// at `tsconfig.host.json` by hand, stays green.
 	//
-	// Nothing builds through this file: `tsconfig.extension.json` still compiles
+	// Nothing builds through this file: `tsconfig.host.json` still compiles
 	// these suites into `out/`, and inheriting from it is what keeps the two
 	// answers the same.
-	"extends": "../../tsconfig.extension.json",
+	"extends": "../../tsconfig.host.json",
 	"include": ["."]
 }

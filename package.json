@@ -35,7 +35,7 @@
 		"onLanguage:markdown",
 		"onStartupFinished"
 	],
-	"main": "./out/extension.js",
+	"main": "./out/host.js",
 	"contributes": {
 		"customEditors": [
 			{
@@ -226,9 +226,9 @@
 	"scripts": {
 		"vscode:prepublish": "pnpm run build",
 		"vscode:sentinel": "mkdir -p out && echo '{\"type\":\"commonjs\"}' > out/package.json",
-		"vscode:bundle-agent-sdk": "esbuild src/extension/agent-sdk-bundle.ts --bundle --platform=node --format=esm --outfile=out/extension/agent-sdk-bundle.mjs --external:vscode && cp src/extension/load-agent-sdk.cjs out/extension/load-agent-sdk.cjs",
-		"vscode:compile": "tsc -p ./tsconfig.extension.json && pnpm vscode:bundle-agent-sdk && pnpm vscode:bundle-mcp && pnpm vscode:sentinel",
-		"vscode:watch": "pnpm vscode:sentinel && pnpm vscode:bundle-agent-sdk && pnpm vscode:bundle-mcp && tsc -watch -p ./tsconfig.extension.json",
+		"vscode:bundle-agent-sdk": "esbuild src/host/agent-sdk-bundle.ts --bundle --platform=node --format=esm --outfile=out/host/agent-sdk-bundle.mjs --external:vscode && cp src/host/load-agent-sdk.cjs out/host/load-agent-sdk.cjs",
+		"vscode:compile": "tsc -p ./tsconfig.host.json && pnpm vscode:bundle-agent-sdk && pnpm vscode:bundle-mcp && pnpm vscode:sentinel",
+		"vscode:watch": "pnpm vscode:sentinel && pnpm vscode:bundle-agent-sdk && pnpm vscode:bundle-mcp && tsc -watch -p ./tsconfig.host.json",
 		"vscode:package": "pnpm dlx @vscode/vsce@3.9.2 package --no-dependencies",
 		"vscode:install": "pnpm install && pnpm vscode:package && code --install-extension editor-markdown-notes-$npm_package_version.vsix",
 		"watch": "pnpm vscode:watch",
@@ -240,7 +240,7 @@
 		"test:extension": "vscode-test",
 		"dev": "vite",
 		"build": "tsc -b && vite build && pnpm vscode:compile",
-		"typecheck": "tsc -b --noEmit && tsc -p ./tsconfig.extension.json --noEmit",
+		"typecheck": "tsc -b --noEmit && tsc -p ./tsconfig.host.json --noEmit",
 		"lint": "pnpm typecheck && oxlint --fix && oxfmt",
 		"lint:ci": "oxlint && oxfmt --check",
 		"release": "pnpm version --message 'chore(release): %s'",

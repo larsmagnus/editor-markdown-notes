@@ -5,7 +5,7 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import { DocumentWriter } from '../extension/document-updates'
+import { DocumentWriter } from '../host/document-updates'
 
 async function openTempNote(contents: string) {
 	const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
-import DevFileSelector from './dev-file-selector'
+import DevFileSelector from '@/components/dev-file-selector'
 
 const meta = {
 	component: DevFileSelector,

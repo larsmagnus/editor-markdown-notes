@@ -3,8 +3,8 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import { getImageBaseUris } from '../extension/image-base-uris'
-import { resolveImageSrc } from '../lib/resolve-image-src'
+import { getImageBaseUris } from '../host/image-base-uris'
+import { resolveImageSrc } from '../lib/host/resolve-image-src'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 

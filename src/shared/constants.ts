@@ -5,7 +5,7 @@
  * Separate from `messages.ts`, which is the host ↔ webview *message* contract.
  * These are plain strings with no runtime imports, so this file is safe to pull
  * into all three build graphs - which is the whole reason it exists rather than
- * living in `src/extension/`, a directory the webview bundle must never reach
+ * living in `src/host/`, a directory the webview bundle must never reach
  * into. One `vscode` import added there would break the panel at build time.
  */
 

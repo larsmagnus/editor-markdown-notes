@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import Header from './header'
+import Header from '@/components/header'
 
 const meta = {
 	component: Header,

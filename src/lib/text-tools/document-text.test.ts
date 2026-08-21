@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/core'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions'
+import { extensions } from '@/editor/extensions/extensions'
 import { getDocumentText } from '@/lib/text-tools/document-text'
 import { offsetToPosition } from '@/lib/text-tools/offset-to-position'
 

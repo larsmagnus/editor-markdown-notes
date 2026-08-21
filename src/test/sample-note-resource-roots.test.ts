@@ -3,7 +3,7 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import { getDocumentResourceRoots } from '../extension/image-base-uris'
+import { getDocumentResourceRoots } from '../host/image-base-uris'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 

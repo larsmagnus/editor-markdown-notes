@@ -2,7 +2,7 @@ import * as assert from 'assert'
 
 import * as vscode from 'vscode'
 
-import { readSearchMatches } from '../extension/read-search-match'
+import { readSearchMatches } from '../host/read-search-match'
 
 import { runSearch } from './search-test-support'
 

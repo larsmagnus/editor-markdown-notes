@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
-import Toolbar from './toolbar'
+import Toolbar from '@/components/toolbar'
 
 const meta = {
 	component: Toolbar,

@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { Editor, EditorContext } from '@tiptap/react'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions'
+import { extensions } from '@/editor/extensions/extensions'
 import { useEditorHistory } from '@/hooks/use-editor-history'
 
 let currentEditor: Editor | undefined

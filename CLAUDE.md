@@ -8,7 +8,7 @@ Only add a line here if a future session couldn't cheaply rediscover it by readi
 
 A VSCode extension for editing markdown in a live preview powered by a React web application.
 
-- **VSCode Extension**: `src/extension.ts` only activates; everything else lives in `src/extension/` and compiles to `out/extension.js`, a name `package.json`'s `main` field requires — renaming to `src/extension/index.ts` would break activation. `tsconfig.extension.json` has no `paths` mapping, so a stray `@/` alias fails typecheck instead of MODULE_NOT_FOUND at activation. The root package is ESM for Vite, but the extension host needs CommonJS: `vscode:compile` writes `out/package.json` as `{"type":"commonjs"}`, making everything under `out/` CJS.
+- **VSCode Extension**: `src/host.ts` only activates; everything else lives in `src/host/` and compiles to `out/host.js`, a name `package.json`'s `main` field requires — renaming to `src/host/index.ts` would break activation. `tsconfig.host.json` has no `paths` mapping, so a stray `@/` alias fails typecheck instead of MODULE_NOT_FOUND at activation. Host-only pure utilities shared with the webview (e.g. frontmatter splitting) live in `src/lib/host/**`, the one exception carved out of `src/lib/`, for the same relative-import reason. The root package is ESM for Vite, but the extension host needs CommonJS: `vscode:compile` writes `out/package.json` as `{"type":"commonjs"}`, making everything under `out/` CJS.
 - **Shared contract**: `src/shared/messages.ts` holds host ↔ webview message types and defaults, included in both tsconfig projects; the CJS sentinel above is what makes value imports safe from the extension host.
 
 ## Development Commands
@@ -17,7 +17,7 @@ A VSCode extension for editing markdown in a live preview powered by a React web
 
 `knip.jsonc` must include `.css` in `project`, or Tailwind v4's `@plugin` directives in `src/globals.css` don't count as usage and those plugins read as unused deps. `src/components/ui/**` exports are exempt, keeping vendored shadcn files a clean overwrite.
 
-Vitest runs `src/**/*.test.{ts,tsx}` except `src/test/**`, which `tsconfig.extension.json` compiles without a DOM lib — keep webview tests out of it. Those suites are `pnpm test:extension`, which boots a real VS Code and is the only way to check host behaviour.
+Vitest runs `src/**/*.test.{ts,tsx}` except `src/test/**`, which `tsconfig.host.json` compiles without a DOM lib — keep webview tests out of it. Those suites are `pnpm test:extension`, which boots a real VS Code and is the only way to check host behaviour.
 
 jscpd v5 has no Node API (Rust rewrite) — shell out to the `cpd`/`jscpd` binary, don't `import` it.
 
@@ -31,7 +31,7 @@ Never replace `navigator` wholesale in a test that also mounts an editor: a stub
 
 #### Debugging a blank panel
 
-Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The webview console is invisible to the host, so `src/extension/webview-document.ts` injects a bridge (`src/lib/webview-diagnostics.ts`) ahead of the app bundle that forwards uncaught errors, rejected promises, CSP violations, `console.error`/`warn`, and a "#root is still empty" watchdog into that channel. Nothing logged means the host never got that far — check the entry-chunk line at the top.
+Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The webview console is invisible to the host, so `src/host/webview-document.ts` injects a bridge (`src/lib/host/webview-diagnostics.ts`) ahead of the app bundle that forwards uncaught errors, rejected promises, CSP violations, `console.error`/`warn`, and a "#root is still empty" watchdog into that channel. Nothing logged means the host never got that far — check the entry-chunk line at the top.
 
 ## Architecture
 
@@ -71,7 +71,7 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 
 ### MCP server (`src/mcp/`)
 
-`src/mcp/README.md` carries the why. The build is the only trap not in it: its own process, so unlike `agent-sdk-bundle.ts` it needs **no** `.cjs` loader shim — that shim exists because the CommonJS host has to reach an ES module, while this is a fresh `node` VSCode starts. Excluded from `tsconfig.extension.json` and bundled with `--alias:@=./src`, so it uses `@/` imports like the webview rather than the host's relative ones.
+`src/mcp/README.md` carries the why. The build is the only trap not in it: its own process, so unlike `agent-sdk-bundle.ts` it needs **no** `.cjs` loader shim — that shim exists because the CommonJS host has to reach an ES module, while this is a fresh `node` VSCode starts. Excluded from `tsconfig.host.json` and bundled with `--alias:@=./src`, so it uses `@/` imports like the webview rather than the host's relative ones.
 
 ### Content Management
 
@@ -103,7 +103,7 @@ The Claude prompt templates (`claude-prompt.ts`) take `%@`, `%s` and `%c`, subst
 
 `src/lib/schemas.ts` holds the zod schemas for everything the webview receives from outside itself (localStorage, host `config` messages). Every field uses `.catch()`, so parsing degrades to a default rather than throwing and blanking the editor.
 
-**Keep zod out of the extension host.** The `.vsix` is packaged with `--no-dependencies`, so `node_modules` is not shipped and anything `src/extension.ts` requires at runtime must be dependency-free. The host merges over `DEFAULT_SETTINGS` / `DEFAULT_VIEW_OPTIONS` instead.
+**Keep zod out of the extension host.** The `.vsix` is packaged with `--no-dependencies`, so `node_modules` is not shipped and anything `src/host.ts` requires at runtime must be dependency-free. The host merges over `DEFAULT_SETTINGS` / `DEFAULT_VIEW_OPTIONS` instead.
 
 ### File Organization
 

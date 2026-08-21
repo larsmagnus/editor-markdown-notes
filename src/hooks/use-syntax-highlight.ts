@@ -2,7 +2,7 @@ import type { Editor } from '@tiptap/react'
 import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
 
-import type { PlacedToken } from '@/editor/syntax-highlight-extension'
+import type { PlacedToken } from '@/editor/extensions/syntax-highlight/syntax-highlight-extension'
 import { useDocumentRevision } from '@/hooks/use-document-revision'
 import { useShikiTheme } from '@/hooks/use-shiki-theme'
 import type { RelativeToken } from '@/lib/syntax-highlight-tokens'

@@ -1,5 +1,5 @@
 /**
- * Shared contract between the extension host (`src/extension.ts`) and the
+ * Shared contract between the extension host (`src/host.ts`) and the
  * webview React app. Types and plain constants only — no runtime imports —
  * so this file is safe to include in both build graphs.
  */

@@ -27,7 +27,7 @@
 		}
 	},
 	"include": ["src"],
-	// src/test holds the extension host's mocha suites (tsconfig.extension.json compiles
+	// src/test holds the extension host's mocha suites (tsconfig.host.json compiles
 	// them)
 	"exclude": ["src/test"]
 }

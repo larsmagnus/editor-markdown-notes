@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-import { MarkdownEditorProvider } from '../extension/markdown-editor-provider'
+import { MarkdownEditorProvider } from '../host/markdown-editor-provider'
 
 export { pause } from './search-test-support'
 

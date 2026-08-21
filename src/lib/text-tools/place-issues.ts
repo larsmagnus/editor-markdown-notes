@@ -1,4 +1,4 @@
-import type { PlacedIssue } from '@/editor/text-tools-extension'
+import type { PlacedIssue } from '@/editor/extensions/text-tools/text-tools-extension'
 import type { DocumentText } from '@/lib/text-tools/document-text'
 import { offsetToPosition } from '@/lib/text-tools/offset-to-position'
 import type { TextIssue } from '@/lib/text-tools/types'

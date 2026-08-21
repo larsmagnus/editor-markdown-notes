@@ -1,0 +1,39 @@
+{
+	"compilerOptions": {
+		"module": "CommonJS",
+		"target": "ES2022",
+		"outDir": "out",
+		"lib": ["ES2022"],
+		"sourceMap": true,
+		"rootDir": "src",
+		"strict": true,
+		"skipLibCheck": true,
+		"types": ["mocha", "node"]
+		// No `paths` mapping, deliberately. `tsc` does not rewrite path aliases, so
+		// `@/lib/x` would typecheck here and emit `require("@/lib/x")` verbatim,
+		// killing the extension with MODULE_NOT_FOUND on activation - a failure
+		// neither test suite can see. Omitting the mapping turns that into a
+		// typecheck error instead, which is why host code uses relative imports.
+	},
+	"include": [
+		"src/host.ts",
+		"src/host/**/*",
+		"src/shared/**/*",
+		"src/test/**/*",
+		// Pure and dependency-free host-side modules, grouped here rather than
+		// scattered through `src/lib/**` — which would drag the whole webview lib
+		// tree (zod, React, the retext stack) into the CommonJS host build.
+		"src/lib/host/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"out",
+		// esbuild's entry point, never tsc's - see the file's own comment.
+		"src/host/agent-sdk-bundle.ts",
+		// Its own esbuild bundle and its own process, which reaches the retext
+		// stack through `@/` aliases this project deliberately cannot resolve.
+		"src/mcp",
+		// This project has no DOM lib and no vitest types.
+		"src/lib/host/**/*.test.ts"
+	]
+}

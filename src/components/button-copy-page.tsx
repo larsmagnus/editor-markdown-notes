@@ -1,6 +1,6 @@
 import { ChevronDown, Code, Copy, FileType } from 'lucide-react'
 
-import { CopiedBadge } from '@/components/copied-badge'
+import { BadgeCopied } from '@/components/badge-copied'
 import { CopyActionsMenu } from '@/components/copy-actions-menu'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
@@ -85,7 +85,7 @@ export function ButtonCopyPage({ content }: ButtonCopyPageProps) {
 				</DropdownMenu>
 			</ButtonGroup>
 
-			<CopiedBadge show={copied} />
+			<BadgeCopied show={copied} />
 		</div>
 	)
 }

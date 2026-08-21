@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { AppErrorBoundary } from './app-error-boundary'
+import { AppErrorBoundary } from '@/components/app-error-boundary'
 
 /** Stands in for a subtree that throws on render, the case the boundary exists for. */
 function BrokenSubtree(): never {

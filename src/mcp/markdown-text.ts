@@ -3,7 +3,7 @@ import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown } from 'mdast-util-gfm'
 import { gfm } from 'micromark-extension-gfm'
 
-import { splitFrontmatter } from '@/lib/frontmatter'
+import { splitFrontmatter } from '@/lib/host/frontmatter'
 import type { ProseExclusion } from '@/lib/text-tools/prose-policy'
 import {
 	BLOCK_SEPARATOR,

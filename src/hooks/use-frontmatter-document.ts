@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/react'
 import { useEffect } from 'react'
 
-import { splitFrontmatter } from '@/lib/frontmatter'
+import { splitFrontmatter } from '@/lib/host/frontmatter'
 
 /** Stable, so the default does not re-run the effect on every render. */
 const neverOwnSave = () => false

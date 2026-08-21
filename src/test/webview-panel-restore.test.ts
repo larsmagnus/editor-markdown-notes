@@ -5,7 +5,7 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import { DocumentWriter } from '../extension/document-updates'
+import { DocumentWriter } from '../host/document-updates'
 
 import {
 	captureNextPanel,

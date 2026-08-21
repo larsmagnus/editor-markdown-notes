@@ -2,10 +2,10 @@ import type { HighlighterCore } from 'shiki'
 import { createHighlighterCore } from 'shiki/core'
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript'
 
-import { findLanguageImporter } from '@/editor/shiki-language-map'
 import type { ShikiTheme } from '@/hooks/use-shiki-theme'
 import { kindIsDark } from '@/hooks/use-shiki-theme'
 import { loadDefaultShikiTheme } from '@/lib/default-shiki-theme'
+import { findLanguageImporter } from '@/lib/shiki-language-map'
 
 /**
  * Lazily creates and caches the singleton Shiki highlighter.

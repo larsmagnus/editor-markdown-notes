@@ -1,0 +1,105 @@
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import { SettingsProvider } from '@/components/settings-provider'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { ButtonActions } from '@/editor/extensions/mermaid/button-actions'
+import { copyToClipboard } from '@/lib/clipboard'
+
+// Mocked at the module rather than at `navigator`, which is the app's one seam
+// onto the clipboard. Tolerating a missing clipboard is that module's job and
+// is tested there.
+vi.mock('@/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
+
+const DIAGRAM_CODE = 'flowchart LR\n  A[Start] --> B[Ship it]'
+const DIAGRAM_SVG = '<svg aria-roledescription="flowchart-v2"></svg>'
+
+afterEach(() => {
+	delete window.vscode
+	localStorage.clear()
+	vi.unstubAllGlobals()
+	vi.clearAllMocks()
+})
+
+describe('ButtonActions', () => {
+	it('copies the diagram source when the copy button is clicked', async () => {
+		render(
+			<SettingsProvider>
+				<TooltipProvider>
+					<ButtonActions code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
+				</TooltipProvider>
+			</SettingsProvider>
+		)
+
+		await userEvent.click(screen.getByLabelText('Copy diagram code'))
+
+		expect(copyToClipboard).toHaveBeenCalledWith(DIAGRAM_CODE)
+	})
+
+	it('copies the rendered SVG from the menu', async () => {
+		render(
+			<SettingsProvider>
+				<TooltipProvider>
+					<ButtonActions code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
+				</TooltipProvider>
+			</SettingsProvider>
+		)
+
+		await userEvent.click(screen.getByLabelText('Diagram actions'))
+		await userEvent.click(await screen.findByText('Copy SVG'))
+
+		expect(copyToClipboard).toHaveBeenCalledWith(DIAGRAM_SVG)
+	})
+
+	// The host knows which file this is but nothing about which of its diagrams
+	// was asked about, so the source is what narrows the prompt.
+	it('sends the diagram source to the host when opening Claude in VS Code', async () => {
+		const postMessage = vi.fn()
+		window.vscode = { postMessage, getState: () => {}, setState: () => {} }
+
+		render(
+			<SettingsProvider>
+				<TooltipProvider>
+					<ButtonActions code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
+				</TooltipProvider>
+			</SettingsProvider>
+		)
+
+		await userEvent.click(screen.getByLabelText('Diagram actions'))
+		await userEvent.click(await screen.findByText('Open in Claude'))
+
+		expect(postMessage).toHaveBeenCalledWith({
+			type: 'openClaudeTerminal',
+			content: DIAGRAM_CODE,
+		})
+	})
+
+	// Standalone there is no host to ask, so the source travels by clipboard -
+	// the same fallback the whole-note "Open in Claude" takes.
+	it('copies the source and opens claude.ai outside VS Code', async () => {
+		const open = vi.fn()
+		vi.stubGlobal('open', open)
+
+		render(
+			<SettingsProvider>
+				<TooltipProvider>
+					<ButtonActions code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
+				</TooltipProvider>
+			</SettingsProvider>
+		)
+
+		await userEvent.click(screen.getByLabelText('Diagram actions'))
+		await userEvent.click(await screen.findByText('Open in Claude'))
+
+		expect(copyToClipboard).toHaveBeenCalledWith(DIAGRAM_CODE)
+		expect(open).toHaveBeenCalledWith(
+			'https://claude.ai',
+			'_blank',
+			'noopener,noreferrer'
+		)
+		// That branch replaces the reader's clipboard, so it owes them the same
+		// acknowledgement an explicit copy gets.
+		expect(screen.getByRole('status')).toHaveTextContent('Copied')
+	})
+})

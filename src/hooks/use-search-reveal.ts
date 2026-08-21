@@ -1,8 +1,8 @@
 import type { Editor } from '@tiptap/react'
 import { useEffect } from 'react'
 
-import { SEARCH_REVEAL_TARGET_CLASS } from '@/editor/search-reveal/extension'
-import { findOccurrences } from '@/editor/search-reveal/find-occurrences'
+import { findOccurrences } from '@/editor/extensions/search-reveal/find-occurrences'
+import { SEARCH_REVEAL_TARGET_CLASS } from '@/editor/extensions/search-reveal/search-reveal-extension'
 import { scrollHoldInView } from '@/lib/scroll/scroll-hold-in-view'
 import { takeSearchReveal } from '@/lib/search-reveal'
 

@@ -1,7 +1,7 @@
 import { useEditor } from '@tiptap/react'
 import { useCallback, useRef } from 'react'
 
-import { extensions } from '@/editor/extensions'
+import { extensions } from '@/editor/extensions/extensions'
 import { useAskProposal } from '@/hooks/use-ask-proposal'
 import { useFrontmatterDocument } from '@/hooks/use-frontmatter-document'
 import { useItalicMarker } from '@/hooks/use-italic-marker'
@@ -10,7 +10,7 @@ import { useSearchReveal } from '@/hooks/use-search-reveal'
 import { useSettings } from '@/hooks/use-settings'
 import { useSyntaxHighlight } from '@/hooks/use-syntax-highlight'
 import { useTextTools } from '@/hooks/use-text-tools'
-import { splitFrontmatter } from '@/lib/frontmatter'
+import { splitFrontmatter } from '@/lib/host/frontmatter'
 
 /** Stable, so the default does not rebuild `save` on every render. */
 const noSaveTarget = () => {}

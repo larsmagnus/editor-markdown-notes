@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react'
 import { Editor } from '@tiptap/react'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions'
+import { extensions } from '@/editor/extensions/extensions'
 import { useFrontmatterDocument } from '@/hooks/use-frontmatter-document'
 
 let currentEditor: Editor | undefined

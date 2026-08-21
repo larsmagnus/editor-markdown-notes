@@ -2,8 +2,8 @@ import { useCurrentEditor } from '@tiptap/react'
 import { useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 
-import type { TableAnchor } from '@/editor/table/geometry'
-import type { TableAxis } from '@/editor/table/menu-items'
+import type { TableAnchor } from '@/editor/extensions/table/geometry'
+import type { TableAxis } from '@/editor/extensions/table/menu-items'
 
 /** Below this the gesture is still a click, not a drag. */
 const DRAG_THRESHOLD_PX = 4

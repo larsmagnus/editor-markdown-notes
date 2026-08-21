@@ -2,7 +2,7 @@ import * as assert from 'assert'
 
 import * as vscode from 'vscode'
 
-import { readSearchReveal } from '../extension/read-search-reveal'
+import { readSearchReveal } from '../host/read-search-reveal'
 
 import { runSearch } from './search-test-support'
 

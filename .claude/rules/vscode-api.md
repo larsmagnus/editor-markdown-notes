@@ -1,6 +1,6 @@
 ---
 paths:
-  - 'src/extension.ts,src/extension/**,src/test/**'
+  - 'src/host.ts,src/host/**,src/test/**'
 ---
 
 # VS Code API Rules
