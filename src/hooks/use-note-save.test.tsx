@@ -135,6 +135,62 @@ describe('useNoteSave', () => {
 		expect(saveContent).not.toHaveBeenCalled()
 	})
 
+	// Switching from the live editor to the raw editor unmounts this hook's
+	// caller. The debounce library cancels its own pending timer on unmount, so
+	// an edit made in the second before the switch used to vanish silently -
+	// the raw view then opened on the pre-edit document, not what was just typed.
+	it('flushes a pending save when unmounted before the debounce fires', () => {
+		const saveContent = vi.fn()
+		const { result, unmount } = renderHook(() =>
+			useNoteSave({
+				isVSCodeContext: true,
+				saveContent,
+				currentFile: () => '# Roadmap\n\nShip it. Today.',
+			})
+		)
+
+		result.current.queueSave('# Roadmap\n\nShip it. Today.')
+		unmount()
+
+		expect(saveContent).toHaveBeenCalledWith('# Roadmap\n\nShip it. Today.')
+	})
+
+	// The debounced path (`runDebounce()` above) routes a standalone save
+	// through `updateNotes` rather than `saveContent`, which posts to a VS Code
+	// API that does not exist outside VSCode. The flush on unmount has to take
+	// the same fork.
+	it('flushes a pending standalone save through updateNotes, not saveContent', () => {
+		const saveContent = vi.fn()
+		const { result, unmount } = renderHook(() =>
+			useNoteSave({
+				isVSCodeContext: false,
+				saveContent,
+				currentFile: () => '# Roadmap\n\nShip it. Today.',
+			})
+		)
+
+		result.current.queueSave('# Roadmap\n\nShip it. Today.')
+		unmount()
+
+		expect(updateNotes).toHaveBeenCalledWith('# Roadmap\n\nShip it. Today.')
+		expect(saveContent).not.toHaveBeenCalled()
+	})
+
+	it('does not flush on unmount when nothing was ever typed', () => {
+		const saveContent = vi.fn()
+		const { unmount } = renderHook(() =>
+			useNoteSave({
+				isVSCodeContext: true,
+				saveContent,
+				currentFile: () => null,
+			})
+		)
+
+		unmount()
+
+		expect(saveContent).not.toHaveBeenCalled()
+	})
+
 	describe('Cmd/Ctrl+S', () => {
 		it('saves immediately rather than waiting out the debounce', () => {
 			const saveContent = vi.fn()

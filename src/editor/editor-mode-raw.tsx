@@ -112,7 +112,7 @@ export function EditorModeRaw({
 			spellCheck={false}
 			aria-label="Raw markdown"
 			className={cn(
-				'w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre outline-none',
+				'w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre outline-none field-sizing-content',
 				className
 			)}
 		/>
