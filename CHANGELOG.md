@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-08-21
+
 - Added a document stats section to the writing tools panel, showing word, character, sentence and paragraph counts alongside estimated reading time
 - Fixed the raw markdown view showing only the first line or two of a note until scrolled
 
