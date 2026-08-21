@@ -2,7 +2,7 @@ import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 
 import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react-swc'
+import react from '@vitejs/plugin-react'
 import type { Plugin } from 'vite'
 import { configDefaults, defineConfig } from 'vitest/config'
 
