@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Changed task list checkboxes in the live editor to match the app's other checkboxes
+- Fixed typing `- [ ] ` not converting into a task item, leaving the brackets as literal text
+- Fixed Tab at the start of a list item indenting its text instead of nesting the item
+
 ## [0.22.0] - 2026-08-21
 
 - Added a document stats section to the writing tools panel, showing word, character, sentence and paragraph counts alongside estimated reading time
