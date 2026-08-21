@@ -115,6 +115,37 @@ describe('Editor Mode Live', () => {
 		expect(checkboxes[1]).not.toBeChecked()
 	})
 
+	it('checking a task list item saves it as checked in the markdown', async () => {
+		const content = '- [ ] Ship footnotes'
+
+		render(<EditorModeLive content={content} />)
+
+		const checkbox = await screen.findByRole('checkbox')
+		await userEvent.click(checkbox)
+
+		expect(checkbox).toBeChecked()
+		await waitFor(
+			() => {
+				expect(updateNotes).toHaveBeenCalledWith('- [x] Ship footnotes')
+			},
+			{ timeout: 2000 }
+		)
+	})
+
+	// `- ` makes a plain bullet before `[ ] ` is typed, which used to leave
+	// `[ ] ` as literal text - see `task-item-extension.ts` for why.
+	it('converts a typed "- [ ] " into a task item, not literal text', async () => {
+		render(<EditorModeLive content="" />)
+
+		await userEvent.click(screen.getByRole('textbox'))
+		await userEvent.keyboard('- {[} {]} Ship footnotes')
+
+		const checkbox = await screen.findByRole('checkbox')
+		expect(checkbox).not.toBeChecked()
+		expect(screen.getByText('Ship footnotes')).toBeInTheDocument()
+		expect(screen.queryByText(/\[ \]/)).not.toBeInTheDocument()
+	})
+
 	// Outside VSCode the notes are served from the site root, so the author's
 	// path is already the right one and must reach the DOM untouched.
 	it('renders an image with its alt text', async () => {

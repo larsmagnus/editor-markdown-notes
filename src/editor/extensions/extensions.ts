@@ -7,7 +7,6 @@ import ListItem from '@tiptap/extension-list-item'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
-import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import { TextStyle } from '@tiptap/extension-text-style'
 import type { TextStyleOptions } from '@tiptap/extension-text-style'
@@ -36,6 +35,7 @@ import { SyntaxHighlight } from '@/editor/extensions/syntax-highlight/syntax-hig
 import { TabIndent } from '@/editor/extensions/tab-indent/tab-indent-extension'
 import { TableCommands } from '@/editor/extensions/table/commands'
 import { MarkdownTable } from '@/editor/extensions/table/table-extension'
+import { TaskItemExtension } from '@/editor/extensions/task-item/task-item-extension'
 import { TextTools } from '@/editor/extensions/text-tools/text-tools-extension'
 import { resolveImageSrc } from '@/lib/host/resolve-image-src'
 
@@ -111,7 +111,7 @@ export const extensions = [
 	TaskList.extend({
 		addAttributes: () => ({ tight: { default: true, rendered: false } }),
 	}),
-	TaskItem.configure({ nested: true }),
+	TaskItemExtension,
 	// Inline, so an image sits in a paragraph. As a block node the serializer
 	// never closes the block and the image runs into the text that follows it.
 	// `draggable` (native drag-and-drop reordering) is already the extension's
