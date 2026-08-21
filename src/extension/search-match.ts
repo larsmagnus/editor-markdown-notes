@@ -1,13 +1,11 @@
 /**
- * Parsing for the search view's two readable commands.
+ * Parsing for `search.action.getSearchResults`.
  *
- * `search.action.getSearchResults` returns the whole result set as text,
- * grouped by absolute file path, one match per line as `  line,column: text`.
- * `search.action.copyMatch` returns the *focused* match alone, in the same
- * `line,column: text` shape. Both are 1-based on line and column, which is why
+ * It returns the whole result set as text, grouped by absolute file path, one
+ * match per line as `  line,column: text`, both 1-based - which is why
  * everything here converts to the 0-based positions VSCode's API uses.
  *
- * These are the only route by which a search-result click can reach a custom
+ * This is the only route by which a search-result click can reach a custom
  * editor: `resolveCustomTextEditor` is handed no selection, and revealing an
  * already-open tab raises no event carrying one.
  */
@@ -23,20 +21,6 @@ export interface SearchMatch {
 
 /** `  67,2: \t<input id="email" …` - leading spaces vary with nesting depth. */
 const MATCH_LINE = /^\s*(\d+),(\d+):\s?(.*)$/
-
-/**
- * The match the search view currently has focused, from `copyMatch` output.
- *
- * Returns `undefined` for anything that is not a single match line - an empty
- * clipboard, or a whole-file copy, both of which mean "no match is focused"
- * rather than an error worth surfacing.
- */
-export function parseFocusedMatch(copied: string): SearchMatch | undefined {
-	const [line] = copied.split('\n')
-	if (!line) return undefined
-
-	return toMatch(line)
-}
 
 /**
  * Every match, keyed by the absolute path of the file holding it.

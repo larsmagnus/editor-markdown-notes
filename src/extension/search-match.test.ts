@@ -1,40 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseFocusedMatch, parseSearchResults } from './search-match'
+import { parseSearchResults } from './search-match'
 
 /**
  * Fixtures are copied verbatim out of VSCode 1.133.0, from a `<input` search
  * across this repo - the scenario the reveal feature exists for.
  */
-
-describe('parseFocusedMatch', () => {
-	it('reads the line and column of the focused match, 0-based', () => {
-		const match = parseFocusedMatch(
-			'67,2: \t<input id="email" name="email" type="email" required />'
-		)
-
-		expect(match).toEqual({
-			line: 66,
-			column: 1,
-			lineText: '\t<input id="email" name="email" type="email" required />',
-		})
-	})
-
-	it('distinguishes two matches sharing one line by their column', () => {
-		const line = '\t<input id="email" required /><input id="second" />'
-
-		expect(parseFocusedMatch(`8,2: ${line}`)?.column).toBe(1)
-		expect(parseFocusedMatch(`8,57: ${line}`)?.column).toBe(56)
-	})
-
-	it('reports no focused match for an empty clipboard', () => {
-		expect(parseFocusedMatch('')).toBeUndefined()
-	})
-
-	it('reports no focused match when a whole file was copied instead', () => {
-		expect(parseFocusedMatch('/Users/lars/notes/other-note.md')).toBeUndefined()
-	})
-})
 
 describe('parseSearchResults', () => {
 	it('groups every match under the file holding it', () => {
