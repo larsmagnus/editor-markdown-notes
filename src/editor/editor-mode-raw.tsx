@@ -13,6 +13,9 @@ interface RawMarkdownEditorProps {
 	className?: string
 }
 
+/** Where the "Skip to editor" link (`skip-target.ts`) focuses in raw mode. */
+export const RAW_MARKDOWN_EDITOR_ID = 'raw-markdown-editor'
+
 /**
  * The note as plain markdown source, editable and autosaving.
  *
@@ -105,6 +108,7 @@ export function EditorModeRaw({
 
 	return (
 		<textarea
+			id={RAW_MARKDOWN_EDITOR_ID}
 			ref={textareaRef}
 			value={draft}
 			onChange={handleChange}

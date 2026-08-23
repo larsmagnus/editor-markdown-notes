@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 
 import { AppErrorBoundary } from '@/components/app-error-boundary'
+import { SkipLinks } from '@/components/skip-links'
 import { EditorBody } from '@/editor/editor-body'
 import { useNoteSource } from '@/hooks/use-note-source'
 import { useScrollPosition } from '@/hooks/use-scroll-position'
@@ -33,6 +34,8 @@ function Layout({ defaultFileName }: LayoutProps) {
 
 	return (
 		<div ref={scrollRef} className="h-screen overflow-auto">
+			<SkipLinks raw={viewOptions.raw} textToolsOpen={viewOptions.textTools} />
+
 			{!settings.hideToolbar && (
 				<AppErrorBoundary title="The toolbar">
 					<Suspense fallback={null}>

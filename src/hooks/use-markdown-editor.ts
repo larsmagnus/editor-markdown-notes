@@ -1,7 +1,12 @@
 import { useEditor } from '@tiptap/react'
 import { useCallback, useRef } from 'react'
 
+import {
+	EDITOR_KEYBOARD_HINT_ID,
+	LIVE_EDITOR_ID,
+} from '@/editor/editor-mode-live-surface'
 import { extensions } from '@/editor/extensions/extensions'
+import { useFocusNavigation } from '@/editor/extensions/focus-navigation/use-focus-navigation'
 import { useAskProposal } from '@/hooks/use-ask-proposal'
 import { useFrontmatterDocument } from '@/hooks/use-frontmatter-document'
 import { useItalicMarker } from '@/hooks/use-italic-marker'
@@ -68,10 +73,21 @@ export function useMarkdownEditor(
 		editorProps: {
 			// Make space for toolbar + bubble menu
 			scrollMargin: 110,
+			// Set here, not as props on `<EditorContent>`, so they land on
+			// `view.dom` itself rather than TipTap's wrapper div. `role` is
+			// explicit: TipTap only adds its own `role="textbox"` default when
+			// nothing here already provides an `attributes` object.
+			attributes: {
+				role: 'textbox',
+				id: LIVE_EDITOR_ID,
+				spellcheck: 'false',
+				'aria-describedby': EDITOR_KEYBOARD_HINT_ID,
+			},
 		},
 	})
 
 	useFrontmatterDocument(editor, content, isOwnSave)
+	useFocusNavigation(editor)
 
 	// After the rebuild above, which is what puts the note's real text in the
 	// document - searching the doc it was constructed with would miss the

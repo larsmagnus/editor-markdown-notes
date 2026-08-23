@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 
 import { expect, test } from '@playwright/test'
 
-import { openInVSCode, pasteText } from '@/e2e/helpers'
+import { openInVSCode, pasteText } from '@/e2e/lib/helpers'
 
 test.describe('Lists in the live editor', () => {
 	test('typing "- " creates a bullet list item', async ({ page }) => {

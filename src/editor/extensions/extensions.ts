@@ -20,6 +20,7 @@ import { AskInlineStatus } from '@/editor/extensions/ask/ask-inline-status-exten
 import { AskSuggestion } from '@/editor/extensions/ask/ask-suggestion-extension'
 import { CodeBlockView } from '@/editor/extensions/code-block/code-block-view'
 import { CodeExtension } from '@/editor/extensions/code-block/code-extension'
+import { FocusNavigation } from '@/editor/extensions/focus-navigation/focus-navigation-extension'
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
 import {
 	focusImageToolbar,
@@ -186,6 +187,10 @@ export const extensions = [
 	// table cell and when a node (not a text caret) is selected, so it doesn't
 	// compete with those keys' own meanings elsewhere in this file.
 	TabIndent,
+	// The WCAG "no keyboard trap" escape hatch. Outranks TabIndent, the image
+	// node's Tab shortcut, and the table's Tab-between-cells keymap (all
+	// registered earlier); yields to SlashCommand's own popup.
+	FocusNavigation,
 	// A plugin + keyboard handling only, no schema node, so it can sit anywhere.
 	SlashCommand,
 ]

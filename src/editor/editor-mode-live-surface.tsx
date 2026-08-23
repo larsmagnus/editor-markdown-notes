@@ -6,6 +6,19 @@ import { TableControls } from '@/editor/extensions/table/controls'
 import type { CodeBlockStyle } from '@/hooks/use-syntax-highlight'
 import { cn } from '@/lib/utils'
 
+/**
+ * Where the "Skip to editor" link focuses in live mode. Applied via
+ * `useMarkdownEditor`'s `editorProps.attributes`, not as a prop on
+ * `<EditorContent>` here: TipTap's `PureEditorContent` renders its own
+ * wrapper `<div>` and appends `editor.view.dom` inside it as a child, so an
+ * `id` passed to `<EditorContent>` lands on that wrapper, not the real
+ * `role="textbox"` element.
+ */
+export const LIVE_EDITOR_ID = 'live-editor'
+
+/** The escape-hatch hint's `aria-describedby` target - the `<p>` below. */
+export const EDITOR_KEYBOARD_HINT_ID = 'editor-keyboard-hint'
+
 type EditorSurfaceProps = Omit<EditorContentProps, 'editor'> & {
 	includeProseBaseClassNames?: boolean
 	/**
@@ -45,11 +58,14 @@ export function EditorSurface({
 			    height, so the whole column is a click target - not just the
 			    text. The sticky text-tools panel stays top-aligned. */}
 			<div className="relative min-w-0 flex-1 self-stretch">
+				<p id={EDITOR_KEYBOARD_HINT_ID} className="sr-only">
+					Press Escape, then Tab, to move keyboard focus out of the document
+					text.
+				</p>
 				<EditorConsumer>
 					{({ editor }) => (
 						<EditorContent
 							editor={editor}
-							spellCheck={false}
 							className={cn(
 								includeProseBaseClassNames &&
 									'prose dark:prose-invert prose-headings:font-bold prose-headings:text-black dark:prose-headings:text-white',
