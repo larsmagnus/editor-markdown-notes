@@ -2,7 +2,10 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
+import type { Logger } from '../shared/logger'
 import type { HostToWebview } from '../shared/messages'
+
+import { computeMinimalReplacement } from './minimal-edit'
 
 /** Pushes the document's current text at one panel. */
 export function postDocumentUpdate(
@@ -19,39 +22,65 @@ export function postDocumentUpdate(
 }
 
 /**
- * Writes the webview's markdown back to the document.
+ * Applies the webview's markdown to the document, dirtying it - writing to
+ * disk from here is not this class's job any more; VS Code owns that.
  *
- * Applying the edit fires `onDidChangeTextDocument`, which would otherwise push
- * the text straight back at the webview mid-edit; `isWriting` is what breaks
- * that loop.
+ * Replaces only the span that changed (`computeMinimalReplacement`) instead
+ * of the whole document, so a sync does not spam VS Code's own text undo
+ * stack, collapse folding, or move the caret in any other editor open on the
+ * same file - and skips `applyEdit` altogether when nothing changed.
+ *
+ * Applying the edit fires `onDidChangeTextDocument`, which would otherwise
+ * push the text straight back at the webview mid-edit; `matchesLastWrite` is
+ * what the change subscription checks to break that loop. Content rather
+ * than a timing window: a wall-clock guard suppresses *whatever* change
+ * lands inside it - including a genuine external one racing this write - and
+ * stops suppressing a slow edit's own echo the moment the window closes.
+ *
+ * Writes are queued on one promise chain rather than fired independently, so
+ * two syncs in flight at once cannot apply out of order or race which one's
+ * text `lastWritten` ends up holding. A failed write does not leave the
+ * chain rejected forever - the next sync queued behind it still runs.
  */
 export class DocumentWriter {
-	private writing = false
+	private readonly log: Logger
+	private lastWritten: string | null = null
+	private queue: Promise<void> = Promise.resolve()
 
-	public get isWriting(): boolean {
-		return this.writing
+	constructor(log: Logger) {
+		this.log = log
 	}
 
-	public async write(document: vscode.TextDocument, content: string) {
-		this.writing = true
+	public matchesLastWrite(text: string): boolean {
+		return this.lastWritten === text
+	}
 
-		try {
-			const edit = new vscode.WorkspaceEdit()
+	public write(document: vscode.TextDocument, content: string): Promise<void> {
+		this.queue = this.queue
+			.then(() => this.applyWrite(document, content))
+			.catch((error: unknown) => {
+				this.log.error(`Failed to sync the document: ${String(error)}`)
+			})
 
-			edit.replace(
-				document.uri,
-				new vscode.Range(0, 0, document.lineCount, 0),
-				content
-			)
+		return this.queue
+	}
 
-			await vscode.workspace.applyEdit(edit)
-			await document.save()
-		} finally {
-			// Cleared on a later tick: the change events the edit produced are
-			// delivered after this promise settles.
-			setTimeout(() => {
-				this.writing = false
-			}, 100)
-		}
+	private async applyWrite(document: vscode.TextDocument, content: string) {
+		const replacement = computeMinimalReplacement(document.getText(), content)
+		this.lastWritten = content
+		if (!replacement) return
+
+		const edit = new vscode.WorkspaceEdit()
+
+		edit.replace(
+			document.uri,
+			new vscode.Range(
+				document.positionAt(replacement.start),
+				document.positionAt(replacement.end)
+			),
+			replacement.text
+		)
+
+		await vscode.workspace.applyEdit(edit)
 	}
 }

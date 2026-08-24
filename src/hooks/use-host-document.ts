@@ -42,11 +42,12 @@ export function useHostDocument() {
 
 	// Applying `next` here too, not just posting it, keeps `content` current for
 	// readers like the toolbar's copy actions - the host's own echo of this
-	// write is deliberately suppressed (`DocumentWriter.isWriting`), so without
-	// this, `content` would otherwise sit stale until the next external change.
-	// `syncContent` itself only runs on `useNoteSync`'s 1000ms debounce, so
-	// `content` can still lag the very latest keystroke by up to that window -
-	// the same latency the file on disk already has, not a new gap this closes.
+	// write is deliberately suppressed (`DocumentWriter.matchesLastWrite`), so
+	// without this, `content` would otherwise sit stale until the next external
+	// change. `syncContent` itself only runs on `useNoteSync`'s 1000ms debounce,
+	// so `content` can still lag the very latest keystroke by up to that window
+	// - the same latency the `TextDocument` already has, not a new gap this
+	// closes.
 	const syncContent = useCallback((next: string) => {
 		setContent(next)
 		getVSCodeApi()?.postMessage({ type: 'syncDocument', content: next })

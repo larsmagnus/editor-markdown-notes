@@ -61,7 +61,7 @@ export function attachPanelSession({
 	// a disposed panel, and every line below throws on one.
 	if (token.isCancellationRequested) return new vscode.Disposable(() => {})
 
-	const writer = new DocumentWriter()
+	const writer = new DocumentWriter(log)
 
 	panel.webview.options = {
 		enableScripts: true,

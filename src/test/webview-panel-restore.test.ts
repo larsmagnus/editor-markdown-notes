@@ -18,6 +18,7 @@ import {
 } from './webview-panel-restore-support'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const log = { info: () => {}, warn: () => {}, error: () => {} }
 
 /** Long enough for VS Code to settle a background/reveal transition. */
 const RESTORE_SETTLE_MS = 3000
@@ -156,7 +157,7 @@ suite('Webview panel restore', () => {
 			await background(panel, otherFile)
 
 			const document = await vscode.workspace.openTextDocument(file)
-			await new DocumentWriter().write(
+			await new DocumentWriter(log).write(
 				document,
 				'# Original\n\nAfter the edit.\n'
 			)
