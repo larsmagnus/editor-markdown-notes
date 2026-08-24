@@ -1,6 +1,7 @@
 import type { Editor } from '@tiptap/react'
 import { useEffect, useRef } from 'react'
 
+import { frontmatterFenceText } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import { splitFrontmatter } from '@/lib/host/frontmatter'
 
 /** Stable, so the default does not re-run the effect on every render. */
@@ -80,7 +81,7 @@ export function useFrontmatterDocument(
 		if (frontmatter !== null) {
 			chain.insertContentAt(0, {
 				type: 'frontmatter',
-				content: frontmatter ? [{ type: 'text', text: frontmatter }] : [],
+				content: [{ type: 'text', text: frontmatterFenceText(frontmatter) }],
 			})
 		}
 		chain.run()

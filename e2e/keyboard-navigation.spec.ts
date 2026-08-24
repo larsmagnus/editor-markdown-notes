@@ -68,6 +68,19 @@ test.describe('Keyboard navigation in the live editor', () => {
 		const copyButtons = page.getByRole('button', { name: 'Copy code' })
 
 		await paragraph.click()
+		// The click's own focus must land before Escape checks for it - otherwise
+		// Escape arms nothing, and the Tab that follows just indents instead. Shiki's
+		// async tokenizing pass re-renders each code block once it resolves, which
+		// can still be in flight right after the click - wait for both blocks'
+		// coloring to settle first, or that re-render can land between Escape and
+		// Tab and lose the one-shot the same way.
+		await expect(content).toBeFocused()
+		await expect(
+			content.locator('pre code span[style*="color"]').first()
+		).toBeVisible()
+		await expect(
+			content.locator('pre code span[style*="color"]').last()
+		).toBeVisible()
 		await page.keyboard.press('Escape')
 		await page.keyboard.press('Tab')
 
@@ -102,6 +115,7 @@ test.describe('Keyboard navigation in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 
 		await content.locator('p').click()
+		await expect(content).toBeFocused()
 		await page.keyboard.press('Escape')
 		await page.keyboard.press('Shift+Tab')
 
@@ -149,7 +163,7 @@ test.describe('Keyboard navigation in the live editor', () => {
 		await page.keyboard.press('Enter')
 		await expect(sidebar).not.toBeFocused()
 		await expect(
-			page.getByRole('button', { name: 'Copy frontmatter' })
+			page.getByRole('button', { name: 'Edit frontmatter source' })
 		).toBeFocused()
 	})
 })

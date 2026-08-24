@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
 	fenceCode,
 	fenceLanguage,
+	fenceText,
 	parseFence,
 } from '@/editor/extensions/code-block/code-fence'
 
@@ -91,5 +92,20 @@ describe('parseFence', () => {
 		const text = '```js\nconst a = 1\n\nconst b = 2\n```'
 
 		expect(fenceCode(text)).toBe('const a = 1\n\nconst b = 2')
+	})
+})
+
+describe('fenceText', () => {
+	it('wraps code in fence lines', () => {
+		expect(fenceText('const a = 1', 'ts')).toBe('```ts\nconst a = 1\n```')
+	})
+
+	// A parse/build round trip through an empty block used to insert a blank
+	// line the original file never had (`fenceText('', lang)` wrote
+	// ```` ```ts\n\n``` ```` for a block parsed from ```` ```ts\n``` ````),
+	// so re-serializing it after any unrelated edit silently added a line.
+	it('wraps empty code with no blank line between the fences', () => {
+		expect(fenceText('', 'ts')).toBe('```ts\n```')
+		expect(parseFence(fenceText('', 'ts'))).toEqual(parseFence('```ts\n```'))
 	})
 })

@@ -5,6 +5,7 @@ import { ReactNodeViewRenderer } from '@tiptap/react'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
 import { detectFrontmatter } from '@/editor/extensions/frontmatter/detect'
+import { isAtFrontmatterEdge } from '@/editor/extensions/frontmatter/frontmatter-edge-keymap'
 import { FrontmatterView } from '@/editor/extensions/frontmatter/frontmatter-view'
 
 /**
@@ -49,24 +50,10 @@ export const Frontmatter = Node.create({
 		return ReactNodeViewRenderer(FrontmatterView)
 	},
 
-	// Frontmatter is always the document's first node, so there is nowhere for
-	// Up/Left to go once the caret reaches its start - left to the default
-	// keymap, ProseMirror's gap cursor still tries, landing a cursor above the
-	// block with nothing rendered there to show for it. `endOfTextblock` (not a
-	// plain position check) is what makes this correct for wrapped lines: it
-	// asks the view whether the caret is on the first *visual* line, not just
-	// at text offset 0.
 	addKeyboardShortcuts() {
-		const isAtFrontmatterEdge = (dir: 'up' | 'left') => {
-			const { selection } = this.editor.state
-			if (!selection.empty) return false
-			if (selection.$from.parent.type.name !== 'frontmatter') return false
-			return this.editor.view.endOfTextblock(dir)
-		}
-
 		return {
-			ArrowUp: () => isAtFrontmatterEdge('up'),
-			ArrowLeft: () => isAtFrontmatterEdge('left'),
+			ArrowUp: () => isAtFrontmatterEdge(this.editor, 'up'),
+			ArrowLeft: () => isAtFrontmatterEdge(this.editor, 'left'),
 		}
 	},
 
@@ -83,13 +70,11 @@ export const Frontmatter = Node.create({
 	addStorage() {
 		return {
 			markdown: {
+				// The block's text already contains its `---` fences verbatim (see
+				// `frontmatter-fence.ts`), so this only needs to write it back out.
 				serialize(state: MarkdownSerializerState, node: ProseMirrorNode) {
-					state.write('---\n')
-					if (node.textContent) {
-						state.text(node.textContent, false)
-						state.write('\n')
-					}
-					state.write('---')
+					state.text(node.textContent, false)
+					state.ensureNewLine()
 					state.closeBlock(node)
 				},
 				parse: {},

@@ -24,7 +24,9 @@ describe('detectFrontmatter', () => {
 		)
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('title: Roadmap')
+		expect(editor.state.doc.firstChild?.textContent).toBe(
+			'---\ntitle: Roadmap\n---'
+		)
 	})
 
 	it('does not convert without a closing fence', () => {
@@ -47,7 +49,7 @@ describe('detectFrontmatter', () => {
 		const editor = documentFrom(['---', '', '---', '', '# Roadmap'].join('\n'))
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('')
+		expect(editor.state.doc.firstChild?.textContent).toBe('---\n---')
 	})
 
 	it('creates an empty block and leaves the rest untouched when a heading sits between the fences', () => {
@@ -66,7 +68,7 @@ describe('detectFrontmatter', () => {
 		)
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('')
+		expect(editor.state.doc.firstChild?.textContent).toBe('---\n---')
 		// Everything after the empty block - including the fence that would have
 		// closed a real frontmatter block - survives exactly as typed.
 		expect(editor.state.doc.child(1).type.name).toBe('heading')
@@ -82,7 +84,7 @@ describe('detectFrontmatter', () => {
 		)
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('')
+		expect(editor.state.doc.firstChild?.textContent).toBe('---\n---')
 		expect(editor.state.doc.child(1).firstChild?.type.name === 'image').toBe(
 			true
 		)
@@ -94,7 +96,9 @@ describe('detectFrontmatter', () => {
 		)
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('title: Roadmap')
+		expect(editor.state.doc.firstChild?.textContent).toBe(
+			'---\ntitle: Roadmap\n---'
+		)
 	})
 
 	it('adds a trailing empty paragraph when the whole document is the pattern', () => {

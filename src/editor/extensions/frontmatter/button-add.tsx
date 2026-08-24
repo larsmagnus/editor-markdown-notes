@@ -25,7 +25,22 @@ export function ButtonAdd({ editor }: ButtonAddProps) {
 	if (hasFrontmatter) return null
 
 	function handleClick() {
-		editor.chain().insertContentAt(0, { type: 'frontmatter' }).focus(1).run()
+		editor
+			.chain()
+			.insertContentAt(0, {
+				type: 'frontmatter',
+				// A blank line between the fences, not `frontmatterFenceText('')`
+				// (which collapses to `---\n---`, no gap) - that builder exists to
+				// round-trip an already-empty block byte-for-byte, but here the
+				// author is about to type, and typing right where its two fence
+				// lines touch would run straight into the closing one.
+				content: [{ type: 'text', text: '---\n\n---' }],
+			})
+			// Position 5: past the node's own opening token (1) and the fence-open
+			// line ("---\n" is 4 characters) - lands the caret on the blank line
+			// between the fences.
+			.focus(5)
+			.run()
 	}
 
 	return (

@@ -19,9 +19,10 @@ import { AskInlineStatus } from '@/editor/extensions/ask/ask-inline-status-exten
 import { AskSuggestion } from '@/editor/extensions/ask/ask-suggestion-extension'
 import { CodeBlockExtension } from '@/editor/extensions/code-block/code-block-extension'
 import { CodeExtension } from '@/editor/extensions/code-block/code-extension'
-import { createCodeFenceRevealProvider } from '@/editor/extensions/code-block/code-fence-reveal-provider'
+import { parseFence } from '@/editor/extensions/code-block/code-fence'
 import { FocusNavigation } from '@/editor/extensions/focus-navigation/focus-navigation-extension'
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
+import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import {
 	focusImageToolbar,
 	moveToAdjacentImage,
@@ -33,6 +34,7 @@ import { patchMarkdownEscaping } from '@/editor/extensions/markdown/markdown-esc
 import { SearchRevealHighlight } from '@/editor/extensions/search-reveal/search-reveal-extension'
 import { SlashCommand } from '@/editor/extensions/slash-command/slash-command-extension'
 import { SyntaxHighlight } from '@/editor/extensions/syntax-highlight/syntax-highlight-extension'
+import { createFenceRevealProvider } from '@/editor/extensions/syntax-reveal/create-fence-reveal-provider'
 import { SyntaxReveal } from '@/editor/extensions/syntax-reveal/syntax-reveal-extension'
 import { TabIndent } from '@/editor/extensions/tab-indent/tab-indent-extension'
 import { TableCommands } from '@/editor/extensions/table/commands'
@@ -179,11 +181,13 @@ export const extensions = [
 	// Decorations only, and inert until the `/ask` slash command starts one.
 	AskInlineStatus,
 	// Decorations only, hiding markdown syntax (fences, delimiters, markers)
-	// while the caret is elsewhere. `frontmatter` gets its own fence-in-content
-	// treatment and joins this list once that lands; other constructs register
-	// their own provider here as they land.
+	// while the caret is elsewhere. Other constructs register their own
+	// provider here as they land.
 	SyntaxReveal.configure({
-		providers: [createCodeFenceRevealProvider(['codeBlock'])],
+		providers: [
+			createFenceRevealProvider(['codeBlock'], parseFence),
+			createFenceRevealProvider(['frontmatter'], parseFrontmatterFence),
+		],
 	}),
 	// Otherwise unhandled, Tab is a browser default: it moves focus to the next
 	// focusable element on the page rather than indenting. Declines inside a

@@ -524,7 +524,7 @@ describe('Editor Mode Live', () => {
 
 			expect(
 				container.querySelector('[data-type="frontmatter"]')?.textContent
-			).toBe('Frontmatterxtitle: Roadmap')
+			).toBe('Frontmatterx---\ntitle: Roadmap\n---')
 		})
 
 		it('hides the add-frontmatter button for a note that already has one', async () => {

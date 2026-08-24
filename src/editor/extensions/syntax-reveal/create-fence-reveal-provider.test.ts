@@ -2,16 +2,18 @@ import { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { createCodeFenceRevealProvider } from '@/editor/extensions/code-block/code-fence-reveal-provider'
+import { parseFence } from '@/editor/extensions/code-block/code-fence'
+import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
+import { createFenceRevealProvider } from '@/editor/extensions/syntax-reveal/create-fence-reveal-provider'
 
-describe('createCodeFenceRevealProvider', () => {
+describe('createFenceRevealProvider', () => {
 	it('spans the whole block as the container, and both fence lines as syntax ranges', () => {
 		const editor = new Editor({ extensions: [StarterKit], content: '' })
 		editor.commands.setContent(
 			'<pre><code>```ts\nconst total = 1\n```</code></pre>'
 		)
 
-		const [span] = createCodeFenceRevealProvider(['codeBlock']).collect(
+		const [span] = createFenceRevealProvider(['codeBlock'], parseFence).collect(
 			editor.state.doc
 		)
 
@@ -28,7 +30,7 @@ describe('createCodeFenceRevealProvider', () => {
 		const editor = new Editor({ extensions: [StarterKit], content: '' })
 		editor.commands.setContent('<pre><code>```ts\nconst total = 1</code></pre>')
 
-		const [span] = createCodeFenceRevealProvider(['codeBlock']).collect(
+		const [span] = createFenceRevealProvider(['codeBlock'], parseFence).collect(
 			editor.state.doc
 		)
 
@@ -39,10 +41,34 @@ describe('createCodeFenceRevealProvider', () => {
 		const editor = new Editor({ extensions: [StarterKit], content: '' })
 		editor.commands.setContent('<p>hello</p>')
 
-		const spans = createCodeFenceRevealProvider(['codeBlock']).collect(
+		const spans = createFenceRevealProvider(['codeBlock'], parseFence).collect(
 			editor.state.doc
 		)
 
 		expect(spans).toHaveLength(0)
+	})
+
+	it('works with the frontmatter fence parser too', () => {
+		const editor = new Editor({ extensions: [StarterKit], content: '' })
+		// A JSON text node, not an HTML string: a plain paragraph's HTML parsing
+		// collapses embedded newlines into spaces, which a fence parser can't
+		// tell apart from a fence line's own trailing whitespace.
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{
+					type: 'paragraph',
+					content: [{ type: 'text', text: '---\nname: notes\n---' }],
+				},
+			],
+		})
+
+		const [span] = createFenceRevealProvider(
+			['paragraph'],
+			parseFrontmatterFence
+		).collect(editor.state.doc)
+
+		// "---\n" (4 chars) starting right after the node's own opening token.
+		expect(span.syntaxRanges[0]).toEqual([1, 5])
 	})
 })

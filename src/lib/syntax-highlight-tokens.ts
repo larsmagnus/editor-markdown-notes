@@ -2,6 +2,7 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { HighlighterCore } from 'shiki'
 
 import { parseFence } from '@/editor/extensions/code-block/code-fence'
+import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import { MERMAID_LANGUAGE } from '@/editor/extensions/mermaid/language'
 import type { PlacedToken } from '@/editor/extensions/syntax-highlight/syntax-highlight-extension'
 import { ensureLanguage } from '@/lib/shiki-highlighter'
@@ -27,7 +28,12 @@ export function collectCodeBlocks(doc: ProseMirrorNode): CodeBlockSnapshot[] {
 
 	doc.descendants((node, pos) => {
 		if (node.type.name === 'frontmatter') {
-			blocks.push({ text: node.textContent, language: 'yaml', from: pos + 1 })
+			const { codeFrom, codeTo } = parseFrontmatterFence(node.textContent)
+			blocks.push({
+				text: node.textContent.slice(codeFrom, codeTo),
+				language: 'yaml',
+				from: pos + 1 + codeFrom,
+			})
 			return
 		}
 

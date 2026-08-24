@@ -3,6 +3,7 @@ import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 
 import { PanZoom } from '@/components/pan-zoom'
 import { fenceCode } from '@/editor/extensions/code-block/code-fence'
+import { focusBlockContentStart } from '@/editor/extensions/focus-block-content-start'
 import { MERMAID_LANGUAGE } from '@/editor/extensions/mermaid/language'
 import { MermaidToolbar } from '@/editor/extensions/mermaid/toolbar'
 import { useCaretInside } from '@/hooks/use-caret-inside'
@@ -28,18 +29,7 @@ export function MermaidBlock({ node, editor, getPos }: MermaidBlockProps) {
 
 	// Moving the caret into the block is what reveals the source - there is no
 	// separate editing flag to set.
-	const startEditing = () => {
-		// `getPos` survives the node view being detached and returns `undefined`
-		// from then on, which would make this `NaN`. See `useCaretInside`.
-		const pos = typeof getPos === 'function' ? getPos() : undefined
-		if (pos === undefined) return
-
-		editor
-			.chain()
-			.focus()
-			.setTextSelection(pos + 1)
-			.run()
-	}
+	const startEditing = () => focusBlockContentStart(editor, getPos)
 
 	return (
 		<NodeViewWrapper className="group relative not-prose my-4">

@@ -1,3 +1,5 @@
+import { findClosingFence } from '@/editor/extensions/syntax-reveal/find-closing-fence'
+
 /**
  * A fenced code block's own text, split into its fence-open line, code, and
  * fence-close line - the block's `language` attribute is gone, so this is now
@@ -35,21 +37,16 @@ export function parseFence(text: string): ParsedFence {
 	const language = open[2].trim()
 	const codeFrom = open[0].length
 	const rest = text.slice(codeFrom)
+	const closeIndex = findClosingFence(rest, marker)
 
-	// The closing fence, if present, is either the entire remainder (zero
-	// lines of code) or a line of its own further down - both cases are one
-	// match: an optional line break, then the same marker, then only
-	// trailing whitespace, anchored to the very end of the block's text.
-	const close = new RegExp(`(^|\\n)${marker}[ \\t]*$`).exec(rest)
-
-	if (!close) {
+	if (closeIndex === null) {
 		return { language, codeFrom, codeTo: text.length, hasClosingFence: false }
 	}
 
 	return {
 		language,
 		codeFrom,
-		codeTo: codeFrom + close.index,
+		codeTo: codeFrom + closeIndex,
 		hasClosingFence: true,
 	}
 }
@@ -65,9 +62,16 @@ export function fenceLanguage(text: string): string {
 	return parseFence(text).language
 }
 
-/** Builds a block's full literal text (fence lines included) from its parts. */
+/**
+ * Builds a block's full literal text (fence lines included) from its parts -
+ * no blank line between the fences for empty code, so a block parsed from an
+ * originally-empty fence round-trips back to the exact same bytes.
+ */
 export function fenceText(code: string, language: string): string {
-	return `\`\`\`${language}\n${code}\n\`\`\``
+	const marker = '```'
+	return code
+		? `${marker}${language}\n${code}\n${marker}`
+		: `${marker}${language}\n${marker}`
 }
 
 /**

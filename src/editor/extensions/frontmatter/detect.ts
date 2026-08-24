@@ -3,6 +3,8 @@ import { Fragment } from '@tiptap/pm/model'
 import { Selection } from '@tiptap/pm/state'
 import type { EditorState, Transaction } from '@tiptap/pm/state'
 
+import { frontmatterFenceText } from '@/editor/extensions/frontmatter/frontmatter-fence'
+
 /**
  * A paragraph made only of text (and marks) - the shape a line of typed YAML
  * takes. Images are inline nodes, so a paragraph holding one still passes a
@@ -67,7 +69,7 @@ export function detectFrontmatter(state: EditorState): Transaction | null {
 	// an (empty) frontmatter block in that case; everything else, the closing
 	// fence included, is left exactly as it was.
 	if (!allPlain) {
-		const node = frontmatter.create()
+		const node = frontmatter.create(null, schema.text(frontmatterFenceText('')))
 		const tr = state.tr.replaceWith(0, doc.firstChild.nodeSize, node)
 		tr.setSelection(Selection.near(tr.doc.resolve(node.nodeSize)))
 		return tr
@@ -80,9 +82,7 @@ export function detectFrontmatter(state: EditorState): Transaction | null {
 	const text = lines.join('\n')
 
 	const end = closingPos + doc.child(closingIndex).nodeSize
-	const node = text
-		? frontmatter.create(null, schema.text(text))
-		: frontmatter.create()
+	const node = frontmatter.create(null, schema.text(frontmatterFenceText(text)))
 
 	// `block+` requires at least one block after frontmatter - a document that
 	// was nothing but the typed pattern needs an empty paragraph to stay valid.

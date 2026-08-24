@@ -79,8 +79,13 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
 			runWithRange(editor, range, (chain) =>
 				chain
 					.setCodeBlock()
-					.insertContent({ type: 'text', text: fenceText('', '') })
-					// Land the caret on the empty code line between the fences
+					// A blank line between the fences, not `fenceText('', '')` (which
+					// collapses to "```\n```", no gap) - that builder exists to
+					// round-trip an already-empty block byte-for-byte, but here the
+					// author is about to type, and typing right where the fences
+					// touch would run straight into the closing one.
+					.insertContent({ type: 'text', text: '```\n\n```' })
+					// Land the caret on the blank code line between the fences
 					// ("```\n" is 4 characters, plus the node's own opening token),
 					// rather than after the closing one.
 					.setTextSelection(range.from + 1 + 4)
