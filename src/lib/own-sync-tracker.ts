@@ -1,4 +1,3 @@
-/** How many of the most recent syncs are still recognised as our own. */
 const HISTORY_SIZE = 5
 
 /**

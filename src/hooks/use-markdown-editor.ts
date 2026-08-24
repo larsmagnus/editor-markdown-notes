@@ -68,6 +68,11 @@ export function useMarkdownEditor(
 		[]
 	)
 
+	const recordOwnSync = useCallback(
+		(next: string) => ownSyncTracker.current.record(next),
+		[]
+	)
+
 	const editor = useEditor({
 		extensions,
 		// markdown-it has no concept of frontmatter and would parse `---` as an
@@ -111,6 +116,7 @@ export function useMarkdownEditor(
 		isVSCodeContext,
 		syncContent: sync,
 		enabled: active,
+		recordOwnSync,
 	})
 	useFlushOnDeactivate(active, flushQueuedSync)
 

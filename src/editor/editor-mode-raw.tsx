@@ -66,11 +66,15 @@ export function EditorModeRaw({
 		},
 		[syncContent]
 	)
+	const recordOwnSync = useCallback((next: string) => {
+		adoptedRef.current = next
+	}, [])
 	const { queueSync, flushQueuedSync } = useNoteSync({
 		isVSCodeContext,
 		syncContent: rememberSync,
 		currentFile,
 		active,
+		recordOwnSync,
 	})
 	useFlushOnDeactivate(active, flushQueuedSync)
 

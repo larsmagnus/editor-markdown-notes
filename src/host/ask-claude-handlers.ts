@@ -23,6 +23,16 @@ export function createAskClaudeHandlers({
 }: AskClaudeHandlersOptions) {
 	const activeAskControllers = new Map<string, AbortController>()
 
+	const replyWithError = (requestId: string, error: unknown) => {
+		activeAskControllers.delete(requestId)
+		const reply: HostToWebview = {
+			type: 'askError',
+			requestId,
+			error: error instanceof Error ? error.message : 'Ask Claude failed.',
+		}
+		void panel.webview.postMessage(reply)
+	}
+
 	const askClaude = async (message: {
 		requestId: string
 		prompt: string
@@ -53,10 +63,15 @@ export function createAskClaudeHandlers({
 			? vscode.workspace.asRelativePath(document.uri, false)
 			: path.basename(document.uri.fsPath)
 
-		// The Agent SDK reads the file by path, not our buffer - VS Code no
-		// longer saves on every sync, so without this it can read content that
-		// is still only in the webview.
-		await document.save()
+		try {
+			// The Agent SDK reads the file by path, not our buffer - VS Code no
+			// longer saves on every sync, so without this it can read content
+			// that is still only in the webview.
+			await document.save()
+		} catch (error: unknown) {
+			replyWithError(message.requestId, error)
+			return
+		}
 
 		void runClaudeAsk(
 			message.prompt,
@@ -77,15 +92,7 @@ export function createAskClaudeHandlers({
 						}
 				void panel.webview.postMessage(reply)
 			})
-			.catch((error: unknown) => {
-				activeAskControllers.delete(message.requestId)
-				const reply: HostToWebview = {
-					type: 'askError',
-					requestId: message.requestId,
-					error: error instanceof Error ? error.message : 'Ask Claude failed.',
-				}
-				void panel.webview.postMessage(reply)
-			})
+			.catch((error: unknown) => replyWithError(message.requestId, error))
 	}
 
 	const cancelAsk = (message: { requestId: string }) => {

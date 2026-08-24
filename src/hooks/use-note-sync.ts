@@ -22,6 +22,15 @@ type UseNoteSyncOptions = {
 	 *  the active view answers `requestLatest`; the inactive one's held text
 	 *  can lag the debounce and would answer with stale content. */
 	active: boolean
+	/**
+	 * Marks a `requestLatest` answer as this view's own, without syncing it -
+	 * `syncContent` would work too, but it is a real write, and a save must
+	 * never turn "what do you currently hold" into "write that back": the
+	 * live editor's re-serialization of syntax it does not support (a
+	 * footnote, say) would overwrite a file nobody actually asked it to
+	 * change.
+	 */
+	recordOwnSync: (content: string) => void
 }
 
 /**
@@ -36,6 +45,7 @@ export function useNoteSync({
 	syncContent,
 	currentFile,
 	active,
+	recordOwnSync,
 }: UseNoteSyncOptions) {
 	// Seeded `null` rather than `''` so that emptying a note still syncs; an
 	// empty string is a legitimate document, not the absence of one.
@@ -74,8 +84,28 @@ export function useNoteSync({
 	useHostMessage(
 		requestLatestMessageSchema,
 		(message) => {
+			// Nothing pending means the document already holds this view's
+			// correct text - either it was already synced, or the current state
+			// is only a freshly absorbed external change nobody typed. Answering
+			// with `currentFile()` regardless would write this view's own
+			// re-serialization of that external change (escaping a footnote,
+			// say, or dropping its trailing newline) straight back over it.
+			if (!pendingRef.current) {
+				getVSCodeApi()?.postMessage({
+					type: 'latestContent',
+					requestId: message.requestId,
+					content: null,
+				})
+				return
+			}
+
 			const file = currentFile()
 			if (file === null) return
+
+			// Recorded, not synced - the host may echo this text back (e.g.
+			// touched up by a save hook), and without recording it here that echo
+			// reads as an external change and rebuilds the document.
+			recordOwnSync(file)
 
 			getVSCodeApi()?.postMessage({
 				type: 'latestContent',
@@ -149,6 +179,7 @@ export function useNoteSync({
 	// just before switching away is stuck behind a debounce nothing is left to
 	// fire. `.flush()` is a no-op when nothing is pending.
 	const flushQueuedSync = useCallback(() => {
+		pendingRef.current = false
 		debouncedQueueSync.flush()
 	}, [debouncedQueueSync])
 

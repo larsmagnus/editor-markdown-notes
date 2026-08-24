@@ -46,6 +46,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => '',
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		).result.current.queueSync('')
 
@@ -64,6 +65,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => emptied,
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		).result.current.queueSync(emptied)
 
@@ -81,6 +83,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => '# Roadmap',
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		)
 
@@ -97,6 +100,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => '# Roadmap 2026',
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		)
 
@@ -117,6 +121,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => '# Roadmap',
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		)
 
@@ -138,6 +143,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => '# Roadmap',
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		).result.current.queueSync('# Roadmap')
 
@@ -159,6 +165,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => '# Roadmap\n\nShip it. Today.',
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		)
 
@@ -180,6 +187,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => '# Roadmap\n\nShip it. Today.',
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		)
 
@@ -202,6 +210,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => '# Roadmap\n\nShip it. Today.',
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		)
 
@@ -225,6 +234,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => '# Roadmap',
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		)
 
@@ -243,6 +253,7 @@ describe('useNoteSync', () => {
 				syncContent,
 				currentFile: () => null,
 				active: true,
+				recordOwnSync: vi.fn(),
 			})
 		)
 
@@ -269,6 +280,7 @@ describe('useNoteSync', () => {
 					syncContent,
 					currentFile: () => '# Roadmap',
 					active: true,
+					recordOwnSync: vi.fn(),
 				})
 			)
 
@@ -285,6 +297,7 @@ describe('useNoteSync', () => {
 					syncContent,
 					currentFile: () => '# Roadmap',
 					active: true,
+					recordOwnSync: vi.fn(),
 				})
 			)
 
@@ -304,6 +317,7 @@ describe('useNoteSync', () => {
 					syncContent,
 					currentFile: () => '# Roadmap',
 					active: true,
+					recordOwnSync: vi.fn(),
 				})
 			)
 
@@ -322,6 +336,7 @@ describe('useNoteSync', () => {
 					syncContent,
 					currentFile: () => '# Roadmap',
 					active: true,
+					recordOwnSync: vi.fn(),
 				})
 			)
 
@@ -351,18 +366,21 @@ describe('useNoteSync', () => {
 			})
 		}
 
-		it('replies with the current file while active', () => {
+		it('replies with the current file when an edit is pending', () => {
 			const postMessage = vi.fn()
 			window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
 
-			renderHook(() =>
+			const { result } = renderHook(() =>
 				useNoteSync({
 					isVSCodeContext: true,
 					syncContent: vi.fn(),
 					currentFile: () => '# Roadmap 2026',
 					active: true,
+					recordOwnSync: vi.fn(),
 				})
 			)
+			act(() => result.current.queueSync('# Roadmap 2026'))
+			postMessage.mockClear()
 
 			requestLatest('req-1')
 
@@ -373,9 +391,15 @@ describe('useNoteSync', () => {
 			})
 		})
 
-		// The inactive view's held text can lag the debounce by up to a second -
-		// answering with it would tell the save stale content.
-		it('stays silent while inactive', () => {
+		/**
+		 * Nothing pending means the document already holds this view's text -
+		 * either it was already synced, or the current state is only a freshly
+		 * absorbed external change nobody typed. Answering with `currentFile()`
+		 * regardless would write this view's own re-serialization of that
+		 * external change (escaping a footnote, say, or dropping a trailing
+		 * newline) straight back over it, so the reply is `null` instead.
+		 */
+		it('replies with null when nothing is pending', () => {
 			const postMessage = vi.fn()
 			window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
 
@@ -384,9 +408,71 @@ describe('useNoteSync', () => {
 					isVSCodeContext: true,
 					syncContent: vi.fn(),
 					currentFile: () => '# Roadmap 2026',
-					active: false,
+					active: true,
+					recordOwnSync: vi.fn(),
 				})
 			)
+
+			requestLatest('req-1')
+
+			expect(postMessage).toHaveBeenCalledWith({
+				type: 'latestContent',
+				requestId: 'req-1',
+				content: null,
+			})
+		})
+
+		/**
+		 * `syncContent` is a real write - for the live editor, it round-trips
+		 * through TipTap's own re-serialization, which escapes syntax it has no
+		 * node for (a footnote, say). Calling it here to satisfy the save would
+		 * overwrite a file nobody actually asked to change; `recordOwnSync` marks
+		 * the text as this view's own without writing anything.
+		 */
+		it('records the reply as its own without syncing it', () => {
+			const syncContent = vi.fn()
+			const recordOwnSync = vi.fn()
+			window.vscode = {
+				postMessage: vi.fn(),
+				getState: vi.fn(),
+				setState: vi.fn(),
+			}
+
+			const { result } = renderHook(() =>
+				useNoteSync({
+					isVSCodeContext: true,
+					syncContent,
+					currentFile: () => '# Roadmap 2026',
+					active: true,
+					recordOwnSync,
+				})
+			)
+			act(() => result.current.queueSync('# Roadmap 2026'))
+			syncContent.mockClear()
+
+			requestLatest('req-1')
+
+			expect(recordOwnSync).toHaveBeenCalledWith('# Roadmap 2026')
+			expect(syncContent).not.toHaveBeenCalled()
+		})
+
+		// The inactive view's held text can lag the debounce by up to a second -
+		// answering with it would tell the save stale content.
+		it('stays silent while inactive', () => {
+			const postMessage = vi.fn()
+			window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
+
+			const { result } = renderHook(() =>
+				useNoteSync({
+					isVSCodeContext: true,
+					syncContent: vi.fn(),
+					currentFile: () => '# Roadmap 2026',
+					active: false,
+					recordOwnSync: vi.fn(),
+				})
+			)
+			act(() => result.current.queueSync('# Roadmap 2026'))
+			postMessage.mockClear()
 
 			requestLatest('req-1')
 
@@ -397,14 +483,17 @@ describe('useNoteSync', () => {
 			const postMessage = vi.fn()
 			window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
 
-			renderHook(() =>
+			const { result } = renderHook(() =>
 				useNoteSync({
 					isVSCodeContext: true,
 					syncContent: vi.fn(),
 					currentFile: () => null,
 					active: true,
+					recordOwnSync: vi.fn(),
 				})
 			)
+			act(() => result.current.queueSync('anything'))
+			postMessage.mockClear()
 
 			requestLatest('req-1')
 

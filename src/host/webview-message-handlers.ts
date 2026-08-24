@@ -127,14 +127,29 @@ export function createWebviewMessageHandlers({
  * Dispatches one message to its handler. Indexing the record with the message's
  * own `type` does not narrow the argument alongside it, so the cast is what
  * keeps the table's per-member types while still calling it generically.
+ *
+ * Catches both a synchronous throw and a rejected promise - a handler is
+ * fired from `onDidReceiveMessage` with nothing awaiting it, so either would
+ * otherwise surface as an unhandled rejection instead of a logged error.
  */
 export function dispatchWebviewMessage(
 	handlers: WebviewMessageHandlers,
-	message: WebviewToHost
+	message: WebviewToHost,
+	log: Logger
 ) {
 	const handler = handlers[message.type] as (
 		message: WebviewToHost
 	) => void | Promise<void>
 
-	handler(message)
+	try {
+		void Promise.resolve(handler(message)).catch((error: unknown) => {
+			log.error(
+				`Failed to handle webview message "${message.type}": ${String(error)}`
+			)
+		})
+	} catch (error: unknown) {
+		log.error(
+			`Failed to handle webview message "${message.type}": ${String(error)}`
+		)
+	}
 }

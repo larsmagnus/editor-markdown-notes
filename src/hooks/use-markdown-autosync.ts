@@ -14,6 +14,8 @@ type UseMarkdownAutosyncOptions = {
 	 *  belt-and-braces against anything else that might one day dispatch a
 	 *  transaction on it unattended. */
 	enabled: boolean
+	/** See `useNoteSync`'s option of the same name. */
+	recordOwnSync: (content: string) => void
 }
 
 /**
@@ -31,6 +33,7 @@ export function useMarkdownAutosync({
 	isVSCodeContext,
 	syncContent,
 	enabled,
+	recordOwnSync,
 }: UseMarkdownAutosyncOptions) {
 	const currentFile = useCallback(
 		() => editor?.storage?.markdown?.getMarkdown() ?? null,
@@ -42,6 +45,7 @@ export function useMarkdownAutosync({
 		syncContent,
 		currentFile,
 		active: enabled,
+		recordOwnSync,
 	})
 
 	useEffect(() => {

@@ -286,8 +286,15 @@ export type WebviewToHost =
 	 * currently holds, read directly rather than through the debounced sync
 	 * path. Sent by the view `active` at the moment the request arrives; the
 	 * other stays silent, since its held text can lag by up to a debounce.
+	 *
+	 * `content` is `null` when nothing is pending: the document already holds
+	 * this view's text, either because it was already synced or because the
+	 * current state is only a freshly absorbed external change nobody typed.
+	 * Answering with `currentFile()` regardless would let this view's own
+	 * re-serialization of that external change (escaping a footnote, say)
+	 * overwrite it.
 	 */
-	| { type: 'latestContent'; requestId: string; content: string }
+	| { type: 'latestContent'; requestId: string; content: string | null }
 
 export type HostToWebview =
 	| { type: 'update'; content: string; fileName: string }

@@ -111,7 +111,7 @@ export function attachPanelSession({
 				postDocumentUpdate(panel, document)
 			),
 			panel.webview.onDidReceiveMessage((message: WebviewToHost) =>
-				dispatchWebviewMessage(handlers, message)
+				dispatchWebviewMessage(handlers, message, log)
 			),
 			disposable
 		),
