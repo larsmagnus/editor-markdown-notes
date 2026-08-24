@@ -2,12 +2,12 @@ import type { Editor, EditorEvents } from '@tiptap/react'
 import { useCallback, useEffect } from 'react'
 
 import { CONTENT_SYNC_META } from '@/hooks/use-frontmatter-document'
-import { useNoteSave } from '@/hooks/use-note-save'
+import { useNoteSync } from '@/hooks/use-note-sync'
 
-type UseMarkdownAutosaveOptions = {
+type UseMarkdownAutosyncOptions = {
 	editor: Editor | null
 	isVSCodeContext: boolean
-	saveContent: (content: string) => void
+	syncContent: (content: string) => void
 	/** Off while this editor is mounted but hidden behind the other mode - see
 	 *  `EditorBody`. A hidden editor only ever changes by absorbing an incoming
 	 *  content sync (`CONTENT_SYNC_META`, already skipped below), so this is
@@ -17,28 +17,29 @@ type UseMarkdownAutosaveOptions = {
 }
 
 /**
- * Autosaves the TipTap document, frontmatter and all.
+ * Syncs the TipTap document into the `TextDocument` on every change,
+ * frontmatter and all.
  *
  * Subscribes to the editor rather than taking an `onUpdate` handler, so nothing
  * has to be threaded back into `useEditor` before this hook has run.
  * Frontmatter is a real node in the document, so `getMarkdown()` alone
  * reproduces the whole file - there is no separate frontmatter state to stitch
- * back in before saving.
+ * back in before syncing.
  */
-export function useMarkdownAutosave({
+export function useMarkdownAutosync({
 	editor,
 	isVSCodeContext,
-	saveContent,
+	syncContent,
 	enabled,
-}: UseMarkdownAutosaveOptions) {
+}: UseMarkdownAutosyncOptions) {
 	const currentFile = useCallback(
 		() => editor?.storage?.markdown?.getMarkdown() ?? null,
 		[editor]
 	)
 
-	const { queueSave, cancelQueuedSave, flushQueuedSave } = useNoteSave({
+	const { queueSync, cancelQueuedSync, flushQueuedSync } = useNoteSync({
 		isVSCodeContext,
-		saveContent,
+		syncContent,
 		currentFile,
 	})
 
@@ -47,21 +48,21 @@ export function useMarkdownAutosave({
 
 		const queueCurrentDocument = ({ transaction }: EditorEvents['update']) => {
 			// The host's own text, not the author's. Writing it back would replace
-			// the file with this editor's re-serialization of it, and any save
+			// the file with this editor's re-serialization of it, and any sync
 			// queued before it is now about a document that no longer exists.
 			if (transaction.getMeta(CONTENT_SYNC_META)) {
-				cancelQueuedSave()
+				cancelQueuedSync()
 				return
 			}
 
-			queueSave(editor.storage?.markdown?.getMarkdown() ?? '')
+			queueSync(editor.storage?.markdown?.getMarkdown() ?? '')
 		}
 
 		editor.on('update', queueCurrentDocument)
 		return () => {
 			editor.off('update', queueCurrentDocument)
 		}
-	}, [cancelQueuedSave, editor, enabled, queueSave])
+	}, [cancelQueuedSync, editor, enabled, queueSync])
 
-	return { flushQueuedSave }
+	return { flushQueuedSync }
 }

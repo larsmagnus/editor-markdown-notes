@@ -28,12 +28,12 @@ describe('useFrontmatterDocument', () => {
 	})
 
 	/**
-	 * The autosave carries the editor's own text back as a new `content`, a
+	 * The autosync carries the editor's own text back as a new `content`, a
 	 * debounce behind the keystrokes still arriving - so by the time it lands
 	 * the document has moved on and no longer matches it. Rebuilding there would
 	 * throw away everything typed since, and the caret with it.
 	 */
-	it('leaves the document alone when the change is its own save coming back', () => {
+	it('leaves the document alone when the change is its own sync coming back', () => {
 		const editor = new Editor({ extensions, content: 'Ship it.' })
 		currentEditor = editor
 
@@ -47,7 +47,7 @@ describe('useFrontmatterDocument', () => {
 			{ initialProps: { content: 'Ship it.' } }
 		)
 
-		// The author kept typing while that save was in flight.
+		// The author kept typing while that sync was in flight.
 		editor.commands.setContent('<p>Ship it. Today. Really.</p>')
 
 		rerender({ content: 'Ship it. Today.' })

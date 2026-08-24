@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 
 interface EditorBodyProps {
 	content: string
-	saveContent: (content: string) => void
+	syncContent: (content: string) => void
 	/** Show the markdown source rather than the rendered document. */
 	raw: boolean
 	className?: string
@@ -45,7 +45,7 @@ function EditorModeSlot({ active, children }: EditorModeSlotProps) {
  */
 export function EditorBody({
 	content,
-	saveContent,
+	syncContent,
 	raw,
 	className,
 }: EditorBodyProps) {
@@ -57,7 +57,7 @@ export function EditorBody({
 				<AppErrorBoundary title="The editor" resetKeys={[content]}>
 					<EditorModeLive
 						content={content}
-						saveContent={saveContent}
+						syncContent={syncContent}
 						active={!raw}
 						includeProseBaseClassNames
 						className={className}
@@ -67,7 +67,7 @@ export function EditorBody({
 			<EditorModeSlot active={raw}>
 				<EditorModeRaw
 					content={content}
-					saveContent={saveContent}
+					syncContent={syncContent}
 					active={raw}
 					className={className}
 				/>

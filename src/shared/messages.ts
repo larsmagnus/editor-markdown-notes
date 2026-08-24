@@ -222,7 +222,9 @@ export type ShikiThemePayload = {
 }
 
 export type WebviewToHost =
-	| { type: 'save'; content: string }
+	/** Applies `content` to the `TextDocument`, which makes it dirty - it does
+	 *  not write anything to disk. Only VS Code itself saves. */
+	| { type: 'syncDocument'; content: string }
 	| { type: 'getContent' }
 	| { type: 'setViewOptions'; viewOptions: ViewOptions }
 	/**

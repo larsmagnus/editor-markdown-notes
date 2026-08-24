@@ -32,7 +32,7 @@ export class DocumentWriter {
 		return this.writing
 	}
 
-	public async save(document: vscode.TextDocument, content: string) {
+	public async write(document: vscode.TextDocument, content: string) {
 		this.writing = true
 
 		try {

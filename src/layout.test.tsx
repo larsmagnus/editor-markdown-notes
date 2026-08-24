@@ -30,10 +30,10 @@ function getLiveEditor(): HTMLElement {
 
 describe('Layout', () => {
 	/**
-	 * The host suppresses the echo of the webview's own save, so the note the
-	 * toolbar copies only stays current if the editor's save updates it here.
+	 * The host suppresses the echo of the webview's own sync, so the note the
+	 * toolbar copies only stays current if the editor's sync updates it here.
 	 * The editor used to hold a second, private copy of the document - one
-	 * nothing rendered - so its saves landed there and "Copy page" handed back
+	 * nothing rendered - so its syncs landed there and "Copy page" handed back
 	 * the note exactly as it was when the panel opened.
 	 */
 	it('copies what the author has typed, not the note as it was opened', async () => {
@@ -60,11 +60,11 @@ describe('Layout', () => {
 		await user.keyboard(' Today.')
 
 		// The copy reads whatever `content` holds, so it has to happen after the
-		// save that carries the new text back - that write is the thing under test.
+		// sync that carries the new text back - that write is the thing under test.
 		await waitFor(
 			() => {
 				expect(postMessage).toHaveBeenCalledWith({
-					type: 'save',
+					type: 'syncDocument',
 					content: 'Ship it. Today.',
 				})
 			},

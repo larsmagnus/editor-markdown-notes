@@ -17,7 +17,7 @@ type LayoutProps = {
 
 function Layout({ defaultFileName }: LayoutProps) {
 	const { viewOptions, settings } = useSettings()
-	const { content, fileName, setFileName, files, saveContent } =
+	const { content, fileName, setFileName, files, syncContent } =
 		useNoteSource(defaultFileName)
 
 	// The one scrolling element on the page, so one offset covers the rich
@@ -52,7 +52,7 @@ function Layout({ defaultFileName }: LayoutProps) {
 			<main className="flex flex-col p-3 min-h-screen">
 				<EditorBody
 					content={content}
-					saveContent={saveContent}
+					syncContent={syncContent}
 					raw={viewOptions.raw}
 					className={widthClassName}
 				/>

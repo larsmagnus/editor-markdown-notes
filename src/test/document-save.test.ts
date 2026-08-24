@@ -20,7 +20,7 @@ suite('Saving a document', () => {
 		const writer = new DocumentWriter()
 		const document = await openTempNote('# Roadmap\n\nShip it.\n')
 
-		await writer.save(document, '# Roadmap\n\nShip it. Today.\n')
+		await writer.write(document, '# Roadmap\n\nShip it. Today.\n')
 
 		assert.strictEqual(
 			await fs.readFile(document.fileName, 'utf8'),
@@ -37,7 +37,7 @@ suite('Saving a document', () => {
 		const writer = new DocumentWriter()
 		const document = await openTempNote('# Roadmap\n\nShip it.\n')
 
-		await writer.save(document, '')
+		await writer.write(document, '')
 
 		assert.strictEqual(await fs.readFile(document.fileName, 'utf8'), '')
 	})
@@ -48,7 +48,7 @@ suite('Saving a document', () => {
 			'---\ntitle: Roadmap\n---\n\nShip it.\n'
 		)
 
-		await writer.save(document, '---\ntitle: Roadmap\n---\n\n')
+		await writer.write(document, '---\ntitle: Roadmap\n---\n\n')
 
 		assert.strictEqual(
 			await fs.readFile(document.fileName, 'utf8'),
@@ -65,7 +65,7 @@ suite('Saving a document', () => {
 
 		assert.strictEqual(writer.isWriting, false)
 
-		await writer.save(document, '# Roadmap 2026\n')
+		await writer.write(document, '# Roadmap 2026\n')
 		assert.strictEqual(writer.isWriting, true)
 
 		await new Promise((resolve) => setTimeout(resolve, 200))

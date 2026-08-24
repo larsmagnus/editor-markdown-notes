@@ -59,10 +59,10 @@ describe('createOwnSyncTracker', () => {
 		expect(tracker.matches('# Roadmap\n\nShip it.\n\n\n')).toBe(false)
 	})
 
-	// Two panels on the same document both post `save`, so panel B has to
-	// recognise panel A's write reaching it as an `update` too - the two would
-	// otherwise fight, each rebuilding the other's text back to its own.
-	it('remembers more than the single most recent save', () => {
+	// Two panels on the same document both post `syncDocument`, so panel B has
+	// to recognise panel A's write reaching it as an `update` too - the two
+	// would otherwise fight, each rebuilding the other's text back to its own.
+	it('remembers more than the single most recent sync', () => {
 		const tracker = createOwnSyncTracker()
 
 		tracker.record('# Roadmap\n\nShip it.')
@@ -72,7 +72,7 @@ describe('createOwnSyncTracker', () => {
 		expect(tracker.matches('# Roadmap\n\nShip it today.')).toBe(true)
 	})
 
-	it('forgets a save old enough to have been pushed out of the window', () => {
+	it('forgets a sync old enough to have been pushed out of the window', () => {
 		const tracker = createOwnSyncTracker()
 
 		tracker.record('draft 1')

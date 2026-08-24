@@ -67,7 +67,7 @@ export function createWebviewMessageHandlers({
 	})
 
 	const handlers: WebviewMessageHandlers = {
-		save: (message) => writer.save(document, message.content),
+		syncDocument: (message) => writer.write(document, message.content),
 		getContent: () => {
 			postDocumentUpdate(panel, document)
 			// The webview also gets its config injected into the page, but resend

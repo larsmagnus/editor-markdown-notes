@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
 import { useFlushOnDeactivate } from '@/hooks/use-flush-on-deactivate'
-import { useNoteSave } from '@/hooks/use-note-save'
+import { useNoteSync } from '@/hooks/use-note-sync'
 import { useSettings } from '@/hooks/use-settings'
 import { findRawSearchRange } from '@/lib/raw-search-reveal'
 import { takeSearchReveal } from '@/lib/search-reveal'
@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 
 interface RawMarkdownEditorProps {
 	content: string
-	saveContent: (content: string) => void
+	syncContent: (content: string) => void
 	/** Off while live mode is on screen instead - see `EditorBody`. Stays
 	 *  mounted regardless, so an edit made here is still one undoable step on
 	 *  the live editor once it is revealed again. */
@@ -22,7 +22,7 @@ interface RawMarkdownEditorProps {
 export const RAW_MARKDOWN_EDITOR_ID = 'raw-markdown-editor'
 
 /**
- * The note as plain markdown source, editable and autosaving.
+ * The note as plain markdown source, editable and autosyncing.
  *
  * Writes the file verbatim - frontmatter included - because this view shows the
  * whole file. The rich editor keeps frontmatter as its own node and reads it
@@ -31,7 +31,7 @@ export const RAW_MARKDOWN_EDITOR_ID = 'raw-markdown-editor'
  */
 export function EditorModeRaw({
 	content,
-	saveContent,
+	syncContent,
 	active = true,
 	className,
 }: RawMarkdownEditorProps) {
@@ -47,7 +47,7 @@ export function EditorModeRaw({
 	// what it took from `content`, or what it wrote back. A draft that still
 	// matches it has nothing of the author's to lose.
 	//
-	// Both directions matter because `useHostDocument` applies each save locally,
+	// Both directions matter because `useHostDocument` applies each sync locally,
 	// so `content` follows this view's own writes as well as outside edits -
 	// tracking only what arrived would read an author who undid their way back
 	// to the earlier text as having nothing pending.
@@ -59,21 +59,21 @@ export function EditorModeRaw({
 	// echo of this view's own write apart from an outside edit, and unlike the
 	// live editor a stale match would only cost a redundant `setDraft` here,
 	// not a document rebuild that drops keystrokes.
-	const rememberSave = useCallback(
+	const rememberSync = useCallback(
 		(next: string) => {
 			adoptedRef.current = next
-			saveContent(next)
+			syncContent(next)
 		},
-		[saveContent]
+		[syncContent]
 	)
-	const { queueSave, flushQueuedSave } = useNoteSave({
+	const { queueSync, flushQueuedSync } = useNoteSync({
 		isVSCodeContext,
-		saveContent: rememberSave,
+		syncContent: rememberSync,
 		currentFile,
 	})
-	useFlushOnDeactivate(active, flushQueuedSave)
+	useFlushOnDeactivate(active, flushQueuedSync)
 
-	// Only while the caret is elsewhere. The host echoes every save back as an
+	// Only while the caret is elsewhere. The host echoes every sync back as an
 	// `update`, and that echo is a debounce behind the keystrokes still arriving
 	// - adopting it mid-edit would reset both the text and the caret.
 	useEffect(() => {
@@ -115,7 +115,7 @@ export function EditorModeRaw({
 
 	const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
 		setDraft(event.target.value)
-		queueSave(event.target.value)
+		queueSync(event.target.value)
 	}
 
 	return (

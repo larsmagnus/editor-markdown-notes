@@ -10,8 +10,8 @@ import { TextToolsAside } from '@/text-tools/text-tools-aside'
 
 interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 	content: string
-	/** Where autosave writes. Only the VS Code path has one. */
-	saveContent?: (content: string) => void
+	/** Where autosync writes. Only the VS Code path has one. */
+	syncContent?: (content: string) => void
 	/** Off while raw mode is on screen instead - see `EditorBody`. Stays
 	 *  mounted regardless, so its undo history survives the toggle. */
 	active?: boolean
@@ -21,14 +21,14 @@ interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 
 function EditorModeLive({
 	content,
-	saveContent,
+	syncContent,
 	active = true,
 	showMenu,
 	includeProseBaseClassNames,
 	...props
 }: EditorProps) {
 	const { editor, analysis, isAnalyzing, hasSpellingFailed, codeBlockStyle } =
-		useMarkdownEditor(content, saveContent, active)
+		useMarkdownEditor(content, syncContent, active)
 
 	if (!editor) return null
 

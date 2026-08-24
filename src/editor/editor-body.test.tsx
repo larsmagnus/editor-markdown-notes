@@ -21,10 +21,10 @@ afterEach(() => {
 })
 
 /**
- * Mirrors `useHostDocument`'s own-write echo: a save also updates the shared
+ * Mirrors `useHostDocument`'s own-write echo: a sync also updates the shared
  * `content` this component hands back down, the way the real host round-trip
  * does - `EditorModeRaw`'s "leave the draft alone while typing" logic depends
- * on seeing its own saves come back through `content`.
+ * on seeing its own syncs come back through `content`.
  */
 function ToggleableEditorBody({ initialContent }: { initialContent: string }) {
 	const [content, setContent] = useState(initialContent)
@@ -35,7 +35,7 @@ function ToggleableEditorBody({ initialContent }: { initialContent: string }) {
 			<button type="button" onClick={() => setRaw((current) => !current)}>
 				Toggle raw
 			</button>
-			<EditorBody content={content} saveContent={setContent} raw={raw} />
+			<EditorBody content={content} syncContent={setContent} raw={raw} />
 		</>
 	)
 }

@@ -11,7 +11,7 @@ import { useAskProposal } from '@/hooks/use-ask-proposal'
 import { useFlushOnDeactivate } from '@/hooks/use-flush-on-deactivate'
 import { useFrontmatterDocument } from '@/hooks/use-frontmatter-document'
 import { useItalicMarker } from '@/hooks/use-italic-marker'
-import { useMarkdownAutosave } from '@/hooks/use-markdown-autosave'
+import { useMarkdownAutosync } from '@/hooks/use-markdown-autosync'
 import { useSearchReveal } from '@/hooks/use-search-reveal'
 import { useSettings } from '@/hooks/use-settings'
 import { useSyntaxHighlight } from '@/hooks/use-syntax-highlight'
@@ -19,31 +19,31 @@ import { useTextTools } from '@/hooks/use-text-tools'
 import { splitFrontmatter } from '@/lib/host/frontmatter'
 import { createOwnSyncTracker } from '@/lib/own-sync-tracker'
 
-/** Stable, so the default does not rebuild `save` on every render. */
-const noSaveTarget = () => {}
+/** Stable, so the default does not rebuild `sync` on every render. */
+const noSyncTarget = () => {}
 
 /**
- * Everything the editor needs to run one note: the TipTap instance, autosaving,
+ * Everything the editor needs to run one note: the TipTap instance, autosync,
  * the writing checks and the live italic marker.
  *
  * Composed here rather than in the component so the component is only layout,
  * and so the order these depend on each other is stated once.
  *
- * `saveContent` comes from the caller rather than from `useHostDocument` here,
+ * `syncContent` comes from the caller rather than from `useHostDocument` here,
  * because that hook holds state: calling it twice would give the editor a
- * second, private copy of the document, and every save would land in the one
+ * second, private copy of the document, and every sync would land in the one
  * nothing else reads. It is optional since only the VS Code path ever writes -
- * standalone, `useNoteSave` routes to the `updateNotes` stub instead.
+ * standalone, `useNoteSync` routes to the `updateNotes` stub instead.
  *
  * `active` is false while raw mode is on screen instead (`EditorBody`), which
  * now keeps this editor mounted rather than tearing it down - it still has to
  * absorb incoming content while hidden, so only the expensive or
- * visibility-only parts (autosave, the writing checks, syntax highlighting,
+ * visibility-only parts (autosync, the writing checks, syntax highlighting,
  * "Skip to editor") gate on it.
  */
 export function useMarkdownEditor(
 	content: string,
-	saveContent: (content: string) => void = noSaveTarget,
+	syncContent: (content: string) => void = noSyncTarget,
 	active = true
 ) {
 	const { viewOptions, settings, isVSCodeContext } = useSettings()
@@ -52,18 +52,18 @@ export function useMarkdownEditor(
 	// through the host is recognizable as its own echo rather than an outside
 	// edit - a bounded history rather than a single last value, since two
 	// panels on the same document each see the other's write as an `update`,
-	// and a second save can be queued before the first one's echo arrives.
+	// and a second sync can be queued before the first one's echo arrives.
 	const ownSyncTracker = useRef(createOwnSyncTracker())
 
-	const save = useCallback(
+	const sync = useCallback(
 		(next: string) => {
 			ownSyncTracker.current.record(next)
-			saveContent(next)
+			syncContent(next)
 		},
-		[saveContent]
+		[syncContent]
 	)
 
-	const isOwnSave = useCallback(
+	const isOwnSync = useCallback(
 		(next: string) => ownSyncTracker.current.matches(next),
 		[]
 	)
@@ -98,7 +98,7 @@ export function useMarkdownEditor(
 		},
 	})
 
-	useFrontmatterDocument(editor, content, isOwnSave)
+	useFrontmatterDocument(editor, content, isOwnSync)
 	useFocusNavigation(editor, active)
 
 	// After the rebuild above, which is what puts the note's real text in the
@@ -106,13 +106,13 @@ export function useMarkdownEditor(
 	// frontmatter and race the only content sync this note ever gets for free.
 	useSearchReveal(editor)
 
-	const { flushQueuedSave } = useMarkdownAutosave({
+	const { flushQueuedSync } = useMarkdownAutosync({
 		editor,
 		isVSCodeContext,
-		saveContent: save,
+		syncContent: sync,
 		enabled: active,
 	})
-	useFlushOnDeactivate(active, flushQueuedSave)
+	useFlushOnDeactivate(active, flushQueuedSync)
 
 	const { analysis, isAnalyzing, hasSpellingFailed } = useTextTools({
 		editor,

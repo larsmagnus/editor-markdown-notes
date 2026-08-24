@@ -40,7 +40,7 @@ afterEach(() => {
 /**
  * The keystroke lands on the page, not on the editor, so it travels
  * `useSaveShortcut` -> a `vscode-save-request` event on `window` -> the listener
- * in `useNoteSave` -> `postMessage`. Those halves are covered individually; this
+ * in `useNoteSync` -> `postMessage`. Those halves are covered individually; this
  * is the only test that joins them, and a mistake in the wiring between them
  * shows up nowhere else.
  */
@@ -58,7 +58,7 @@ describe('Cmd/Ctrl+S reaching the host', () => {
 		await userEvent.keyboard('{Meta>}s{/Meta}')
 
 		expect(postMessage).toHaveBeenCalledWith({
-			type: 'save',
+			type: 'syncDocument',
 			content: `${NOTE} Today.`,
 		})
 	})
@@ -74,7 +74,7 @@ describe('Cmd/Ctrl+S reaching the host', () => {
 		await userEvent.keyboard('{Control>}s{/Control}')
 
 		expect(postMessage).toHaveBeenCalledWith({
-			type: 'save',
+			type: 'syncDocument',
 			content: '---\ntitle: Roadmap\n---\n\n# Roadmap\n\nShip it. Today.',
 		})
 	})
@@ -89,7 +89,10 @@ describe('Cmd/Ctrl+S reaching the host', () => {
 		)
 		await userEvent.keyboard('{Meta>}s{/Meta}')
 
-		expect(postMessage).toHaveBeenCalledWith({ type: 'save', content: '' })
+		expect(postMessage).toHaveBeenCalledWith({
+			type: 'syncDocument',
+			content: '',
+		})
 	})
 })
 
@@ -107,7 +110,7 @@ describe('autosaving to the host', () => {
 		await waitFor(
 			() => {
 				expect(postMessage).toHaveBeenCalledWith({
-					type: 'save',
+					type: 'syncDocument',
 					content: `${NOTE} Today.`,
 				})
 			},

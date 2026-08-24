@@ -156,7 +156,7 @@ suite('Webview panel restore', () => {
 			await background(panel, otherFile)
 
 			const document = await vscode.workspace.openTextDocument(file)
-			await new DocumentWriter().save(
+			await new DocumentWriter().write(
 				document,
 				'# Original\n\nAfter the edit.\n'
 			)

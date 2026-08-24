@@ -1,14 +1,14 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useNoteSave } from '@/hooks/use-note-save'
+import { useNoteSync } from '@/hooks/use-note-sync'
 import { updateNotes } from '@/lib/update-notes'
 
 // Resolves rather than returning `undefined`, because the real `updateNotes` is
 // `async` and the caller attaches a rejection handler to what it hands back.
 vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 
-const SAVE_DEBOUNCE_MS = 1000
+const SYNC_DEBOUNCE_MS = 1000
 
 beforeEach(() => {
 	vi.useFakeTimers()
@@ -22,225 +22,225 @@ afterEach(() => {
 /** Lets the debounce elapse without waiting on a real second. */
 function runDebounce() {
 	act(() => {
-		vi.advanceTimersByTime(SAVE_DEBOUNCE_MS)
+		vi.advanceTimersByTime(SYNC_DEBOUNCE_MS)
 	})
 }
 
-describe('useNoteSave', () => {
+describe('useNoteSync', () => {
 	/**
 	 * The debounce used to be seeded with `''` and guarded with a truthiness
 	 * check, so a note the author had emptied looked identical to a note that had
-	 * never been typed into - and deleting everything silently never saved.
+	 * never been typed into - and deleting everything silently never synced.
 	 */
-	it('saves a note the author has emptied', () => {
-		const saveContent = vi.fn()
+	it('syncs a note the author has emptied', () => {
+		const syncContent = vi.fn()
 		renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: true,
-				saveContent,
+				syncContent,
 				currentFile: () => '',
 			})
-		).result.current.queueSave('')
+		).result.current.queueSync('')
 
 		runDebounce()
 
-		expect(saveContent).toHaveBeenCalledWith('')
+		expect(syncContent).toHaveBeenCalledWith('')
 	})
 
-	it('saves a note emptied down to its frontmatter', () => {
-		const saveContent = vi.fn()
+	it('syncs a note emptied down to its frontmatter', () => {
+		const syncContent = vi.fn()
 		const emptied = '---\ntitle: Roadmap\n---\n\n'
 
 		renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: true,
-				saveContent,
+				syncContent,
 				currentFile: () => emptied,
 			})
-		).result.current.queueSave(emptied)
+		).result.current.queueSync(emptied)
 
 		runDebounce()
 
-		expect(saveContent).toHaveBeenCalledWith(emptied)
+		expect(syncContent).toHaveBeenCalledWith(emptied)
 	})
 
-	it('does not save anything before the first edit', () => {
-		const saveContent = vi.fn()
+	it('does not sync anything before the first edit', () => {
+		const syncContent = vi.fn()
 
 		renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: true,
-				saveContent,
+				syncContent,
 				currentFile: () => '# Roadmap',
 			})
 		)
 
 		runDebounce()
 
-		expect(saveContent).not.toHaveBeenCalled()
+		expect(syncContent).not.toHaveBeenCalled()
 	})
 
-	it('coalesces a burst of keystrokes into one save', () => {
-		const saveContent = vi.fn()
+	it('coalesces a burst of keystrokes into one sync', () => {
+		const syncContent = vi.fn()
 		const { result } = renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: true,
-				saveContent,
+				syncContent,
 				currentFile: () => '# Roadmap 2026',
 			})
 		)
 
-		result.current.queueSave('# Road')
-		result.current.queueSave('# Roadmap')
-		result.current.queueSave('# Roadmap 2026')
+		result.current.queueSync('# Road')
+		result.current.queueSync('# Roadmap')
+		result.current.queueSync('# Roadmap 2026')
 		runDebounce()
 
-		expect(saveContent).toHaveBeenCalledTimes(1)
-		expect(saveContent).toHaveBeenCalledWith('# Roadmap 2026')
+		expect(syncContent).toHaveBeenCalledTimes(1)
+		expect(syncContent).toHaveBeenCalledWith('# Roadmap 2026')
 	})
 
-	it('waits for the pause before saving', () => {
-		const saveContent = vi.fn()
+	it('waits for the pause before syncing', () => {
+		const syncContent = vi.fn()
 		const { result } = renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: true,
-				saveContent,
+				syncContent,
 				currentFile: () => '# Roadmap',
 			})
 		)
 
-		result.current.queueSave('# Roadmap')
+		result.current.queueSync('# Roadmap')
 		act(() => {
-			vi.advanceTimersByTime(SAVE_DEBOUNCE_MS - 100)
+			vi.advanceTimersByTime(SYNC_DEBOUNCE_MS - 100)
 		})
 
-		expect(saveContent).not.toHaveBeenCalled()
+		expect(syncContent).not.toHaveBeenCalled()
 	})
 
-	// Standalone there is no host to write the file, so the save has to reach the
-	// stub instead of being posted into nothing.
+	// Standalone there is no host to write the file, so the sync has to reach
+	// the stub instead of being posted into nothing.
 	it('routes to the standalone stub when there is no host', () => {
-		const saveContent = vi.fn()
+		const syncContent = vi.fn()
 		renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: false,
-				saveContent,
+				syncContent,
 				currentFile: () => '# Roadmap',
 			})
-		).result.current.queueSave('# Roadmap')
+		).result.current.queueSync('# Roadmap')
 
 		runDebounce()
 
 		expect(updateNotes).toHaveBeenCalledWith('# Roadmap')
-		expect(saveContent).not.toHaveBeenCalled()
+		expect(syncContent).not.toHaveBeenCalled()
 	})
 
 	// Switching from the live editor to the raw editor unmounts this hook's
 	// caller. The debounce library cancels its own pending timer on unmount, so
 	// an edit made in the second before the switch used to vanish silently -
 	// the raw view then opened on the pre-edit document, not what was just typed.
-	it('flushes a pending save when unmounted before the debounce fires', () => {
-		const saveContent = vi.fn()
+	it('flushes a pending sync when unmounted before the debounce fires', () => {
+		const syncContent = vi.fn()
 		const { result, unmount } = renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: true,
-				saveContent,
+				syncContent,
 				currentFile: () => '# Roadmap\n\nShip it. Today.',
 			})
 		)
 
-		result.current.queueSave('# Roadmap\n\nShip it. Today.')
+		result.current.queueSync('# Roadmap\n\nShip it. Today.')
 		unmount()
 
-		expect(saveContent).toHaveBeenCalledWith('# Roadmap\n\nShip it. Today.')
+		expect(syncContent).toHaveBeenCalledWith('# Roadmap\n\nShip it. Today.')
 	})
 
-	// The debounced path (`runDebounce()` above) routes a standalone save
-	// through `updateNotes` rather than `saveContent`, which posts to a VS Code
+	// The debounced path (`runDebounce()` above) routes a standalone sync
+	// through `updateNotes` rather than `syncContent`, which posts to a VS Code
 	// API that does not exist outside VSCode. The flush on unmount has to take
 	// the same fork.
-	it('flushes a pending standalone save through updateNotes, not saveContent', () => {
-		const saveContent = vi.fn()
+	it('flushes a pending standalone sync through updateNotes, not syncContent', () => {
+		const syncContent = vi.fn()
 		const { result, unmount } = renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: false,
-				saveContent,
+				syncContent,
 				currentFile: () => '# Roadmap\n\nShip it. Today.',
 			})
 		)
 
-		result.current.queueSave('# Roadmap\n\nShip it. Today.')
+		result.current.queueSync('# Roadmap\n\nShip it. Today.')
 		unmount()
 
 		expect(updateNotes).toHaveBeenCalledWith('# Roadmap\n\nShip it. Today.')
-		expect(saveContent).not.toHaveBeenCalled()
+		expect(syncContent).not.toHaveBeenCalled()
 	})
 
 	// Both editor modes stay mounted at once (`EditorBody`), so a view that
 	// hides itself instead of unmounting has to flush explicitly, or a
 	// keystroke made just before switching away is stuck behind a debounce
 	// nothing is left to fire.
-	it('flushes a pending save immediately when asked to', () => {
-		const saveContent = vi.fn()
+	it('flushes a pending sync immediately when asked to', () => {
+		const syncContent = vi.fn()
 		const { result } = renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: true,
-				saveContent,
+				syncContent,
 				currentFile: () => '# Roadmap\n\nShip it. Today.',
 			})
 		)
 
-		result.current.queueSave('# Roadmap\n\nShip it. Today.')
+		result.current.queueSync('# Roadmap\n\nShip it. Today.')
 		act(() => {
-			result.current.flushQueuedSave()
+			result.current.flushQueuedSync()
 		})
 
-		expect(saveContent).toHaveBeenCalledWith('# Roadmap\n\nShip it. Today.')
+		expect(syncContent).toHaveBeenCalledWith('# Roadmap\n\nShip it. Today.')
 
-		saveContent.mockClear()
+		syncContent.mockClear()
 		runDebounce()
-		expect(saveContent).not.toHaveBeenCalled()
+		expect(syncContent).not.toHaveBeenCalled()
 	})
 
 	it('does nothing when flushed with nothing pending', () => {
-		const saveContent = vi.fn()
+		const syncContent = vi.fn()
 		const { result } = renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: true,
-				saveContent,
+				syncContent,
 				currentFile: () => '# Roadmap',
 			})
 		)
 
 		act(() => {
-			result.current.flushQueuedSave()
+			result.current.flushQueuedSync()
 		})
 
-		expect(saveContent).not.toHaveBeenCalled()
+		expect(syncContent).not.toHaveBeenCalled()
 	})
 
 	it('does not flush on unmount when nothing was ever typed', () => {
-		const saveContent = vi.fn()
+		const syncContent = vi.fn()
 		const { unmount } = renderHook(() =>
-			useNoteSave({
+			useNoteSync({
 				isVSCodeContext: true,
-				saveContent,
+				syncContent,
 				currentFile: () => null,
 			})
 		)
 
 		unmount()
 
-		expect(saveContent).not.toHaveBeenCalled()
+		expect(syncContent).not.toHaveBeenCalled()
 	})
 
 	describe('Cmd/Ctrl+S', () => {
-		it('saves immediately rather than waiting out the debounce', () => {
-			const saveContent = vi.fn()
+		it('syncs immediately rather than waiting out the debounce', () => {
+			const syncContent = vi.fn()
 			renderHook(() =>
-				useNoteSave({
+				useNoteSync({
 					isVSCodeContext: true,
-					saveContent,
+					syncContent,
 					currentFile: () => '# Roadmap 2026',
 				})
 			)
@@ -249,15 +249,15 @@ describe('useNoteSave', () => {
 				window.dispatchEvent(new CustomEvent('vscode-save-request'))
 			})
 
-			expect(saveContent).toHaveBeenCalledWith('# Roadmap 2026')
+			expect(syncContent).toHaveBeenCalledWith('# Roadmap 2026')
 		})
 
-		it('saves an emptied note', () => {
-			const saveContent = vi.fn()
+		it('syncs an emptied note', () => {
+			const syncContent = vi.fn()
 			renderHook(() =>
-				useNoteSave({
+				useNoteSync({
 					isVSCodeContext: true,
-					saveContent,
+					syncContent,
 					currentFile: () => '',
 				})
 			)
@@ -266,17 +266,17 @@ describe('useNoteSave', () => {
 				window.dispatchEvent(new CustomEvent('vscode-save-request'))
 			})
 
-			expect(saveContent).toHaveBeenCalledWith('')
+			expect(syncContent).toHaveBeenCalledWith('')
 		})
 
 		// `null` is the caller saying it has nothing to serialize yet - an editor
 		// that has not finished mounting. Writing that would truncate the file.
 		it('writes nothing when the caller has no document yet', () => {
-			const saveContent = vi.fn()
+			const syncContent = vi.fn()
 			renderHook(() =>
-				useNoteSave({
+				useNoteSync({
 					isVSCodeContext: true,
-					saveContent,
+					syncContent,
 					currentFile: () => null,
 				})
 			)
@@ -285,15 +285,15 @@ describe('useNoteSave', () => {
 				window.dispatchEvent(new CustomEvent('vscode-save-request'))
 			})
 
-			expect(saveContent).not.toHaveBeenCalled()
+			expect(syncContent).not.toHaveBeenCalled()
 		})
 
 		it('is ignored outside VSCode, where the keystroke is the browser’s', () => {
-			const saveContent = vi.fn()
+			const syncContent = vi.fn()
 			renderHook(() =>
-				useNoteSave({
+				useNoteSync({
 					isVSCodeContext: false,
-					saveContent,
+					syncContent,
 					currentFile: () => '# Roadmap',
 				})
 			)
@@ -302,16 +302,16 @@ describe('useNoteSave', () => {
 				window.dispatchEvent(new CustomEvent('vscode-save-request'))
 			})
 
-			expect(saveContent).not.toHaveBeenCalled()
+			expect(syncContent).not.toHaveBeenCalled()
 			expect(updateNotes).not.toHaveBeenCalled()
 		})
 
 		it('stops listening once the editor is gone', () => {
-			const saveContent = vi.fn()
+			const syncContent = vi.fn()
 			const { unmount } = renderHook(() =>
-				useNoteSave({
+				useNoteSync({
 					isVSCodeContext: true,
-					saveContent,
+					syncContent,
 					currentFile: () => '# Roadmap',
 				})
 			)
@@ -321,7 +321,7 @@ describe('useNoteSave', () => {
 				window.dispatchEvent(new CustomEvent('vscode-save-request'))
 			})
 
-			expect(saveContent).not.toHaveBeenCalled()
+			expect(syncContent).not.toHaveBeenCalled()
 		})
 	})
 })

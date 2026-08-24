@@ -7,7 +7,7 @@ import { EditorModeRaw } from '@/editor/editor-mode-raw'
 import { updateNotes } from '@/lib/update-notes'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`
-// and the save effect attaches a rejection handler to what it hands back.
+// and the sync effect attaches a rejection handler to what it hands back.
 vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 
 const NOTE_WITH_FRONTMATTER = [
@@ -29,8 +29,8 @@ afterEach(() => {
 })
 
 describe('EditorModeRaw', () => {
-	it('autosaves the whole file, frontmatter fences included', async () => {
-		const saveContent = vi.fn()
+	it('autosyncs the whole file, frontmatter fences included', async () => {
+		const syncContent = vi.fn()
 		window.vscode = {
 			postMessage: vi.fn(),
 			getState: vi.fn(),
@@ -41,7 +41,7 @@ describe('EditorModeRaw', () => {
 			<SettingsProvider>
 				<EditorModeRaw
 					content={NOTE_WITH_FRONTMATTER}
-					saveContent={saveContent}
+					syncContent={syncContent}
 				/>
 			</SettingsProvider>
 		)
@@ -50,7 +50,7 @@ describe('EditorModeRaw', () => {
 
 		await waitFor(
 			() => {
-				expect(saveContent).toHaveBeenCalledWith(
+				expect(syncContent).toHaveBeenCalledWith(
 					`${NOTE_WITH_FRONTMATTER} Today.`
 				)
 			},
@@ -59,9 +59,9 @@ describe('EditorModeRaw', () => {
 	})
 
 	// Select-all-and-delete is the one gesture a textarea makes trivially easy,
-	// and the debounce used to treat the empty result as "nothing to save".
-	it('saves a note the author has emptied', async () => {
-		const saveContent = vi.fn()
+	// and the debounce used to treat the empty result as "nothing to sync".
+	it('syncs a note the author has emptied', async () => {
+		const syncContent = vi.fn()
 		window.vscode = {
 			postMessage: vi.fn(),
 			getState: vi.fn(),
@@ -72,7 +72,7 @@ describe('EditorModeRaw', () => {
 			<SettingsProvider>
 				<EditorModeRaw
 					content={NOTE_WITH_FRONTMATTER}
-					saveContent={saveContent}
+					syncContent={syncContent}
 				/>
 			</SettingsProvider>
 		)
@@ -81,16 +81,16 @@ describe('EditorModeRaw', () => {
 
 		await waitFor(
 			() => {
-				expect(saveContent).toHaveBeenCalledWith('')
+				expect(syncContent).toHaveBeenCalledWith('')
 			},
 			{ timeout: 2000 }
 		)
 	})
 
-	it('saves through the standalone stub when there is no host', async () => {
+	it('syncs through the standalone stub when there is no host', async () => {
 		render(
 			<SettingsProvider>
-				<EditorModeRaw content={NOTE_WITH_FRONTMATTER} saveContent={vi.fn()} />
+				<EditorModeRaw content={NOTE_WITH_FRONTMATTER} syncContent={vi.fn()} />
 			</SettingsProvider>
 		)
 
@@ -106,8 +106,8 @@ describe('EditorModeRaw', () => {
 		)
 	})
 
-	it('saves immediately on Cmd/Ctrl+S without waiting for the debounce', async () => {
-		const saveContent = vi.fn()
+	it('syncs immediately on Cmd/Ctrl+S without waiting for the debounce', async () => {
+		const syncContent = vi.fn()
 		window.vscode = {
 			postMessage: vi.fn(),
 			getState: vi.fn(),
@@ -118,7 +118,7 @@ describe('EditorModeRaw', () => {
 			<SettingsProvider>
 				<EditorModeRaw
 					content={NOTE_WITH_FRONTMATTER}
-					saveContent={saveContent}
+					syncContent={syncContent}
 				/>
 			</SettingsProvider>
 		)
@@ -126,19 +126,19 @@ describe('EditorModeRaw', () => {
 		await userEvent.type(screen.getByLabelText('Raw markdown'), ' Today.')
 		window.dispatchEvent(new CustomEvent('vscode-save-request'))
 
-		expect(saveContent).toHaveBeenCalledWith(`${NOTE_WITH_FRONTMATTER} Today.`)
+		expect(syncContent).toHaveBeenCalledWith(`${NOTE_WITH_FRONTMATTER} Today.`)
 	})
 
 	it('adopts a different note when the caret is elsewhere', async () => {
 		const { rerender } = render(
 			<SettingsProvider>
-				<EditorModeRaw content={'# Roadmap'} saveContent={vi.fn()} />
+				<EditorModeRaw content={'# Roadmap'} syncContent={vi.fn()} />
 			</SettingsProvider>
 		)
 
 		rerender(
 			<SettingsProvider>
-				<EditorModeRaw content={'# Backlog'} saveContent={vi.fn()} />
+				<EditorModeRaw content={'# Backlog'} syncContent={vi.fn()} />
 			</SettingsProvider>
 		)
 
@@ -146,11 +146,11 @@ describe('EditorModeRaw', () => {
 	})
 
 	/**
-	 * The host writes each save to disk and echoes it straight back as an
+	 * The host writes each sync to disk and echoes it straight back as an
 	 * `update`, a debounce behind whatever has been typed since. Adopting that
 	 * echo would drop the newest keystrokes and jump the caret to the end.
 	 */
-	it('ignores the host echoing an earlier save back while typing', async () => {
+	it('ignores the host echoing an earlier sync back while typing', async () => {
 		window.vscode = {
 			postMessage: vi.fn(),
 			getState: vi.fn(),
@@ -159,16 +159,16 @@ describe('EditorModeRaw', () => {
 
 		const { rerender } = render(
 			<SettingsProvider>
-				<EditorModeRaw content={'# Roadmap'} saveContent={vi.fn()} />
+				<EditorModeRaw content={'# Roadmap'} syncContent={vi.fn()} />
 			</SettingsProvider>
 		)
 
 		await userEvent.type(screen.getByLabelText('Raw markdown'), ' 2026')
 
-		// What the host round-trips back from the save queued mid-word.
+		// What the host round-trips back from the sync queued mid-word.
 		rerender(
 			<SettingsProvider>
-				<EditorModeRaw content={'# Roadmap 20'} saveContent={vi.fn()} />
+				<EditorModeRaw content={'# Roadmap 20'} syncContent={vi.fn()} />
 			</SettingsProvider>
 		)
 
@@ -191,7 +191,7 @@ describe('EditorModeRaw', () => {
 
 		const { rerender } = render(
 			<SettingsProvider>
-				<EditorModeRaw content={'# Roadmap'} saveContent={vi.fn()} />
+				<EditorModeRaw content={'# Roadmap'} syncContent={vi.fn()} />
 			</SettingsProvider>
 		)
 
@@ -201,7 +201,7 @@ describe('EditorModeRaw', () => {
 		// Someone else's edit - another tab, git - while the caret sits here.
 		rerender(
 			<SettingsProvider>
-				<EditorModeRaw content={'# Backlog'} saveContent={vi.fn()} />
+				<EditorModeRaw content={'# Backlog'} syncContent={vi.fn()} />
 			</SettingsProvider>
 		)
 
@@ -211,11 +211,11 @@ describe('EditorModeRaw', () => {
 	})
 
 	/**
-	 * `content` follows this view's own saves, so "the draft still matches what
+	 * `content` follows this view's own syncs, so "the draft still matches what
 	 * arrived" is not on its own a safe reason to adopt: an author who types and
 	 * then undoes it back to the earlier text matches again, while `content` has
-	 * moved on to the save in between. Adopting there would put text on screen
-	 * that the pending save is about to contradict on disk.
+	 * moved on to the sync in between. Adopting there would put text on screen
+	 * that the pending sync is about to contradict on disk.
 	 */
 	it('keeps the author’s text when they have undone their way back to it', async () => {
 		const user = userEvent.setup()
@@ -224,11 +224,11 @@ describe('EditorModeRaw', () => {
 			getState: vi.fn(),
 			setState: vi.fn(),
 		}
-		const saveContent = vi.fn()
+		const syncContent = vi.fn()
 
 		const { rerender } = render(
 			<SettingsProvider>
-				<EditorModeRaw content={'# Roadmap'} saveContent={saveContent} />
+				<EditorModeRaw content={'# Roadmap'} syncContent={syncContent} />
 			</SettingsProvider>
 		)
 
@@ -238,16 +238,16 @@ describe('EditorModeRaw', () => {
 
 		await waitFor(
 			() => {
-				expect(saveContent).toHaveBeenCalledWith('# Roadmap 2026')
+				expect(syncContent).toHaveBeenCalledWith('# Roadmap 2026')
 			},
 			{ timeout: 2000 }
 		)
 
-		// `useHostDocument` applies each save locally, so the note the parent
+		// `useHostDocument` applies each sync locally, so the note the parent
 		// holds is now this view's own text rather than anyone else's edit.
 		rerender(
 			<SettingsProvider>
-				<EditorModeRaw content={'# Roadmap 2026'} saveContent={saveContent} />
+				<EditorModeRaw content={'# Roadmap 2026'} syncContent={syncContent} />
 			</SettingsProvider>
 		)
 
@@ -278,7 +278,7 @@ describe('EditorModeRaw', () => {
 
 		render(
 			<SettingsProvider>
-				<EditorModeRaw content={NOTE_WITH_FRONTMATTER} saveContent={vi.fn()} />
+				<EditorModeRaw content={NOTE_WITH_FRONTMATTER} syncContent={vi.fn()} />
 			</SettingsProvider>
 		)
 
@@ -294,7 +294,7 @@ describe('EditorModeRaw', () => {
 	it('selects nothing on an ordinary open', async () => {
 		render(
 			<SettingsProvider>
-				<EditorModeRaw content={NOTE_WITH_FRONTMATTER} saveContent={vi.fn()} />
+				<EditorModeRaw content={NOTE_WITH_FRONTMATTER} syncContent={vi.fn()} />
 			</SettingsProvider>
 		)
 

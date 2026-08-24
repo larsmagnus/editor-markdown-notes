@@ -14,15 +14,17 @@ export function useHostDocument() {
 	const [content, setContent] = useState(() => window.initialContent ?? '')
 	const [fileName, setFileName] = useState(() => window.fileName ?? '')
 
-	// Those globals are frozen into the page when the note first opens, and VS
-	// Code rebuilds a backgrounded tab from that same frozen HTML - so a page
-	// that just booted cannot tell whether it is showing the file or a snapshot
-	// of it from an hour ago. Asking on every boot is what closes that gap:
-	// edits made while the tab was hidden never reached it, because `postMessage`
-	// at a webview that is not live is dropped. Only a freshly booted page asks,
-	// which is why this is safe where a host-side push on visibility is not -
-	// that would also hit pages whose context survived, still holding up to a
-	// debounce of unsaved keystrokes.
+	// Those globals are frozen into the page when the note first opens, and a
+	// window reload or reopening a closed tab rebuilds the page from that same
+	// frozen HTML - so a page that just booted cannot tell whether it is
+	// showing the file or a snapshot of it from an hour ago. Asking on every
+	// boot is what closes that gap. `retainContextWhenHidden`
+	// (`markdown-editor-provider.ts`) means backgrounding the tab no longer
+	// triggers this at all - the page keeps running, and `postMessage` reaches
+	// it whether or not it is currently visible. Only a freshly booted page
+	// asks, which is why this is safe where a host-side push on visibility is
+	// not - that would also hit pages whose context survived, still holding up
+	// to a debounce of unsynced keystrokes.
 	useEffect(() => {
 		if (!isVSCodeWebview()) return
 
@@ -42,13 +44,13 @@ export function useHostDocument() {
 	// readers like the toolbar's copy actions - the host's own echo of this
 	// write is deliberately suppressed (`DocumentWriter.isWriting`), so without
 	// this, `content` would otherwise sit stale until the next external change.
-	// `saveContent` itself only runs on `useNoteSave`'s 1000ms save debounce, so
+	// `syncContent` itself only runs on `useNoteSync`'s 1000ms debounce, so
 	// `content` can still lag the very latest keystroke by up to that window -
 	// the same latency the file on disk already has, not a new gap this closes.
-	const saveContent = useCallback((next: string) => {
+	const syncContent = useCallback((next: string) => {
 		setContent(next)
-		getVSCodeApi()?.postMessage({ type: 'save', content: next })
+		getVSCodeApi()?.postMessage({ type: 'syncDocument', content: next })
 	}, [])
 
-	return { content, fileName, saveContent }
+	return { content, fileName, syncContent }
 }

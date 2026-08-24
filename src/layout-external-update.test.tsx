@@ -28,10 +28,10 @@ function getLiveEditor(): HTMLElement {
 
 describe('Layout, when the host reports an outside change', () => {
 	/**
-	 * An external edit must not come back out of the editor as a save.
+	 * An external edit must not come back out of the editor as a sync.
 	 *
 	 * The host replaces the whole document on an `update`, and that replacement
-	 * looks exactly like a user edit to the auto-save - so the editor writes its
+	 * looks exactly like a user edit to the autosync - so the editor writes its
 	 * own re-serialization back over a file it was only told about. Whatever the
 	 * markdown round-trip does not preserve is destroyed on disk with nobody
 	 * having touched the note.
@@ -62,12 +62,12 @@ describe('Layout, when the host reports an outside change', () => {
 
 		await within(getLiveEditor()).findByText('Ship it tomorrow.')
 
-		// Past the 1000ms auto-save debounce, which is the whole window in which
+		// Past the 1000ms autosync debounce, which is the whole window in which
 		// the editor could decide to write the change back at the host.
 		await new Promise((resolve) => setTimeout(resolve, 1500))
 
 		expect(postMessage).not.toHaveBeenCalledWith(
-			expect.objectContaining({ type: 'save' })
+			expect.objectContaining({ type: 'syncDocument' })
 		)
 	})
 
@@ -112,7 +112,7 @@ describe('Layout, when the host reports an outside change', () => {
 		await waitFor(
 			() => {
 				expect(postMessage).toHaveBeenCalledWith({
-					type: 'save',
+					type: 'syncDocument',
 					content: 'Ship it tomorrow. Really.',
 				})
 			},

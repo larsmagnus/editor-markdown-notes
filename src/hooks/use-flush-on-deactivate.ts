@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 /**
- * Flushes a pending save the moment a view stops being the one on screen.
+ * Flushes a pending sync the moment a view stops being the one on screen.
  *
  * Both editor modes stay mounted at once (`EditorBody`), so switching between
  * them no longer unmounts the one left behind - nothing is left to flush a
