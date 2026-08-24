@@ -21,10 +21,10 @@ describe('inside VSCode', () => {
 	})
 
 	/**
-	 * VSCode destroys the webview when the tab is merely backgrounded, then
-	 * reloads it from the HTML it already holds - whose injected offset is frozen
-	 * at whatever it was when the note first opened. The panel's own state is the
-	 * only thing carrying anything newer across that.
+	 * A window reload or reopening a closed tab rebuilds the webview from the
+	 * HTML it already holds - whose injected offset is frozen at whatever it
+	 * was when the note first opened. The panel's own state is the only thing
+	 * carrying anything newer across that.
 	 */
 	it('prefers the panel state to a stale injected offset', () => {
 		window.vscode = {

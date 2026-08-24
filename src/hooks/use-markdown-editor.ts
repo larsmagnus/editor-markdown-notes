@@ -17,6 +17,7 @@ import { useSettings } from '@/hooks/use-settings'
 import { useSyntaxHighlight } from '@/hooks/use-syntax-highlight'
 import { useTextTools } from '@/hooks/use-text-tools'
 import { splitFrontmatter } from '@/lib/host/frontmatter'
+import { createOwnSyncTracker } from '@/lib/own-sync-tracker'
 
 /** Stable, so the default does not rebuild `save` on every render. */
 const noSaveTarget = () => {}
@@ -47,20 +48,23 @@ export function useMarkdownEditor(
 ) {
 	const { viewOptions, settings, isVSCodeContext } = useSettings()
 
-	// What this editor last wrote back, so the `content` that returns through
-	// the host is recognizable as its own echo rather than an outside edit.
-	const lastSaved = useRef<string | null>(null)
+	// What this editor recently wrote back, so the `content` that returns
+	// through the host is recognizable as its own echo rather than an outside
+	// edit - a bounded history rather than a single last value, since two
+	// panels on the same document each see the other's write as an `update`,
+	// and a second save can be queued before the first one's echo arrives.
+	const ownSyncTracker = useRef(createOwnSyncTracker())
 
 	const save = useCallback(
 		(next: string) => {
-			lastSaved.current = next
+			ownSyncTracker.current.record(next)
 			saveContent(next)
 		},
 		[saveContent]
 	)
 
 	const isOwnSave = useCallback(
-		(next: string) => lastSaved.current === next,
+		(next: string) => ownSyncTracker.current.matches(next),
 		[]
 	)
 

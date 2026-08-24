@@ -54,6 +54,11 @@ export function EditorModeRaw({
 	const adoptedRef = useRef(content)
 
 	const currentFile = useCallback(() => draftRef.current, [])
+	// This view's own echo check, parallel to `use-markdown-editor.ts`'s
+	// `own-sync-tracker` rather than sharing it: `adoptedRef` already tells the
+	// echo of this view's own write apart from an outside edit, and unlike the
+	// live editor a stale match would only cost a redundant `setDraft` here,
+	// not a document rebuild that drops keystrokes.
 	const rememberSave = useCallback(
 		(next: string) => {
 			adoptedRef.current = next
