@@ -23,7 +23,7 @@ export function createAskClaudeHandlers({
 }: AskClaudeHandlersOptions) {
 	const activeAskControllers = new Map<string, AbortController>()
 
-	const askClaude = (message: {
+	const askClaude = async (message: {
 		requestId: string
 		prompt: string
 		selectedText?: string
@@ -52,6 +52,11 @@ export function createAskClaudeHandlers({
 		const relativePath = workspaceFolder
 			? vscode.workspace.asRelativePath(document.uri, false)
 			: path.basename(document.uri.fsPath)
+
+		// The Agent SDK reads the file by path, not our buffer - VS Code no
+		// longer saves on every sync, so without this it can read content that
+		// is still only in the webview.
+		await document.save()
 
 		void runClaudeAsk(
 			message.prompt,

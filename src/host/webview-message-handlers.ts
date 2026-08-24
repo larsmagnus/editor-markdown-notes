@@ -87,7 +87,11 @@ export function createWebviewMessageHandlers({
 		openInTextEditor: () => {
 			void openInTextEditor(document.uri)
 		},
-		openClaudeTerminal: (message) => {
+		// Claude reads the file, not our buffer - VS Code no longer saves on
+		// every sync, so without this the terminal command it types can point
+		// `claude` at content that is still only in the webview.
+		openClaudeTerminal: async (message) => {
+			await document.save()
 			openClaudeTerminal(document.uri, store.getSettings(), message.content)
 		},
 		// Answers the asking panel alone. Broadcasting instead would make every
