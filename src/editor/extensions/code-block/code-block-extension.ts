@@ -9,6 +9,8 @@ import {
 	fenceLanguage,
 	insertLiteralFences,
 } from '@/editor/extensions/code-block/code-fence'
+import { createEnsureFencePlugin } from '@/editor/extensions/code-block/ensure-fence-plugin'
+import { createFenceInputRule } from '@/editor/extensions/code-block/fence-input-rule'
 import { unwrapCodeBlockAtFenceStart } from '@/editor/extensions/code-block/unwrap-code-block'
 import type { MarkdownIt } from '@/editor/extensions/markdown/markdown-it-types'
 
@@ -28,7 +30,10 @@ const LANGUAGE_CLASS_PREFIX = 'language-'
  * same fact. Every reader of "what language is this block" parses the text
  * instead (`fenceLanguage`), which is also what makes editing the fence
  * line's language tag live-update highlighting: there's nothing else to
- * resync.
+ * resync. `fence-input-rule.ts` and `ensure-fence-plugin.ts` are what keep
+ * every path that can create a `codeBlock` node - typing, the toolbar
+ * toggle, VS Code paste - honest about that: none of them can produce one
+ * with no fence text in it.
  */
 export const CodeBlockExtension = CodeBlock.extend({
 	addAttributes() {
@@ -54,17 +59,30 @@ export const CodeBlockExtension = CodeBlock.extend({
 		return ReactNodeViewRenderer(CodeBlockView)
 	},
 
-	// Backspacing at the very start of the fence line - `parentOffset === 0`,
-	// since the fence text is now the first thing in the block's content -
-	// unwraps the block into a plain paragraph holding its code.
+	// The stock extension's own shortcuts (`Mod-Alt-c` toggle, triple-Enter and
+	// ArrowUp/ArrowDown to exit the block) still apply - only `Backspace` is
+	// replaced, so this must spread `this.parent()` rather than return in its
+	// place, or the whole map is lost.
 	addKeyboardShortcuts() {
 		return {
+			...this.parent?.(),
+			// Backspacing at the very start of the fence line - `parentOffset === 0`,
+			// since the fence text is now the first thing in the block's content -
+			// unwraps the block into a plain paragraph holding its code.
 			Backspace: () =>
 				unwrapCodeBlockAtFenceStart(this.name)(
 					this.editor.state,
 					this.editor.view.dispatch
 				),
 		}
+	},
+
+	addInputRules() {
+		return [createFenceInputRule(this.type)]
+	},
+
+	addProseMirrorPlugins() {
+		return [createEnsureFencePlugin(this.type)]
 	},
 
 	addStorage() {

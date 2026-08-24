@@ -146,6 +146,22 @@ describe('Editor Mode Live', () => {
 		expect(screen.queryByText(/\[ \]/)).not.toBeInTheDocument()
 	})
 
+	// Regression: the stock `CodeBlock` extension's own backtick input rule
+	// only sets a `language` attribute, which this schema no longer has - the
+	// resulting block used to have no fence text in it at all (nothing to
+	// syntax-highlight, and unfenced plain text on save). `code-block-extension.ts`
+	// supersedes it with one that inserts a real fence instead.
+	it('typing a fenced code block trigger inserts real fence text, language included', async () => {
+		const { container } = render(<EditorModeLive content="" />)
+
+		await userEvent.click(screen.getByRole('textbox'))
+		await userEvent.keyboard('```ts ')
+
+		const code = container.querySelector('pre code.language-ts')
+		expect(code).not.toBeNull()
+		expect(code?.textContent).toBe('```ts\n\n```')
+	})
+
 	// Outside VSCode the notes are served from the site root, so the author's
 	// path is already the right one and must reach the DOM untouched.
 	it('renders an image with its alt text', async () => {

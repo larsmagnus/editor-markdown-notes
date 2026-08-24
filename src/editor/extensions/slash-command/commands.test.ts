@@ -53,6 +53,13 @@ describe('code', () => {
 			type: 'codeBlock',
 			content: [{ type: 'text', text: '```\n\n```' }],
 		})
+		// Regression: this used to land one character too far, on the closing
+		// fence's first backtick instead of the blank line between the fences -
+		// typing immediately would corrupt the fence.
+		expect(editor.state.selection.from).toBe(5)
+		expect(editor.state.doc.textBetween(1, editor.state.selection.from)).toBe(
+			'```\n'
+		)
 	})
 })
 

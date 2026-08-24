@@ -26,4 +26,16 @@ describe('findClosingFence', () => {
 	it('works with a non-backtick marker', () => {
 		expect(findClosingFence('name: notes\n---', '---')).toBe(11)
 	})
+
+	// Regression: `$` without the `m` flag only matches the very end of the
+	// whole string, so a block with one more newline typed after its closing
+	// fence (still inside the block - pressing Enter there inserts `\n`, it
+	// doesn't leave it) used to report no closing fence at all.
+	it('finds the closing marker even with a trailing newline after it', () => {
+		expect(findClosingFence('const a = 1\n```\n', '```')).toBe(11)
+	})
+
+	it('finds the closing marker even with multiple trailing newlines after it', () => {
+		expect(findClosingFence('const a = 1\n```\n\n', '```')).toBe(11)
+	})
 })

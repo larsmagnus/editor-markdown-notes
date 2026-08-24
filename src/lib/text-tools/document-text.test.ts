@@ -82,7 +82,9 @@ describe('getDocumentText', () => {
 		editor.commands.setContent('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
-			content: [{ type: 'text', text: 'title: Roadmap\nstatus: draft' }],
+			content: [
+				{ type: 'text', text: '---\ntitle: Roadmap\nstatus: draft\n---' },
+			],
 		})
 
 		// Joined the same way separate blocks are elsewhere - retext has no
@@ -95,13 +97,32 @@ describe('getDocumentText', () => {
 		)
 	})
 
+	// Regression: the `---` fence lines are real text in the node's own content
+	// now, not markup added only at save time - fed to `getDocumentText`
+	// unstripped, they used to reach retext as if they were YAML prose lines.
+	it('excludes the --- fence lines from the analyzed text', () => {
+		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
+		editor.commands.setContent('Real prose here.')
+		editor.commands.insertContentAt(0, {
+			type: 'frontmatter',
+			content: [{ type: 'text', text: '---\ntitle: Roadmap\n---' }],
+		})
+
+		const { text } = getDocumentText(editor.state.doc)
+		expect(text).not.toContain('-')
+		expect(text).toBe('Roadmap\n\nReal prose here.')
+	})
+
 	it('drops a blank line inside frontmatter rather than emitting an empty block', () => {
 		const editor = new Editor({ extensions, content: '' })
 		currentEditor = editor
 		editor.commands.setContent('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
-			content: [{ type: 'text', text: 'title: Roadmap\n\nstatus: draft' }],
+			content: [
+				{ type: 'text', text: '---\ntitle: Roadmap\n\nstatus: draft\n---' },
+			],
 		})
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
@@ -115,7 +136,9 @@ describe('getDocumentText', () => {
 		editor.commands.setContent('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
-			content: [{ type: 'text', text: 'tags:\n  - Some prose in a list' }],
+			content: [
+				{ type: 'text', text: '---\ntags:\n  - Some prose in a list\n---' },
+			],
 		})
 
 		// A bare `tags:` has no value to keep, so it contributes nothing; the
@@ -129,7 +152,10 @@ describe('getDocumentText', () => {
 		const editor = new Editor({ extensions, content: '' })
 		currentEditor = editor
 		editor.commands.setContent('Real prose here.')
-		editor.commands.insertContentAt(0, { type: 'frontmatter' })
+		editor.commands.insertContentAt(0, {
+			type: 'frontmatter',
+			content: [{ type: 'text', text: '---\n---' }],
+		})
 
 		expect(getDocumentText(editor.state.doc).text).toBe('Real prose here.')
 	})

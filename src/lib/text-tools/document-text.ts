@@ -1,5 +1,6 @@
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
+import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import type { ProseExclusion } from '@/lib/text-tools/prose-policy'
 import {
 	BLOCK_SEPARATOR,
@@ -80,10 +81,17 @@ function appendFrontmatterLines(
 ): string {
 	let result = text
 
-	// `pos` is the frontmatter node itself; its content starts one inside, and
-	// `offset` walks `textContent`, which - `content: 'text*'`, no marks - lines
-	// up with document positions one-for-one.
-	for (const { value, offset } of frontmatterLineOffsets(node.textContent)) {
+	// The block's own `---` fence lines are real text in its content now (see
+	// `frontmatter-fence.ts`), not just markup added at save time - stripped
+	// here the same way `frontmatter-prose.ts` strips them on the MCP side, or
+	// the fence lines themselves would reach retext as if they were YAML prose.
+	const { codeFrom, codeTo } = parseFrontmatterFence(node.textContent)
+	const yaml = node.textContent.slice(codeFrom, codeTo)
+
+	// `pos` is the frontmatter node itself; its content starts one inside, then
+	// `codeFrom` past the opening fence line, and `offset` walks `yaml`, which -
+	// `content: 'text*'`, no marks - lines up with document positions one-for-one.
+	for (const { value, offset } of frontmatterLineOffsets(yaml)) {
 		// Reuses the same "already have text" check the block separator uses
 		// everywhere else, so a line joins the block before it exactly the way
 		// the block itself joins whatever textblock came before it.
@@ -91,7 +99,7 @@ function appendFrontmatterLines(
 		slices.push({
 			offset: result.length,
 			length: value.text.length,
-			from: pos + 1 + offset + value.start,
+			from: pos + 1 + codeFrom + offset + value.start,
 		})
 		result += value.text
 	}
