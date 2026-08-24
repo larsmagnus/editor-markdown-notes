@@ -8,6 +8,7 @@ import {
 import { extensions } from '@/editor/extensions/extensions'
 import { useFocusNavigation } from '@/editor/extensions/focus-navigation/use-focus-navigation'
 import { useAskProposal } from '@/hooks/use-ask-proposal'
+import { useFlushOnDeactivate } from '@/hooks/use-flush-on-deactivate'
 import { useFrontmatterDocument } from '@/hooks/use-frontmatter-document'
 import { useItalicMarker } from '@/hooks/use-italic-marker'
 import { useMarkdownAutosave } from '@/hooks/use-markdown-autosave'
@@ -32,10 +33,17 @@ const noSaveTarget = () => {}
  * second, private copy of the document, and every save would land in the one
  * nothing else reads. It is optional since only the VS Code path ever writes -
  * standalone, `useNoteSave` routes to the `updateNotes` stub instead.
+ *
+ * `active` is false while raw mode is on screen instead (`EditorBody`), which
+ * now keeps this editor mounted rather than tearing it down - it still has to
+ * absorb incoming content while hidden, so only the expensive or
+ * visibility-only parts (autosave, the writing checks, syntax highlighting,
+ * "Skip to editor") gate on it.
  */
 export function useMarkdownEditor(
 	content: string,
-	saveContent: (content: string) => void = noSaveTarget
+	saveContent: (content: string) => void = noSaveTarget,
+	active = true
 ) {
 	const { viewOptions, settings, isVSCodeContext } = useSettings()
 
@@ -87,18 +95,24 @@ export function useMarkdownEditor(
 	})
 
 	useFrontmatterDocument(editor, content, isOwnSave)
-	useFocusNavigation(editor)
+	useFocusNavigation(editor, active)
 
 	// After the rebuild above, which is what puts the note's real text in the
 	// document - searching the doc it was constructed with would miss the
 	// frontmatter and race the only content sync this note ever gets for free.
 	useSearchReveal(editor)
 
-	useMarkdownAutosave({ editor, isVSCodeContext, saveContent: save })
+	const { flushQueuedSave } = useMarkdownAutosave({
+		editor,
+		isVSCodeContext,
+		saveContent: save,
+		enabled: active,
+	})
+	useFlushOnDeactivate(active, flushQueuedSave)
 
 	const { analysis, isAnalyzing, hasSpellingFailed } = useTextTools({
 		editor,
-		enabled: viewOptions.textTools,
+		enabled: viewOptions.textTools && active,
 		rules: viewOptions.textToolRules,
 		targetAge: settings.textToolsTargetAge,
 		spellingLanguage: viewOptions.spellingLanguage,
@@ -106,7 +120,7 @@ export function useMarkdownEditor(
 	})
 
 	useItalicMarker(editor, settings.italicMarker)
-	const codeBlockStyle = useSyntaxHighlight(editor)
+	const codeBlockStyle = useSyntaxHighlight(editor, active)
 	useAskProposal(editor)
 
 	return {

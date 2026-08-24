@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
+import { useFlushOnDeactivate } from '@/hooks/use-flush-on-deactivate'
 import { useNoteSave } from '@/hooks/use-note-save'
 import { useSettings } from '@/hooks/use-settings'
 import { findRawSearchRange } from '@/lib/raw-search-reveal'
@@ -10,6 +11,10 @@ import { cn } from '@/lib/utils'
 interface RawMarkdownEditorProps {
 	content: string
 	saveContent: (content: string) => void
+	/** Off while live mode is on screen instead - see `EditorBody`. Stays
+	 *  mounted regardless, so an edit made here is still one undoable step on
+	 *  the live editor once it is revealed again. */
+	active?: boolean
 	className?: string
 }
 
@@ -27,6 +32,7 @@ export const RAW_MARKDOWN_EDITOR_ID = 'raw-markdown-editor'
 export function EditorModeRaw({
 	content,
 	saveContent,
+	active = true,
 	className,
 }: RawMarkdownEditorProps) {
 	const { isVSCodeContext } = useSettings()
@@ -55,11 +61,12 @@ export function EditorModeRaw({
 		},
 		[saveContent]
 	)
-	const { queueSave } = useNoteSave({
+	const { queueSave, flushQueuedSave } = useNoteSave({
 		isVSCodeContext,
 		saveContent: rememberSave,
 		currentFile,
 	})
+	useFlushOnDeactivate(active, flushQueuedSave)
 
 	// Only while the caret is elsewhere. The host echoes every save back as an
 	// `update`, and that echo is a debounce behind the keystrokes still arriving

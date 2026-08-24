@@ -54,4 +54,55 @@ describe('useFrontmatterDocument', () => {
 
 		expect(editor.getText()).toBe('Ship it. Today. Really.')
 	})
+
+	/**
+	 * The mount-time rebuild (inserting frontmatter into the initial content)
+	 * stays excluded from history, or Ctrl+Z on an untouched document would
+	 * clear it - see the first case below. Every later rebuild is a genuine
+	 * external change, so it has to be undoable: left out of history, the
+	 * existing stack would apply its steps to a document this rebuild had
+	 * already swapped out from under them, corrupting rather than reverting.
+	 */
+	describe('undo across a rebuild', () => {
+		it('is not itself undoable on the very first rebuild', () => {
+			const editor = new Editor({ extensions, content: 'Ship it.' })
+			currentEditor = editor
+
+			renderHook(({ content }) => useFrontmatterDocument(editor, content), {
+				initialProps: { content: '---\ntitle: Roadmap\n---\n\nShip it.' },
+			})
+
+			expect(editor.getText()).toContain('Ship it.')
+			expect(editor.can().undo()).toBe(false)
+		})
+
+		it('undoes a later rebuild as one step, then the edit before it', async () => {
+			const editor = new Editor({ extensions, content: 'Ship it.' })
+			currentEditor = editor
+
+			const { rerender } = renderHook(
+				({ content }) => useFrontmatterDocument(editor, content),
+				{ initialProps: { content: 'Ship it.' } }
+			)
+
+			editor.chain().focus('end').insertContent(' Today.').run()
+			expect(editor.getText()).toBe('Ship it. Today.')
+
+			// A real pause, not a scripting convenience: the edit and the rebuild
+			// need to land in separate `prosemirror-history` groups (grouped by
+			// wall-clock proximity, ~500ms) for undo to revert them one at a time
+			// rather than as a single merged step - see editor-mode-live.test.tsx.
+			await new Promise((resolve) => setTimeout(resolve, 600))
+
+			// A change made outside this editor - someone edited the file directly.
+			rerender({ content: 'Ship it. Today. Reviewed by the team.' })
+			expect(editor.getText()).toBe('Ship it. Today. Reviewed by the team.')
+
+			editor.commands.undo()
+			expect(editor.getText()).toBe('Ship it. Today.')
+
+			editor.commands.undo()
+			expect(editor.getText()).toBe('Ship it.')
+		})
+	})
 })

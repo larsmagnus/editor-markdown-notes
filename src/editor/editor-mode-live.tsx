@@ -12,6 +12,9 @@ interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 	content: string
 	/** Where autosave writes. Only the VS Code path has one. */
 	saveContent?: (content: string) => void
+	/** Off while raw mode is on screen instead - see `EditorBody`. Stays
+	 *  mounted regardless, so its undo history survives the toggle. */
+	active?: boolean
 	showMenu?: boolean
 	includeProseBaseClassNames?: boolean
 }
@@ -19,12 +22,13 @@ interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 function EditorModeLive({
 	content,
 	saveContent,
+	active = true,
 	showMenu,
 	includeProseBaseClassNames,
 	...props
 }: EditorProps) {
 	const { editor, analysis, isAnalyzing, hasSpellingFailed, codeBlockStyle } =
-		useMarkdownEditor(content, saveContent)
+		useMarkdownEditor(content, saveContent, active)
 
 	if (!editor) return null
 

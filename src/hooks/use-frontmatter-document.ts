@@ -1,5 +1,5 @@
 import type { Editor } from '@tiptap/react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { splitFrontmatter } from '@/lib/host/frontmatter'
 
@@ -36,7 +36,22 @@ export function useFrontmatterDocument(
 	content: string,
 	isOwnSave: (content: string) => boolean = neverOwnSave
 ) {
+	// Flipped after the first effect run (the mount pass), per editor *instance*
+	// rather than per panel - `useSearchReveal`'s doc comment records why:
+	// TipTap rebuilds the editor during startup, and a per-panel guard let the
+	// discarded instance consume the one-shot meant for its replacement.
+	//
+	// Tied to the *pass*, not to whether that pass actually ran a transaction:
+	// a note with no frontmatter matches the editor's initial doc immediately,
+	// so the mount pass below returns before reaching `setContent` at all - if
+	// the flag only flipped there, the next genuine external change would find
+	// it still unset and get wrongly treated as the mount-time sync.
+	const isMountPass = useRef(true)
+
 	useEffect(() => {
+		const wasMountPass = isMountPass.current
+		isMountPass.current = false
+
 		if (!editor || content === undefined) return
 		if (editor.storage.markdown.getMarkdown() === content) return
 		// `content` catches up to the editor by way of its own autosave, and by
@@ -48,13 +63,18 @@ export function useFrontmatterDocument(
 
 		const { frontmatter, body } = splitFrontmatter(content)
 
-		// One transaction, excluded from history: this is a content sync (initial
-		// load, or an external change echoed back from the host), not a user
-		// edit - left undoable, it put a phantom step ahead of the user's very
-		// first keystroke, so Ctrl+Z on an untouched document cleared it.
+		// The mount-time rebuild stays excluded from history: left undoable, it
+		// put a phantom step ahead of the user's very first keystroke, so Ctrl+Z
+		// on an untouched document cleared it. Every later rebuild is a genuine
+		// external change instead, and is left undoable as one clean step -
+		// otherwise it leaves the existing history stack referring to a document
+		// this replacement just swapped out from under it, and the next Ctrl+Z
+		// corrupts the document rather than reverting anything.
+		const addToHistory = !wasMountPass
+
 		const chain = editor
 			.chain()
-			.setMeta('addToHistory', false)
+			.setMeta('addToHistory', addToHistory)
 			.setMeta(CONTENT_SYNC_META, true)
 			.setContent(body)
 		if (frontmatter !== null) {

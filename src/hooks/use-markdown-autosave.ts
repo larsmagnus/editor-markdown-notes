@@ -8,6 +8,12 @@ type UseMarkdownAutosaveOptions = {
 	editor: Editor | null
 	isVSCodeContext: boolean
 	saveContent: (content: string) => void
+	/** Off while this editor is mounted but hidden behind the other mode - see
+	 *  `EditorBody`. A hidden editor only ever changes by absorbing an incoming
+	 *  content sync (`CONTENT_SYNC_META`, already skipped below), so this is
+	 *  belt-and-braces against anything else that might one day dispatch a
+	 *  transaction on it unattended. */
+	enabled: boolean
 }
 
 /**
@@ -23,20 +29,21 @@ export function useMarkdownAutosave({
 	editor,
 	isVSCodeContext,
 	saveContent,
+	enabled,
 }: UseMarkdownAutosaveOptions) {
 	const currentFile = useCallback(
 		() => editor?.storage?.markdown?.getMarkdown() ?? null,
 		[editor]
 	)
 
-	const { queueSave, cancelQueuedSave } = useNoteSave({
+	const { queueSave, cancelQueuedSave, flushQueuedSave } = useNoteSave({
 		isVSCodeContext,
 		saveContent,
 		currentFile,
 	})
 
 	useEffect(() => {
-		if (!editor) return
+		if (!editor || !enabled) return
 
 		const queueCurrentDocument = ({ transaction }: EditorEvents['update']) => {
 			// The host's own text, not the author's. Writing it back would replace
@@ -54,5 +61,7 @@ export function useMarkdownAutosave({
 		return () => {
 			editor.off('update', queueCurrentDocument)
 		}
-	}, [cancelQueuedSave, editor, queueSave])
+	}, [cancelQueuedSave, editor, enabled, queueSave])
+
+	return { flushQueuedSave }
 }

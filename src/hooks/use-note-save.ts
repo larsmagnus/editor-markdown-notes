@@ -118,5 +118,15 @@ export function useNoteSave({
 		debouncedQueueSave.cancel()
 	}, [debouncedQueueSave])
 
-	return { queueSave, cancelQueuedSave }
+	// Both editor modes stay mounted at once now (`EditorBody`), so neither
+	// unmounts on a toggle any more - the flush-on-unmount effect above no
+	// longer fires for that case, only for a real tab close. A caller that
+	// hides its own view instead has to flush explicitly, or a keystroke made
+	// just before switching away is stuck behind a debounce nothing is left to
+	// fire. `.flush()` is a no-op when nothing is pending.
+	const flushQueuedSave = useCallback(() => {
+		debouncedQueueSave.flush()
+	}, [debouncedQueueSave])
+
+	return { queueSave, cancelQueuedSave, flushQueuedSave }
 }

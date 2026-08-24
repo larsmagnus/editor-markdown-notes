@@ -31,7 +31,7 @@ export type CodeBlockStyle = CSSProperties & {
  * are reached through `await import()` for the same reason `renderMermaid` and
  * `analyze-client` are - a note without code blocks loads none of it.
  */
-export function useSyntaxHighlight(editor: Editor | null) {
+export function useSyntaxHighlight(editor: Editor | null, active: boolean) {
 	const theme = useShikiTheme()
 	const revision = useDocumentRevision(editor)
 	const [codeBlockStyle, setCodeBlockStyle] = useState<CodeBlockStyle>()
@@ -44,7 +44,10 @@ export function useSyntaxHighlight(editor: Editor | null) {
 	const cacheRef = useRef(new Map<string, RelativeToken[]>())
 
 	useEffect(() => {
-		if (!editor) return
+		// Hidden behind the other editor mode (`EditorBody`) - nobody can see the
+		// colors, and tokenizing there would only spend the highlighter's time on
+		// a document that only ever changes by absorbing a content sync.
+		if (!editor || !active) return
 
 		let cancelled = false
 
@@ -116,7 +119,7 @@ export function useSyntaxHighlight(editor: Editor | null) {
 		return () => {
 			cancelled = true
 		}
-	}, [editor, revision, theme])
+	}, [editor, active, revision, theme])
 
 	return codeBlockStyle
 }

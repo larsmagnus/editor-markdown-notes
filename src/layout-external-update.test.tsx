@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { SettingsProvider } from '@/components/settings-provider'
+import { LIVE_EDITOR_ID } from '@/editor/editor-mode-live-surface'
 import Layout from '@/layout'
 
 // The bubble menu positions itself with floating-ui, which measures the DOM and
@@ -16,6 +17,14 @@ afterEach(() => {
 	localStorage.clear()
 	vi.clearAllMocks()
 })
+
+// The hidden raw textarea now mounts the same text as the live editor, so
+// `screen.findByText` alone is ambiguous between the two - every query below
+// scopes to whichever one is actually on screen. `within` throws its own clear
+// error against `null`, so nothing here re-checks that the editor mounted.
+function getLiveEditor(): HTMLElement {
+	return document.getElementById(LIVE_EDITOR_ID) as HTMLElement
+}
 
 describe('Layout, when the host reports an outside change', () => {
 	/**
@@ -39,7 +48,7 @@ describe('Layout, when the host reports an outside change', () => {
 			</SettingsProvider>
 		)
 
-		await screen.findByText('Ship it.')
+		await within(getLiveEditor()).findByText('Ship it.')
 
 		window.dispatchEvent(
 			new MessageEvent('message', {
@@ -51,7 +60,7 @@ describe('Layout, when the host reports an outside change', () => {
 			})
 		)
 
-		await screen.findByText('Ship it tomorrow.')
+		await within(getLiveEditor()).findByText('Ship it tomorrow.')
 
 		// Past the 1000ms auto-save debounce, which is the whole window in which
 		// the editor could decide to write the change back at the host.
@@ -80,7 +89,7 @@ describe('Layout, when the host reports an outside change', () => {
 			</SettingsProvider>
 		)
 
-		await screen.findByText('Ship it.')
+		await within(getLiveEditor()).findByText('Ship it.')
 
 		window.dispatchEvent(
 			new MessageEvent('message', {
@@ -95,7 +104,9 @@ describe('Layout, when the host reports an outside change', () => {
 		// Clicked into rather than typed into straight away: the editor does not
 		// autofocus, so that a note opens where it was last scrolled to rather
 		// than wherever a caret puts itself.
-		await user.click(await screen.findByText('Ship it tomorrow.'))
+		await user.click(
+			await within(getLiveEditor()).findByText('Ship it tomorrow.')
+		)
 		await user.keyboard(' Really.')
 
 		await waitFor(

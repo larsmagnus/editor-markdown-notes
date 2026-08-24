@@ -176,6 +176,49 @@ describe('useNoteSave', () => {
 		expect(saveContent).not.toHaveBeenCalled()
 	})
 
+	// Both editor modes stay mounted at once (`EditorBody`), so a view that
+	// hides itself instead of unmounting has to flush explicitly, or a
+	// keystroke made just before switching away is stuck behind a debounce
+	// nothing is left to fire.
+	it('flushes a pending save immediately when asked to', () => {
+		const saveContent = vi.fn()
+		const { result } = renderHook(() =>
+			useNoteSave({
+				isVSCodeContext: true,
+				saveContent,
+				currentFile: () => '# Roadmap\n\nShip it. Today.',
+			})
+		)
+
+		result.current.queueSave('# Roadmap\n\nShip it. Today.')
+		act(() => {
+			result.current.flushQueuedSave()
+		})
+
+		expect(saveContent).toHaveBeenCalledWith('# Roadmap\n\nShip it. Today.')
+
+		saveContent.mockClear()
+		runDebounce()
+		expect(saveContent).not.toHaveBeenCalled()
+	})
+
+	it('does nothing when flushed with nothing pending', () => {
+		const saveContent = vi.fn()
+		const { result } = renderHook(() =>
+			useNoteSave({
+				isVSCodeContext: true,
+				saveContent,
+				currentFile: () => '# Roadmap',
+			})
+		)
+
+		act(() => {
+			result.current.flushQueuedSave()
+		})
+
+		expect(saveContent).not.toHaveBeenCalled()
+	})
+
 	it('does not flush on unmount when nothing was ever typed', () => {
 		const saveContent = vi.fn()
 		const { unmount } = renderHook(() =>

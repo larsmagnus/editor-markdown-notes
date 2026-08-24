@@ -26,9 +26,15 @@ import { skipToEditorRef } from '@/editor/extensions/focus-navigation/skip-targe
  * click, excluding clicks for free).
  *
  * Also publishes `skipToEditorRef`, the one place that knows both the live
- * `Editor` and this search.
+ * `Editor` and this search - only while `active`, since the live editor now
+ * stays mounted, hidden, behind raw mode (`EditorBody`) rather than
+ * unmounting. Left unconditional, "Skip to editor" would keep jumping into
+ * the invisible live editor even while raw view is what's on screen.
  */
-export function useFocusNavigation(editor: Editor | null): void {
+export function useFocusNavigation(
+	editor: Editor | null,
+	active: boolean
+): void {
 	const pendingDirection = useRef<1 | -1 | null>(null)
 
 	useEffect(() => {
@@ -52,7 +58,9 @@ export function useFocusNavigation(editor: Editor | null): void {
 	}, [])
 
 	useEffect(() => {
-		if (!editor) return
+		// Not active: leave `skipToEditorRef` unclaimed, so `skipToEditor()` falls
+		// back to the raw textarea instead of jumping into this hidden editor.
+		if (!editor || !active) return
 
 		function onFocus({ event }: { event: FocusEvent }) {
 			const direction = pendingDirection.current
@@ -78,7 +86,7 @@ export function useFocusNavigation(editor: Editor | null): void {
 			editor.off('focus', onFocus)
 			skipToEditorRef.current = null
 		}
-	}, [editor])
+	}, [editor, active])
 
 	useEffect(() => {
 		if (!editor) return
@@ -86,13 +94,13 @@ export function useFocusNavigation(editor: Editor | null): void {
 		function onKeyDown(event: KeyboardEvent) {
 			if (event.key !== 'Tab' || !editor) return
 
-			const active = document.activeElement
-			if (!(active instanceof HTMLElement)) return
-			if (active === editor.view.dom) return // FocusNavigation's case.
-			if (!editor.view.dom.contains(active)) return
+			const activeElement = document.activeElement
+			if (!(activeElement instanceof HTMLElement)) return
+			if (activeElement === editor.view.dom) return // FocusNavigation's case.
+			if (!editor.view.dom.contains(activeElement)) return
 
 			const direction = event.shiftKey ? -1 : 1
-			if (focusNearestStopFromElement(editor, active, direction)) {
+			if (focusNearestStopFromElement(editor, activeElement, direction)) {
 				event.preventDefault()
 				event.stopPropagation() // Else still bubbles to TabIndent on `view.dom`.
 			}
