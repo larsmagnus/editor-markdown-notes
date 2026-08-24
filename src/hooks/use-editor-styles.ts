@@ -34,7 +34,6 @@ export function useEditorStyles() {
 
 	const hasStyle = (style: Style) => {
 		const { activeName } = commandFor(style)
-		if (!activeName) return false
 
 		return editor?.isActive(activeName) ?? false
 	}
@@ -47,7 +46,5 @@ export function useEditorStyles() {
 		return apply(editor.can().chain().focus()).run()
 	}
 
-	const reset = () => toggleStyle('none')
-
-	return { toggleStyle, hasStyle, canToggleStyle, reset }
+	return { toggleStyle, hasStyle, canToggleStyle }
 }

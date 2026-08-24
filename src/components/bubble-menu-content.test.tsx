@@ -181,6 +181,27 @@ describe('colours', () => {
 			editor.isActive('textStyle', { color: 'oklch(63.7% 0.237 25.331)' })
 		).toBe(false)
 	})
+
+	it('clears only the colour, leaving other formatting intact', async () => {
+		const editor = new Editor({ extensions, content: '## Some notes' })
+		currentEditor = editor
+		editor.commands.setTextSelection({ from: 6, to: 11 })
+		editor.commands.setMark('bold')
+		render(
+			<EditorContext.Provider value={{ editor }}>
+				<BubbleMenuContent />
+			</EditorContext.Provider>
+		)
+
+		await userEvent.click(screen.getAllByTitle('Set color')[0])
+		await userEvent.click(screen.getByTitle('Clear color'))
+
+		expect(
+			editor.isActive('textStyle', { color: 'oklch(63.7% 0.237 25.331)' })
+		).toBe(false)
+		expect(editor.getHTML()).toContain('<h2>')
+		expect(editor.getHTML()).toContain('<strong>')
+	})
 })
 
 describe('images', () => {
@@ -521,24 +542,5 @@ describe('image keyboard navigation', () => {
 		await userEvent.keyboard('{Tab}')
 
 		expect(screen.getByLabelText('Alt')).toHaveFocus()
-	})
-})
-
-describe('reset', () => {
-	it('clears marks and heading level from the selection', async () => {
-		const editor = new Editor({ extensions, content: '## Some notes' })
-		currentEditor = editor
-		editor.commands.setTextSelection({ from: 6, to: 11 })
-		editor.commands.setMark('bold')
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-
-		await userEvent.click(screen.getByTitle('Reset all styles and formatting'))
-
-		expect(editor.getHTML()).toContain('<p>Some notes</p>')
-		expect(editor.getHTML()).not.toContain('<strong>')
 	})
 })

@@ -8,10 +8,12 @@ import defaultColors from 'tailwindcss/colors'
 export const COLOR_SWATCHES = [
 	{
 		color: defaultColors.red[500],
-		className: 'bg-red-500 hover:bg-red-300',
+		className:
+			'bg-red-500 hover:bg-red-300 focus-visible:bg-red-300 dark:hover:bg-red-300 dark:focus-visible:bg-red-300',
 	},
 	{
 		color: defaultColors.yellow[400],
-		className: 'bg-yellow-400 hover:bg-yellow-200',
+		className:
+			'bg-yellow-400 hover:bg-yellow-200 focus-visible:bg-yellow-200 dark:hover:bg-yellow-200 dark:focus-visible:bg-yellow-200',
 	},
 ]

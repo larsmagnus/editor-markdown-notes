@@ -8,13 +8,12 @@ export type TextStyle =
 	| 'codeBlock'
 	| 'blockquote'
 	| 'paragraph'
-	| 'none'
 
 type TextStyleCommand = {
 	/** Applies the style to an already-focused chain. */
 	apply: (chain: ChainedCommands) => ChainedCommands
-	/** The mark or node `editor.isActive` checks, or null if the style is a reset. */
-	activeName: string | null
+	/** The mark or node `editor.isActive` checks. */
+	activeName: string
 	/**
 	 * Whether `editor.can()` gives a meaningful answer. The styles marked false
 	 * always apply, and asking about them used to fall off the end of a switch and
@@ -65,12 +64,6 @@ export const TEXT_STYLE_COMMANDS: Record<TextStyle, TextStyleCommand> = {
 	paragraph: {
 		apply: (chain) => chain.setParagraph(),
 		activeName: 'paragraph',
-		queryable: false,
-	},
-	none: {
-		// Colours, then marks, then the heading level.
-		apply: (chain) => chain.unsetColor().unsetAllMarks().setParagraph(),
-		activeName: null,
 		queryable: false,
 	},
 }

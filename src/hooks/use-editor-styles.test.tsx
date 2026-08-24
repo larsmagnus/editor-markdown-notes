@@ -132,24 +132,6 @@ describe('toggleStyle', () => {
 		expect(editor.getHTML()).toContain('<p>Some notes</p>')
 	})
 
-	it('clears every mark and the heading level for "none"', () => {
-		const editor = new Editor({ extensions, content: '## **Some notes**' })
-		currentEditor = editor
-		editor.commands.setTextSelection({ from: 1, to: 11 })
-		const { result } = renderHook(() => useEditorStyles(), {
-			wrapper: ({ children }) => (
-				<EditorContext.Provider value={{ editor }}>
-					{children}
-				</EditorContext.Provider>
-			),
-		})
-
-		act(() => result.current.toggleStyle('none'))
-
-		expect(editor.getHTML()).toContain('<p>Some notes</p>')
-		expect(editor.getHTML()).not.toContain('<strong>')
-	})
-
 	it('toggles an ordered list', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
 		currentEditor = editor
@@ -278,7 +260,6 @@ describe('canToggleStyle', () => {
 
 		expect(result.current.canToggleStyle('paragraph')).toBe(true)
 		expect(result.current.canToggleStyle('codeBlock')).toBe(true)
-		expect(result.current.canToggleStyle('none')).toBe(true)
 	})
 
 	it('allows the list styles unconditionally', () => {
