@@ -281,6 +281,13 @@ export type WebviewToHost =
 	  }
 	/** Stops a running `askClaude` request; no reply is sent for it. */
 	| { type: 'cancelAsk'; requestId: string }
+	/**
+	 * Answers `requestLatest` with whatever the active view - live or raw -
+	 * currently holds, read directly rather than through the debounced sync
+	 * path. Sent by the view `active` at the moment the request arrives; the
+	 * other stays silent, since its held text can lag by up to a debounce.
+	 */
+	| { type: 'latestContent'; requestId: string; content: string }
 
 export type HostToWebview =
 	| { type: 'update'; content: string; fileName: string }
@@ -299,3 +306,15 @@ export type HostToWebview =
 	/** Sent once an `askClaude` request fails - a bad/missing `claude` CLI,
 	 *  an auth failure, or the request being aborted. */
 	| { type: 'askError'; requestId: string; error: string }
+	/**
+	 * Asks the active view for its current text, ahead of a VS Code save
+	 * (`onWillSaveTextDocument`) - the last debounced sync can be up to a
+	 * second behind whatever was just typed. Answered once, by `latestContent`.
+	 */
+	| { type: 'requestLatest'; requestId: string }
+	/**
+	 * The document was just saved to disk. The one signal the webview has for
+	 * "the `TextDocument` is clean again" - it has no other way to read
+	 * `TextDocument.isDirty` directly.
+	 */
+	| { type: 'documentSaved' }

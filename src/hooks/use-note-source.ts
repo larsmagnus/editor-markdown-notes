@@ -1,6 +1,5 @@
 import useContent from '@/hooks/use-content'
 import { useHostDocument } from '@/hooks/use-host-document'
-import { useSaveShortcut } from '@/hooks/use-save-shortcut'
 import { useSettings } from '@/hooks/use-settings'
 
 /**
@@ -10,14 +9,17 @@ import { useSettings } from '@/hooks/use-settings'
  * in `public/`, which the file selector switches between. Both hooks run either
  * way — hooks cannot be called conditionally — but the demo fetches are skipped
  * inside VSCode.
+ *
+ * The save keystroke is not handled here, or anywhere in the webview any
+ * more - `workbench.action.files.save` reaches the document directly, and
+ * `onWillSaveTextDocument` (`save-participant.ts`) is what makes that save
+ * exact rather than up to a debounce stale.
  */
 export function useNoteSource(defaultFileName: string) {
 	const { isVSCodeContext } = useSettings()
 
 	const host = useHostDocument()
 	const demo = useContent({ defaultFileName, enabled: !isVSCodeContext })
-
-	useSaveShortcut(isVSCodeContext)
 
 	if (isVSCodeContext) {
 		return {

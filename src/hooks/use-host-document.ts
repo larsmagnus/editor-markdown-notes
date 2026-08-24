@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { useHostMessage } from '@/hooks/use-host-message'
-import { updateMessageSchema } from '@/lib/schemas'
+import { documentDirty } from '@/lib/document-dirty-tracker'
+import { documentSavedMessageSchema, updateMessageSchema } from '@/lib/schemas'
 import { getVSCodeApi, isVSCodeWebview } from '@/lib/vscode-api'
 
 /**
@@ -36,6 +37,18 @@ export function useHostDocument() {
 		(message) => {
 			setContent(message.content)
 			setFileName(message.fileName)
+		},
+		isVSCodeWebview()
+	)
+
+	// The one signal `documentDirty` (`use-note-sync.ts`) has for "the
+	// `TextDocument` is clean again" - without it, the first edit after every
+	// save but the very first would find the document still marked dirty from
+	// before, and never sync immediately ahead of its debounce.
+	useHostMessage(
+		documentSavedMessageSchema,
+		() => {
+			documentDirty.current = false
 		},
 		isVSCodeWebview()
 	)

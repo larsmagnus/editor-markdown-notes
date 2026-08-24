@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useNoteSync } from '@/hooks/use-note-sync'
+import { documentDirty } from '@/lib/document-dirty-tracker'
 import { updateNotes } from '@/lib/update-notes'
 
 // Resolves rather than returning `undefined`, because the real `updateNotes` is
@@ -12,11 +13,16 @@ const SYNC_DEBOUNCE_MS = 1000
 
 beforeEach(() => {
 	vi.useFakeTimers()
+	// Marked dirty by default: most tests below are about the debounce, not
+	// about the immediate-sync-on-first-edit behaviour, which has its own
+	// describe block that manages this explicitly.
+	documentDirty.current = true
 })
 
 afterEach(() => {
 	vi.useRealTimers()
 	vi.clearAllMocks()
+	documentDirty.current = false
 })
 
 /** Lets the debounce elapse without waiting on a real second. */
@@ -39,6 +45,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: true,
 				syncContent,
 				currentFile: () => '',
+				active: true,
 			})
 		).result.current.queueSync('')
 
@@ -56,6 +63,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: true,
 				syncContent,
 				currentFile: () => emptied,
+				active: true,
 			})
 		).result.current.queueSync(emptied)
 
@@ -72,6 +80,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: true,
 				syncContent,
 				currentFile: () => '# Roadmap',
+				active: true,
 			})
 		)
 
@@ -87,6 +96,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: true,
 				syncContent,
 				currentFile: () => '# Roadmap 2026',
+				active: true,
 			})
 		)
 
@@ -106,6 +116,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: true,
 				syncContent,
 				currentFile: () => '# Roadmap',
+				active: true,
 			})
 		)
 
@@ -126,6 +137,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: false,
 				syncContent,
 				currentFile: () => '# Roadmap',
+				active: true,
 			})
 		).result.current.queueSync('# Roadmap')
 
@@ -146,6 +158,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: true,
 				syncContent,
 				currentFile: () => '# Roadmap\n\nShip it. Today.',
+				active: true,
 			})
 		)
 
@@ -166,6 +179,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: false,
 				syncContent,
 				currentFile: () => '# Roadmap\n\nShip it. Today.',
+				active: true,
 			})
 		)
 
@@ -187,6 +201,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: true,
 				syncContent,
 				currentFile: () => '# Roadmap\n\nShip it. Today.',
+				active: true,
 			})
 		)
 
@@ -209,6 +224,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: true,
 				syncContent,
 				currentFile: () => '# Roadmap',
+				active: true,
 			})
 		)
 
@@ -226,6 +242,7 @@ describe('useNoteSync', () => {
 				isVSCodeContext: true,
 				syncContent,
 				currentFile: () => null,
+				active: true,
 			})
 		)
 
@@ -234,94 +251,164 @@ describe('useNoteSync', () => {
 		expect(syncContent).not.toHaveBeenCalled()
 	})
 
-	describe('Cmd/Ctrl+S', () => {
-		it('syncs immediately rather than waiting out the debounce', () => {
+	/**
+	 * VS Code does not save a clean document - a keystroke landing inside the
+	 * debounce window, before anything has reached the `TextDocument`, would
+	 * make Cmd/Ctrl+S (and `files.autoSave`) silently do nothing.
+	 */
+	describe('syncing the first edit since a clean state immediately', () => {
+		beforeEach(() => {
+			documentDirty.current = false
+		})
+
+		it('syncs immediately, ahead of the debounce', () => {
 			const syncContent = vi.fn()
-			renderHook(() =>
+			const { result } = renderHook(() =>
 				useNoteSync({
 					isVSCodeContext: true,
 					syncContent,
-					currentFile: () => '# Roadmap 2026',
+					currentFile: () => '# Roadmap',
+					active: true,
 				})
 			)
 
-			act(() => {
-				window.dispatchEvent(new CustomEvent('vscode-save-request'))
-			})
+			result.current.queueSync('# Roadmap 2026')
 
 			expect(syncContent).toHaveBeenCalledWith('# Roadmap 2026')
 		})
 
-		it('syncs an emptied note', () => {
+		it('marks the document dirty, so a second edit waits for the debounce as usual', () => {
 			const syncContent = vi.fn()
-			renderHook(() =>
+			const { result } = renderHook(() =>
 				useNoteSync({
 					isVSCodeContext: true,
 					syncContent,
-					currentFile: () => '',
+					currentFile: () => '# Roadmap',
+					active: true,
 				})
 			)
 
-			act(() => {
-				window.dispatchEvent(new CustomEvent('vscode-save-request'))
-			})
-
-			expect(syncContent).toHaveBeenCalledWith('')
-		})
-
-		// `null` is the caller saying it has nothing to serialize yet - an editor
-		// that has not finished mounting. Writing that would truncate the file.
-		it('writes nothing when the caller has no document yet', () => {
-			const syncContent = vi.fn()
-			renderHook(() =>
-				useNoteSync({
-					isVSCodeContext: true,
-					syncContent,
-					currentFile: () => null,
-				})
-			)
-
-			act(() => {
-				window.dispatchEvent(new CustomEvent('vscode-save-request'))
-			})
+			result.current.queueSync('# Road')
+			syncContent.mockClear()
+			result.current.queueSync('# Roadmap')
 
 			expect(syncContent).not.toHaveBeenCalled()
 		})
 
-		it('is ignored outside VSCode, where the keystroke is the browser’s', () => {
+		it('does nothing immediately once the document is already dirty', () => {
+			documentDirty.current = true
 			const syncContent = vi.fn()
-			renderHook(() =>
+			const { result } = renderHook(() =>
+				useNoteSync({
+					isVSCodeContext: true,
+					syncContent,
+					currentFile: () => '# Roadmap',
+					active: true,
+				})
+			)
+
+			result.current.queueSync('# Roadmap 2026')
+
+			expect(syncContent).not.toHaveBeenCalled()
+		})
+
+		// Standalone there is no `TextDocument` for VS Code to consider clean or
+		// dirty, and no save command competing with the debounce either.
+		it('does not sync immediately outside VSCode', () => {
+			const syncContent = vi.fn()
+			const { result } = renderHook(() =>
 				useNoteSync({
 					isVSCodeContext: false,
 					syncContent,
 					currentFile: () => '# Roadmap',
+					active: true,
 				})
 			)
 
-			act(() => {
-				window.dispatchEvent(new CustomEvent('vscode-save-request'))
-			})
+			result.current.queueSync('# Roadmap 2026')
 
 			expect(syncContent).not.toHaveBeenCalled()
-			expect(updateNotes).not.toHaveBeenCalled()
+		})
+	})
+
+	/**
+	 * `onWillSaveTextDocument` (`save-participant.ts`) asks the active view for
+	 * its current text ahead of a save, since the last debounced sync can be up
+	 * to a second behind whatever was just typed.
+	 */
+	describe('answering a request for the current text', () => {
+		afterEach(() => {
+			delete window.vscode
 		})
 
-		it('stops listening once the editor is gone', () => {
-			const syncContent = vi.fn()
-			const { unmount } = renderHook(() =>
+		function requestLatest(requestId: string) {
+			act(() => {
+				window.dispatchEvent(
+					new MessageEvent('message', {
+						data: { type: 'requestLatest', requestId },
+					})
+				)
+			})
+		}
+
+		it('replies with the current file while active', () => {
+			const postMessage = vi.fn()
+			window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
+
+			renderHook(() =>
 				useNoteSync({
 					isVSCodeContext: true,
-					syncContent,
-					currentFile: () => '# Roadmap',
+					syncContent: vi.fn(),
+					currentFile: () => '# Roadmap 2026',
+					active: true,
 				})
 			)
 
-			unmount()
-			act(() => {
-				window.dispatchEvent(new CustomEvent('vscode-save-request'))
-			})
+			requestLatest('req-1')
 
-			expect(syncContent).not.toHaveBeenCalled()
+			expect(postMessage).toHaveBeenCalledWith({
+				type: 'latestContent',
+				requestId: 'req-1',
+				content: '# Roadmap 2026',
+			})
+		})
+
+		// The inactive view's held text can lag the debounce by up to a second -
+		// answering with it would tell the save stale content.
+		it('stays silent while inactive', () => {
+			const postMessage = vi.fn()
+			window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
+
+			renderHook(() =>
+				useNoteSync({
+					isVSCodeContext: true,
+					syncContent: vi.fn(),
+					currentFile: () => '# Roadmap 2026',
+					active: false,
+				})
+			)
+
+			requestLatest('req-1')
+
+			expect(postMessage).not.toHaveBeenCalled()
+		})
+
+		it('stays silent when the editor has not finished mounting', () => {
+			const postMessage = vi.fn()
+			window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
+
+			renderHook(() =>
+				useNoteSync({
+					isVSCodeContext: true,
+					syncContent: vi.fn(),
+					currentFile: () => null,
+					active: true,
+				})
+			)
+
+			requestLatest('req-1')
+
+			expect(postMessage).not.toHaveBeenCalled()
 		})
 	})
 })

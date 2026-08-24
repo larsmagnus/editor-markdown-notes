@@ -39,11 +39,20 @@ type PanelSessionOptions = {
 	token: vscode.CancellationToken
 }
 
+export type PanelSession = {
+	/** `null` when the token was already cancelled - see below - and nothing
+	 *  was actually wired up for the caller to register anywhere. */
+	writer: DocumentWriter | null
+	disposable: vscode.Disposable
+}
+
 /**
  * Wires one open note to one webview panel, for as long as the panel lives.
  *
- * Returns a disposable covering every subscription it made; the caller disposes
- * it when the panel closes.
+ * Returns the panel's `DocumentWriter` - `MarkdownEditorProvider` needs it to
+ * answer `onWillSaveTextDocument` for this document - and a disposable
+ * covering every subscription this made; the caller disposes it when the
+ * panel closes.
  */
 export function attachPanelSession({
 	panel,
@@ -56,10 +65,12 @@ export function attachPanelSession({
 	broadcastConfig,
 	readShikiTheme,
 	token,
-}: PanelSessionOptions): vscode.Disposable {
+}: PanelSessionOptions): PanelSession {
 	// A tab closed while the provider was still awaiting the search results leaves
 	// a disposed panel, and every line below throws on one.
-	if (token.isCancellationRequested) return new vscode.Disposable(() => {})
+	if (token.isCancellationRequested) {
+		return { writer: null, disposable: new vscode.Disposable(() => {}) }
+	}
 
 	const writer = new DocumentWriter(log)
 
@@ -93,13 +104,16 @@ export function attachPanelSession({
 		readShikiTheme,
 	})
 
-	return vscode.Disposable.from(
-		onDocumentChanged(document, writer, () =>
-			postDocumentUpdate(panel, document)
+	return {
+		writer,
+		disposable: vscode.Disposable.from(
+			onDocumentChanged(document, writer, () =>
+				postDocumentUpdate(panel, document)
+			),
+			panel.webview.onDidReceiveMessage((message: WebviewToHost) =>
+				dispatchWebviewMessage(handlers, message)
+			),
+			disposable
 		),
-		panel.webview.onDidReceiveMessage((message: WebviewToHost) =>
-			dispatchWebviewMessage(handlers, message)
-		),
-		disposable
-	)
+	}
 }

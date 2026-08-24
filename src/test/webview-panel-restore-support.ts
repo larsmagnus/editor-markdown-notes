@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 
 import { MarkdownEditorProvider } from '../host/markdown-editor-provider'
+import { hasMessageType } from '../host/message-guards'
 
 export { pause } from './search-test-support'
 
@@ -68,13 +69,7 @@ export function spyOnReceivedMessages(panel: vscode.WebviewPanel) {
  * unrelated traffic (config, Shiki theme) crossing the same channel.
  */
 export function messagesOfType(messages: unknown[], type: string): unknown[] {
-	return messages.filter(
-		(message) =>
-			typeof message === 'object' &&
-			message !== null &&
-			'type' in message &&
-			message.type === type
-	)
+	return messages.filter((message) => hasMessageType(message, type))
 }
 
 /**
@@ -85,10 +80,5 @@ export function messagesOfType(messages: unknown[], type: string): unknown[] {
 export function isUpdateMessage(
 	message: unknown
 ): message is { type: 'update'; content: string; fileName: string } {
-	return (
-		typeof message === 'object' &&
-		message !== null &&
-		'type' in message &&
-		message.type === 'update'
-	)
+	return hasMessageType(message, 'update')
 }

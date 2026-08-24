@@ -109,6 +109,11 @@ export function createWebviewMessageHandlers({
 		},
 		askClaude,
 		cancelAsk,
+		// Resolved by `requestLatestContent`'s own ad-hoc listener, scoped to one
+		// in-flight request - not through this table, which has no per-request
+		// state to resolve against. Still has to be here, or a real reply from
+		// the webview has no handler to dispatch to.
+		latestContent: () => {},
 	}
 
 	return { handlers, disposable }

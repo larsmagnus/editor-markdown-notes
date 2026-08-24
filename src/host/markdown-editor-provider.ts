@@ -7,7 +7,10 @@ import { broadcastToPanels } from './broadcast'
 import { CONFIG_SECTION, VIEW_TYPE } from './constants'
 import { attachPanelSession } from './panel-session'
 import { readSearchReveal } from './read-search-reveal'
+import type { PanelSaveSession } from './save-participant'
+import { registerSaveParticipant, trackSaveSession } from './save-participant'
 import type { ScrollPositionStore } from './scroll-position-store'
+import { SessionsByUri } from './sessions-by-uri'
 import type { SettingsStore } from './settings-store'
 import type { ShikiThemeStore } from './shiki-theme-store'
 
@@ -22,6 +25,8 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 	private readonly scrollPositions: ScrollPositionStore
 	private readonly log: Logger
 	private readonly panels = new Set<vscode.WebviewPanel>()
+	/** For `registerSaveParticipant`. */
+	private readonly saveSessions = new SessionsByUri<PanelSaveSession>()
 
 	constructor(
 		context: vscode.ExtensionContext,
@@ -62,7 +67,11 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			vscode.workspace.onDidChangeConfiguration((event) => {
 				if (event.affectsConfiguration(CONFIG_SECTION)) this.broadcastConfig()
 			}),
-			this.shikiThemeStore.onDidChangeTheme(this.broadcastShikiTheme)
+			this.shikiThemeStore.onDidChangeTheme(this.broadcastShikiTheme),
+			registerSaveParticipant(
+				(uri) => this.saveSessions.get(uri.toString()),
+				this.log
+			)
 		)
 	}
 
@@ -111,9 +120,17 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 
 		this.panels.add(webviewPanel)
 
+		const untrackSaveSession = trackSaveSession(
+			this.saveSessions,
+			document.uri.toString(),
+			webviewPanel,
+			session.writer
+		)
+
 		webviewPanel.onDidDispose(() => {
 			this.panels.delete(webviewPanel)
-			session.dispose()
+			session.disposable.dispose()
+			untrackSaveSession()
 		})
 	}
 }

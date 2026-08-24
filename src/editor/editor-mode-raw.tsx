@@ -70,6 +70,7 @@ export function EditorModeRaw({
 		isVSCodeContext,
 		syncContent: rememberSync,
 		currentFile,
+		active,
 	})
 	useFlushOnDeactivate(active, flushQueuedSync)
 

@@ -37,65 +37,6 @@ afterEach(() => {
 	vi.clearAllMocks()
 })
 
-/**
- * The keystroke lands on the page, not on the editor, so it travels
- * `useSaveShortcut` -> a `vscode-save-request` event on `window` -> the listener
- * in `useNoteSync` -> `postMessage`. Those halves are covered individually; this
- * is the only test that joins them, and a mistake in the wiring between them
- * shows up nowhere else.
- */
-describe('Cmd/Ctrl+S reaching the host', () => {
-	it('posts the raw markdown view straight to the host', async () => {
-		const postMessage = bootInsideVSCode({ raw: true })
-
-		render(<App />)
-
-		const textarea = await screen.findByRole('textbox', {
-			name: 'Raw markdown',
-		})
-		await userEvent.click(textarea)
-		await userEvent.keyboard(' Today.')
-		await userEvent.keyboard('{Meta>}s{/Meta}')
-
-		expect(postMessage).toHaveBeenCalledWith({
-			type: 'syncDocument',
-			content: `${NOTE} Today.`,
-		})
-	})
-
-	it('posts the rich editor document, frontmatter reattached', async () => {
-		const postMessage = bootInsideVSCode({ raw: false })
-
-		render(<App />)
-
-		await screen.findByRole('heading', { name: 'Roadmap' })
-		await userEvent.click(screen.getByText('Ship it.'))
-		await userEvent.keyboard(' Today.')
-		await userEvent.keyboard('{Control>}s{/Control}')
-
-		expect(postMessage).toHaveBeenCalledWith({
-			type: 'syncDocument',
-			content: '---\ntitle: Roadmap\n---\n\n# Roadmap\n\nShip it. Today.',
-		})
-	})
-
-	it('posts a note the author has emptied in the raw view', async () => {
-		const postMessage = bootInsideVSCode({ raw: true })
-
-		render(<App />)
-
-		await userEvent.clear(
-			await screen.findByRole('textbox', { name: 'Raw markdown' })
-		)
-		await userEvent.keyboard('{Meta>}s{/Meta}')
-
-		expect(postMessage).toHaveBeenCalledWith({
-			type: 'syncDocument',
-			content: '',
-		})
-	})
-})
-
 describe('autosaving to the host', () => {
 	it('posts the raw markdown view once the typing pauses', async () => {
 		const postMessage = bootInsideVSCode({ raw: true })

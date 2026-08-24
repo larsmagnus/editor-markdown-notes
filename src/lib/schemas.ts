@@ -304,3 +304,26 @@ export const shikiThemeMessageSchema = z
 		description:
 			"Posted by the host on request and whenever the active VS Code color theme changes. Unlike the schemas above this one has no top-level `.catch()` - a message that fails to parse is another extension's traffic and must be ignored, not defaulted.",
 	})
+
+export const requestLatestMessageSchema = z
+	.object({
+		type: z.literal('requestLatest'),
+		requestId: z.string(),
+	})
+	.meta({
+		id: 'RequestLatestMessage',
+		title: 'Request latest content',
+		description:
+			"Posted by the host ahead of a VS Code save, asking the active view for its current text. No `.catch()` - a message that fails to parse is another extension's traffic and must be ignored, not defaulted.",
+	})
+
+export const documentSavedMessageSchema = z
+	.object({
+		type: z.literal('documentSaved'),
+	})
+	.meta({
+		id: 'DocumentSavedMessage',
+		title: 'Document saved',
+		description:
+			'Posted by the host once the document is written to disk. No `.catch()`, same reason as `requestLatest`.',
+	})

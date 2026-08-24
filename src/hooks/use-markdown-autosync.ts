@@ -41,6 +41,7 @@ export function useMarkdownAutosync({
 		isVSCodeContext,
 		syncContent,
 		currentFile,
+		active: enabled,
 	})
 
 	useEffect(() => {

@@ -106,29 +106,6 @@ describe('EditorModeRaw', () => {
 		)
 	})
 
-	it('syncs immediately on Cmd/Ctrl+S without waiting for the debounce', async () => {
-		const syncContent = vi.fn()
-		window.vscode = {
-			postMessage: vi.fn(),
-			getState: vi.fn(),
-			setState: vi.fn(),
-		}
-
-		render(
-			<SettingsProvider>
-				<EditorModeRaw
-					content={NOTE_WITH_FRONTMATTER}
-					syncContent={syncContent}
-				/>
-			</SettingsProvider>
-		)
-
-		await userEvent.type(screen.getByLabelText('Raw markdown'), ' Today.')
-		window.dispatchEvent(new CustomEvent('vscode-save-request'))
-
-		expect(syncContent).toHaveBeenCalledWith(`${NOTE_WITH_FRONTMATTER} Today.`)
-	})
-
 	it('adopts a different note when the caret is elsewhere', async () => {
 		const { rerender } = render(
 			<SettingsProvider>
