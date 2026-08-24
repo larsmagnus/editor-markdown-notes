@@ -52,9 +52,10 @@ export function useScrollPosition(fileName: string) {
 				})
 
 		// Written on every event rather than debounced: a scroll fires at most once
-		// per frame, and the panel can be disposed at any moment - VSCode tears the
-		// webview down when the tab is backgrounded, without running any teardown
-		// here - so there is no reliable later moment to flush a pending write.
+		// per frame, and the panel can still be disposed at any moment - a window
+		// reload, the tab closing, the extension host restarting - without running
+		// any teardown here, so there is no reliable later moment to flush a
+		// pending write.
 		const record = () => {
 			if (!restoring) writeScrollTop(fileName, container.scrollTop)
 		}

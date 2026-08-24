@@ -9,12 +9,17 @@ export type WebviewPanelState = {
 }
 
 /**
- * The panel's own state, the one thing that survives VS Code destroying the
- * webview for a backgrounded tab.
+ * The panel's own state, the one thing that survives VS Code rebuilding the
+ * webview.
  *
- * The page is rebuilt from HTML frozen when the note first opened, so anything
- * that must not happen twice has to be recorded here rather than inferred from
- * the injected globals - those come back looking brand new every time.
+ * `retainContextWhenHidden` (`markdown-editor-provider.ts`) keeps a
+ * backgrounded tab's webview alive, so this state is no longer what carries a
+ * note across that specific transition - a window reload or reopening a
+ * closed tab still rebuilds the page from HTML frozen when the note first
+ * opened, and those are the cases this remains for. Anything that must not
+ * happen twice across one of those has to be recorded here rather than
+ * inferred from the injected globals - those come back looking brand new
+ * every time.
  *
  * Read and written as a whole, because `setState` replaces rather than merges:
  * writing one field on its own silently drops the other.

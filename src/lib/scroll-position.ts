@@ -8,13 +8,13 @@ const STORAGE_KEY_PREFIX = `${EXTENSION_ID}:scroll-top:`
 /**
  * Where a note was last scrolled to, from whichever side remembers it.
  *
- * In VSCode there are two, because the webview is destroyed in two different
- * ways. Closing the tab leaves only the host, which injects
- * `window.initialScrollTop` ahead of the bundle. Backgrounding the tab destroys
- * the webview too, but VSCode reloads it from the HTML it already holds - whose
- * injected offset is frozen at whatever it was when the note first opened - so
- * the panel's own `setState`, which VSCode preserves across exactly that cycle,
- * is what carries the newer value and is read first.
+ * In VSCode there are two. Closing the tab leaves only the host, which
+ * injects `window.initialScrollTop` ahead of the bundle. A window reload or
+ * reopening a closed tab still rebuilds the webview from that same frozen
+ * HTML - `retainContextWhenHidden` (`markdown-editor-provider.ts`) only
+ * covers backgrounding the tab, not those - so the panel's own `setState`,
+ * read first here, is what carries a newer value across a rebuild it does
+ * survive.
  *
  * Standalone there is no host, and `sessionStorage` matches the same
  * session-scoped lifetime.

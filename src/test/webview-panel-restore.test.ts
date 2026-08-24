@@ -19,7 +19,7 @@ import {
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 
-/** Long enough for VS Code to tear the page down and boot the bundle again. */
+/** Long enough for VS Code to settle a background/reveal transition. */
 const RESTORE_SETTLE_MS = 3000
 
 /** Opens a note in the custom editor and hands back the real panel. */
@@ -60,25 +60,21 @@ async function reveal(panel: vscode.WebviewPanel) {
 }
 
 /**
- * Asserts the panel was handed `content` at a moment it could actually take
- * it in.
+ * Asserts the panel already holds `content`, without requiring a fresh
+ * `update` after the caller reveals it.
  *
- * The spy sees the host *calling* `postMessage`, not the page receiving it,
- * and VS Code drops a message aimed at a webview that is not live - so an
- * update posted while the tab was hidden proves nothing. Only one sent after
- * the reveal reaches the rebuilt page, which is why the count is taken first.
+ * `retainContextWhenHidden` keeps the page running while hidden, so a
+ * `postMessage` sent to it is delivered immediately rather than dropped -
+ * unlike the torn-down-and-rebuilt page this suite used to cover, there is no
+ * later handshake to wait for. The last `update` posted, whenever it was
+ * posted, is what the page has.
  */
-function assertToldCurrentContent(
-	messages: unknown[],
-	postedWhileHidden: number,
-	content: string
-) {
+function assertHoldsCurrentContent(messages: unknown[], content: string) {
 	const updates = messages.filter(isUpdateMessage)
 
 	assert.ok(
-		updates.length > postedWhileHidden,
-		'a panel back in the foreground should be handed the current text again; ' +
-			'the update sent while it was hidden was dropped by VS Code'
+		updates.length > 0,
+		'the panel should have been told about the change at all'
 	)
 	assert.deepStrictEqual(updates.at(-1), {
 		type: 'update',
@@ -97,20 +93,16 @@ suite('Webview panel restore', () => {
 	/**
 	 * The instrument every other test here depends on.
 	 *
-	 * The bug under investigation is that `attachPanelSession` sets
-	 * `webview.html` exactly once, embedding `document.getText()` as
-	 * `window.initialContent` at that moment (`webview-document.ts`), and
-	 * nothing sets `retainContextWhenHidden`. If VS Code discards a
-	 * backgrounded tab's page and rebuilds it from that frozen HTML, the note
-	 * comes back showing whatever the file said when it first opened.
-	 *
-	 * That whole account rests on the page actually being rebuilt, which is not
-	 * something the API states. `useShikiTheme` posts `getShikiTheme` once per
-	 * mount, so a second one arriving after the tab is reshown is a page that
-	 * booted twice - and this test is worth more than the ones below, because a
-	 * red result here means the mechanism is wrong rather than the fix missing.
+	 * `markdown-editor-provider.ts` sets `retainContextWhenHidden: true`
+	 * specifically so a backgrounded tab keeps its running page - and with it,
+	 * TipTap's undo history - rather than VS Code discarding it and rebuilding
+	 * from the HTML frozen when the note first opened. `useShikiTheme` posts
+	 * `getShikiTheme` once per mount, so a second one arriving after the tab is
+	 * reshown would mean a page that booted twice; this test is worth more than
+	 * the ones below, because a red result here means the flag stopped working
+	 * rather than the content-catch-up behaviour it enables being wrong.
 	 */
-	test('rebuilds the page when a backgrounded tab is shown again', async function () {
+	test('does not rebuild the page when a backgrounded tab is shown again', async function () {
 		this.timeout(30_000)
 
 		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))
@@ -129,10 +121,11 @@ suite('Webview panel restore', () => {
 
 			await reveal(panel)
 
-			assert.ok(
-				messagesOfType(spy.messages, 'getShikiTheme').length > bootsBefore,
-				'the page should boot again when the tab is reshown, which is what makes ' +
-					'it repaint from the HTML frozen when the note first opened'
+			assert.strictEqual(
+				messagesOfType(spy.messages, 'getShikiTheme').length,
+				bootsBefore,
+				'the page should not boot again when the tab is reshown - ' +
+					'retainContextWhenHidden is what keeps it, and its undo history, alive'
 			)
 		} finally {
 			spy.dispose()
@@ -142,20 +135,12 @@ suite('Webview panel restore', () => {
 	})
 
 	/**
-	 * The bug report: a note is edited, the edit is visibly there, and later the
-	 * live editor shows the original content again even though disk still has
-	 * the edit.
-	 *
-	 * A page rebuilt from frozen HTML has no way to learn what changed while it
-	 * was gone - edits only ever reach the *running* page as an `update`
-	 * postMessage, which does nothing for a page that no longer exists to
-	 * receive it. So the panel has to be told the current content once it is
-	 * back. Deliberately no assertion about *what* prompts that: a
-	 * webview-initiated request on boot and a host-side visibility listener
-	 * both satisfy this, and only one of them is safe for a page whose context
-	 * survived with unsaved keystrokes in it.
+	 * The bug report the whole suite grew from, restated the other way: a note
+	 * is edited while backgrounded, and the still-running page has to actually
+	 * receive that change rather than it being silently dropped for a page that
+	 * is not currently visible.
 	 */
-	test('the panel is told the current content after an edit made while it was backgrounded', async function () {
+	test('the panel is told the current content while it is backgrounded', async function () {
 		this.timeout(30_000)
 
 		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))
@@ -177,14 +162,11 @@ suite('Webview panel restore', () => {
 			)
 			assert.strictEqual(document.getText(), '# Original\n\nAfter the edit.\n')
 
-			const postedWhileHidden = messages.filter(isUpdateMessage).length
-			await reveal(panel)
+			assertHoldsCurrentContent(messages, '# Original\n\nAfter the edit.\n')
 
-			assertToldCurrentContent(
-				messages,
-				postedWhileHidden,
-				'# Original\n\nAfter the edit.\n'
-			)
+			// Revealing it again must not lose or change what it already has.
+			await reveal(panel)
+			assertHoldsCurrentContent(messages, '# Original\n\nAfter the edit.\n')
 		} finally {
 			await vscode.commands.executeCommand('workbench.action.closeAllEditors')
 			await fs.rm(directory, { recursive: true, force: true })
@@ -221,12 +203,14 @@ suite('Webview panel restore', () => {
 			await vscode.workspace.applyEdit(edit)
 			await pause(500)
 
-			const postedWhileHidden = messages.filter(isUpdateMessage).length
-			await reveal(panel)
-
-			assertToldCurrentContent(
+			assertHoldsCurrentContent(
 				messages,
-				postedWhileHidden,
+				'# Original\n\nAfter the external edit.\n'
+			)
+
+			await reveal(panel)
+			assertHoldsCurrentContent(
+				messages,
 				'# Original\n\nAfter the external edit.\n'
 			)
 		} finally {

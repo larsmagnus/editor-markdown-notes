@@ -42,8 +42,22 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			// `enableFindWidget` is what makes Cmd/Ctrl+F trigger VSCode's built-in
 			// webview find widget (searches rendered DOM text); it can only be set
 			// here, not on `webviewPanel.options`, which is read-only per-panel.
+			//
+			// `retainContextWhenHidden` keeps a backgrounded tab's webview alive
+			// instead of VSCode tearing it down and rebuilding it from frozen HTML
+			// on return - the only way to keep TipTap's undo history across a tab
+			// switch, since it lives entirely in the page. The cost is real: every
+			// open note keeps its DOM, its TipTap instance, its Shiki highlighter
+			// and (with the writing checks on) its retext worker resident for the
+			// life of the window. If that bites, the lever is disposing the text
+			// tools analyzer on `onDidChangeViewState`, not reverting this flag.
+			// Reload and reopening a closed tab still rebuild the webview from
+			// scratch - only backgrounding stops doing so.
 			vscode.window.registerCustomEditorProvider(VIEW_TYPE, this, {
-				webviewOptions: { enableFindWidget: true },
+				webviewOptions: {
+					enableFindWidget: true,
+					retainContextWhenHidden: true,
+				},
 			}),
 			vscode.workspace.onDidChangeConfiguration((event) => {
 				if (event.affectsConfiguration(CONFIG_SECTION)) this.broadcastConfig()
