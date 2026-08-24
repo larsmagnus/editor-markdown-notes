@@ -11,4 +11,5 @@ export interface MarkdownIt {
 	renderer: {
 		rules: Record<string, (tokens: { markup: string }[], idx: number) => string>
 	}
+	set: (options: { langPrefix?: string }) => void
 }

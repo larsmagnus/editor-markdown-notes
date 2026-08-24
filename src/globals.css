@@ -232,6 +232,23 @@
 	}
 
 	/*
+	 * Markdown syntax `syntax-reveal-extension.ts` hides while the caret is
+	 * elsewhere - fence lines, formatting delimiters, list/heading markers.
+	 * Not `display: none`: contenteditable places and moves the caret through
+	 * fully-`none` inline content unreliably at its exact boundary. Zero-width
+	 * but still laid out keeps the caret's own position math working right up
+	 * to the hidden text, and `white-space: nowrap` keeps multi-character
+	 * syntax (a language tag, a marker) from wrapping onto its own line while
+	 * collapsed.
+	 */
+	.ProseMirror .syntax-hidden {
+		display: inline-block;
+		width: 0;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	/*
 	 * Code blocks take both colors from the resolved Shiki theme, published as
 	 * custom properties by `useCodeBlockStyle`. Both, not just the foreground:
 	 * token colors assume their own theme's background, while Typography's `pre`

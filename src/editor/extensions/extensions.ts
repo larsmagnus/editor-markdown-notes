@@ -1,4 +1,3 @@
-import CodeBlock from '@tiptap/extension-code-block'
 import { Color } from '@tiptap/extension-color'
 import Document from '@tiptap/extension-document'
 import Image from '@tiptap/extension-image'
@@ -11,15 +10,16 @@ import TaskList from '@tiptap/extension-task-list'
 import { TextStyle } from '@tiptap/extension-text-style'
 import type { TextStyleOptions } from '@tiptap/extension-text-style'
 import type { Command } from '@tiptap/pm/state'
-import { mergeAttributes, ReactNodeViewRenderer } from '@tiptap/react'
+import { mergeAttributes } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import type { MarkdownStorage } from 'tiptap-markdown'
 import { Markdown } from 'tiptap-markdown'
 
 import { AskInlineStatus } from '@/editor/extensions/ask/ask-inline-status-extension'
 import { AskSuggestion } from '@/editor/extensions/ask/ask-suggestion-extension'
-import { CodeBlockView } from '@/editor/extensions/code-block/code-block-view'
+import { CodeBlockExtension } from '@/editor/extensions/code-block/code-block-extension'
 import { CodeExtension } from '@/editor/extensions/code-block/code-extension'
+import { createCodeFenceRevealProvider } from '@/editor/extensions/code-block/code-fence-reveal-provider'
 import { FocusNavigation } from '@/editor/extensions/focus-navigation/focus-navigation-extension'
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
 import {
@@ -33,6 +33,7 @@ import { patchMarkdownEscaping } from '@/editor/extensions/markdown/markdown-esc
 import { SearchRevealHighlight } from '@/editor/extensions/search-reveal/search-reveal-extension'
 import { SlashCommand } from '@/editor/extensions/slash-command/slash-command-extension'
 import { SyntaxHighlight } from '@/editor/extensions/syntax-highlight/syntax-highlight-extension'
+import { SyntaxReveal } from '@/editor/extensions/syntax-reveal/syntax-reveal-extension'
 import { TabIndent } from '@/editor/extensions/tab-indent/tab-indent-extension'
 import { TableCommands } from '@/editor/extensions/table/commands'
 import { MarkdownTable } from '@/editor/extensions/table/table-extension'
@@ -85,12 +86,7 @@ export const extensions = [
 	// the way the table's header row does.
 	Document.extend({ content: 'frontmatter? block+' }),
 	Frontmatter,
-	// The name stays `codeBlock`, which is what keeps `tiptap-markdown`'s fenced
-	// block serializer attached. The node view only changes how a block is drawn:
-	// a `mermaid` one renders its diagram, everything else stays a `<pre>`.
-	CodeBlock.extend({
-		addNodeView: () => ReactNodeViewRenderer(CodeBlockView),
-	}),
+	CodeBlockExtension,
 	// Order nests marks: Italic before Code so `*text `code` text*` nests as
 	// `*` around the backticks rather than the reverse (mark rank, not source
 	// order, decides nesting - see each file's comment for why they coexist).
@@ -182,6 +178,13 @@ export const extensions = [
 	AskSuggestion,
 	// Decorations only, and inert until the `/ask` slash command starts one.
 	AskInlineStatus,
+	// Decorations only, hiding markdown syntax (fences, delimiters, markers)
+	// while the caret is elsewhere. `frontmatter` gets its own fence-in-content
+	// treatment and joins this list once that lands; other constructs register
+	// their own provider here as they land.
+	SyntaxReveal.configure({
+		providers: [createCodeFenceRevealProvider(['codeBlock'])],
+	}),
 	// Otherwise unhandled, Tab is a browser default: it moves focus to the next
 	// focusable element on the page rather than indenting. Declines inside a
 	// table cell and when a node (not a text caret) is selected, so it doesn't

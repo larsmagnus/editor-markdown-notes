@@ -45,11 +45,15 @@ describe('TabIndent', () => {
 
 	it('inserts an indent inside a code block', () => {
 		const editor = documentFrom(['```ts', 'const a = 1', '```'].join('\n'))
-		editor.commands.setTextSelection(1)
+		// Position 7: right after the fence-open line ("```ts\n" is 6 characters,
+		// plus the node's own opening token), i.e. the very start of the code.
+		editor.commands.setTextSelection(7)
 
 		editor.commands.keyboardShortcut('Tab')
 
-		expect(editor.state.doc.firstChild?.textContent).toBe('  const a = 1')
+		expect(editor.state.doc.firstChild?.textContent).toBe(
+			'```ts\n  const a = 1\n```'
+		)
 	})
 
 	it('removes a preceding indent on Shift-Tab', () => {

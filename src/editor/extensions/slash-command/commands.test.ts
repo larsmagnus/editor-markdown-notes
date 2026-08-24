@@ -36,22 +36,23 @@ describe('mermaid', () => {
 
 		expect(editor.getJSON().content?.[0]).toMatchObject({
 			type: 'codeBlock',
-			attrs: { language: 'mermaid' },
-			content: [{ type: 'text', text: 'graph TD\n  A --> B' }],
+			content: [{ type: 'text', text: '```mermaid\ngraph TD\n  A --> B\n```' }],
 		})
 	})
 })
 
 describe('code', () => {
-	it('turns the current block into an empty code block', () => {
+	it('turns the current block into an empty, fenced code block', () => {
 		const editor = new Editor({ extensions, content: '' })
 		currentEditor = editor
 
 		commandFor('code').run(editor, { from: 1, to: 1 })
 
 		expect(editor.isActive('codeBlock')).toBe(true)
-		expect(editor.getJSON().content?.[0]).toMatchObject({ type: 'codeBlock' })
-		expect(editor.getJSON().content?.[0]?.content).toBeUndefined()
+		expect(editor.getJSON().content?.[0]).toMatchObject({
+			type: 'codeBlock',
+			content: [{ type: 'text', text: '```\n\n```' }],
+		})
 	})
 })
 

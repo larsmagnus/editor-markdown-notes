@@ -2,6 +2,7 @@ import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 
 import { PanZoom } from '@/components/pan-zoom'
+import { fenceCode } from '@/editor/extensions/code-block/code-fence'
 import { MERMAID_LANGUAGE } from '@/editor/extensions/mermaid/language'
 import { MermaidToolbar } from '@/editor/extensions/mermaid/toolbar'
 import { useCaretInside } from '@/hooks/use-caret-inside'
@@ -14,7 +15,8 @@ type MermaidBlockProps = Pick<NodeViewProps, 'node' | 'editor' | 'getPos'>
 /** A fenced `mermaid` block: its diagram, or its source while it is edited. */
 export function MermaidBlock({ node, editor, getPos }: MermaidBlockProps) {
 	const isEditing = useCaretInside({ editor, getPos })
-	const result = useMermaidRender(node.textContent, useIsDark(), isEditing)
+	const code = fenceCode(node.textContent)
+	const result = useMermaidRender(code, useIsDark(), isEditing)
 
 	const failed = result && 'error' in result
 	// The source is the only way to fix a diagram that will not parse, so an
@@ -53,7 +55,7 @@ export function MermaidBlock({ node, editor, getPos }: MermaidBlockProps) {
 						className="max-h-[32rem] rounded-md border border-border/50 p-2 hover:border-border"
 						controls={
 							<MermaidToolbar
-								code={node.textContent}
+								code={code}
 								svg={result.svg}
 								onEdit={startEditing}
 							/>

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
+import { fenceText } from '@/editor/extensions/code-block/code-fence'
 import { MERMAID_LANGUAGE } from '@/editor/extensions/mermaid/language'
 import { runAskCommand } from '@/editor/extensions/slash-command/ask-command'
 import { runInsertImageCommand } from '@/editor/extensions/slash-command/insert-image-command'
@@ -58,10 +59,15 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
 		run: (editor, range) =>
 			runWithRange(editor, range, (chain) =>
 				chain
-					.setCodeBlock({ language: MERMAID_LANGUAGE })
+					.setCodeBlock()
 					// A JSON text node, not a markdown/HTML string: `insertContent`
 					// parses a string as HTML by default, which double-escapes `-->`.
-					.insertContent({ type: 'text', text: 'graph TD\n  A --> B' })
+					// `language` is no longer a node attribute (see `code-block-extension.ts`),
+					// so the fence line carries it as real text instead.
+					.insertContent({
+						type: 'text',
+						text: fenceText('graph TD\n  A --> B', MERMAID_LANGUAGE),
+					})
 			),
 	},
 	{
@@ -70,7 +76,15 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
 		keywords: ['code', 'snippet', 'fence', 'pre'],
 		icon: Code2,
 		run: (editor, range) =>
-			runWithRange(editor, range, (chain) => chain.setCodeBlock()),
+			runWithRange(editor, range, (chain) =>
+				chain
+					.setCodeBlock()
+					.insertContent({ type: 'text', text: fenceText('', '') })
+					// Land the caret on the empty code line between the fences
+					// ("```\n" is 4 characters, plus the node's own opening token),
+					// rather than after the closing one.
+					.setTextSelection(range.from + 1 + 4)
+			),
 	},
 	{
 		id: 'task-list',

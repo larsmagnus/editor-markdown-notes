@@ -1,6 +1,7 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { HighlighterCore } from 'shiki'
 
+import { parseFence } from '@/editor/extensions/code-block/code-fence'
 import { MERMAID_LANGUAGE } from '@/editor/extensions/mermaid/language'
 import type { PlacedToken } from '@/editor/extensions/syntax-highlight/syntax-highlight-extension'
 import { ensureLanguage } from '@/lib/shiki-highlighter'
@@ -31,9 +32,14 @@ export function collectCodeBlocks(doc: ProseMirrorNode): CodeBlockSnapshot[] {
 		}
 
 		if (node.type.name !== 'codeBlock') return
-		const language = String(node.attrs.language ?? '')
+		const { language, codeFrom, codeTo } = parseFence(node.textContent)
 		if (!language || language === MERMAID_LANGUAGE) return
-		blocks.push({ text: node.textContent, language, from: pos + 1 })
+		blocks.push({
+			text: node.textContent.slice(codeFrom, codeTo),
+			language,
+			// +1 for the node's own opening token, +codeFrom past the fence line.
+			from: pos + 1 + codeFrom,
+		})
 	})
 
 	return blocks
