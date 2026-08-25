@@ -1,6 +1,7 @@
 import { MarkdownSerializerState } from 'prosemirror-markdown'
 
 import type { HeadingSerializerState } from '@/editor/extensions/heading/heading-extension'
+import type { LinkSerializerState } from '@/editor/extensions/link/link-markdown-spec'
 import {
 	backtickRuns,
 	flankingAsteriskOffsets,
@@ -45,6 +46,13 @@ export function patchMarkdownEscaping(): void {
 		str: string,
 		startOfLine = false
 	): string {
+		// A link's own delimiter characters - `[`, `]`, `(url "title")` - are
+		// real, marked text now (see `link-markdown-spec.ts`), and unlike every
+		// other delimited mark, a link can't use `escape: false` to protect them
+		// (it silently drops the mark's own open/close for a link wrapping only
+		// an image). `inLink` reproduces that same full bypass instead.
+		if ((this as LinkSerializerState).inLink) return str
+
 		const asteriskOffsets = flankingAsteriskOffsets(str)
 		const runs = backtickRuns(str)
 

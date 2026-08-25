@@ -227,6 +227,27 @@ describe('images and links', () => {
 			'Docs live at <https://example.com> today.'
 		)
 	})
+
+	it('keeps a link with a title', () => {
+		const markdown = 'Read [the guide](https://example.com "The guide") first.'
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
+	// Regression: nesting bold inside a link's own text used to be lost the
+	// same way inline code nested inside bold was - see `uniform-outer-marks.ts`.
+	it('keeps bold nested inside a link', () => {
+		expect(roundTrip('Read [**the guide**](https://example.com) first.')).toBe(
+			'Read [**the guide**](https://example.com) first.'
+		)
+	})
+
+	it('keeps a link whose text contains a literal bracket-then-paren, unescaped', () => {
+		// Coincidental `](` in plain prose is escaped (see the escaping
+		// describe block below); a real link's own `](` must not be.
+		expect(roundTrip('[a link](https://example.com)')).toBe(
+			'[a link](https://example.com)'
+		)
+	})
 })
 
 describe('features that already worked keep working', () => {

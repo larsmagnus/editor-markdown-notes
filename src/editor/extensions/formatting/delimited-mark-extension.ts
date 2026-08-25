@@ -2,7 +2,10 @@ import type { Mark } from '@tiptap/core'
 
 import { createDelimiterInputRule } from '@/editor/extensions/formatting/delimiter-input-rule'
 import { IDENTITY_DELIMITER_SERIALIZE } from '@/editor/extensions/formatting/delimiter-spec'
-import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
+import type {
+	DelimiterMarkdownSerialize,
+	DelimiterSpec,
+} from '@/editor/extensions/formatting/delimiter-spec'
 import { createEnsureDelimitersPlugin } from '@/editor/extensions/formatting/ensure-delimiters-plugin'
 import {
 	removeClosingDelimiterOnDelete,
@@ -31,6 +34,7 @@ export function createDelimitedMarkExtension(
 		ensureSpec,
 		inputRegex,
 		outerMarkNames,
+		serialize = IDENTITY_DELIMITER_SERIALIZE,
 	}: {
 		ensureSpec: DelimiterSpec
 		/**
@@ -41,13 +45,19 @@ export function createDelimitedMarkExtension(
 		inputRegex?: RegExp
 		/** See `uniform-outer-marks.ts` - names of delimited marks that outrank this one. */
 		outerMarkNames?: string[]
+		/**
+		 * Defaults to identity (the common case: the delimiter is already real,
+		 * marked text, nothing left to synthesize). A link needs its own - see
+		 * `link-markdown-spec.ts` for why one delimited mark can't stay identity.
+		 */
+		serialize?: DelimiterMarkdownSerialize
 	}
 ): Mark {
 	return base.extend({
 		addStorage() {
 			return {
 				markdown: {
-					serialize: IDENTITY_DELIMITER_SERIALIZE,
+					serialize,
 					parse: PARSED_BY_MARKDOWN_IT,
 				},
 			}

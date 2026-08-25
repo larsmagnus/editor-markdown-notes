@@ -49,6 +49,8 @@ export function createEnsureDelimitersPlugin(
 			let tr: Transaction | undefined
 
 			for (const run of [...runs].reverse()) {
+				if (spec.isBare?.(newState.doc, run)) continue
+
 				const runText = newState.doc.textBetween(run.from, run.to)
 				const hasOpening = spec.detectOpen(runText) > 0
 				const hasClosing = spec.detectClose(runText) > 0

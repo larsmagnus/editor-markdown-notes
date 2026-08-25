@@ -13,8 +13,8 @@ const DELIMITER = '~~'
 export const StrikeExtension = createDelimitedMarkExtension(Strike, {
 	ensureSpec: fixedDelimiter(DELIMITER),
 	inputRegex,
-	// Nests inside bold - see `uniform-outer-marks.ts`.
-	outerMarkNames: ['bold'],
+	// Nests inside link and bold - see `uniform-outer-marks.ts`.
+	outerMarkNames: ['link', 'bold'],
 }).extend({
 	addCommands() {
 		return {

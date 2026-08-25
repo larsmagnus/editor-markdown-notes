@@ -1,7 +1,6 @@
 import { Color } from '@tiptap/extension-color'
 import Document from '@tiptap/extension-document'
 import Image from '@tiptap/extension-image'
-import Link from '@tiptap/extension-link'
 import ListItem from '@tiptap/extension-list-item'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
@@ -36,6 +35,8 @@ import {
 } from '@/editor/extensions/image/keyboard-nav'
 import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
 import { ItalicExtension } from '@/editor/extensions/italic/italic-extension'
+import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
+import { LinkExtension } from '@/editor/extensions/link/link-extension'
 import { StrictLinkify } from '@/editor/extensions/link/strict-linkify-extension'
 import { MarkdownClipboard } from '@/editor/extensions/markdown/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '@/editor/extensions/markdown/markdown-escaping'
@@ -65,11 +66,6 @@ patchMarkdownEscaping()
 export const extensions = [
 	Color.configure({ types: [TextStyle.name, ListItem.name] }),
 	TextStyle.configure({ types: [ListItem.name] } as Partial<TextStyleOptions>),
-	// Linkifying is markdown-it's job (see `linkify` below), which `StrictLinkify`
-	// keeps to URLs with an explicit scheme. TipTap's own autolink plugin has no
-	// such restriction and runs on every transaction, so with it on a heading
-	// reading `notes.md` becomes `[notes.md](http://notes.md)`.
-	Link.configure({ autolink: false }),
 	StarterKit.configure({
 		bulletList: {
 			keepMarks: true,
@@ -88,7 +84,7 @@ export const extensions = [
 		// - see each for why.
 		bold: false,
 		strike: false,
-		// StarterKit bundles both as of v3. Link is registered above instead
+		// StarterKit bundles both as of v3. Link is registered below instead
 		// (autolink disabled); underline stays unsupported (see CLAUDE.md).
 		link: false,
 		underline: false,
@@ -104,9 +100,16 @@ export const extensions = [
 	Frontmatter,
 	CodeBlockExtension,
 	HeadingExtension,
-	// Order nests marks: Italic before Code so `*text `code` text*` nests as
-	// `*` around the backticks rather than the reverse (mark rank, not source
-	// order, decides nesting - see each file's comment for why they coexist).
+	// Linkifying is markdown-it's job (see `linkify` below), which `StrictLinkify`
+	// keeps to URLs with an explicit scheme. TipTap's own autolink plugin has no
+	// such restriction and runs on every transaction, so with it on a heading
+	// reading `notes.md` becomes `[notes.md](http://notes.md)`.
+	//
+	// Order nests marks: Link before Italic before Code so e.g. `*text `code`
+	// text*` nests as `*` around the backticks rather than the reverse (mark
+	// rank, not source order, decides nesting - see each file's comment for why
+	// they coexist).
+	LinkExtension.configure({ autolink: false }),
 	ItalicExtension,
 	CodeExtension,
 	BoldExtension,
@@ -205,6 +208,7 @@ export const extensions = [
 			createFenceRevealProvider(['codeBlock'], parseFence),
 			createFenceRevealProvider(['frontmatter'], parseFrontmatterFence),
 			createFenceRevealProvider(['heading'], parseHeadingReveal),
+			createDelimitedMarkRevealProvider('link', linkDelimiterSpec()),
 			createDelimitedMarkRevealProvider('bold', fixedDelimiter('**')),
 			createDelimitedMarkRevealProvider('strike', fixedDelimiter('~~')),
 			createDelimitedMarkRevealProvider('italic', italicDelimiterSpec()),

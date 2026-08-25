@@ -1,6 +1,30 @@
-import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
+import type { Mark, Node as ProseMirrorNode } from '@tiptap/pm/model'
+import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
 import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
+
+type MarkBoundary =
+	| string
+	| ((
+			state: MarkdownSerializerState,
+			mark: Mark,
+			parent: ProseMirrorNode,
+			index: number
+	  ) => string)
+
+/**
+ * The shape `delimited-mark-extension.ts`'s `serialize` option needs -
+ * `prosemirror-markdown`'s own `MarkSerializerSpec` isn't exported, so this
+ * is the minimal reconstruction every delimited mark's storage satisfies:
+ * `IDENTITY_DELIMITER_SERIALIZE` for the common case, or a mark's own (a
+ * link needs three cases - see `link-markdown-spec.ts`).
+ */
+export type DelimiterMarkdownSerialize = {
+	open: MarkBoundary
+	close: MarkBoundary
+	mixable: boolean
+	escape: boolean
+}
 
 /**
  * How `ensure-delimiters-plugin.ts` and the backspace/delete boundary
@@ -20,6 +44,15 @@ export type DelimiterSpec = {
 	resolveOpen(doc: ProseMirrorNode, run: MarkRun): string
 	/** The delimiter text to insert at the run's end when it has none. */
 	resolveClose(doc: ProseMirrorNode, run: MarkRun): string
+	/**
+	 * True when a run needs no delimiter text at all - a link whose visible
+	 * text already equals its own `href` (an autolink, `<https://x>`) has
+	 * nothing for brackets to add. `ensure-delimiters-plugin.ts` skips a bare
+	 * run entirely instead of reading `detectOpen`/`detectClose`'s `0` as
+	 * "missing, please synthesize" the way every other delimited mark does.
+	 * Omitted by every mark that has no such case.
+	 */
+	isBare?(doc: ProseMirrorNode, run: MarkRun): boolean
 }
 
 /**

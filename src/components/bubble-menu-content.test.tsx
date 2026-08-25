@@ -112,8 +112,10 @@ describe('links', () => {
 		await userEvent.type(screen.getByLabelText('URL'), 'https://example.com')
 		await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
 
+		// The `[`/`](url)` delimiters are real, marked text now (see
+		// `link-extension.ts`), not markup synthesized only at save time.
 		expect(editor.getHTML()).toContain('href="https://example.com"')
-		expect(editor.getHTML()).toContain('>notes</a>')
+		expect(editor.getHTML()).toContain('>[notes](https://example.com)</a>')
 	})
 
 	it('removes an existing link', async () => {
@@ -151,6 +153,33 @@ describe('links', () => {
 		await userEvent.click(screen.getByTitle('Link'))
 
 		expect(screen.getByLabelText('URL')).toHaveValue('https://example.com')
+	})
+
+	// Regression: applying a new URL over an existing link used to only touch
+	// the mark's attrs, leaving the old URL's literal text - now the visible
+	// source of truth - sitting stale right beside it.
+	it('replaces the literal URL text when editing an existing link', async () => {
+		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
+		editor.commands.setContent('Read the [notes](https://old.example.com)')
+		editor.commands.setTextSelection({ from: 10, to: 15 })
+		render(
+			<EditorContext.Provider value={{ editor }}>
+				<BubbleMenuContent />
+			</EditorContext.Provider>
+		)
+
+		await userEvent.click(screen.getByTitle('Link'))
+		await userEvent.clear(screen.getByLabelText('URL'))
+		await userEvent.type(
+			screen.getByLabelText('URL'),
+			'https://new.example.com'
+		)
+		await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
+
+		const markdown = editor.storage.markdown.getMarkdown() as string
+		expect(markdown).toContain('[notes](https://new.example.com)')
+		expect(markdown).not.toContain('old.example.com')
 	})
 })
 

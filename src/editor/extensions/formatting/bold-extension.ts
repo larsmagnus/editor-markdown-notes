@@ -13,6 +13,8 @@ const DELIMITER = '**'
 export const BoldExtension = createDelimitedMarkExtension(Bold, {
 	ensureSpec: fixedDelimiter(DELIMITER),
 	inputRegex: starInputRegex,
+	// Nests inside link - see `uniform-outer-marks.ts`.
+	outerMarkNames: ['link'],
 }).extend({
 	addCommands() {
 		return {

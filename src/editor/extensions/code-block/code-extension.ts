@@ -27,7 +27,7 @@ export const CodeExtension = createDelimitedMarkExtension(
 		ensureSpec: inlineCodeDelimiterSpec(),
 		inputRegex: CODE_INPUT_REGEX,
 		// Nests inside bold, strike, and italic - see `uniform-outer-marks.ts`.
-		outerMarkNames: ['bold', 'strike', 'italic'],
+		outerMarkNames: ['link', 'bold', 'strike', 'italic'],
 	}
 ).extend({
 	addCommands() {
