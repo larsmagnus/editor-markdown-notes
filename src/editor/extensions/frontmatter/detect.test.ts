@@ -90,6 +90,9 @@ describe('detectFrontmatter', () => {
 		)
 	})
 
+	// Bold's own `**` delimiters are real text now (see `formatting/`), so the
+	// swept line keeps them verbatim rather than the bare "title" a bold mark
+	// with no adjacent text used to leave behind.
 	it('sweeps plain paragraphs between the fences as before, marks and all', () => {
 		const editor = documentFrom(
 			['---', '', '**title**: Roadmap', '', '---', '', '# Roadmap'].join('\n')
@@ -97,7 +100,7 @@ describe('detectFrontmatter', () => {
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
 		expect(editor.state.doc.firstChild?.textContent).toBe(
-			'---\ntitle: Roadmap\n---'
+			'---\n**title**: Roadmap\n---'
 		)
 	})
 

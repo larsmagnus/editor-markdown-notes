@@ -81,8 +81,10 @@ describe('Editor Mode Live', () => {
 
 		const table = await screen.findByRole('table')
 		expect(table.querySelector('p')).toBeNull()
-		expect(screen.getByRole('cell', { name: '1.2M' })).toContainHTML(
-			'<strong>1.2M</strong>'
+		// The `**` delimiters are real, marked text now (see `formatting/`), so
+		// they're part of both the cell's accessible name and its markup.
+		expect(screen.getByRole('cell', { name: '**1.2M**' })).toContainHTML(
+			'<strong>**1.2M**</strong>'
 		)
 	})
 
@@ -160,6 +162,27 @@ describe('Editor Mode Live', () => {
 		const code = container.querySelector('pre code.language-ts')
 		expect(code).not.toBeNull()
 		expect(code?.textContent).toBe('```ts\n\n```')
+	})
+
+	// Regression: the input rule's handler ran before the very keystroke that
+	// completed its own trigger (the closing `*`/`~`) had reached the document
+	// - `state.doc` was one character short of the match it had just
+	// recognized. Continuing to type afterward then found a "run" one
+	// character short of its own closing delimiter on every subsequent
+	// keystroke, and the safety net kept re-wrapping it - `**b**o**l**d**`
+	// from typing "bold" straight through after the trigger.
+	it('typing "**bold**" and continuing to type does not corrupt the run', async () => {
+		const { container } = render(<EditorModeLive content="" />)
+
+		await userEvent.click(screen.getByRole('textbox'))
+		await userEvent.keyboard('Some **bold** text')
+
+		const strongs = container.querySelectorAll('strong')
+		expect(strongs).toHaveLength(1)
+		expect(strongs[0].textContent).toBe('**bold**')
+		expect(container.querySelector('[role="textbox"]')?.textContent).toBe(
+			'Some **bold** text'
+		)
 	})
 
 	// Outside VSCode the notes are served from the site root, so the author's

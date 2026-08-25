@@ -27,7 +27,9 @@ describe('toggleStyle', () => {
 
 		act(() => result.current.toggleStyle('bold'))
 
-		expect(editor.getHTML()).toContain('<strong>notes</strong>')
+		// The `**` delimiters are real, marked text now (see `formatting/`),
+		// not markup synthesized only at save time.
+		expect(editor.getHTML()).toContain('<strong>**notes**</strong>')
 	})
 
 	it('toggles italic', () => {
@@ -61,7 +63,9 @@ describe('toggleStyle', () => {
 
 		act(() => result.current.toggleStyle('strike'))
 
-		expect(editor.getHTML()).toContain('<s>notes</s>')
+		// The `~~` delimiters are real, marked text now (see `formatting/`),
+		// not markup synthesized only at save time.
+		expect(editor.getHTML()).toContain('<s>~~notes~~</s>')
 	})
 
 	it('toggles code', () => {

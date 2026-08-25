@@ -21,6 +21,9 @@ import { CodeBlockExtension } from '@/editor/extensions/code-block/code-block-ex
 import { CodeExtension } from '@/editor/extensions/code-block/code-extension'
 import { parseFence } from '@/editor/extensions/code-block/code-fence'
 import { FocusNavigation } from '@/editor/extensions/focus-navigation/focus-navigation-extension'
+import { BoldExtension } from '@/editor/extensions/formatting/bold-extension'
+import { createDelimitedMarkRevealProvider } from '@/editor/extensions/formatting/create-delimited-mark-reveal-provider'
+import { StrikeExtension } from '@/editor/extensions/formatting/strike-extension'
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
 import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import {
@@ -51,8 +54,8 @@ patchMarkdownEscaping()
  * registered - without the nodes below, markdown-it parses them into HTML
  * that the schema then drops, and the next auto-save writes the loss to disk.
  *
- * `Code`/`Italic`/`Table` are StarterKit's defaults disabled and replaced by
- * their own file in this folder - see each for why.
+ * `Code`/`Italic`/`Bold`/`Strike`/`Table` are StarterKit's defaults disabled
+ * and replaced by their own file in this folder - see each for why.
  */
 export const extensions = [
 	Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -74,6 +77,11 @@ export const extensions = [
 		codeBlock: false,
 		code: false,
 		italic: false,
+		// `Bold`/`Strike`/`Italic`/`Code` are StarterKit's defaults disabled and
+		// replaced by their own file in this folder or `formatting/` - see each
+		// for why.
+		bold: false,
+		strike: false,
 		// StarterKit bundles both as of v3. Link is registered above instead
 		// (autolink disabled); underline stays unsupported (see CLAUDE.md).
 		link: false,
@@ -94,6 +102,8 @@ export const extensions = [
 	// order, decides nesting - see each file's comment for why they coexist).
 	ItalicExtension,
 	CodeExtension,
+	BoldExtension,
+	StrikeExtension,
 	// Column resizing needs handle styling and a toolbar to be worth it - tables
 	// are edited in place instead, with Tab/Shift-Tab moving between cells.
 	MarkdownTable,
@@ -187,6 +197,8 @@ export const extensions = [
 		providers: [
 			createFenceRevealProvider(['codeBlock'], parseFence),
 			createFenceRevealProvider(['frontmatter'], parseFrontmatterFence),
+			createDelimitedMarkRevealProvider('bold', 2),
+			createDelimitedMarkRevealProvider('strike', 2),
 		],
 	}),
 	// Otherwise unhandled, Tab is a browser default: it moves focus to the next
