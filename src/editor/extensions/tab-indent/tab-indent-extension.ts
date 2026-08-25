@@ -2,6 +2,8 @@ import { Extension } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
 import { isInTable } from '@tiptap/pm/tables'
 
+import { parseListMarker } from '@/editor/extensions/list/list-marker'
+
 const INDENT = '  '
 
 // `listItem`/`taskItem` bind Tab/Shift-Tab to sink/lift themselves, but
@@ -34,19 +36,27 @@ export const TabIndent = Extension.create({
 		}
 
 		// The item's type name, or `null` if the caret isn't right after its
-		// bullet/number/checkbox (i.e. offset 0 of the item's first block).
+		// bullet/number/checkbox. The marker is real leading text in the item's
+		// first paragraph now (see `list-marker.ts`), so "right after it" is
+		// `parentOffset === markerLength`, not offset 0 - offset 0 sits *before*
+		// the marker, where typing would edit the marker itself rather than
+		// nest/un-nest the item.
 		const listItemAtCaretStart = () => {
 			const { selection } = this.editor.state
 			if (!(selection instanceof TextSelection) || !selection.empty) return null
 
 			const { $from } = selection
-			if ($from.parentOffset !== 0 || $from.depth < 1) return null
+			if ($from.depth < 1) return null
 
 			const itemDepth = $from.depth - 1
 			const listItem = $from.node(itemDepth)
 
 			if (!NESTABLE_LIST_ITEM_TYPES.includes(listItem.type.name)) return null
 			if ($from.index(itemDepth) !== 0) return null
+
+			const markerLength =
+				parseListMarker($from.parent.textContent)?.markerLength ?? 0
+			if ($from.parentOffset !== markerLength) return null
 
 			return listItem.type.name
 		}

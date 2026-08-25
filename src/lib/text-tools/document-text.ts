@@ -2,6 +2,7 @@ import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
 import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import { headingMarkerLength } from '@/editor/extensions/heading/heading-marker'
+import { parseListMarker } from '@/editor/extensions/list/list-marker'
 import {
 	appendTextblockChildren,
 	IGNORED_NODES,
@@ -21,6 +22,28 @@ import {
 export type DocumentText = {
 	text: string
 	slices: TextSlice[]
+}
+
+/**
+ * How much of `node`'s own leading text is markup, not prose - a heading's
+ * `#`x`level`, or a list item's own bullet/ordered/task marker (real text
+ * held by its *first paragraph*, `node` here, not the `listItem`/`taskItem`
+ * wrapping it - that wrapper is never itself a textblock, so the walk below
+ * never visits it directly).
+ */
+function leadingMarkerLength(
+	node: ProseMirrorNode,
+	parent: ProseMirrorNode | null,
+	index: number
+): number {
+	if (node.type.name === 'heading') return headingMarkerLength(node.textContent)
+
+	const inListItem =
+		index === 0 &&
+		(parent?.type.name === 'listItem' || parent?.type.name === 'taskItem')
+	if (inListItem) return parseListMarker(node.textContent)?.markerLength ?? 0
+
+	return 0
 }
 
 /**
@@ -79,7 +102,7 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 	const exclusions = delimiterRanges(doc)
 	const cursor = { index: 0 }
 
-	doc.descendants((node, pos) => {
+	doc.descendants((node, pos, parent, index) => {
 		if (IGNORED_NODES.has(node.type.name)) return false
 		if (!node.isTextblock) return true
 
@@ -90,8 +113,6 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 
 		if (text) text += BLOCK_SEPARATOR
 
-		const markerLength =
-			node.type.name === 'heading' ? headingMarkerLength(node.textContent) : 0
 		text = appendTextblockChildren(
 			node,
 			pos,
@@ -99,7 +120,7 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 			exclusions,
 			cursor,
 			slices,
-			markerLength
+			leadingMarkerLength(node, parent, index)
 		)
 
 		return false

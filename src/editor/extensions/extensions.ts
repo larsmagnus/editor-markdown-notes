@@ -1,7 +1,6 @@
 import { Color } from '@tiptap/extension-color'
 import Document from '@tiptap/extension-document'
 import Image from '@tiptap/extension-image'
-import ListItem from '@tiptap/extension-list-item'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
@@ -38,6 +37,8 @@ import { ItalicExtension } from '@/editor/extensions/italic/italic-extension'
 import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
 import { LinkExtension } from '@/editor/extensions/link/link-extension'
 import { StrictLinkify } from '@/editor/extensions/link/strict-linkify-extension'
+import { ListItemExtension } from '@/editor/extensions/list/list-item-extension'
+import { createListMarkerRevealProvider } from '@/editor/extensions/list/list-marker-reveal-provider'
 import { MarkdownClipboard } from '@/editor/extensions/markdown/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '@/editor/extensions/markdown/markdown-escaping'
 import { SearchRevealHighlight } from '@/editor/extensions/search-reveal/search-reveal-extension'
@@ -64,8 +65,10 @@ patchMarkdownEscaping()
  * and replaced by their own file in this folder - see each for why.
  */
 export const extensions = [
-	Color.configure({ types: [TextStyle.name, ListItem.name] }),
-	TextStyle.configure({ types: [ListItem.name] } as Partial<TextStyleOptions>),
+	Color.configure({ types: [TextStyle.name, ListItemExtension.name] }),
+	TextStyle.configure({
+		types: [ListItemExtension.name],
+	} as Partial<TextStyleOptions>),
 	StarterKit.configure({
 		bulletList: {
 			keepMarks: true,
@@ -91,6 +94,8 @@ export const extensions = [
 		// Replaced below so the top-level content expression can require
 		// frontmatter, if present, to be the document's first node.
 		document: false,
+		// Replaced below by its own file in `list/` - see why.
+		listItem: false,
 	}),
 	// `frontmatter?` goes first in the content expression so at most one can
 	// exist and it can only ever be the document's first child - the schema
@@ -100,6 +105,7 @@ export const extensions = [
 	Frontmatter,
 	CodeBlockExtension,
 	HeadingExtension,
+	ListItemExtension,
 	// Linkifying is markdown-it's job (see `linkify` below), which `StrictLinkify`
 	// keeps to URLs with an explicit scheme. TipTap's own autolink plugin has no
 	// such restriction and runs on every transaction, so with it on a heading
@@ -208,6 +214,7 @@ export const extensions = [
 			createFenceRevealProvider(['codeBlock'], parseFence),
 			createFenceRevealProvider(['frontmatter'], parseFrontmatterFence),
 			createFenceRevealProvider(['heading'], parseHeadingReveal),
+			createListMarkerRevealProvider(['listItem', 'taskItem']),
 			createDelimitedMarkRevealProvider('link', linkDelimiterSpec()),
 			createDelimitedMarkRevealProvider('bold', fixedDelimiter('**')),
 			createDelimitedMarkRevealProvider('strike', fixedDelimiter('~~')),

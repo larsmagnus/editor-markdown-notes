@@ -144,8 +144,9 @@ describe('Editor Mode Live', () => {
 
 		const checkbox = await screen.findByRole('checkbox')
 		expect(checkbox).not.toBeChecked()
-		expect(screen.getByText('Ship footnotes')).toBeInTheDocument()
-		expect(screen.queryByText(/\[ \]/)).not.toBeInTheDocument()
+		// The `- [ ] ` marker is real, marked text now (see `list-marker.ts`),
+		// not markup synthesized only at save time.
+		expect(screen.getByText('- [ ] Ship footnotes')).toBeInTheDocument()
 	})
 
 	// Regression: the stock `CodeBlock` extension's own backtick input rule

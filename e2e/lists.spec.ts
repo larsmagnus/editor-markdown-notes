@@ -52,8 +52,13 @@ test.describe('Lists in the live editor', () => {
 		await page.keyboard.press('Enter')
 		await page.keyboard.type('Second item')
 
+		// The `- ` marker is real, marked text now (see `list-marker.ts`), not
+		// markup synthesized only at save time.
 		const list = content.locator('ul').filter({ hasText: 'First item' })
-		await expect(list.locator('li')).toHaveText(['First item', 'Second item'])
+		await expect(list.locator('li')).toHaveText([
+			'- First item',
+			'- Second item',
+		])
 	})
 
 	test('pressing Enter in a nested list item adds a nested sibling', async ({
@@ -74,8 +79,8 @@ test.describe('Lists in the live editor', () => {
 			.locator('li', { hasText: 'First item' })
 			.locator('ul')
 		await expect(nestedList.locator('li')).toHaveText([
-			'Nested item',
-			'Nested sibling',
+			'- Nested item',
+			'- Nested sibling',
 		])
 	})
 
@@ -95,7 +100,7 @@ test.describe('Lists in the live editor', () => {
 		const nestedList = content
 			.locator('li', { hasText: 'First item' })
 			.locator('ul')
-		await expect(nestedList.locator('li')).toHaveText(['Second item'])
+		await expect(nestedList.locator('li')).toHaveText(['- Second item'])
 	})
 
 	test('Shift-Tab right after the bullet un-nests the list item', async ({
@@ -113,8 +118,8 @@ test.describe('Lists in the live editor', () => {
 
 		const topLevelList = content.locator('ul').filter({ hasText: 'First item' })
 		await expect(topLevelList.locator('> li')).toHaveText([
-			'First item',
-			'Second item',
+			'- First item',
+			'- Second item',
 		])
 	})
 
@@ -166,6 +171,6 @@ test.describe('Lists in the live editor', () => {
 		const nestedList = content
 			.locator('li', { hasText: 'First item' })
 			.locator('ul')
-		await expect(nestedList.locator('li')).toHaveText(['Nested item'])
+		await expect(nestedList.locator('li')).toHaveText(['- Nested item'])
 	})
 })
