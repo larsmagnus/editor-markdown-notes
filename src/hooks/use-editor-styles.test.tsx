@@ -140,6 +140,31 @@ describe('toggleStyle', () => {
 		expect(editor.getHTML()).toContain('<p>Some notes</p>')
 	})
 
+	// Regression: only the selection's starting block had its `#`x`level`
+	// marker stripped, leaving every heading after the first still reading
+	// as literal marker text inside a `<p>`.
+	it('turns every heading a multi-block selection spans back into a paragraph', () => {
+		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
+		editor.commands.setContent('# One\n\n## Two')
+		editor.commands.setTextSelection({
+			from: 0,
+			to: editor.state.doc.content.size,
+		})
+		const { result } = renderHook(() => useEditorStyles(), {
+			wrapper: ({ children }) => (
+				<EditorContext.Provider value={{ editor }}>
+					{children}
+				</EditorContext.Provider>
+			),
+		})
+
+		act(() => result.current.toggleStyle('paragraph'))
+
+		expect(editor.getHTML()).toContain('<p>One</p>')
+		expect(editor.getHTML()).toContain('<p>Two</p>')
+	})
+
 	it('toggles an ordered list', () => {
 		const editor = new Editor({ extensions, content: 'Some notes' })
 		currentEditor = editor

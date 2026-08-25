@@ -41,11 +41,19 @@ test.describe('Links in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 		const link = content.locator('a')
 
-		// Clicking the link reveals `](https://old.example.com)`. Walk the
-		// caret back from the line's end to just after `old` (`.example.com)
-		// first.` is 20 characters) and select it (3 characters, backward) to
-		// replace just that token.
+		// Clicking the link reveals `](https://old.example.com)`. Wait for both
+		// the editor's own focus and the reveal to actually land before
+		// navigating by keyboard, or a click that hasn't settled yet races the
+		// keys that follow - which land in the browser's default caret position
+		// instead (see `keyboard-navigation.spec.ts`'s own comment on the same
+		// race with Escape/Tab).
 		await link.click()
+		await expect(content).toBeFocused()
+		await expect(link.locator('.syntax-hidden')).toHaveCount(0)
+
+		// Walk the caret back from the line's end to just after `old`
+		// (`.example.com) first.` is 20 characters) and select it (3
+		// characters, backward) to replace just that token.
 		await page.keyboard.press('End')
 		for (let i = 0; i < 20; i += 1) await page.keyboard.press('ArrowLeft')
 		await page.keyboard.down('Shift')

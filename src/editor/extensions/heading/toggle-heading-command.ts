@@ -1,6 +1,7 @@
 import type { Node as ProseMirrorNode, NodeType } from '@tiptap/pm/model'
 import type { Command, EditorState, Transaction } from '@tiptap/pm/state'
 
+import { canSetBlockType } from '@/editor/extensions/can-set-block-type'
 import {
 	headingMarkerLength,
 	headingMarkerText,
@@ -25,6 +26,24 @@ function blocksInSelection(
 		blocks.push({ pos, node })
 	})
 	return blocks
+}
+
+/**
+ * Whether every block can actually become `headingType` in place - a list
+ * item's own content spec requires its first child to be a `paragraph`, so
+ * toggling a heading on with the caret inside one would otherwise reach
+ * `setNodeMarkup` and throw. Already-heading blocks trivially qualify (no
+ * type change needed there).
+ */
+function everyBlockCanBecomeHeading(
+	state: EditorState,
+	blocks: HeadingBlock[],
+	headingType: NodeType
+): boolean {
+	return blocks.every(({ pos, node }) => {
+		if (node.type === headingType) return true
+		return canSetBlockType(state.doc.resolve(pos + 1), headingType)
+	})
 }
 
 /** Sets one block's type to `headingType`, inserting or replacing its marker. */
@@ -65,6 +84,7 @@ export function createSetHeadingCommand(
 	return (state, dispatch) => {
 		const blocks = blocksInSelection(state, headingType, paragraphType)
 		if (blocks.length === 0) return false
+		if (!everyBlockCanBecomeHeading(state, blocks, headingType)) return false
 		if (!dispatch) return true
 
 		const tr = state.tr
@@ -98,6 +118,13 @@ export function createToggleHeadingCommand(
 				node.type === headingType &&
 				parseHeadingLevel(node.textContent) === level
 		)
+
+		if (
+			!allAtLevel &&
+			!everyBlockCanBecomeHeading(state, blocks, headingType)
+		) {
+			return false
+		}
 
 		if (!dispatch) return true
 
