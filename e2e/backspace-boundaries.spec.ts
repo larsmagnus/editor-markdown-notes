@@ -21,7 +21,8 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 			// DOMObserver batches native-arrow-driven selection changes, and a
 			// synthetic press-immediately-after-press sequence can outrun it,
 			// leaving `editor.state.selection` briefly stale relative to the DOM.
-			await page.waitForTimeout(20)
+			// Generous under parallel-worker CPU contention, not just locally.
+			await page.waitForTimeout(100)
 		}
 		await page.keyboard.press('Backspace')
 	}

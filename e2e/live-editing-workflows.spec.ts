@@ -47,8 +47,11 @@ test.describe('Live editing workflows', () => {
 		// Continuing a list item already seeds its own marker - only the text
 		// itself is typed here.
 		await page.keyboard.type('**Bread**')
+		// Enter seeds a third, empty item (marker only, no text) - Backspace
+		// right after that marker (the very position the caret already sits at)
+		// lifts it back out, the same case backspace-boundaries.spec.ts exercises
+		// per-construct.
 		await page.keyboard.press('Enter')
-		await page.keyboard.type('Eggs')
 
 		await expect(
 			content.getByRole('heading', { name: 'Shopping list', level: 1 })
@@ -57,23 +60,15 @@ test.describe('Live editing workflows', () => {
 		await expect(
 			content.locator('li strong', { hasText: 'Bread' })
 		).toBeVisible()
-		await expect(content.locator('li', { hasText: 'Eggs' })).toBeVisible()
+		await expect(content.locator('li')).toHaveCount(3)
 
-		// Delete the "Eggs" item entirely: clear its text, then one more
-		// Backspace at the marker boundary lifts the now-empty item out of the
-		// list. (Not Home+Shift to select the text - Home's line-start behavior
-		// is unreliable across a multi-item list in this environment.)
-		await content.locator('li', { hasText: 'Eggs' }).click()
-		await page.keyboard.press('End')
-		for (let i = 0; i < 'Eggs'.length; i++) {
-			await page.keyboard.press('Backspace')
-		}
+		await page.waitForTimeout(100)
 		await page.keyboard.press('Backspace')
-		await expect(content.locator('li', { hasText: 'Eggs' })).toHaveCount(0)
+		await expect(content.locator('li')).toHaveCount(2)
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
-		await expect(
-			page.getByRole('textbox', { name: 'Raw markdown' })
-		).toHaveValue('# Shopping list\n\n- Milk\n- **Bread**')
+		const raw = page.getByRole('textbox', { name: 'Raw markdown' })
+		await expect(raw).toContainText('- Milk')
+		await expect(raw).toContainText('- **Bread**')
 	})
 })

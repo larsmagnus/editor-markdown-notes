@@ -137,7 +137,7 @@ describe('Editor Mode Live', () => {
 	// `- ` makes a plain bullet before `[ ] ` is typed, which used to leave
 	// `[ ] ` as literal text - see `task-item-extension.ts` for why.
 	it('converts a typed "- [ ] " into a task item, not literal text', async () => {
-		render(<EditorModeLive content="" />)
+		const { container } = render(<EditorModeLive content="" />)
 
 		await userEvent.click(screen.getByRole('textbox'))
 		await userEvent.keyboard('- {[} {]} Ship footnotes')
@@ -145,8 +145,13 @@ describe('Editor Mode Live', () => {
 		const checkbox = await screen.findByRole('checkbox')
 		expect(checkbox).not.toBeChecked()
 		// The `- [ ] ` marker is real, marked text now (see `list-marker.ts`),
-		// not markup synthesized only at save time.
-		expect(screen.getByText('- [ ] Ship footnotes')).toBeInTheDocument()
+		// not markup synthesized only at save time - `textContent` (unlike
+		// `getByText`) still finds it while it's CSS-hidden, which it is here
+		// since the caret sits at the end of "Ship footnotes", not on the
+		// marker itself (`list-marker-reveal-provider.ts`).
+		expect(container.querySelector('li')?.textContent).toBe(
+			'- [ ] Ship footnotes'
+		)
 	})
 
 	// Regression: the stock `CodeBlock` extension's own backtick input rule

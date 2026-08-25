@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 import { openInVSCode } from '@/e2e/lib/helpers'
 
 test.describe('List markers in the live editor', () => {
-	test('the bullet is hidden while the caret is elsewhere, and reveals when it enters the item', async ({
+	test('the bullet is hidden while the caret is elsewhere, and reveals when it reaches the marker itself', async ({
 		page,
 	}) => {
 		await openInVSCode(page, '- First item\n- Second item')
@@ -15,7 +15,13 @@ test.describe('List markers in the live editor', () => {
 		await other.click()
 		await expect(marker).toHaveCount(1)
 
+		// Clicking the item's own text (not its marker) must not reveal it -
+		// only the marker's own range does.
 		await item.click()
+		await expect(marker).toHaveCount(1)
+
+		// The marker's own left edge, where "- " renders as zero-width.
+		await item.click({ position: { x: 2, y: 2 } })
 		await expect(marker).toHaveCount(0)
 
 		await other.click()
