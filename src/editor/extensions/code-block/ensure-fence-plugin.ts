@@ -17,6 +17,13 @@ import { fenceText } from '@/editor/extensions/code-block/code-fence'
  * both an already-fenced block and one an author is still typing their own
  * fence into character by character - re-wrapping mid-typing would fight
  * that edit instead of leaving it alone.
+ *
+ * Fixed in *reverse* document order when more than one block needs it in the
+ * same transaction: `pos` for every block is read once, up front, from
+ * `newState.doc` - replacing an earlier block first would change the fenced
+ * text's length and invalidate every later block's `pos` before it's used.
+ * Replacing later blocks first never has that problem, since nothing after
+ * a replacement's own range shifts what comes before it.
  */
 export function createEnsureFencePlugin(type: NodeType): Plugin {
 	return new Plugin({
@@ -26,20 +33,27 @@ export function createEnsureFencePlugin(type: NodeType): Plugin {
 				return null
 			}
 
-			let tr: Transaction | undefined
+			const unfenced: {
+				pos: number
+				node: { nodeSize: number; text: string }
+			}[] = []
 			newState.doc.descendants((node, pos) => {
 				if (node.type !== type) return
 				const text = node.textContent
 				if (text.startsWith('`')) return
+				unfenced.push({ pos, node: { nodeSize: node.nodeSize, text } })
+			})
 
+			let tr: Transaction | undefined
+			for (const { pos, node } of unfenced.reverse()) {
 				const target = tr ?? newState.tr
 				target.replaceWith(
 					pos + 1,
 					pos + node.nodeSize - 1,
-					newState.schema.text(fenceText(text, ''))
+					newState.schema.text(fenceText(node.text, ''))
 				)
 				tr = target
-			})
+			}
 			return tr
 		},
 	})

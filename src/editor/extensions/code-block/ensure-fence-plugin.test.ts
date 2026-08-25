@@ -57,4 +57,23 @@ describe('createEnsureFencePlugin', () => {
 
 		expect(editor.state.doc.firstChild?.textContent).toBe('``')
 	})
+
+	// Regression: fixing blocks in document order used to read every block's
+	// `pos` once, up front, then replace earlier blocks first - which changes
+	// their length and invalidates every later block's `pos` before it's used,
+	// corrupting the second (and any later) block.
+	it('fixes multiple unfenced blocks in one transaction without corrupting later ones', () => {
+		const editor = new Editor({ extensions, content: '' })
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{ type: 'codeBlock', content: [{ type: 'text', text: 'first' }] },
+				{ type: 'paragraph' },
+				{ type: 'codeBlock', content: [{ type: 'text', text: 'second' }] },
+			],
+		})
+
+		expect(editor.state.doc.child(0).textContent).toBe('```\nfirst\n```')
+		expect(editor.state.doc.child(2).textContent).toBe('```\nsecond\n```')
+	})
 })
