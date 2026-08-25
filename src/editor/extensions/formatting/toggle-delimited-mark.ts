@@ -29,7 +29,8 @@ import { wrapSelectionWithDelimiter } from '@/editor/extensions/formatting/wrap-
  */
 export function toggleDelimitedMark(
 	markType: MarkType,
-	delimiter: string
+	delimiter: string,
+	attrs?: Record<string, unknown>
 ): Command {
 	return (state, dispatch) => {
 		const { selection } = state
@@ -53,6 +54,10 @@ export function toggleDelimitedMark(
 
 		if (state.doc.rangeHasMark(from, to, markType)) return false // mixed selection
 
-		return wrapSelectionWithDelimiter(markType, delimiter)(state, dispatch)
+		return wrapSelectionWithDelimiter(
+			markType,
+			delimiter,
+			attrs
+		)(state, dispatch)
 	}
 }

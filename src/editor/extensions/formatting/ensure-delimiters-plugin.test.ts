@@ -2,6 +2,7 @@ import { Editor, Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
+import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 import { createEnsureDelimitersPlugin } from '@/editor/extensions/formatting/ensure-delimiters-plugin'
 
 describe('createEnsureDelimitersPlugin', () => {
@@ -13,7 +14,10 @@ describe('createEnsureDelimitersPlugin', () => {
 					name: 'ensureBoldDelimiters',
 					addProseMirrorPlugins() {
 						return [
-							createEnsureDelimitersPlugin(this.editor.schema.marks.bold, '**'),
+							createEnsureDelimitersPlugin(
+								this.editor.schema.marks.bold,
+								fixedDelimiter('**')
+							),
 						]
 					},
 				}),
@@ -36,7 +40,10 @@ describe('createEnsureDelimitersPlugin', () => {
 					name: 'ensureBoldDelimiters',
 					addProseMirrorPlugins() {
 						return [
-							createEnsureDelimitersPlugin(this.editor.schema.marks.bold, '**'),
+							createEnsureDelimitersPlugin(
+								this.editor.schema.marks.bold,
+								fixedDelimiter('**')
+							),
 						]
 					},
 				}),
@@ -59,7 +66,10 @@ describe('createEnsureDelimitersPlugin', () => {
 					name: 'ensureBoldDelimiters',
 					addProseMirrorPlugins() {
 						return [
-							createEnsureDelimitersPlugin(this.editor.schema.marks.bold, '**'),
+							createEnsureDelimitersPlugin(
+								this.editor.schema.marks.bold,
+								fixedDelimiter('**')
+							),
 						]
 					},
 				}),
@@ -84,7 +94,10 @@ describe('createEnsureDelimitersPlugin', () => {
 					name: 'ensureBoldDelimiters',
 					addProseMirrorPlugins() {
 						return [
-							createEnsureDelimitersPlugin(this.editor.schema.marks.bold, '**'),
+							createEnsureDelimitersPlugin(
+								this.editor.schema.marks.bold,
+								fixedDelimiter('**')
+							),
 						]
 					},
 				}),
@@ -112,7 +125,10 @@ describe('createEnsureDelimitersPlugin', () => {
 					name: 'ensureBoldDelimiters',
 					addProseMirrorPlugins() {
 						return [
-							createEnsureDelimitersPlugin(this.editor.schema.marks.bold, '**'),
+							createEnsureDelimitersPlugin(
+								this.editor.schema.marks.bold,
+								fixedDelimiter('**')
+							),
 						]
 					},
 				}),
@@ -128,5 +144,38 @@ describe('createEnsureDelimitersPlugin', () => {
 		// marked bold end to end.
 		expect(editor.state.doc.rangeHasMark(7, size, bold)).toBe(true)
 		expect(editor.state.doc.rangeHasMark(1, 7, bold)).toBe(false)
+	})
+
+	// Regression: without `outerMarkNames`, a text node carrying two delimited
+	// marks at once made each plugin's inserted delimiter drop the other mark,
+	// so neither plugin ever saw a fully-delimited run - each kept re-wrapping
+	// the other's fresh delimiter one layer deeper, forever.
+	it('converges instead of endlessly re-wrapping a run carrying two delimited marks', () => {
+		const editor = new Editor({
+			extensions: [
+				StarterKit,
+				Extension.create({
+					name: 'ensureNestedDelimiters',
+					addProseMirrorPlugins() {
+						const { bold, italic } = this.editor.schema.marks
+						return [
+							createEnsureDelimitersPlugin(bold, fixedDelimiter('**')),
+							createEnsureDelimitersPlugin(italic, fixedDelimiter('_'), [
+								'bold',
+							]),
+						]
+					},
+				}),
+			],
+			content: '',
+		})
+
+		editor.commands.setContent(
+			'<p><strong><em>bold and italic</em></strong></p>'
+		)
+
+		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
+			'**_bold and italic_**'
+		)
 	})
 })

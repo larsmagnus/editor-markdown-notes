@@ -46,7 +46,9 @@ describe('toggleStyle', () => {
 
 		act(() => result.current.toggleStyle('italic'))
 
-		expect(editor.getHTML()).toContain('<em>notes</em>')
+		// The `_` delimiters are real, marked text now (see `formatting/`),
+		// not markup synthesized only at save time.
+		expect(editor.getHTML()).toContain('<em>_notes_</em>')
 	})
 
 	it('toggles strike', () => {

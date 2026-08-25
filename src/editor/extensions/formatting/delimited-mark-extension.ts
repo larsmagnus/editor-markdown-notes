@@ -1,6 +1,8 @@
 import type { Mark } from '@tiptap/core'
 
 import { createDelimiterInputRule } from '@/editor/extensions/formatting/delimiter-input-rule'
+import { IDENTITY_DELIMITER_SERIALIZE } from '@/editor/extensions/formatting/delimiter-spec'
+import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
 import { createEnsureDelimitersPlugin } from '@/editor/extensions/formatting/ensure-delimiters-plugin'
 import {
 	removeClosingDelimiterOnDelete,
@@ -25,21 +27,29 @@ import { PARSED_BY_MARKDOWN_IT } from '@/editor/extensions/markdown/mark-seriali
  */
 export function createDelimitedMarkExtension(
 	base: Mark,
-	{ delimiter, inputRegex }: { delimiter: string; inputRegex: RegExp }
+	{
+		delimiterLength,
+		ensureSpec,
+		inputRegex,
+		outerMarkNames,
+	}: {
+		delimiterLength: number
+		ensureSpec: DelimiterSpec
+		/**
+		 * Omit when the caller provides its own `addInputRules` in a further
+		 * `.extend()` - italic needs one rule per markup variant (`*`/`_`) with
+		 * its own attributes, which a single regex can't express.
+		 */
+		inputRegex?: RegExp
+		/** See `uniform-outer-marks.ts` - names of delimited marks that outrank this one. */
+		outerMarkNames?: string[]
+	}
 ): Mark {
 	return base.extend({
 		addStorage() {
 			return {
 				markdown: {
-					// The delimiters are already real text carrying this mark (see
-					// `wrap-selection-with-delimiter.ts`) - nothing left to
-					// synthesize here, or they'd double up. `escape: false` is load-
-					// bearing, not cosmetic: `prosemirror-markdown`'s default escaping
-					// has no way to tell a coincidental double-asterisk in plain prose
-					// apart from a real delimiter, and would otherwise write this
-					// mark's own `**`/`~~` back out as `\*\*`/`\~\~` - syntax that
-					// silently stops being a mark on the next load.
-					serialize: { open: '', close: '', mixable: true, escape: false },
+					serialize: IDENTITY_DELIMITER_SERIALIZE,
 					parse: PARSED_BY_MARKDOWN_IT,
 				},
 			}
@@ -49,12 +59,12 @@ export function createDelimitedMarkExtension(
 			return {
 				...this.parent?.(),
 				Backspace: () =>
-					removeOpeningDelimiterOnBackspace(this.type, delimiter.length)(
+					removeOpeningDelimiterOnBackspace(this.type, delimiterLength)(
 						this.editor.state,
 						this.editor.view.dispatch
 					),
 				Delete: () =>
-					removeClosingDelimiterOnDelete(this.type, delimiter.length)(
+					removeClosingDelimiterOnDelete(this.type, delimiterLength)(
 						this.editor.state,
 						this.editor.view.dispatch
 					),
@@ -62,13 +72,13 @@ export function createDelimitedMarkExtension(
 		},
 
 		addInputRules() {
-			return [createDelimiterInputRule(this.type, inputRegex)]
+			return inputRegex ? [createDelimiterInputRule(this.type, inputRegex)] : []
 		},
 
 		addProseMirrorPlugins() {
 			return [
 				...(this.parent?.() ?? []),
-				createEnsureDelimitersPlugin(this.type, delimiter),
+				createEnsureDelimitersPlugin(this.type, ensureSpec, outerMarkNames),
 			]
 		},
 	})

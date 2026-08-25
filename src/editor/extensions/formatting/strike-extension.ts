@@ -2,6 +2,7 @@ import Strike, { inputRegex } from '@tiptap/extension-strike'
 
 import { createToggleMarkCommand } from '@/editor/extensions/formatting/create-toggle-mark-command'
 import { createDelimitedMarkExtension } from '@/editor/extensions/formatting/delimited-mark-extension'
+import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 
 const DELIMITER = '~~'
 
@@ -10,8 +11,11 @@ const DELIMITER = '~~'
  * `delimited-mark-extension.ts` for everything shared with `bold`.
  */
 export const StrikeExtension = createDelimitedMarkExtension(Strike, {
-	delimiter: DELIMITER,
+	delimiterLength: DELIMITER.length,
+	ensureSpec: fixedDelimiter(DELIMITER),
 	inputRegex,
+	// Nests inside bold - see `uniform-outer-marks.ts`.
+	outerMarkNames: ['bold'],
 }).extend({
 	addCommands() {
 		return {

@@ -199,6 +199,7 @@ export const extensions = [
 			createFenceRevealProvider(['frontmatter'], parseFrontmatterFence),
 			createDelimitedMarkRevealProvider('bold', 2),
 			createDelimitedMarkRevealProvider('strike', 2),
+			createDelimitedMarkRevealProvider('italic', 1),
 		],
 	}),
 	// Otherwise unhandled, Tab is a browser default: it moves focus to the next

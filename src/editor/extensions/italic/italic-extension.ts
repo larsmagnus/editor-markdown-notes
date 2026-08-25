@@ -1,11 +1,16 @@
 import type { Storage } from '@tiptap/core'
-import ItalicMark from '@tiptap/extension-italic'
+import ItalicMark, {
+	starInputRegex,
+	underscoreInputRegex,
+} from '@tiptap/extension-italic'
 
+import { createDelimitedMarkExtension } from '@/editor/extensions/formatting/delimited-mark-extension'
+import { createDelimiterInputRule } from '@/editor/extensions/formatting/delimiter-input-rule'
+import { createToggleItalicCommand } from '@/editor/extensions/italic/create-toggle-italic-command'
+import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
 import { italicMarkdownSpec } from '@/editor/extensions/italic/italic-markdown-spec'
-import {
-	italicInputRules,
-	italicPasteRules,
-} from '@/editor/extensions/italic/italic-rules'
+import { italicMarkupAttribute } from '@/editor/extensions/italic/italic-markup-attribute'
+import { italicPasteRules } from '@/editor/extensions/italic/italic-rules'
 import { DEFAULT_SETTINGS } from '@/shared/messages'
 
 // `addAttributes()`'s `parseHTML` closes over a `storage` snapshot Tiptap
@@ -27,29 +32,29 @@ import { DEFAULT_SETTINGS } from '@/shared/messages'
 let liveStorage: Storage['italic'] | null = null
 
 /**
- * Preserves whichever italic marker (`_` or `*`) a file was written with,
- * instead of the default serializer's hardcoded `*`. `markup` is read from
- * `data-markup` (see `italicMarkdownSpec`). Fresh italics (toolbar, bubble
- * menu, Cmd/Ctrl+I) have no source marker, so they use
- * `storage.preferredMarkup` instead, kept live by `editor.tsx` from
+ * `_italic_`/`*italic*` with real, caret-revealed delimiter text - built on
+ * `delimited-mark-extension.ts`, but keeping its own open/close resolution
+ * (`italic-delimiter-spec.ts`, `italic-wrap-markup.ts`) instead of a fixed
+ * delimiter, since which character is CommonMark-valid depends on context
+ * (`italicMarkup`'s intraword rule) and on `storage.preferredMarkup`, not on
+ * a constant the way bold's `**`/strike's `~~` are.
+ *
+ * `markup` is read from `data-markup` (see `italicMarkdownSpec`). Fresh
+ * italics (toolbar, bubble menu, Cmd/Ctrl+I) have no source marker, so they
+ * use `storage.preferredMarkup` instead, kept live by `editor.tsx` from
  * `editorMarkdownNotes.italicMarker`.
  */
-export const ItalicExtension = ItalicMark.extend({
+export const ItalicExtension = createDelimitedMarkExtension(ItalicMark, {
+	delimiterLength: 1,
+	ensureSpec: italicDelimiterSpec(),
+	// Nests inside bold and strike - see `uniform-outer-marks.ts`.
+	outerMarkNames: ['bold', 'strike'],
+}).extend({
 	onBeforeCreate() {
 		liveStorage = this.editor.storage.italic
 	},
 	addAttributes() {
-		return {
-			markup: {
-				default: DEFAULT_SETTINGS.italicMarker,
-				parseHTML: (element: HTMLElement) =>
-					element.getAttribute('data-markup') ||
-					liveStorage?.preferredMarkup ||
-					DEFAULT_SETTINGS.italicMarker,
-				renderHTML: () => ({}),
-				rendered: false,
-			},
-		}
+		return { markup: italicMarkupAttribute(() => liveStorage) }
 	},
 	addStorage() {
 		return {
@@ -65,14 +70,12 @@ export const ItalicExtension = ItalicMark.extend({
 					commands.setMark(this.name, {
 						markup: this.storage.preferredMarkup,
 					}),
-			toggleItalic:
-				() =>
-				({ commands, editor }) => {
-					if (editor.isActive(this.name)) return commands.unsetMark(this.name)
-					return commands.setMark(this.name, {
-						markup: this.storage.preferredMarkup,
-					})
-				},
+			toggleItalic: () =>
+				createToggleItalicCommand(
+					this.type,
+					this.name,
+					() => this.storage.preferredMarkup
+				),
 			unsetItalic:
 				() =>
 				({ commands }) =>
@@ -80,7 +83,14 @@ export const ItalicExtension = ItalicMark.extend({
 		}
 	},
 	addInputRules() {
-		return italicInputRules(this.type)
+		return [
+			createDelimiterInputRule(this.type, starInputRegex, () => ({
+				markup: '*',
+			})),
+			createDelimiterInputRule(this.type, underscoreInputRegex, () => ({
+				markup: '_',
+			})),
+		]
 	},
 	addPasteRules() {
 		return italicPasteRules(this.type)

@@ -32,7 +32,8 @@ import type { MarkType } from '@tiptap/pm/model'
  */
 export function createDelimiterInputRule(
 	markType: MarkType,
-	find: RegExp
+	find: RegExp,
+	getAttributes?: () => Record<string, unknown>
 ): InputRule {
 	return new InputRule({
 		find,
@@ -56,9 +57,11 @@ export function createDelimiterInputRule(
 			// reads as "another run missing its delimiters" and wraps on the
 			// spot - `**b**o**l**d**` from a single sentence typed straight
 			// through. Stock's own `markInputRule` calls this for the same reason.
-			tr.addMark(outerStart, outerEnd, markType.create()).removeStoredMark(
-				markType
-			)
+			tr.addMark(
+				outerStart,
+				outerEnd,
+				markType.create(getAttributes?.())
+			).removeStoredMark(markType)
 		},
 	})
 }

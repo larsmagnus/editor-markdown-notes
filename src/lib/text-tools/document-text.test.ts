@@ -233,6 +233,30 @@ describe('getDocumentText', () => {
 		)
 	})
 
+	it('strips italic delimiters but keeps the marked text as prose', () => {
+		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{
+					type: 'paragraph',
+					content: [
+						{ type: 'text', text: 'This is ' },
+						{
+							type: 'text',
+							marks: [{ type: 'italic', attrs: { markup: '_' } }],
+							text: '_truly_',
+						},
+						{ type: 'text', text: ' fine.' },
+					],
+				},
+			],
+		})
+
+		expect(getDocumentText(editor.state.doc).text).toBe('This is truly fine.')
+	})
+
 	it('reads headings and list items as prose too', () => {
 		const editor = new Editor({
 			extensions,

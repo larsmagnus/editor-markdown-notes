@@ -71,7 +71,9 @@ describe('text styles', () => {
 
 		await userEvent.click(screen.getByTitle('italic'))
 
-		expect(editor.getHTML()).toContain('<em>notes</em>')
+		// The `_` delimiters are real, marked text now (see `formatting/`),
+		// not markup synthesized only at save time.
+		expect(editor.getHTML()).toContain('<em>_notes_</em>')
 	})
 
 	it('strikes through the selection', async () => {

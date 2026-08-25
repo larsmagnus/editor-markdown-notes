@@ -2,7 +2,9 @@ import type { MarkType } from '@tiptap/pm/model'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 import type { Transaction } from '@tiptap/pm/state'
 
+import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
+import { uniformOuterMarks } from '@/editor/extensions/formatting/uniform-outer-marks'
 
 /**
  * Extends any run of `markType` missing its delimiter text at either end -
@@ -14,12 +16,15 @@ import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
  * marked text - see `delimited-mark-extension.ts`) would write it out with
  * no markup at all.
  *
- * The inserted delimiter text carries the mark explicitly
- * (`schema.text(delimiter, [run.mark])`), the same as
+ * The inserted delimiter text carries the mark explicitly, the same as
  * `wrap-selection-with-delimiter.ts` - not left to whatever mark `tr.insert`
  * would otherwise infer from the insertion point, which is exactly the
  * ambiguity a plain `tr.insertText` used to resolve inconsistently at the
- * two ends of a run.
+ * two ends of a run. `outerMarkNames` (see `uniform-outer-marks.ts`) is what
+ * it also carries when this run nests inside another delimited mark - drop
+ * that and two nested delimited marks (`**_text_**`) oscillate forever, each
+ * one seeing the other's fresh delimiter as *not* carrying it and wrapping
+ * it again one layer deeper.
  *
  * Runs are fixed in *reverse* document order: inserting text at a later
  * run's boundary never shifts an earlier run's positions, so each run's
@@ -30,7 +35,8 @@ import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
  */
 export function createEnsureDelimitersPlugin(
 	markType: MarkType,
-	delimiter: string
+	spec: DelimiterSpec,
+	outerMarkNames: string[] = []
 ): Plugin {
 	return new Plugin({
 		key: new PluginKey(`ensureDelimiters$${markType.name}`),
@@ -44,14 +50,27 @@ export function createEnsureDelimitersPlugin(
 
 			for (const run of [...runs].reverse()) {
 				const runText = newState.doc.textBetween(run.from, run.to)
-				const hasOpening = runText.startsWith(delimiter)
-				const hasClosing = runText.endsWith(delimiter)
+				const hasOpening = spec.matches(runText.slice(0, spec.length))
+				const hasClosing = spec.matches(runText.slice(-spec.length))
 				if (hasOpening && hasClosing) continue
 
+				const marks = [
+					run.mark,
+					...uniformOuterMarks(newState.doc, run, outerMarkNames),
+				]
 				const target = tr ?? newState.tr
-				const delimiterText = newState.schema.text(delimiter, [run.mark])
-				if (!hasClosing) target.insert(run.to, delimiterText)
-				if (!hasOpening) target.insert(run.from, delimiterText)
+				if (!hasClosing) {
+					target.insert(
+						run.to,
+						newState.schema.text(spec.resolveClose(newState.doc, run), marks)
+					)
+				}
+				if (!hasOpening) {
+					target.insert(
+						run.from,
+						newState.schema.text(spec.resolveOpen(newState.doc, run), marks)
+					)
+				}
 				tr = target
 			}
 

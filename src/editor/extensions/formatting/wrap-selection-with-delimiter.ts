@@ -18,7 +18,8 @@ import type { Command } from '@tiptap/pm/state'
  */
 export function wrapSelectionWithDelimiter(
 	markType: MarkType,
-	delimiter: string
+	delimiter: string,
+	attrs?: Record<string, unknown>
 ): Command {
 	return (state, dispatch) => {
 		const { selection } = state
@@ -28,7 +29,7 @@ export function wrapSelectionWithDelimiter(
 
 		if (dispatch) {
 			const tr = state.tr
-			const mark = markType.create()
+			const mark = markType.create(attrs)
 			// Closing delimiter first: inserting at `from` shifts `to`, but
 			// nothing shifts a position already past it.
 			tr.insert(to, state.schema.text(delimiter, [mark]))

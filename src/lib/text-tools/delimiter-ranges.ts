@@ -1,16 +1,25 @@
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
+import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
+import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
+import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
 
 /**
  * Marks whose delimiters (see `delimited-mark-extension.ts`) are real,
- * literal document text rather than synthesized at save time - `**`/`~~`
- * live inside the run they mark, so the whole run can't simply be skipped
- * the way an `IGNORED_MARKS` entry in `document-text.ts` is: the interior is
- * genuine prose the speller and readability checks still need to see, only
- * the two-character fence at each end is syntax.
+ * literal document text rather than synthesized at save time - `**`/`~~`/
+ * `_`/`*` live inside the run they mark, so the whole run can't simply be
+ * skipped the way an `IGNORED_MARKS` entry in `document-text.ts` is: the
+ * interior is genuine prose the speller and readability checks still need to
+ * see, only the fence at each end is syntax. Reuses each mark's own
+ * `DelimiterSpec` rather than a bare string so this can't drift from what
+ * `ensure-delimiters-plugin.ts` itself considers a valid delimiter.
  */
-const DELIMITED_MARKS: Record<string, string> = { bold: '**', strike: '~~' }
+const DELIMITED_MARKS: Record<string, DelimiterSpec> = {
+	bold: fixedDelimiter('**'),
+	strike: fixedDelimiter('~~'),
+	italic: italicDelimiterSpec(),
+}
 
 /**
  * The document position ranges every delimited mark's opening/closing fence
@@ -22,24 +31,24 @@ const DELIMITED_MARKS: Record<string, string> = { bold: '**', strike: '~~' }
  * content })` parses a mark straight onto its bare interior, and
  * `ensure-delimiters-plugin.ts` only fixes that up on the next real
  * transaction - so each end is only counted as a delimiter when the run's
- * own text actually starts/ends with it, the same check that plugin makes.
+ * own text actually matches one, the same check that plugin makes.
  */
 export function delimiterRanges(doc: ProseMirrorNode): [number, number][] {
 	const ranges: [number, number][] = []
 
-	for (const [markName, delimiter] of Object.entries(DELIMITED_MARKS)) {
+	for (const [markName, spec] of Object.entries(DELIMITED_MARKS)) {
 		const markType = doc.type.schema.marks[markName]
 		if (!markType) continue
 
 		for (const run of findMarkRuns(doc, markType)) {
-			if (run.to - run.from < delimiter.length * 2) continue
+			if (run.to - run.from < spec.length * 2) continue
 
 			const runText = doc.textBetween(run.from, run.to)
-			if (runText.startsWith(delimiter)) {
-				ranges.push([run.from, run.from + delimiter.length])
+			if (spec.matches(runText.slice(0, spec.length))) {
+				ranges.push([run.from, run.from + spec.length])
 			}
-			if (runText.endsWith(delimiter)) {
-				ranges.push([run.to - delimiter.length, run.to])
+			if (spec.matches(runText.slice(-spec.length))) {
+				ranges.push([run.to - spec.length, run.to])
 			}
 		}
 	}

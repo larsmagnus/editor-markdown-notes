@@ -68,6 +68,24 @@ describe('delimiterRanges', () => {
 		expect(delimiterRanges(editor.state.doc)).toEqual([])
 	})
 
+	it('finds the opening and closing markers of an italic run', () => {
+		const doc = buildDoc('italic', '_truly_')
+		const runFrom = 1 + 'before '.length
+		expect(delimiterRanges(doc)).toEqual([
+			[runFrom, runFrom + 1],
+			[runFrom + 7 - 1, runFrom + 7],
+		])
+	})
+
+	it('finds an asterisk-delimited italic run too', () => {
+		const doc = buildDoc('italic', '*truly*')
+		const runFrom = 1 + 'before '.length
+		expect(delimiterRanges(doc)).toEqual([
+			[runFrom, runFrom + 1],
+			[runFrom + 7 - 1, runFrom + 7],
+		])
+	})
+
 	it('ignores a run too short to hold both delimiters', () => {
 		const editor = new Editor({ extensions, content: '' })
 		currentEditor = editor

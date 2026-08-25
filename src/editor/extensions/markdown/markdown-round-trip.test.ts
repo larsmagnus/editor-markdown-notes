@@ -255,6 +255,15 @@ describe('features that already worked keep working', () => {
 		expect(roundTrip('*italic text*')).toBe('*italic text*')
 	})
 
+	// Regression: nesting two delimited marks on the same run used to make
+	// `ensure-delimiters-plugin.ts` oscillate forever - see
+	// `uniform-outer-marks.ts`.
+	it('keeps nested bold and italic in a fixed outer-to-inner order', () => {
+		expect(roundTrip('**_bold and italic_**')).toBe('**_bold and italic_**')
+		expect(roundTrip('**~~bold and struck~~**')).toBe('**~~bold and struck~~**')
+		expect(roundTrip('~~_struck and italic_~~')).toBe('~~_struck and italic_~~')
+	})
+
 	it('keeps one contiguous bold run around inline code', () => {
 		expect(roundTrip('**Add `x` command**')).toBe('**Add `x` command**')
 	})

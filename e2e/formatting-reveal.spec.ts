@@ -37,6 +37,23 @@ test.describe('Formatting delimiters in the live editor', () => {
 		).toHaveValue('Some ~~struck~~ text')
 	})
 
+	test('typing "_italic_" creates real italic text and saves it back out unchanged', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await content.locator('p').click()
+		await page.keyboard.type('Some _italic_ text')
+
+		await expect(content.locator('em')).toBeVisible()
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Some _italic_ text')
+	})
+
 	test('the ** delimiters are hidden while the caret is elsewhere, and reveal when it enters the run', async ({
 		page,
 	}) => {
@@ -56,6 +73,25 @@ test.describe('Formatting delimiters in the live editor', () => {
 		await expect(delimiters).toHaveCount(2)
 
 		await strong.click()
+		await expect(delimiters).toHaveCount(0)
+
+		await before.click({ position: { x: 2, y: 2 } })
+		await expect(delimiters).toHaveCount(2)
+	})
+
+	test('the _ delimiters are hidden while the caret is elsewhere, and reveal when it enters the run', async ({
+		page,
+	}) => {
+		await openInVSCode(page, 'Some _italic_ text')
+		const content = page.getByRole('textbox').first()
+		const em = content.locator('em')
+		const delimiters = em.locator('.syntax-hidden')
+		const before = content.getByText('Some', { exact: false }).first()
+
+		await before.click({ position: { x: 2, y: 2 } })
+		await expect(delimiters).toHaveCount(2)
+
+		await em.click()
 		await expect(delimiters).toHaveCount(0)
 
 		await before.click({ position: { x: 2, y: 2 } })
