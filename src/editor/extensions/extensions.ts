@@ -29,6 +29,7 @@ import { HeadingExtension } from '@/editor/extensions/heading/heading-extension'
 import { parseHeadingReveal } from '@/editor/extensions/heading/heading-reveal'
 import { ImageView } from '@/editor/extensions/image/image-view'
 import {
+	focusImageSourceField,
 	focusImageToolbar,
 	moveToAdjacentImage,
 } from '@/editor/extensions/image/keyboard-nav'
@@ -177,14 +178,25 @@ export const extensions = [
 			// The view goes through too: `moveToAdjacentImage` calls `view.focus()`
 			// to keep the bubble menu's `hasFocus()` check satisfied, and
 			// `focusImageToolbar` reads the rendered toolbar off the real DOM.
-			const run = (command: Command) => () =>
-				command(this.editor.state, this.editor.view.dispatch, this.editor.view)
+			const run =
+				(...commands: Command[]) =>
+				() =>
+					commands.some((command) =>
+						command(
+							this.editor.state,
+							this.editor.view.dispatch,
+							this.editor.view
+						)
+					)
 
 			return {
 				Tab: run(moveToAdjacentImage(1)),
 				'Shift-Tab': run(moveToAdjacentImage(-1)),
 				ArrowRight: run(focusImageToolbar()),
 				ArrowDown: run(focusImageToolbar()),
+				// Declines unless the image is already selected, falling through to
+				// ProseMirror's default node deletion for every other Backspace.
+				Backspace: run(focusImageSourceField()),
 			}
 		},
 	}),

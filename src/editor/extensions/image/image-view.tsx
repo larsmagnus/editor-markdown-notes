@@ -26,7 +26,7 @@ export function ImageView({
 	getPos,
 	updateAttributes,
 }: ImageViewProps) {
-	const isEditing = useImageSelected({ editor, getPos })
+	const selected = useImageSelected({ editor, getPos })
 	const attrs = {
 		src: String(node.attrs.src ?? ''),
 		alt: String(node.attrs.alt ?? ''),
@@ -41,7 +41,7 @@ export function ImageView({
 				title={attrs.title ?? undefined}
 				contentEditable={false}
 			/>
-			{isEditing ? (
+			{selected ? (
 				<ImageSourceField
 					sourceText={imageMarkdownText(attrs)}
 					onCommit={updateAttributes}

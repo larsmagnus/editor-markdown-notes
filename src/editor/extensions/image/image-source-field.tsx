@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { parseImageMarkdown } from '@/editor/extensions/image/image-markdown-text'
 import type { ImageAttrs } from '@/editor/extensions/image/image-markdown-text'
+import { consumeImageSourceFocusRequest } from '@/editor/extensions/image/image-source-focus-request'
 import { IMAGE_SOURCE_FIELD_ID } from '@/editor/extensions/image/keyboard-nav'
 
 type ImageSourceFieldProps = {
@@ -18,6 +19,16 @@ type ImageSourceFieldProps = {
  * blur or Enter, not per keystroke: `src`/`alt` mid-edit are rarely valid
  * image markdown, and re-parsing every character would flicker the `<img>`
  * between its old and new source.
+ *
+ * Mounting alone doesn't claim focus - a plain click on the image only
+ * selects it, and stealing focus on every selection would blur the editor
+ * immediately, hiding the bubble menu's "Edit source" button before it could
+ * ever be clicked (its default `shouldShow` requires `view.hasFocus()`).
+ * `consumeImageSourceFocusRequest` is the one exception: an ArrowRight/
+ * ArrowLeft keydown about to land the caret on the image
+ * (`use-image-selected.ts`) sets it before the selection change that mounts
+ * this field even reaches React, since *that* entry is explicitly a caret
+ * movement the user should land inside, at the edge they were headed toward.
  */
 export function ImageSourceField({
 	sourceText,
@@ -31,6 +42,19 @@ export function ImageSourceField({
 	useEffect(() => {
 		setDraft(sourceText)
 	}, [sourceText])
+
+	useEffect(() => {
+		const edge = consumeImageSourceFocusRequest()
+		if (!edge) return
+
+		const field = document.getElementById(IMAGE_SOURCE_FIELD_ID)
+		if (!(field instanceof HTMLInputElement)) return
+
+		field.focus()
+		const pos = edge === 'start' ? 0 : field.value.length
+		field.setSelectionRange(pos, pos)
+		field.scrollIntoView({ block: 'nearest' })
+	}, [])
 
 	const commit = () => {
 		const parsed = parseImageMarkdown(draft)

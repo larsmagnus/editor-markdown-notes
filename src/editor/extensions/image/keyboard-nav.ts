@@ -36,6 +36,13 @@ function findAdjacentImagePos(
 	return found
 }
 
+/** A transaction selecting the image at `pos` as a `NodeSelection`, scrolled into view. */
+function selectImageTransaction(state: EditorState, pos: number) {
+	return state.tr
+		.setSelection(NodeSelection.create(state.doc, pos))
+		.scrollIntoView()
+}
+
 function isImageSelected(state: EditorState): boolean {
 	return (
 		state.selection instanceof NodeSelection &&
@@ -66,11 +73,7 @@ export function moveToAdjacentImage(dir: Direction): Command {
 		if (pos === null) return false
 
 		if (dispatch) {
-			dispatch(
-				state.tr
-					.setSelection(NodeSelection.create(state.doc, pos))
-					.scrollIntoView()
-			)
+			dispatch(selectImageTransaction(state, pos))
 			view?.focus()
 		}
 
@@ -101,19 +104,23 @@ export function focusImageToolbar(): Command {
 
 /**
  * Moves DOM focus into the selected image's already-revealed source field
- * (`image-view.tsx`) - selecting an image already satisfies `useCaretInside`,
- * so the field is already rendered by the time this runs; the button just
+ * (`image-view.tsx`) - selecting an image already satisfies `useImageSelected`,
+ * so the field is already rendered by the time this runs; the caller just
  * has to move focus there. Declines unless an image is currently selected,
- * matching `focusImageToolbar`.
+ * matching `focusImageToolbar`. Used both by the bubble menu's "Edit source"
+ * button and by `Backspace` on an already-selected image (`extensions.ts`) -
+ * without this, Backspace falls through to ProseMirror's default "delete the
+ * selected node" instead of editing the field's text.
  */
 export function focusImageSourceField(): Command {
 	return (state) => {
 		if (!isImageSelected(state)) return false
 
 		const field = document.getElementById(IMAGE_SOURCE_FIELD_ID)
-		if (!(field instanceof HTMLElement)) return false
+		if (!(field instanceof HTMLInputElement)) return false
 
 		field.focus()
+		field.scrollIntoView({ block: 'nearest' })
 		return true
 	}
 }

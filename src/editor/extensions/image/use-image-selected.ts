@@ -13,6 +13,11 @@ import { useSelectionTouchesNode } from '@/hooks/selection-touches-node'
  * revealed field disappear the instant the button meant to focus it is
  * clicked. Selection alone is what "moving the caret to the start or end"
  * means for an atom with no content of its own to hold a caret in.
+ *
+ * Arrow-key entry auto-focusing the revealed field, once mounted, is handled
+ * by `image-source-focus-request.ts`'s own module-level keydown listener,
+ * not here - see its doc comment for why that has to sit outside React's
+ * component tree entirely.
  */
 export function useImageSelected({
 	editor,
