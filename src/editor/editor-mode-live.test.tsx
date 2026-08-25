@@ -581,19 +581,29 @@ describe('Editor Mode Live', () => {
 			const { container } = render(<EditorModeLive content={note} />)
 
 			await screen.findByRole('heading', { name: '# Roadmap' })
-			// Clicking the first token rather than the full line: syntax
-			// highlighting may or may not have split the text into spans by the
-			// time this runs, and 'title' alone is a match either way.
-			await userEvent.click(screen.getByText(/^title/))
-			for (let index = 0; index < 20; index += 1) {
+			// Caret entry alone no longer reveals the raw fences (Phase 1.1) -
+			// "Edit source" is required to reach the editable text this test
+			// navigates through.
+			await userEvent.click(screen.getByLabelText('Edit frontmatter source'))
+			// Clicking anywhere in the block's text, then overshooting with
+			// ArrowLeft, reaches its very start regardless of exactly where the
+			// click landed - the raw view is now the whole fence-included text
+			// as one block (Phase 1.1), longer than the single "title" span this
+			// used to click, so the overshoot count is generous rather than
+			// tied to one exact offset.
+			await userEvent.click(screen.getByText(/title/))
+			for (let index = 0; index < 40; index += 1) {
 				await userEvent.keyboard('{ArrowLeft}')
 			}
 			await userEvent.keyboard('{ArrowUp}')
 			await userEvent.keyboard('x')
 
+			// Typing right before the opening fence breaks it too - Phase 1.1
+			// surfaces that with a visible error rather than silently rendering
+			// as if the block were still well-formed.
 			expect(
 				container.querySelector('[data-type="frontmatter"]')?.textContent
-			).toBe('Frontmatterx---\ntitle: Roadmap\n---')
+			).toBe('FrontmatterNeeds a closing --- fencex---\ntitle: Roadmap\n---')
 		})
 
 		it('hides the add-frontmatter button for a note that already has one', async () => {
@@ -642,6 +652,9 @@ describe('Editor Mode Live', () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
 
 			await screen.findByRole('heading', { name: '# Roadmap' })
+			// Caret entry alone no longer reveals the raw fences (Phase 1.1) -
+			// "Edit source" is required to reach the editable text below.
+			await userEvent.click(screen.getByLabelText('Edit frontmatter source'))
 			// Syntax highlighting splits the block's text into several `<span>`s
 			// ('status', ': ', 'draft') - clicking the last one lands the cursor at
 			// its end, the same place a click already lands in the plain-paragraph

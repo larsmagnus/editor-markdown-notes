@@ -25,7 +25,6 @@ import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 import { inlineCodeDelimiterSpec } from '@/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
 import { StrikeExtension } from '@/editor/extensions/formatting/strike-extension'
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
-import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import { HeadingExtension } from '@/editor/extensions/heading/heading-extension'
 import { parseHeadingReveal } from '@/editor/extensions/heading/heading-reveal'
 import { ImageView } from '@/editor/extensions/image/image-view'
@@ -220,7 +219,6 @@ export const extensions = [
 	SyntaxReveal.configure({
 		providers: [
 			createFenceRevealProvider(['codeBlock'], parseFence),
-			createFenceRevealProvider(['frontmatter'], parseFrontmatterFence),
 			createFenceRevealProvider(['heading'], parseHeadingReveal),
 			createListMarkerRevealProvider(['listItem', 'taskItem']),
 			createDelimitedMarkRevealProvider('link', linkDelimiterSpec()),

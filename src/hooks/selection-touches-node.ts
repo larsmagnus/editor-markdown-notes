@@ -2,9 +2,11 @@ import type { NodeViewProps } from '@tiptap/react'
 import { useEffect, useState } from 'react'
 
 /**
- * Does `editor`'s current selection touch the node at `pos`?
+ * Does `editor`'s current selection touch the node at `pos`? A synchronous
+ * one-off read - `useSelectionTouchesNode` below is the subscribed version
+ * for a component that needs to keep tracking it.
  */
-function selectionTouchesNode(
+export function selectionTouchesNode(
 	editor: NodeViewProps['editor'],
 	pos: number
 ): boolean {
