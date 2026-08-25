@@ -54,6 +54,14 @@ export function createDelimitedMarkExtension(
 	}
 ): Mark {
 	return base.extend({
+		// The closing delimiter is real, mark-carrying text (`ensure-delimiters-
+		// plugin.ts` inserts it with the mark applied), so the mark's own range
+		// genuinely ends there. ProseMirror's default `inclusive: true` would
+		// extend it into whatever gets typed right after - exactly wrong once
+		// the caret can legitimately sit past a real closing delimiter rather
+		// than past an invisible mark boundary.
+		inclusive: false,
+
 		addStorage() {
 			return {
 				markdown: {
