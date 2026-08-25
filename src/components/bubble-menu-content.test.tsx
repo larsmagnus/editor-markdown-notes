@@ -502,6 +502,9 @@ describe('image keyboard navigation', () => {
 		screen.getByTitle('Edit image').focus()
 
 		await userEvent.keyboard('{ArrowRight}')
+		expect(screen.getByTitle('Edit source')).toHaveFocus()
+
+		await userEvent.keyboard('{ArrowRight}')
 		expect(screen.getByTitle('Link')).toHaveFocus()
 
 		await userEvent.keyboard('{ArrowRight}')

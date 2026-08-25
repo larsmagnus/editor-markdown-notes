@@ -8,7 +8,7 @@ import TaskList from '@tiptap/extension-task-list'
 import { TextStyle } from '@tiptap/extension-text-style'
 import type { TextStyleOptions } from '@tiptap/extension-text-style'
 import type { Command } from '@tiptap/pm/state'
-import { mergeAttributes } from '@tiptap/react'
+import { mergeAttributes, ReactNodeViewRenderer } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import type { MarkdownStorage } from 'tiptap-markdown'
 import { Markdown } from 'tiptap-markdown'
@@ -28,6 +28,7 @@ import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extensi
 import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import { HeadingExtension } from '@/editor/extensions/heading/heading-extension'
 import { parseHeadingReveal } from '@/editor/extensions/heading/heading-reveal'
+import { ImageView } from '@/editor/extensions/image/image-view'
 import {
 	focusImageToolbar,
 	moveToAdjacentImage,
@@ -159,6 +160,13 @@ export const extensions = [
 					),
 				}),
 			]
+		},
+		// `renderHTML` above still drives `getHTML()`/copy-paste HTML - this only
+		// takes over the live, interactive editor, revealing `![alt](src
+		// "title")` underneath as real editable text whenever the caret sits on
+		// or beside the image (`image-view.tsx`).
+		addNodeView() {
+			return ReactNodeViewRenderer(ImageView)
 		},
 		// `Tab`/`Shift-Tab` jump between images the way they jump between fields
 		// in a form; arrow keys then move into the selected image's bubble menu,

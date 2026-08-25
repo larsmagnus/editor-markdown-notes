@@ -9,6 +9,9 @@ type Direction = 1 | -1
 /** The id `ImageBubbleControls` renders its toolbar `div` under. */
 export const IMAGE_TOOLBAR_ID = 'image-toolbar'
 
+/** The id `image-view.tsx` renders its revealed source `input` under. */
+export const IMAGE_SOURCE_FIELD_ID = 'image-source-field'
+
 /**
  * The position of the next (or previous) image relative to `from`, or `null`
  * if there is none - the doc has finitely many images, so a linear scan is
@@ -92,6 +95,25 @@ export function focusImageToolbar(): Command {
 		if (!(firstButton instanceof HTMLElement)) return false
 
 		firstButton.focus()
+		return true
+	}
+}
+
+/**
+ * Moves DOM focus into the selected image's already-revealed source field
+ * (`image-view.tsx`) - selecting an image already satisfies `useCaretInside`,
+ * so the field is already rendered by the time this runs; the button just
+ * has to move focus there. Declines unless an image is currently selected,
+ * matching `focusImageToolbar`.
+ */
+export function focusImageSourceField(): Command {
+	return (state) => {
+		if (!isImageSelected(state)) return false
+
+		const field = document.getElementById(IMAGE_SOURCE_FIELD_ID)
+		if (!(field instanceof HTMLElement)) return false
+
+		field.focus()
 		return true
 	}
 }

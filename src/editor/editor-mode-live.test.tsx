@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -214,6 +214,35 @@ describe('Editor Mode Live', () => {
 			'src',
 			'https://file+.vscode-resource.vscode-cdn.net/Users/dev/notes/docs/diagram.png'
 		)
+	})
+
+	// Images have no text content of their own to reveal via the caret the way
+	// every other construct does (see `image-view.tsx`), so selecting one is
+	// what stands in for "the caret is on it".
+	it('reveals the image markdown as editable text once it is selected', async () => {
+		render(<EditorModeLive content="![Diagram](./diagram.png)" />)
+		const image = await screen.findByRole('img', { name: 'Diagram' })
+
+		await userEvent.click(image)
+
+		expect(await screen.findByLabelText('Image source')).toHaveValue(
+			'![Diagram](./diagram.png)'
+		)
+	})
+
+	it('commits an edited image source back to the rendered image', async () => {
+		render(<EditorModeLive content="![Diagram](./diagram.png)" />)
+		const image = await screen.findByRole('img', { name: 'Diagram' })
+		await userEvent.click(image)
+
+		const field = await screen.findByLabelText<HTMLInputElement>('Image source')
+		fireEvent.change(field, {
+			target: { value: '![New diagram](./new.png)' },
+		})
+		fireEvent.blur(field)
+
+		const updated = await screen.findByRole('img', { name: 'New diagram' })
+		expect(updated).toHaveAttribute('src', './new.png')
 	})
 
 	it('renders a mermaid block as a diagram, not as source', async () => {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCurrentEditor } from '@tiptap/react'
-import { Trash2 } from 'lucide-react'
+import { Code, Trash2 } from 'lucide-react'
 import { useRef } from 'react'
 import type { KeyboardEvent } from 'react'
 
@@ -10,6 +10,7 @@ import { LinkPopover } from '@/components/link-popover'
 import { Button } from '@/components/ui/button'
 import {
 	exitImageToolbar,
+	focusImageSourceField,
 	IMAGE_TOOLBAR_ID,
 } from '@/editor/extensions/image/keyboard-nav'
 import { ImagePopover } from '@/editor/extensions/image/popover'
@@ -54,6 +55,11 @@ export function ImageBubbleControls() {
 		buttons[nextIndex]?.focus()
 	}
 
+	const handleEditSource = () => {
+		if (!editor) return
+		focusImageSourceField()(editor.state, editor.view.dispatch, editor.view)
+	}
+
 	return (
 		<div
 			id={IMAGE_TOOLBAR_ID}
@@ -64,6 +70,16 @@ export function ImageBubbleControls() {
 			className="flex items-center gap-1 p-1 bg-popover text-popover-foreground border border-border rounded-lg shadow-xs drop-shadow-lg w-fit"
 		>
 			<ImagePopover />
+
+			<Button
+				type="button"
+				variant="ghost"
+				size="sm"
+				title="Edit source"
+				onClick={handleEditSource}
+			>
+				<Code className="size-4" />
+			</Button>
 
 			<LinkPopover />
 
