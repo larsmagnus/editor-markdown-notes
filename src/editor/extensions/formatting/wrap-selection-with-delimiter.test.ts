@@ -11,10 +11,10 @@ describe('wrapSelectionWithDelimiter', () => {
 		// "world" is at positions 7-12.
 		editor.commands.setTextSelection({ from: 7, to: 12 })
 
-		const applied = wrapSelectionWithDelimiter(editor.schema.marks.bold, '**')(
-			editor.state,
-			editor.view.dispatch
-		)
+		const applied = wrapSelectionWithDelimiter(editor.schema.marks.bold, {
+			open: '**',
+			close: '**',
+		})(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(true)
 		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
@@ -27,10 +27,10 @@ describe('wrapSelectionWithDelimiter', () => {
 		editor.commands.setContent('<p>hello world</p>')
 		editor.commands.setTextSelection({ from: 7, to: 12 })
 
-		wrapSelectionWithDelimiter(editor.schema.marks.bold, '**')(
-			editor.state,
-			editor.view.dispatch
-		)
+		wrapSelectionWithDelimiter(editor.schema.marks.bold, {
+			open: '**',
+			close: '**',
+		})(editor.state, editor.view.dispatch)
 
 		// "hello **world**" - the whole run, "**world**", spans 7-16.
 		expect(editor.state.doc.rangeHasMark(7, 16, editor.schema.marks.bold)).toBe(
@@ -43,10 +43,10 @@ describe('wrapSelectionWithDelimiter', () => {
 		editor.commands.setContent('<p>hello world there</p>')
 		editor.commands.setTextSelection({ from: 7, to: 12 })
 
-		wrapSelectionWithDelimiter(editor.schema.marks.bold, '**')(
-			editor.state,
-			editor.view.dispatch
-		)
+		wrapSelectionWithDelimiter(editor.schema.marks.bold, {
+			open: '**',
+			close: '**',
+		})(editor.state, editor.view.dispatch)
 
 		expect(editor.state.doc.rangeHasMark(1, 7, editor.schema.marks.bold)).toBe(
 			false
@@ -65,11 +65,26 @@ describe('wrapSelectionWithDelimiter', () => {
 		editor.commands.setContent('<p>hello world</p>')
 		editor.commands.setTextSelection(7)
 
-		const applied = wrapSelectionWithDelimiter(editor.schema.marks.bold, '**')(
-			editor.state,
-			editor.view.dispatch
-		)
+		const applied = wrapSelectionWithDelimiter(editor.schema.marks.bold, {
+			open: '**',
+			close: '**',
+		})(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(false)
+	})
+
+	it('supports asymmetric open/close delimiter text', () => {
+		const editor = new Editor({ extensions: [StarterKit], content: '' })
+		editor.commands.setContent('<p>hello world</p>')
+		editor.commands.setTextSelection({ from: 7, to: 12 })
+
+		wrapSelectionWithDelimiter(editor.schema.marks.code, {
+			open: '`` ',
+			close: ' ``',
+		})(editor.state, editor.view.dispatch)
+
+		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
+			'hello `` world ``'
+		)
 	})
 })

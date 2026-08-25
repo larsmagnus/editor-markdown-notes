@@ -1,15 +1,21 @@
 import type { MarkType } from '@tiptap/pm/model'
 import type { Command } from '@tiptap/pm/state'
 
+import type {
+	DelimiterPair,
+	DelimiterSpec,
+} from '@/editor/extensions/formatting/delimiter-spec'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
 import { wrapSelectionWithDelimiter } from '@/editor/extensions/formatting/wrap-selection-with-delimiter'
 
 /**
- * Replaces `toggleBold`/`toggleStrike` for a fixed-delimiter mark: selecting
- * plain text wraps it in real delimiter text and marks the whole thing,
- * delimiters included (`wrap-selection-with-delimiter.ts`); selecting a
- * whole existing run unwraps it - strips the mark and deletes both
- * delimiters, which now sit at the run's own two ends.
+ * Replaces `toggleBold`/`toggleStrike` for a delimited mark: selecting plain
+ * text wraps it in real delimiter text and marks the whole thing, delimiters
+ * included (`wrap-selection-with-delimiter.ts`, using `wrapDelimiters`);
+ * selecting a whole existing run unwraps it - strips the mark and deletes
+ * both delimiters, which now sit at the run's own two ends, detected via
+ * `spec` rather than assumed fixed-length since inline code's fence varies
+ * run to run.
  *
  * Declines (returns `false`) on an empty selection or a selection that only
  * partially overlaps a run - the caller falls back to the stock
@@ -29,7 +35,8 @@ import { wrapSelectionWithDelimiter } from '@/editor/extensions/formatting/wrap-
  */
 export function toggleDelimitedMark(
 	markType: MarkType,
-	delimiter: string,
+	spec: DelimiterSpec,
+	wrapDelimiters: DelimiterPair,
 	attrs?: Record<string, unknown>
 ): Command {
 	return (state, dispatch) => {
@@ -43,10 +50,13 @@ export function toggleDelimitedMark(
 
 		if (run) {
 			if (dispatch) {
+				const runText = state.doc.textBetween(run.from, run.to)
+				const openLength = spec.detectOpen(runText)
+				const closeLength = spec.detectClose(runText)
 				const tr = state.tr
 				tr.removeMark(run.from, run.to, markType)
-				tr.delete(run.to - delimiter.length, run.to)
-				tr.delete(run.from, run.from + delimiter.length)
+				if (closeLength > 0) tr.delete(run.to - closeLength, run.to)
+				if (openLength > 0) tr.delete(run.from, run.from + openLength)
 				dispatch(tr)
 			}
 			return true
@@ -56,7 +66,7 @@ export function toggleDelimitedMark(
 
 		return wrapSelectionWithDelimiter(
 			markType,
-			delimiter,
+			wrapDelimiters,
 			attrs
 		)(state, dispatch)
 	}

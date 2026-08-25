@@ -41,15 +41,13 @@ export function delimiterRanges(doc: ProseMirrorNode): [number, number][] {
 		if (!markType) continue
 
 		for (const run of findMarkRuns(doc, markType)) {
-			if (run.to - run.from < spec.length * 2) continue
-
 			const runText = doc.textBetween(run.from, run.to)
-			if (spec.matches(runText.slice(0, spec.length))) {
-				ranges.push([run.from, run.from + spec.length])
-			}
-			if (spec.matches(runText.slice(-spec.length))) {
-				ranges.push([run.to - spec.length, run.to])
-			}
+			const openLength = spec.detectOpen(runText)
+			const closeLength = spec.detectClose(runText)
+			if (openLength + closeLength > runText.length) continue
+
+			if (openLength > 0) ranges.push([run.from, run.from + openLength])
+			if (closeLength > 0) ranges.push([run.to - closeLength, run.to])
 		}
 	}
 

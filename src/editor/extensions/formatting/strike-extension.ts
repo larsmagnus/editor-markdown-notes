@@ -11,7 +11,6 @@ const DELIMITER = '~~'
  * `delimited-mark-extension.ts` for everything shared with `bold`.
  */
 export const StrikeExtension = createDelimitedMarkExtension(Strike, {
-	delimiterLength: DELIMITER.length,
 	ensureSpec: fixedDelimiter(DELIMITER),
 	inputRegex,
 	// Nests inside bold - see `uniform-outer-marks.ts`.

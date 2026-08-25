@@ -3,6 +3,7 @@ import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
 import { createDelimitedMarkRevealProvider } from '@/editor/extensions/formatting/create-delimited-mark-reveal-provider'
+import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 
 describe('createDelimitedMarkRevealProvider', () => {
 	it('spans the whole run, with delimiter ranges at each end', () => {
@@ -10,9 +11,10 @@ describe('createDelimitedMarkRevealProvider', () => {
 		// "hello " is 6 chars (positions 1-7); "**world**" (bold) runs 7-16.
 		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
 
-		const [span] = createDelimitedMarkRevealProvider('bold', 2).collect(
-			editor.state.doc
-		)
+		const [span] = createDelimitedMarkRevealProvider(
+			'bold',
+			fixedDelimiter('**')
+		).collect(editor.state.doc)
 
 		expect(span.containerFrom).toBe(7)
 		expect(span.containerTo).toBe(16)
@@ -28,9 +30,10 @@ describe('createDelimitedMarkRevealProvider', () => {
 			'<p><strong>**one**</strong> plain <strong>**two**</strong></p>'
 		)
 
-		const spans = createDelimitedMarkRevealProvider('bold', 2).collect(
-			editor.state.doc
-		)
+		const spans = createDelimitedMarkRevealProvider(
+			'bold',
+			fixedDelimiter('**')
+		).collect(editor.state.doc)
 
 		expect(spans).toHaveLength(2)
 	})
@@ -40,7 +43,9 @@ describe('createDelimitedMarkRevealProvider', () => {
 		editor.commands.setContent('<p><strong>*</strong></p>')
 
 		expect(
-			createDelimitedMarkRevealProvider('bold', 2).collect(editor.state.doc)
+			createDelimitedMarkRevealProvider('bold', fixedDelimiter('**')).collect(
+				editor.state.doc
+			)
 		).toEqual([])
 	})
 
@@ -49,9 +54,10 @@ describe('createDelimitedMarkRevealProvider', () => {
 		editor.commands.setContent('<p>hello</p>')
 
 		expect(
-			createDelimitedMarkRevealProvider('notARealMark', 2).collect(
-				editor.state.doc
-			)
+			createDelimitedMarkRevealProvider(
+				'notARealMark',
+				fixedDelimiter('**')
+			).collect(editor.state.doc)
 		).toEqual([])
 	})
 })

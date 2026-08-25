@@ -1,6 +1,8 @@
 import type { MarkType } from '@tiptap/pm/model'
 import type { Command } from '@tiptap/pm/state'
 
+import type { DelimiterPair } from '@/editor/extensions/formatting/delimiter-spec'
+
 /**
  * Wraps a non-empty selection in literal delimiter text and marks the whole
  * thing, delimiters included - `**bold**` all carrying the `bold` mark, not
@@ -18,7 +20,7 @@ import type { Command } from '@tiptap/pm/state'
  */
 export function wrapSelectionWithDelimiter(
 	markType: MarkType,
-	delimiter: string,
+	{ open, close }: DelimiterPair,
 	attrs?: Record<string, unknown>
 ): Command {
 	return (state, dispatch) => {
@@ -32,9 +34,9 @@ export function wrapSelectionWithDelimiter(
 			const mark = markType.create(attrs)
 			// Closing delimiter first: inserting at `from` shifts `to`, but
 			// nothing shifts a position already past it.
-			tr.insert(to, state.schema.text(delimiter, [mark]))
-			tr.insert(from, state.schema.text(delimiter, [mark]))
-			tr.addMark(from, to + delimiter.length * 2, mark)
+			tr.insert(to, state.schema.text(close, [mark]))
+			tr.insert(from, state.schema.text(open, [mark]))
+			tr.addMark(from, to + open.length + close.length, mark)
 			dispatch(tr)
 		}
 		return true

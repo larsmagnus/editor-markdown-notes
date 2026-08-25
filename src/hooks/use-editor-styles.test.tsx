@@ -84,7 +84,9 @@ describe('toggleStyle', () => {
 
 		act(() => result.current.toggleStyle('code'))
 
-		expect(editor.getHTML()).toContain('<code>notes</code>')
+		// The backtick delimiters are real, marked text now (see
+		// `formatting/inline-code/`), not markup synthesized only at save time.
+		expect(editor.getHTML()).toContain('<code>`notes`</code>')
 	})
 
 	it('toggles codeBlock', () => {

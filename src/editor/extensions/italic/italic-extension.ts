@@ -45,7 +45,6 @@ let liveStorage: Storage['italic'] | null = null
  * `editorMarkdownNotes.italicMarker`.
  */
 export const ItalicExtension = createDelimitedMarkExtension(ItalicMark, {
-	delimiterLength: 1,
 	ensureSpec: italicDelimiterSpec(),
 	// Nests inside bold and strike - see `uniform-outer-marks.ts`.
 	outerMarkNames: ['bold', 'strike'],

@@ -2,6 +2,7 @@ import type { CommandProps } from '@tiptap/core'
 import type { MarkType } from '@tiptap/pm/model'
 
 import { toggleDelimitedMark } from '@/editor/extensions/formatting/toggle-delimited-mark'
+import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
 import { italicWrapMarkup } from '@/editor/extensions/italic/italic-wrap-markup'
 
 /**
@@ -24,7 +25,12 @@ export function createToggleItalicCommand(
 		if (!state.selection.empty) {
 			const { from, to } = state.selection
 			const markup = italicWrapMarkup(state.doc, from, to, preferredMarkup)
-			if (toggleDelimitedMark(markType, markup, { markup })(state, dispatch)) {
+			const wrapDelimiters = { open: markup, close: markup }
+			if (
+				toggleDelimitedMark(markType, italicDelimiterSpec(), wrapDelimiters, {
+					markup,
+				})(state, dispatch)
+			) {
 				return true
 			}
 		}

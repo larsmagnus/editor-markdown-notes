@@ -2,6 +2,7 @@ import { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
+import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 import {
 	removeClosingDelimiterOnDelete,
 	removeOpeningDelimiterOnBackspace,
@@ -16,7 +17,7 @@ describe('removeOpeningDelimiterOnBackspace', () => {
 
 		const applied = removeOpeningDelimiterOnBackspace(
 			editor.schema.marks.bold,
-			2
+			fixedDelimiter('**')
 		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(true)
@@ -39,7 +40,7 @@ describe('removeOpeningDelimiterOnBackspace', () => {
 
 		const applied = removeOpeningDelimiterOnBackspace(
 			editor.schema.marks.bold,
-			2
+			fixedDelimiter('**')
 		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(false)
@@ -52,7 +53,7 @@ describe('removeOpeningDelimiterOnBackspace', () => {
 
 		const applied = removeOpeningDelimiterOnBackspace(
 			editor.schema.marks.bold,
-			2
+			fixedDelimiter('**')
 		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(false)
@@ -66,10 +67,10 @@ describe('removeClosingDelimiterOnDelete', () => {
 		// The run ("**world**") ends at 16; right before its closing "**" is 14.
 		editor.commands.setTextSelection(14)
 
-		const applied = removeClosingDelimiterOnDelete(editor.schema.marks.bold, 2)(
-			editor.state,
-			editor.view.dispatch
-		)
+		const applied = removeClosingDelimiterOnDelete(
+			editor.schema.marks.bold,
+			fixedDelimiter('**')
+		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(true)
 		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
@@ -82,10 +83,10 @@ describe('removeClosingDelimiterOnDelete', () => {
 		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
 		editor.commands.setTextSelection(11)
 
-		const applied = removeClosingDelimiterOnDelete(editor.schema.marks.bold, 2)(
-			editor.state,
-			editor.view.dispatch
-		)
+		const applied = removeClosingDelimiterOnDelete(
+			editor.schema.marks.bold,
+			fixedDelimiter('**')
+		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(false)
 	})

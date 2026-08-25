@@ -2,6 +2,7 @@ import { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
+import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 import { toggleDelimitedMark } from '@/editor/extensions/formatting/toggle-delimited-mark'
 
 describe('toggleDelimitedMark', () => {
@@ -10,10 +11,11 @@ describe('toggleDelimitedMark', () => {
 		editor.commands.setContent('<p>hello world</p>')
 		editor.commands.setTextSelection({ from: 7, to: 12 })
 
-		const applied = toggleDelimitedMark(editor.schema.marks.bold, '**')(
-			editor.state,
-			editor.view.dispatch
-		)
+		const applied = toggleDelimitedMark(
+			editor.schema.marks.bold,
+			fixedDelimiter('**'),
+			{ open: '**', close: '**' }
+		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(true)
 		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
@@ -27,10 +29,11 @@ describe('toggleDelimitedMark', () => {
 		// The run ("**world**") spans 7-16.
 		editor.commands.setTextSelection({ from: 7, to: 16 })
 
-		const applied = toggleDelimitedMark(editor.schema.marks.bold, '**')(
-			editor.state,
-			editor.view.dispatch
-		)
+		const applied = toggleDelimitedMark(
+			editor.schema.marks.bold,
+			fixedDelimiter('**'),
+			{ open: '**', close: '**' }
+		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(true)
 		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
@@ -45,10 +48,11 @@ describe('toggleDelimitedMark', () => {
 		// whole run - there is only ever one pair of delimiters per run.
 		editor.commands.setTextSelection({ from: 9, to: 14 })
 
-		const applied = toggleDelimitedMark(editor.schema.marks.bold, '**')(
-			editor.state,
-			editor.view.dispatch
-		)
+		const applied = toggleDelimitedMark(
+			editor.schema.marks.bold,
+			fixedDelimiter('**'),
+			{ open: '**', close: '**' }
+		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(true)
 		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
@@ -61,10 +65,11 @@ describe('toggleDelimitedMark', () => {
 		editor.commands.setContent('<p>hello world</p>')
 		editor.commands.setTextSelection(7)
 
-		const applied = toggleDelimitedMark(editor.schema.marks.bold, '**')(
-			editor.state,
-			editor.view.dispatch
-		)
+		const applied = toggleDelimitedMark(
+			editor.schema.marks.bold,
+			fixedDelimiter('**'),
+			{ open: '**', close: '**' }
+		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(false)
 	})
@@ -83,10 +88,11 @@ describe('toggleDelimitedMark', () => {
 			to: editor.state.doc.content.size - 1,
 		})
 
-		const applied = toggleDelimitedMark(editor.schema.marks.bold, '**')(
-			editor.state,
-			editor.view.dispatch
-		)
+		const applied = toggleDelimitedMark(
+			editor.schema.marks.bold,
+			fixedDelimiter('**'),
+			{ open: '**', close: '**' }
+		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(false)
 	})
@@ -97,10 +103,11 @@ describe('toggleDelimitedMark', () => {
 		// Selection starts inside "hello " (plain) and ends inside the bold run.
 		editor.commands.setTextSelection({ from: 5, to: 11 })
 
-		const applied = toggleDelimitedMark(editor.schema.marks.bold, '**')(
-			editor.state,
-			editor.view.dispatch
-		)
+		const applied = toggleDelimitedMark(
+			editor.schema.marks.bold,
+			fixedDelimiter('**'),
+			{ open: '**', close: '**' }
+		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(false)
 	})

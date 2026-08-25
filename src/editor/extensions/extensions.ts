@@ -23,6 +23,8 @@ import { parseFence } from '@/editor/extensions/code-block/code-fence'
 import { FocusNavigation } from '@/editor/extensions/focus-navigation/focus-navigation-extension'
 import { BoldExtension } from '@/editor/extensions/formatting/bold-extension'
 import { createDelimitedMarkRevealProvider } from '@/editor/extensions/formatting/create-delimited-mark-reveal-provider'
+import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
+import { inlineCodeDelimiterSpec } from '@/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
 import { StrikeExtension } from '@/editor/extensions/formatting/strike-extension'
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
 import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
@@ -30,6 +32,7 @@ import {
 	focusImageToolbar,
 	moveToAdjacentImage,
 } from '@/editor/extensions/image/keyboard-nav'
+import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
 import { ItalicExtension } from '@/editor/extensions/italic/italic-extension'
 import { StrictLinkify } from '@/editor/extensions/link/strict-linkify-extension'
 import { MarkdownClipboard } from '@/editor/extensions/markdown/markdown-clipboard-extension'
@@ -197,9 +200,10 @@ export const extensions = [
 		providers: [
 			createFenceRevealProvider(['codeBlock'], parseFence),
 			createFenceRevealProvider(['frontmatter'], parseFrontmatterFence),
-			createDelimitedMarkRevealProvider('bold', 2),
-			createDelimitedMarkRevealProvider('strike', 2),
-			createDelimitedMarkRevealProvider('italic', 1),
+			createDelimitedMarkRevealProvider('bold', fixedDelimiter('**')),
+			createDelimitedMarkRevealProvider('strike', fixedDelimiter('~~')),
+			createDelimitedMarkRevealProvider('italic', italicDelimiterSpec()),
+			createDelimitedMarkRevealProvider('code', inlineCodeDelimiterSpec()),
 		],
 	}),
 	// Otherwise unhandled, Tab is a browser default: it moves focus to the next

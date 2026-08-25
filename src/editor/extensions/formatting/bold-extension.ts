@@ -11,7 +11,6 @@ const DELIMITER = '**'
  * `delimited-mark-extension.ts` for everything shared with `strike`.
  */
 export const BoldExtension = createDelimitedMarkExtension(Bold, {
-	delimiterLength: DELIMITER.length,
 	ensureSpec: fixedDelimiter(DELIMITER),
 	inputRegex: starInputRegex,
 }).extend({

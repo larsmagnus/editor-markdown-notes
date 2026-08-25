@@ -264,6 +264,14 @@ describe('features that already worked keep working', () => {
 		expect(roundTrip('~~_struck and italic_~~')).toBe('~~_struck and italic_~~')
 	})
 
+	// Regression: the same nesting bug `ensure-delimiters-plugin.ts` had for
+	// bold+italic also applies to inline code, whose fence length varies -
+	// `uniform-outer-marks.ts` covers it via the same fixed priority order.
+	it('keeps inline code nested inside bold, italic, and strike all at once', () => {
+		expect(roundTrip('**_Add `x` command_**')).toBe('**_Add `x` command_**')
+		expect(roundTrip('~~Add `x` command~~')).toBe('~~Add `x` command~~')
+	})
+
 	it('keeps one contiguous bold run around inline code', () => {
 		expect(roundTrip('**Add `x` command**')).toBe('**Add `x` command**')
 	})

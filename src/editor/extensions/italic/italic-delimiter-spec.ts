@@ -1,6 +1,7 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
 import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
+import { edgeResolvers } from '@/editor/extensions/formatting/delimiter-spec'
 import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
 import { italicMarkup } from '@/editor/extensions/italic/italic-markup'
 
@@ -13,11 +14,14 @@ import { italicMarkup } from '@/editor/extensions/italic/italic-markup'
  */
 export function italicDelimiterSpec(): DelimiterSpec {
 	return {
-		length: 1,
-		matches: (candidate) => candidate === '*' || candidate === '_',
-		resolveOpen: (doc, run) => resolveEdge(doc, run, 'open'),
-		resolveClose: (doc, run) => resolveEdge(doc, run, 'close'),
+		detectOpen: (text) => (isItalicMarker(text[0]) ? 1 : 0),
+		detectClose: (text) => (isItalicMarker(text.at(-1)) ? 1 : 0),
+		...edgeResolvers(resolveEdge),
 	}
+}
+
+function isItalicMarker(char: string | undefined): boolean {
+	return char === '*' || char === '_'
 }
 
 function resolveEdge(

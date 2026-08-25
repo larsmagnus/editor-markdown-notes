@@ -28,12 +28,10 @@ import { PARSED_BY_MARKDOWN_IT } from '@/editor/extensions/markdown/mark-seriali
 export function createDelimitedMarkExtension(
 	base: Mark,
 	{
-		delimiterLength,
 		ensureSpec,
 		inputRegex,
 		outerMarkNames,
 	}: {
-		delimiterLength: number
 		ensureSpec: DelimiterSpec
 		/**
 		 * Omit when the caller provides its own `addInputRules` in a further
@@ -59,12 +57,12 @@ export function createDelimitedMarkExtension(
 			return {
 				...this.parent?.(),
 				Backspace: () =>
-					removeOpeningDelimiterOnBackspace(this.type, delimiterLength)(
+					removeOpeningDelimiterOnBackspace(this.type, ensureSpec)(
 						this.editor.state,
 						this.editor.view.dispatch
 					),
 				Delete: () =>
-					removeClosingDelimiterOnDelete(this.type, delimiterLength)(
+					removeClosingDelimiterOnDelete(this.type, ensureSpec)(
 						this.editor.state,
 						this.editor.view.dispatch
 					),

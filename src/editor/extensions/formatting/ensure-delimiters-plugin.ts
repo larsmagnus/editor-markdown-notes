@@ -50,8 +50,8 @@ export function createEnsureDelimitersPlugin(
 
 			for (const run of [...runs].reverse()) {
 				const runText = newState.doc.textBetween(run.from, run.to)
-				const hasOpening = spec.matches(runText.slice(0, spec.length))
-				const hasClosing = spec.matches(runText.slice(-spec.length))
+				const hasOpening = spec.detectOpen(runText) > 0
+				const hasClosing = spec.detectClose(runText) > 0
 				if (hasOpening && hasClosing) continue
 
 				const marks = [

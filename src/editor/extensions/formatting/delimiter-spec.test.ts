@@ -3,15 +3,20 @@ import { describe, expect, it } from 'vitest'
 import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 
 describe('fixedDelimiter', () => {
-	it('reports the delimiter length', () => {
-		expect(fixedDelimiter('**').length).toBe(2)
+	it('detects the delimiter length at the start of matching text', () => {
+		expect(fixedDelimiter('**').detectOpen('**bold**')).toBe(2)
 	})
 
-	it('matches only the exact delimiter text', () => {
-		const spec = fixedDelimiter('**')
+	it('reports no opening delimiter when the text starts with something else', () => {
+		expect(fixedDelimiter('**').detectOpen('~~bold~~')).toBe(0)
+	})
 
-		expect(spec.matches('**')).toBe(true)
-		expect(spec.matches('~~')).toBe(false)
+	it('detects the delimiter length at the end of matching text', () => {
+		expect(fixedDelimiter('**').detectClose('**bold**')).toBe(2)
+	})
+
+	it('reports no closing delimiter when the text ends with something else', () => {
+		expect(fixedDelimiter('**').detectClose('**bold~~')).toBe(0)
 	})
 
 	it('always resolves to the fixed delimiter regardless of context', () => {

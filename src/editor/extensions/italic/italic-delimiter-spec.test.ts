@@ -13,16 +13,20 @@ afterEach(() => {
 })
 
 describe('italicDelimiterSpec', () => {
-	it('reports a delimiter length of one', () => {
-		expect(italicDelimiterSpec().length).toBe(1)
-	})
-
-	it('matches either italic marker', () => {
+	it('detects either italic marker at the start of text', () => {
 		const spec = italicDelimiterSpec()
 
-		expect(spec.matches('_')).toBe(true)
-		expect(spec.matches('*')).toBe(true)
-		expect(spec.matches('~')).toBe(false)
+		expect(spec.detectOpen('_text')).toBe(1)
+		expect(spec.detectOpen('*text')).toBe(1)
+		expect(spec.detectOpen('~text')).toBe(0)
+	})
+
+	it('detects either italic marker at the end of text', () => {
+		const spec = italicDelimiterSpec()
+
+		expect(spec.detectClose('text_')).toBe(1)
+		expect(spec.detectClose('text*')).toBe(1)
+		expect(spec.detectClose('text~')).toBe(0)
 	})
 
 	it('resolves to the underscore marker for an isolated run', () => {
