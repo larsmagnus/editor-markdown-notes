@@ -39,6 +39,7 @@ import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
 import { LinkExtension } from '@/editor/extensions/link/link-extension'
 import { StrictLinkify } from '@/editor/extensions/link/strict-linkify-extension'
 import { ListItemExtension } from '@/editor/extensions/list/list-item-extension'
+import { ListMarkerBackspace } from '@/editor/extensions/list/list-marker-backspace-extension'
 import { createListMarkerRevealProvider } from '@/editor/extensions/list/list-marker-reveal-provider'
 import { MarkdownClipboard } from '@/editor/extensions/markdown/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '@/editor/extensions/markdown/markdown-escaping'
@@ -245,6 +246,9 @@ export const extensions = [
 	// table cell and when a node (not a text caret) is selected, so it doesn't
 	// compete with those keys' own meanings elsewhere in this file.
 	TabIndent,
+	// Registered after ListItemExtension/TaskItemExtension so its Backspace
+	// handler runs before their own default deletion behavior.
+	ListMarkerBackspace,
 	// The WCAG "no keyboard trap" escape hatch. Outranks TabIndent, the image
 	// node's Tab shortcut, and the table's Tab-between-cells keymap (all
 	// registered earlier); yields to SlashCommand's own popup.

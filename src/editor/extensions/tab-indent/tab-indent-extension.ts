@@ -2,14 +2,9 @@ import { Extension } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
 import { isInTable } from '@tiptap/pm/tables'
 
-import { parseListMarker } from '@/editor/extensions/list/list-marker'
+import { listItemAtMarkerBoundary } from '@/editor/extensions/list/list-item-at-marker-boundary'
 
 const INDENT = '  '
-
-// `listItem`/`taskItem` bind Tab/Shift-Tab to sink/lift themselves, but
-// `ExtensionManager` runs the last-registered extension's keymap first, so
-// this extension (registered after them) would otherwise always shadow that.
-const NESTABLE_LIST_ITEM_TYPES = ['listItem', 'taskItem']
 
 /**
  * Makes Tab behave like an editor, not a web page, wherever there's a real
@@ -24,7 +19,7 @@ const NESTABLE_LIST_ITEM_TYPES = ['listItem', 'taskItem']
  * competing, unrelated meaning here.
  *
  * Right after a list item's bullet, number, or checkbox, Tab/Shift-Tab
- * nest/un-nest the item instead (see `NESTABLE_LIST_ITEM_TYPES` above).
+ * nest/un-nest the item instead (`listItemAtMarkerBoundary`).
  */
 export const TabIndent = Extension.create({
 	name: 'tabIndent',
@@ -33,32 +28,6 @@ export const TabIndent = Extension.create({
 		const canIndent = () => {
 			const { selection } = this.editor.state
 			return selection instanceof TextSelection && !isInTable(this.editor.state)
-		}
-
-		// The item's type name, or `null` if the caret isn't right after its
-		// bullet/number/checkbox. The marker is real leading text in the item's
-		// first paragraph now (see `list-marker.ts`), so "right after it" is
-		// `parentOffset === markerLength`, not offset 0 - offset 0 sits *before*
-		// the marker, where typing would edit the marker itself rather than
-		// nest/un-nest the item.
-		const listItemAtCaretStart = () => {
-			const { selection } = this.editor.state
-			if (!(selection instanceof TextSelection) || !selection.empty) return null
-
-			const { $from } = selection
-			if ($from.depth < 1) return null
-
-			const itemDepth = $from.depth - 1
-			const listItem = $from.node(itemDepth)
-
-			if (!NESTABLE_LIST_ITEM_TYPES.includes(listItem.type.name)) return null
-			if ($from.index(itemDepth) !== 0) return null
-
-			const markerLength =
-				parseListMarker($from.parent.textContent)?.markerLength ?? 0
-			if ($from.parentOffset !== markerLength) return null
-
-			return listItem.type.name
 		}
 
 		const insertIndent = () =>
@@ -72,7 +41,7 @@ export const TabIndent = Extension.create({
 
 		return {
 			Tab: () => {
-				const listItemType = listItemAtCaretStart()
+				const listItemType = listItemAtMarkerBoundary(this.editor)
 				if (listItemType && this.editor.commands.sinkListItem(listItemType)) {
 					return true
 				}
@@ -82,7 +51,7 @@ export const TabIndent = Extension.create({
 				return insertIndent()
 			},
 			'Shift-Tab': () => {
-				const listItemType = listItemAtCaretStart()
+				const listItemType = listItemAtMarkerBoundary(this.editor)
 				if (listItemType) {
 					this.editor.commands.liftListItem(listItemType)
 					return true

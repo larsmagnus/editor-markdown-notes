@@ -17,6 +17,11 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		await page.keyboard.press('Home')
 		for (let i = 0; i < markerLength; i++) {
 			await page.keyboard.press('ArrowRight')
+			// A real user's keystrokes are never this rapid - ProseMirror's
+			// DOMObserver batches native-arrow-driven selection changes, and a
+			// synthetic press-immediately-after-press sequence can outrun it,
+			// leaving `editor.state.selection` briefly stale relative to the DOM.
+			await page.waitForTimeout(20)
 		}
 		await page.keyboard.press('Backspace')
 	}
