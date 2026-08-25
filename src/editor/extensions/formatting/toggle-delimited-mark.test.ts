@@ -69,6 +69,28 @@ describe('toggleDelimitedMark', () => {
 		expect(applied).toBe(false)
 	})
 
+	// Regression: `findMarkRuns` stops extending a run at any non-text node, so
+	// a selection spanning two bold runs split by a hard break has the mark on
+	// every text node it touches but matches no single run - this used to be
+	// misread as "fully marked" and unwrapped as if it were one run.
+	it('declines on a selection spanning two runs split by a non-text inline node', () => {
+		const editor = new Editor({ extensions: [StarterKit], content: '' })
+		editor.commands.setContent(
+			'<p><strong>**bold </strong><br><strong> text**</strong></p>'
+		)
+		editor.commands.setTextSelection({
+			from: 1,
+			to: editor.state.doc.content.size - 1,
+		})
+
+		const applied = toggleDelimitedMark(editor.schema.marks.bold, '**')(
+			editor.state,
+			editor.view.dispatch
+		)
+
+		expect(applied).toBe(false)
+	})
+
 	it('declines on a selection that only partially overlaps a run', () => {
 		const editor = new Editor({ extensions: [StarterKit], content: '' })
 		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')

@@ -195,6 +195,44 @@ describe('getDocumentText', () => {
 		expect(getDocumentText(editor.state.doc).text).toBe('see here')
 	})
 
+	// Regression: once a mark's delimiters are ensured into real document text
+	// (`ensure-delimiters-plugin.ts`), a run built directly with that text -
+	// the shape any already-open document actually has, since `new Editor({
+	// content })` alone never runs that safety net - used to reach retext with
+	// its `**`/`~~` intact, which can hide a phrase-level issue the delimiter
+	// breaks apart.
+	it('strips bold and strike delimiters but keeps the marked text as prose', () => {
+		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{
+					type: 'paragraph',
+					content: [
+						{ type: 'text', text: 'This is ' },
+						{ type: 'text', marks: [{ type: 'bold' }], text: '**truly**' },
+						{ type: 'text', text: ' and ' },
+						{ type: 'text', marks: [{ type: 'strike' }], text: '~~struck~~' },
+						{ type: 'text', text: ' fine.' },
+					],
+				},
+			],
+		})
+
+		const documentText = getDocumentText(editor.state.doc)
+		expect(documentText.text).toBe('This is truly and struck fine.')
+
+		const from = offsetToPosition(
+			documentText,
+			documentText.text.indexOf('fine')
+		)
+		expect(from).not.toBeNull()
+		expect(editor.state.doc.textBetween(from ?? 0, (from ?? 0) + 4)).toBe(
+			'fine'
+		)
+	})
+
 	it('reads headings and list items as prose too', () => {
 		const editor = new Editor({
 			extensions,

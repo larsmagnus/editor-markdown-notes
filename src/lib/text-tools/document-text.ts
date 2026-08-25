@@ -1,6 +1,11 @@
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
 import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
+import {
+	appendProseText,
+	delimiterRanges,
+} from '@/lib/text-tools/delimiter-ranges'
+import type { TextSlice } from '@/lib/text-tools/delimiter-ranges'
 import type { ProseExclusion } from '@/lib/text-tools/prose-policy'
 import {
 	BLOCK_SEPARATOR,
@@ -12,15 +17,6 @@ import {
  * Flattens a ProseMirror document into the plain text retext analyses, keeping
  * enough of a trail to turn the offsets it reports back into positions.
  */
-
-/** A run of text and the document position its first character sits at. */
-type TextSlice = {
-	/** Offset of this run within the flattened text. */
-	offset: number
-	length: number
-	/** Position of the run's first character in the ProseMirror document. */
-	from: number
-}
 
 export type DocumentText = {
 	text: string
@@ -110,6 +106,8 @@ function appendFrontmatterLines(
 export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 	const slices: TextSlice[] = []
 	let text = ''
+	const exclusions = delimiterRanges(doc)
+	const cursor = { index: 0 }
 
 	doc.descendants((node, pos) => {
 		if (IGNORED_NODES.has(node.type.name)) return false
@@ -146,13 +144,15 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 				return
 			}
 
-			slices.push({
-				offset: text.length,
-				length: child.text.length,
+			text = appendProseText(
+				text,
+				child.text,
 				// `pos` is the textblock itself; its content starts one inside.
-				from: pos + 1 + childOffset,
-			})
-			text += child.text
+				pos + 1 + childOffset,
+				exclusions,
+				cursor,
+				slices
+			)
 		})
 
 		return false

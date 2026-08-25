@@ -4,19 +4,6 @@ import type { Command } from '@tiptap/pm/state'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
 import { wrapSelectionWithDelimiter } from '@/editor/extensions/formatting/wrap-selection-with-delimiter'
 
-function rangeFullyHasMark(
-	state: Parameters<Command>[0],
-	from: number,
-	to: number,
-	markType: MarkType
-): boolean {
-	let fully = true
-	state.doc.nodesBetween(from, to, (node) => {
-		if (node.isText && !markType.isInSet(node.marks)) fully = false
-	})
-	return fully
-}
-
 /**
  * Replaces `toggleBold`/`toggleStrike` for a fixed-delimiter mark: selecting
  * plain text wraps it in real delimiter text and marks the whole thing,
@@ -31,6 +18,14 @@ function rangeFullyHasMark(
  * leave a run's delimiters out of sync with its mark for a selection this
  * command declines to handle itself; `ensure-delimiters-plugin.ts` is the
  * backstop that keeps the invariant true regardless.
+ *
+ * "Whole existing run" is checked by finding one `findMarkRuns` run that
+ * contains the selection outright, not by asking whether every text node in
+ * range carries the mark - a selection spanning two runs split by a
+ * non-text inline atom (an image) can have the mark on every text node it
+ * touches while matching no single run, and must fall through to the
+ * mixed-selection decline below, the same as a selection straddling two
+ * runs of unrelated marked text would.
  */
 export function toggleDelimitedMark(
 	markType: MarkType,
@@ -41,13 +36,11 @@ export function toggleDelimitedMark(
 		if (selection.empty) return false
 
 		const { from, to } = selection
+		const run = findMarkRuns(state.doc, markType).find(
+			(candidate) => candidate.from <= from && candidate.to >= to
+		)
 
-		if (rangeFullyHasMark(state, from, to, markType)) {
-			const run = findMarkRuns(state.doc, markType).find(
-				(candidate) => candidate.from <= from && candidate.to >= to
-			)
-			if (!run) return false
-
+		if (run) {
 			if (dispatch) {
 				const tr = state.tr
 				tr.removeMark(run.from, run.to, markType)
