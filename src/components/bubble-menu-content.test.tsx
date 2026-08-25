@@ -37,7 +37,9 @@ describe('headings', () => {
 		await userEvent.click(screen.getByTitle('Heading'))
 		await userEvent.click(screen.getByTitle('Heading 2'))
 
-		expect(editor.getHTML()).toContain('<h2>Some notes</h2>')
+		// The `##` marker is real, marked text now (see `heading-extension.ts`),
+		// not markup synthesized only at save time.
+		expect(editor.getHTML()).toContain('<h2>## Some notes</h2>')
 	})
 })
 

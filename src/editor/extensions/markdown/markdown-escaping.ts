@@ -1,5 +1,6 @@
 import { MarkdownSerializerState } from 'prosemirror-markdown'
 
+import type { HeadingSerializerState } from '@/editor/extensions/heading/heading-extension'
 import {
 	backtickRuns,
 	flankingAsteriskOffsets,
@@ -48,6 +49,7 @@ export function patchMarkdownEscaping(): void {
 		const runs = backtickRuns(str)
 
 		const { inTable } = this as TableSerializerState
+		const { inHeading } = this as HeadingSerializerState
 
 		let escaped = str.replace(
 			/[`*\\~[\]_|]/g,
@@ -83,10 +85,14 @@ export function patchMarkdownEscaping(): void {
 			}
 		)
 		if (startOfLine) {
-			escaped = escaped
-				.replace(/^(\+[ ]|[-*>])/, '\\$&')
-				.replace(/^(\s*)(#{1,6})(\s|$)/, '$1\\$2$3')
-				.replace(/^(\s*\d+)\.\s/, '$1\\. ')
+			escaped = escaped.replace(/^(\+[ ]|[-*>])/, '\\$&')
+			// A heading's own leading `#`x`level` is real, intentional content
+			// (see `heading-extension.ts`), not prose that merely starts with one -
+			// escaping it here would corrupt every heading on save.
+			if (!inHeading) {
+				escaped = escaped.replace(/^(\s*)(#{1,6})(\s|$)/, '$1\\$2$3')
+			}
+			escaped = escaped.replace(/^(\s*\d+)\.\s/, '$1\\. ')
 		}
 		if (this.options.escapeExtraCharacters) {
 			escaped = escaped.replace(this.options.escapeExtraCharacters, '\\$&')

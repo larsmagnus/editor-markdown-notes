@@ -72,7 +72,9 @@ describe('detectFrontmatter', () => {
 		// Everything after the empty block - including the fence that would have
 		// closed a real frontmatter block - survives exactly as typed.
 		expect(editor.state.doc.child(1).type.name).toBe('heading')
-		expect(editor.state.doc.child(1).textContent).toBe('Roadmap')
+		// The `#` marker is real, marked text now (see `heading-extension.ts`),
+		// not markup synthesized only at save time.
+		expect(editor.state.doc.child(1).textContent).toBe('# Roadmap')
 		expect(editor.state.doc.child(2).textContent).toBe('Ship it.')
 		expect(editor.state.doc.child(3).type.name).toBe('horizontalRule')
 		expect(editor.state.doc.child(4).textContent).toBe('More text.')

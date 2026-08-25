@@ -248,6 +248,13 @@ describe('features that already worked keep working', () => {
 		expect(roundTrip(markdown)).toBe(markdown)
 	})
 
+	// Regression: the heading's own `#` marker is real, unmarked text right
+	// alongside the marked run - `esc()`'s startOfLine heading guard
+	// (`markdown-escaping.ts`) must not swallow it into the mark's own escaping.
+	it('keeps bold text inside a heading', () => {
+		expect(roundTrip('## Ship the **release**')).toBe('## Ship the **release**')
+	})
+
 	it('keeps bold, italic and strikethrough, preserving whichever italic marker was used', () => {
 		expect(
 			roundTrip('**Bold text** and _italic text_ and ~~struck text~~')

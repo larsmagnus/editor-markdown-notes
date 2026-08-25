@@ -28,6 +28,8 @@ import { inlineCodeDelimiterSpec } from '@/editor/extensions/formatting/inline-c
 import { StrikeExtension } from '@/editor/extensions/formatting/strike-extension'
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
 import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
+import { HeadingExtension } from '@/editor/extensions/heading/heading-extension'
+import { parseHeadingReveal } from '@/editor/extensions/heading/heading-reveal'
 import {
 	focusImageToolbar,
 	moveToAdjacentImage,
@@ -80,9 +82,10 @@ export const extensions = [
 		codeBlock: false,
 		code: false,
 		italic: false,
-		// `Bold`/`Strike`/`Italic`/`Code` are StarterKit's defaults disabled and
-		// replaced by their own file in this folder or `formatting/` - see each
-		// for why.
+		heading: false,
+		// `Bold`/`Strike`/`Italic`/`Code`/`Heading` are StarterKit's defaults
+		// disabled and replaced by their own file in this folder or `formatting/`
+		// - see each for why.
 		bold: false,
 		strike: false,
 		// StarterKit bundles both as of v3. Link is registered above instead
@@ -100,6 +103,7 @@ export const extensions = [
 	Document.extend({ content: 'frontmatter? block+' }),
 	Frontmatter,
 	CodeBlockExtension,
+	HeadingExtension,
 	// Order nests marks: Italic before Code so `*text `code` text*` nests as
 	// `*` around the backticks rather than the reverse (mark rank, not source
 	// order, decides nesting - see each file's comment for why they coexist).
@@ -200,6 +204,7 @@ export const extensions = [
 		providers: [
 			createFenceRevealProvider(['codeBlock'], parseFence),
 			createFenceRevealProvider(['frontmatter'], parseFrontmatterFence),
+			createFenceRevealProvider(['heading'], parseHeadingReveal),
 			createDelimitedMarkRevealProvider('bold', fixedDelimiter('**')),
 			createDelimitedMarkRevealProvider('strike', fixedDelimiter('~~')),
 			createDelimitedMarkRevealProvider('italic', italicDelimiterSpec()),

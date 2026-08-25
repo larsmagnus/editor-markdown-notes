@@ -90,8 +90,10 @@ describe('TabIndent', () => {
 		// is only that this extension declines rather than throwing or mangling
 		// the document; something else (or nothing) then owns the key.
 		expect(() => editor.commands.keyboardShortcut('Tab')).not.toThrow()
+		// The `#` marker is real, marked text now (see `heading-extension.ts`),
+		// not markup synthesized only at save time.
 		expect(editor.state.doc.textBetween(0, editor.state.doc.content.size)).toBe(
-			'Roadmap'
+			'# Roadmap'
 		)
 	})
 

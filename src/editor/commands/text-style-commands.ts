@@ -1,5 +1,7 @@
 import type { ChainedCommands } from '@tiptap/react'
 
+import { stripHeadingMarkerCommand } from '@/editor/extensions/heading/strip-heading-marker-command'
+
 export type TextStyle =
 	| 'italic'
 	| 'bold'
@@ -62,7 +64,12 @@ export const TEXT_STYLE_COMMANDS: Record<TextStyle, TextStyleCommand> = {
 		queryable: true,
 	},
 	paragraph: {
-		apply: (chain) => chain.setParagraph(),
+		apply: (chain) =>
+			chain
+				.command(({ state, dispatch }) =>
+					stripHeadingMarkerCommand(state, dispatch)
+				)
+				.setParagraph(),
 		activeName: 'paragraph',
 		queryable: false,
 	},

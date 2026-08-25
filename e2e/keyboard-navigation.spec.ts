@@ -41,8 +41,10 @@ test.describe('Keyboard navigation in the live editor', () => {
 		await page.keyboard.press('Tab')
 		await page.keyboard.press('Q')
 
+		// The `#` marker is real, marked text now (see `heading-extension.ts`),
+		// not markup synthesized only at save time.
 		await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-			/^QEditor Markdown Notes/
+			/^# QEditor Markdown Notes/
 		)
 	})
 

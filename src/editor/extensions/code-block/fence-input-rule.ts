@@ -2,6 +2,7 @@ import { InputRule } from '@tiptap/core'
 import type { NodeType } from '@tiptap/pm/model'
 import { TextSelection } from '@tiptap/pm/state'
 
+import { canSetBlockType } from '@/editor/extensions/can-set-block-type'
 import { parseFence } from '@/editor/extensions/code-block/code-fence'
 
 /**
@@ -18,13 +19,7 @@ export function createFenceInputRule(type: NodeType): InputRule {
 		find: /^```([a-z]+)?[\s\n]$/,
 		handler: ({ state, range, match }) => {
 			const $start = state.doc.resolve(range.from)
-			if (
-				!$start
-					.node(-1)
-					.canReplaceWith($start.index(-1), $start.indexAfter(-1), type)
-			) {
-				return null
-			}
+			if (!canSetBlockType($start, type)) return null
 
 			const language = match[1] ?? ''
 			// A blank line between the fences, not `fenceText('', language)`

@@ -382,7 +382,7 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={'# Roadmap\n\nShip it.'} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			await userEvent.click(screen.getByText('Ship it.'))
 			await userEvent.keyboard(' Today.')
 
@@ -399,12 +399,12 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={'# Roadmap\n\nShip it.'} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 
 			rerender(<EditorModeLive content={'# Backlog\n\nSoon.'} />)
 
 			expect(
-				await screen.findByRole('heading', { name: 'Backlog' })
+				await screen.findByRole('heading', { name: '# Backlog' })
 			).toBeInTheDocument()
 			expect(screen.getByText('Soon.')).toBeInTheDocument()
 		})
@@ -461,7 +461,7 @@ describe('Editor Mode Live', () => {
 		it('saves a note the author has emptied entirely', async () => {
 			render(<EditorModeLive content={'# Roadmap\n\nShip it.'} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			await userEvent.click(screen.getByText('Ship it.'))
 			await userEvent.keyboard('{Control>}a{/Control}{Backspace}')
 
@@ -476,7 +476,7 @@ describe('Editor Mode Live', () => {
 		it('autosaves an ordinary edit once the typing pauses', async () => {
 			render(<EditorModeLive content={'# Roadmap\n\nShip it.'} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			await userEvent.click(screen.getByText('Ship it.'))
 			await userEvent.keyboard(' Today.')
 
@@ -507,7 +507,7 @@ describe('Editor Mode Live', () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
 
 			expect(
-				await screen.findByRole('heading', { name: 'Roadmap' })
+				await screen.findByRole('heading', { name: '# Roadmap' })
 			).toBeInTheDocument()
 		})
 
@@ -520,7 +520,7 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={FRONTMATTER_NOTE} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			const before = container.querySelector('.ProseMirror')?.textContent
 
 			await userEvent.keyboard('{Control>}z{/Control}')
@@ -535,7 +535,7 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={FRONTMATTER_NOTE} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			const block = container.querySelector('[data-type="frontmatter"]')
 			expect(block?.textContent).toContain('title: Roadmap')
 			expect(block?.textContent).toContain('status: draft')
@@ -550,7 +550,7 @@ describe('Editor Mode Live', () => {
 			const note = ['---', 'title: Roadmap', '---', '', '# Roadmap'].join('\n')
 			const { container } = render(<EditorModeLive content={note} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			// Clicking the first token rather than the full line: syntax
 			// highlighting may or may not have split the text into spans by the
 			// time this runs, and 'title' alone is a match either way.
@@ -569,7 +569,7 @@ describe('Editor Mode Live', () => {
 		it('hides the add-frontmatter button for a note that already has one', async () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			expect(
 				screen.queryByRole('button', { name: 'Add frontmatter' })
 			).not.toBeInTheDocument()
@@ -578,7 +578,7 @@ describe('Editor Mode Live', () => {
 		it('shows the add-frontmatter button for a note without one', async () => {
 			render(<EditorModeLive content={'# Roadmap\n\nShip it.'} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			expect(
 				screen.getByRole('button', { name: 'Add frontmatter' })
 			).toBeInTheDocument()
@@ -591,7 +591,7 @@ describe('Editor Mode Live', () => {
 		it('saves a body the author has emptied, keeping the frontmatter', async () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			await userEvent.click(screen.getByText('Ship it.'))
 			await userEvent.keyboard('{Backspace}'.repeat('Ship it.'.length))
 
@@ -611,7 +611,7 @@ describe('Editor Mode Live', () => {
 		it('saves edits made directly in the frontmatter block, fences preserved', async () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			// Syntax highlighting splits the block's text into several `<span>`s
 			// ('status', ': ', 'draft') - clicking the last one lands the cursor at
 			// its end, the same place a click already lands in the plain-paragraph
@@ -634,7 +634,7 @@ describe('Editor Mode Live', () => {
 
 		it('copies the frontmatter text via its copy button', async () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 
 			await userEvent.click(screen.getByLabelText('Copy frontmatter'))
 
@@ -648,7 +648,7 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={FRONTMATTER_NOTE} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			// A real pause, not a scripting convenience: the load and the delete
 			// need to land in separate `prosemirror-history` groups (grouped by
 			// wall-clock proximity, ~500ms) for the later Ctrl+Z to undo only the
@@ -678,7 +678,7 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={'# Roadmap\n\nShip it.'} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			await userEvent.click(
 				screen.getByRole('button', { name: 'Add frontmatter' })
 			)
