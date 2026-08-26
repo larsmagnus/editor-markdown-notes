@@ -94,9 +94,14 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 
 		// Reveals the delimiters (real text) so ArrowLeft can land between them.
+		// Delays between presses avoid the same ProseMirror-state-staleness
+		// window `backspaceRightAfterMarker` above works around.
 		await content.locator('strong').dblclick()
+		await page.waitForTimeout(100)
 		await page.keyboard.press('ArrowLeft') // caret before "bold", after "**"
+		await page.waitForTimeout(100)
 		await page.keyboard.press('ArrowLeft') // caret between the two "*"
+		await page.waitForTimeout(100)
 		await page.keyboard.press('Backspace')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
@@ -111,8 +116,11 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 
 		await content.locator('s').dblclick()
+		await page.waitForTimeout(100)
 		await page.keyboard.press('ArrowLeft')
+		await page.waitForTimeout(100)
 		await page.keyboard.press('ArrowLeft')
+		await page.waitForTimeout(100)
 		await page.keyboard.press('Backspace')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
@@ -127,7 +135,9 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 
 		await content.locator('code').dblclick()
+		await page.waitForTimeout(100)
 		await page.keyboard.press('ArrowLeft') // caret right after the opening `
+		await page.waitForTimeout(100)
 		await page.keyboard.press('Backspace')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
