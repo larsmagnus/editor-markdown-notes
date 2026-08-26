@@ -207,7 +207,9 @@ describe('hasStyle', () => {
 			content: '> **Some** _notes_ and `code`',
 		})
 		currentEditor = editor
-		editor.commands.setTextSelection({ from: 2, to: 6 })
+		// Positions shifted +2 from a bare "Some": the blockquote's own "> " is
+		// now real leading text ahead of it (see `blockquote-marker.ts`).
+		editor.commands.setTextSelection({ from: 4, to: 8 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
 				<EditorContext.Provider value={{ editor }}>

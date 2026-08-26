@@ -1,5 +1,6 @@
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
+import { blockquoteMarkerLength } from '@/editor/extensions/blockquote/blockquote-marker'
 import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import { headingMarkerLength } from '@/editor/extensions/heading/heading-marker'
 import { parseListMarker } from '@/editor/extensions/list/list-marker'
@@ -26,10 +27,11 @@ export type DocumentText = {
 
 /**
  * How much of `node`'s own leading text is markup, not prose - a heading's
- * `#`x`level`, or a list item's own bullet/ordered/task marker (real text
- * held by its *first paragraph*, `node` here, not the `listItem`/`taskItem`
- * wrapping it - that wrapper is never itself a textblock, so the walk below
- * never visits it directly).
+ * `#`x`level`, a list item's own bullet/ordered/task marker, or a
+ * blockquote's own `"> "` (each real text held by its *first paragraph*,
+ * `node` here, not the `listItem`/`taskItem`/`blockquote` wrapping it - that
+ * wrapper is never itself a textblock, so the walk below never visits it
+ * directly).
  */
 function leadingMarkerLength(
 	node: ProseMirrorNode,
@@ -38,10 +40,15 @@ function leadingMarkerLength(
 ): number {
 	if (node.type.name === 'heading') return headingMarkerLength(node.textContent)
 
-	const inListItem =
-		index === 0 &&
-		(parent?.type.name === 'listItem' || parent?.type.name === 'taskItem')
-	if (inListItem) return parseListMarker(node.textContent)?.markerLength ?? 0
+	if (index !== 0) return 0
+
+	if (parent?.type.name === 'listItem' || parent?.type.name === 'taskItem') {
+		return parseListMarker(node.textContent)?.markerLength ?? 0
+	}
+
+	if (parent?.type.name === 'blockquote') {
+		return blockquoteMarkerLength(node.textContent)
+	}
 
 	return 0
 }

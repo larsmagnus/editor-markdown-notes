@@ -2,13 +2,13 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
 import { parseListMarker } from '@/editor/extensions/list/list-marker'
-import { paragraphWithoutMarker } from '@/editor/extensions/list/strip-list-marker-for-serialize'
+import { paragraphWithoutLeadingText } from '@/editor/extensions/paragraph-without-leading-text'
 
 /**
  * Renders `node`'s content with its own marker stripped from its first
  * paragraph - shared by `listItemMarkdownSerialize` and
  * `taskItemMarkdownSerialize`, which differ only in what (if anything) they
- * write back in the marker's place. See `strip-list-marker-for-serialize.ts`
+ * write back in the marker's place. See `paragraph-without-leading-text.ts`
  * for why the marker is stripped here rather than left for the wrapping
  * list to double up on.
  */
@@ -23,7 +23,7 @@ function renderItemWithoutMarker(
 	}
 
 	const markerLength = parseListMarker(paragraph.textContent)?.markerLength ?? 0
-	const stripped = paragraphWithoutMarker(paragraph, markerLength)
+	const stripped = paragraphWithoutLeadingText(paragraph, markerLength)
 
 	state.render(stripped, node, 0)
 	node.forEach((child, _offset, index) => {

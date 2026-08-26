@@ -268,4 +268,14 @@ describe('getDocumentText', () => {
 			'A heading\n\nOne item\n\nAnother'
 		)
 	})
+
+	it('reads a blockquote as prose too, without its own leading "> "', () => {
+		const editor = new Editor({
+			extensions,
+			content: '> A quoted sentence.',
+		})
+		currentEditor = editor
+
+		expect(getDocumentText(editor.state.doc).text).toBe('A quoted sentence.')
+	})
 })

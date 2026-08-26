@@ -15,6 +15,9 @@ import { Markdown } from 'tiptap-markdown'
 
 import { AskInlineStatus } from '@/editor/extensions/ask/ask-inline-status-extension'
 import { AskSuggestion } from '@/editor/extensions/ask/ask-suggestion-extension'
+import { BlockquoteExtension } from '@/editor/extensions/blockquote/blockquote-extension'
+import { BlockquoteMarkerBackspace } from '@/editor/extensions/blockquote/blockquote-marker-backspace-extension'
+import { createBlockquoteMarkerRevealProvider } from '@/editor/extensions/blockquote/blockquote-marker-reveal-provider'
 import { CodeBlockExtension } from '@/editor/extensions/code-block/code-block-extension'
 import { CodeExtension } from '@/editor/extensions/code-block/code-extension'
 import { parseFence } from '@/editor/extensions/code-block/code-fence'
@@ -84,9 +87,10 @@ export const extensions = [
 		code: false,
 		italic: false,
 		heading: false,
-		// `Bold`/`Strike`/`Italic`/`Code`/`Heading` are StarterKit's defaults
-		// disabled and replaced by their own file in this folder or `formatting/`
-		// - see each for why.
+		blockquote: false,
+		// `Bold`/`Strike`/`Italic`/`Code`/`Heading`/`Blockquote` are StarterKit's
+		// defaults disabled and replaced by their own file in this folder or
+		// `formatting/` - see each for why.
 		bold: false,
 		strike: false,
 		// StarterKit bundles both as of v3. Link is registered below instead
@@ -107,6 +111,7 @@ export const extensions = [
 	Frontmatter,
 	CodeBlockExtension,
 	HeadingExtension,
+	BlockquoteExtension,
 	ListItemExtension,
 	// Linkifying is markdown-it's job (see `linkify` below), which `StrictLinkify`
 	// keeps to URLs with an explicit scheme. TipTap's own autolink plugin has no
@@ -234,6 +239,7 @@ export const extensions = [
 			createFenceRevealProvider(['codeBlock'], parseFence),
 			createFenceRevealProvider(['heading'], parseHeadingReveal),
 			createListMarkerRevealProvider(['listItem', 'taskItem']),
+			createBlockquoteMarkerRevealProvider('blockquote'),
 			createDelimitedMarkRevealProvider('link', linkDelimiterSpec()),
 			createDelimitedMarkRevealProvider('bold', fixedDelimiter('**')),
 			createDelimitedMarkRevealProvider('strike', fixedDelimiter('~~')),
@@ -249,6 +255,9 @@ export const extensions = [
 	// Registered after ListItemExtension/TaskItemExtension so its Backspace
 	// handler runs before their own default deletion behavior.
 	ListMarkerBackspace,
+	// Registered after BlockquoteExtension so its Backspace handler runs before
+	// the stock Blockquote's own (see the file's own doc comment).
+	BlockquoteMarkerBackspace,
 	// The WCAG "no keyboard trap" escape hatch. Outranks TabIndent, the image
 	// node's Tab shortcut, and the table's Tab-between-cells keymap (all
 	// registered earlier); yields to SlashCommand's own popup.
