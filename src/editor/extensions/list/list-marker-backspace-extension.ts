@@ -1,7 +1,10 @@
 import { Extension } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
 
-import { listItemAtMarkerBoundary } from '@/editor/extensions/list/list-item-at-marker-boundary'
+import {
+	listItemAtFirstContentChar,
+	listItemAtMarkerBoundary,
+} from '@/editor/extensions/list/list-item-at-marker-boundary'
 
 /**
  * Backspace right after a list item's own bullet/number/checkbox removes the
@@ -28,6 +31,17 @@ import { listItemAtMarkerBoundary } from '@/editor/extensions/list/list-item-at-
  * `liftListItem` (from `prosemirror-schema-list`) computes its lift target
  * against the chain's *starting* state, so applying it after an in-chain
  * delete has already shifted positions silently fails the whole chain.
+ *
+ * Also intercepts Backspace one position further in - right before the
+ * item's first content character, immediately after the marker's own
+ * (hidden) span. Left to fall through, the browser's native contenteditable
+ * deletion at that exact boundary can reach across the hidden span and take
+ * part of the marker with it (its trailing space vanishes), which the sync
+ * plugin then reads as an absent marker and pastes a second one in front of
+ * what's left instead of fixing it in place - the same failure mode as the
+ * marker-boundary case above, reached by a different route. Deleting that
+ * one character ourselves, as an explicit transaction, sidesteps the
+ * browser's native handling entirely.
  */
 export const ListMarkerBackspace = Extension.create({
 	name: 'listMarkerBackspace',
@@ -36,20 +50,27 @@ export const ListMarkerBackspace = Extension.create({
 		return {
 			Backspace: () => {
 				const listItemType = listItemAtMarkerBoundary(this.editor)
-				if (!listItemType) return false
+				if (listItemType) {
+					const markerLength = this.editor.state.selection.$from.parentOffset
 
-				const markerLength = this.editor.state.selection.$from.parentOffset
+					const lifted = this.editor.chain().liftListItem(listItemType).run()
+					if (!lifted) return false
 
-				const lifted = this.editor.chain().liftListItem(listItemType).run()
-				if (!lifted) return false
+					const { selection } = this.editor.state
+					if (!(selection instanceof TextSelection)) return false
+					const paragraphStart = selection.from - markerLength
 
-				const { selection } = this.editor.state
-				if (!(selection instanceof TextSelection)) return false
-				const paragraphStart = selection.from - markerLength
+					return this.editor
+						.chain()
+						.deleteRange({ from: paragraphStart, to: selection.from })
+						.run()
+				}
 
+				if (!listItemAtFirstContentChar(this.editor)) return false
+				const { from } = this.editor.state.selection
 				return this.editor
 					.chain()
-					.deleteRange({ from: paragraphStart, to: selection.from })
+					.deleteRange({ from: from - 1, to: from })
 					.run()
 			},
 		}

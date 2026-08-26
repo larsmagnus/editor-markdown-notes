@@ -15,7 +15,9 @@ test.describe('Deleting a list item down to empty in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 
 		await content.locator('li').click()
+		await page.waitForTimeout(100)
 		await page.keyboard.press('End')
+		await page.waitForTimeout(100)
 		for (let i = 0; i < 'Eggs'.length; i++) {
 			await page.keyboard.press('Backspace')
 			await page.waitForTimeout(100)
