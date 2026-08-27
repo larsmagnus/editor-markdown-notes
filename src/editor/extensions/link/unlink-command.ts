@@ -12,6 +12,9 @@ import { stripLinkDelimiters } from '@/editor/extensions/link/strip-link-delimit
  * the selection when no run matches - an image wrapped in a link has no text
  * run at all (see `link-markdown-spec.ts`), so there is no delimiter text to
  * strip, only the mark itself.
+ *
+ * Declines where the selection holds no link, which is what lets
+ * `editor.can().unsetLink()` report false and the toolbar button disable.
  */
 export function createUnlinkCommand(markType: MarkType): Command {
 	return (state, dispatch) => {
@@ -20,6 +23,7 @@ export function createUnlinkCommand(markType: MarkType): Command {
 			(candidate) => candidate.from <= from && candidate.to >= to
 		)
 
+		if (!run && !state.doc.rangeHasMark(from, to, markType)) return false
 		if (!dispatch) return true
 
 		const tr = state.tr

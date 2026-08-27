@@ -45,4 +45,16 @@ describe('createUnlinkCommand', () => {
 			'![alt](/icon-editor-markdown-notes.png)'
 		)
 	})
+
+	it('declines where there is no link, so the toolbar button can disable', () => {
+		const editor = makeEditor('Just some prose with no link in it')
+		editor.commands.setTextSelection({ from: 1, to: 10 })
+
+		const applied = createUnlinkCommand(editor.schema.marks.link)(
+			editor.state,
+			editor.view.dispatch
+		)
+
+		expect(applied).toBe(false)
+	})
 })
