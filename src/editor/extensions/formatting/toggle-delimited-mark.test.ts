@@ -74,11 +74,10 @@ describe('toggleDelimitedMark', () => {
 		expect(applied).toBe(false)
 	})
 
-	// Regression: `findMarkRuns` stops extending a run at any non-text node, so
-	// a selection spanning two bold runs split by a hard break has the mark on
-	// every text node it touches but matches no single run - this used to be
-	// misread as "fully marked" and unwrapped as if it were one run.
-	it('declines on a selection spanning two runs split by a non-text inline node', () => {
+	// `findMarkRuns` stops extending a run at any non-text node, so a selection
+	// spanning two bold runs split by a hard break matches no single run. It is
+	// still bold end to end, so toggling has to turn it off - both runs at once.
+	it('unwraps every run in a selection split by a non-text inline node', () => {
 		const editor = new Editor({ extensions: [StarterKit], content: '' })
 		editor.commands.setContent(
 			'<p><strong>**bold </strong><br><strong> text**</strong></p>'
@@ -94,7 +93,10 @@ describe('toggleDelimitedMark', () => {
 			{ open: '**', close: '**' }
 		)(editor.state, editor.view.dispatch)
 
-		expect(applied).toBe(false)
+		expect(applied).toBe(true)
+		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
+			'bold  text'
+		)
 	})
 
 	it('declines on a selection that only partially overlaps a run', () => {
@@ -110,5 +112,26 @@ describe('toggleDelimitedMark', () => {
 		)(editor.state, editor.view.dispatch)
 
 		expect(applied).toBe(false)
+	})
+
+	it('absorbs a fully-contained run rather than nesting a second pair around it', () => {
+		const editor = new Editor({ extensions: [StarterKit], content: '' })
+		editor.commands.setContent('<p>plain <strong>**bold**</strong> more</p>')
+		editor.commands.setTextSelection({
+			from: 1,
+			to: editor.state.doc.content.size - 1,
+		})
+
+		const applied = toggleDelimitedMark(
+			editor.schema.marks.bold,
+			fixedDelimiter('**'),
+			{ open: '**', close: '**' }
+		)(editor.state, editor.view.dispatch)
+
+		expect(applied).toBe(true)
+		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
+			'**plain bold more**'
+		)
+		editor.destroy()
 	})
 })
