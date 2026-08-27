@@ -22,7 +22,19 @@ export function linkDelimiterSpec(): DelimiterSpec {
 		resolveOpen: () => '[',
 		resolveClose: (_doc, run) => linkCloseText(hrefOf(run), titleOf(run)),
 		isBare: isBareAutolink,
+		isMidEdit: hasUnparseableClose,
 	}
+}
+
+/**
+ * The run carries the start of a closing delimiter that `detectLinkClose`
+ * will not accept - a URL with a space in it, a `)` momentarily deleted. The
+ * delimiter is there and being edited, not missing.
+ */
+function hasUnparseableClose(text: string): boolean {
+	return (
+		text.startsWith('[') && text.includes('](') && detectLinkClose(text) === 0
+	)
 }
 
 function hrefOf(run: MarkRun): string {

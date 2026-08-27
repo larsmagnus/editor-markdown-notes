@@ -12,13 +12,7 @@ type MarkBoundary =
 			index: number
 	  ) => string)
 
-/**
- * The shape `delimited-mark-extension.ts`'s `serialize` option needs -
- * `prosemirror-markdown`'s own `MarkSerializerSpec` isn't exported, so this
- * is the minimal reconstruction every delimited mark's storage satisfies:
- * `IDENTITY_DELIMITER_SERIALIZE` for the common case, or a mark's own (a
- * link needs three cases - see `link-markdown-spec.ts`).
- */
+/** `prosemirror-markdown`'s `MarkSerializerSpec`, which it does not export. */
 export type DelimiterMarkdownSerialize = {
 	open: MarkBoundary
 	close: MarkBoundary
@@ -27,13 +21,10 @@ export type DelimiterMarkdownSerialize = {
 }
 
 /**
- * How `ensure-delimiters-plugin.ts` and the backspace/delete boundary
- * commands recognize and reconstruct one mark type's delimiter text. A fixed
- * string (bold's `**`, strike's `~~`) is the simple case (`fixedDelimiter`);
- * italic needs its own implementation (`italic-delimiter-spec.ts`) since
- * which character is correct depends on context, and inline code needs its
- * own (`inline-code-delimiter-spec.ts`) since the fence length itself varies
- * per run - neither can be reduced to one fixed-length string.
+ * How one mark type's delimiter text is recognized and reconstructed. A fixed
+ * string covers bold and strike; italic's correct character depends on
+ * context and inline code's fence length varies per run, so both bring their
+ * own.
  */
 export type DelimiterSpec = {
 	/** Length of the delimiter already at the very start of `text`, or 0 if there is none. */
@@ -45,24 +36,25 @@ export type DelimiterSpec = {
 	/** The delimiter text to insert at the run's end when it has none. */
 	resolveClose(doc: ProseMirrorNode, run: MarkRun): string
 	/**
-	 * True when a run needs no delimiter text at all - a link whose visible
-	 * text already equals its own `href` (an autolink, `<https://x>`) has
-	 * nothing for brackets to add. `ensure-delimiters-plugin.ts` skips a bare
-	 * run entirely instead of reading `detectOpen`/`detectClose`'s `0` as
-	 * "missing, please synthesize" the way every other delimited mark does.
-	 * Omitted by every mark that has no such case.
+	 * True when a run needs no delimiter text at all - an autolink's visible
+	 * text already equals its `href`. Distinguishes "none needed" from
+	 * `detectOpen`/`detectClose`'s "missing, please synthesize".
 	 */
 	isBare?(doc: ProseMirrorNode, run: MarkRun): boolean
+	/**
+	 * True when a delimiter is present but does not currently parse - a URL
+	 * mid-retype passes through `](my file.md)`. Read as absent, the repair
+	 * pass appends a second delimiter from attributes the edit has not reached,
+	 * and the duplicate is permanent: the appended text parses on the next pass
+	 * and agrees with those attributes, so nothing takes it back out.
+	 */
+	isMidEdit?(text: string): boolean
 }
 
-/**
- * The literal text to wrap a fresh selection in - separate open/close since
- * inline code's fence sometimes needs an asymmetric padding space (see
- * `inline-code-delimiter-spec.ts`); bold/strike/italic just use the same
- * string both ways.
- */
+/** The literal text to wrap a fresh selection in; inline code's two ends differ. */
 export type DelimiterPair = { open: string; close: string }
 
+/** A delimiter that is the same fixed string at both ends. */
 export function fixedDelimiter(delimiter: string): DelimiterSpec {
 	return {
 		detectOpen: (text) => (text.startsWith(delimiter) ? delimiter.length : 0),
@@ -71,13 +63,7 @@ export function fixedDelimiter(delimiter: string): DelimiterSpec {
 	}
 }
 
-/**
- * `resolveOpen`/`resolveClose` are always the same one-edge computation
- * called with `'open'`/`'close'` - italic's and inline code's own specs
- * both need that computation to resolve the run's document context (via
- * `doc`/`run`), so this is the shared shape, not the resolution logic
- * itself.
- */
+/** Both edge resolvers from the one computation every spec expresses them as. */
 export function edgeResolvers(
 	resolve: (
 		doc: ProseMirrorNode,
@@ -92,14 +78,12 @@ export function edgeResolvers(
 }
 
 /**
- * The `markdown` serializer side every delimited mark shares: the delimiter
- * is already real text carrying the mark (see `wrap-selection-with-
- * delimiter.ts`), so there's nothing left to synthesize here, or it would
- * double up. `escape: false` is load-bearing, not cosmetic -
- * `prosemirror-markdown`'s default escaping has no way to tell a
- * coincidental delimiter-shaped run in plain prose apart from a real one,
- * and would otherwise write this mark's own delimiters back out escaped -
- * syntax that silently stops being a mark on the next load.
+ * The serializer every delimited mark shares: its delimiter is already real
+ * text carrying the mark, so synthesizing one here would double it up.
+ * `escape: false` is load-bearing - the default escaping cannot tell a
+ * coincidental delimiter-shaped run in prose from a real one, and would write
+ * this mark's own delimiters out escaped, as syntax that stops being a mark on
+ * the next load.
  */
 export const IDENTITY_DELIMITER_SERIALIZE = {
 	open: '',
