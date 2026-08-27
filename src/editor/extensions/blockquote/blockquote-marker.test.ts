@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-	blockquoteMarkerLength,
-	firstParagraphStart,
-} from '@/editor/extensions/blockquote/blockquote-marker'
+import { blockquoteMarkerLength } from '@/editor/extensions/blockquote/blockquote-marker'
 
 describe('blockquoteMarkerLength', () => {
 	it('returns 2 for text starting with "> "', () => {
@@ -20,11 +17,5 @@ describe('blockquoteMarkerLength', () => {
 
 	it('returns 0 for an empty string', () => {
 		expect(blockquoteMarkerLength('')).toBe(0)
-	})
-})
-
-describe('firstParagraphStart', () => {
-	it("is two positions past the blockquote node's own start", () => {
-		expect(firstParagraphStart(4)).toBe(6)
 	})
 })

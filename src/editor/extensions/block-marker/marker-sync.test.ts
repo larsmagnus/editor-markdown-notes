@@ -21,7 +21,7 @@ function documentFrom(markdown: string): Editor {
 	return editor
 }
 
-describe('createListMarkerSyncPlugin', () => {
+describe('createMarkerSyncPlugin', () => {
 	it('seeds a bullet marker on a freshly split item', () => {
 		const editor = documentFrom('- First')
 		// Position at the very end of "- First" (marker + text), then split via

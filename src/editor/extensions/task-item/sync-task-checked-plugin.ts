@@ -3,13 +3,14 @@ import { Plugin, PluginKey } from '@tiptap/pm/state'
 import type { Transaction } from '@tiptap/pm/state'
 
 import { parseListMarker } from '@/editor/extensions/list/list-marker'
+import { anyDocChanged } from '@/editor/extensions/transaction-filters'
 
 /**
  * Keeps a task item's `checked` attribute matching whatever its own marker
  * text currently reads - the counterpart to `toggle-task-checked-command.ts`
  * writing that text directly. Typing an `x` into a revealed `[ ]` is real
  * text editing, same as everywhere else in this app's live-preview model
- * (see `list-marker-sync-plugin.ts`'s own doc comment on why it stays
+ * (see `create-marker-sync-plugin.ts`'s own doc comment on why it stays
  * one-directional for this exact attribute), so without this the checkbox
  * UI - which reads `node.attrs.checked` - would go stale the moment someone
  * edited the bracket by hand instead of clicking it.
@@ -18,9 +19,7 @@ export function createSyncTaskCheckedPlugin(schema: Schema): Plugin {
 	return new Plugin({
 		key: new PluginKey('taskCheckedSync'),
 		appendTransaction: (transactions, _oldState, newState) => {
-			if (!transactions.some((transaction) => transaction.docChanged)) {
-				return null
-			}
+			if (!anyDocChanged(transactions)) return null
 
 			const { taskItem } = schema.nodes
 			if (!taskItem) return null

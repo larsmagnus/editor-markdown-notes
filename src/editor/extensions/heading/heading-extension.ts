@@ -5,7 +5,6 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { Command as ProseMirrorCommand } from '@tiptap/pm/state'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
-import { createEnsureHeadingMarkerPlugin } from '@/editor/extensions/heading/ensure-heading-marker-plugin'
 import { createHeadingInputRule } from '@/editor/extensions/heading/heading-input-rule'
 import { parseHeadingLevel } from '@/editor/extensions/heading/heading-marker'
 import { createHeadingNodeView } from '@/editor/extensions/heading/heading-node-view'
@@ -34,10 +33,10 @@ export type HeadingSerializerState = MarkdownSerializerState & {
  * view.ts` is what makes retyping the marker live-update the rendered tag -
  * ProseMirror's default node view only rebuilds a node's DOM on a type/attrs
  * change, never a text change, so without it the tag would stay stuck on
- * whatever it first rendered as. `heading-input-rule.ts` and
- * `ensure-heading-marker-plugin.ts` are what keep every path that can create
- * a `heading` node honest about there being marker text at all: neither the
- * toolbar's toggle nor a paste can produce one with none.
+ * whatever it first rendered as. `heading-input-rule.ts` and the block marker sync
+ * plugin keep every path that can create a `heading` honest about there being
+ * marker text at all: neither the toolbar's toggle nor a paste can produce one
+ * with none.
  */
 export const HeadingExtension = Heading.extend({
 	addAttributes() {
@@ -86,10 +85,6 @@ export const HeadingExtension = Heading.extend({
 
 	addNodeView() {
 		return ({ node }) => createHeadingNodeView(node)
-	},
-
-	addProseMirrorPlugins() {
-		return [createEnsureHeadingMarkerPlugin(this.type)]
 	},
 
 	addStorage() {

@@ -18,7 +18,11 @@ export function insertLiteralListMarkers(element: Element): void {
 		const parent = item.parentElement
 		if (!parent) return
 
-		const target = item.querySelector('p') ?? item
+		// `:scope >`, not a descendant search: an item whose only child is a
+		// sublist has no paragraph of its own, and an unscoped query returns the
+		// *nested* item's paragraph - which the outer item then prepends its own
+		// marker to as well, giving `- - nested`.
+		const target = item.querySelector(':scope > p') ?? item
 		if (parent.tagName === 'OL') {
 			const start = Number(parent.getAttribute('start') ?? '1')
 			const index = Array.from(parent.children).indexOf(item)
@@ -45,7 +49,11 @@ export function insertLiteralTaskMarkers(element: Element): void {
 		item.setAttribute('data-checked', String(checked))
 		input?.remove()
 
-		const target = item.querySelector('p') ?? item
+		// `:scope >`, not a descendant search: an item whose only child is a
+		// sublist has no paragraph of its own, and an unscoped query returns the
+		// *nested* item's paragraph - which the outer item then prepends its own
+		// marker to as well, giving `- - nested`.
+		const target = item.querySelector(':scope > p') ?? item
 		target.prepend(document.createTextNode(taskMarkerText(checked)))
 	})
 }

@@ -1,3 +1,4 @@
+import type { CommandProps } from '@tiptap/core'
 import { Color } from '@tiptap/extension-color'
 import Document from '@tiptap/extension-document'
 import Image from '@tiptap/extension-image'
@@ -15,9 +16,12 @@ import { Markdown } from 'tiptap-markdown'
 
 import { AskInlineStatus } from '@/editor/extensions/ask/ask-inline-status-extension'
 import { AskSuggestion } from '@/editor/extensions/ask/ask-suggestion-extension'
+import { BlockMarkers } from '@/editor/extensions/block-marker/block-marker-extension'
+import { createMarkerRevealProvider } from '@/editor/extensions/block-marker/create-marker-reveal-provider'
+import { MarkerBackspace } from '@/editor/extensions/block-marker/marker-backspace-extension'
+import { BLOCK_MARKER_SPECS } from '@/editor/extensions/block-marker/specs'
+import { withMarkerStrip } from '@/editor/extensions/block-marker/with-marker-strip'
 import { BlockquoteExtension } from '@/editor/extensions/blockquote/blockquote-extension'
-import { BlockquoteMarkerBackspace } from '@/editor/extensions/blockquote/blockquote-marker-backspace-extension'
-import { createBlockquoteMarkerRevealProvider } from '@/editor/extensions/blockquote/blockquote-marker-reveal-provider'
 import { CodeBlockExtension } from '@/editor/extensions/code-block/code-block-extension'
 import { CodeExtension } from '@/editor/extensions/code-block/code-extension'
 import { parseFence } from '@/editor/extensions/code-block/code-fence'
@@ -28,10 +32,11 @@ import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 import { inlineCodeDelimiterSpec } from '@/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
 import { StrikeExtension } from '@/editor/extensions/formatting/strike-extension'
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
+import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import { HeadingExtension } from '@/editor/extensions/heading/heading-extension'
-import { parseHeadingReveal } from '@/editor/extensions/heading/heading-reveal'
 import { ImageView } from '@/editor/extensions/image/image-view'
 import {
+	enterAdjacentImage,
 	focusImageSourceField,
 	focusImageToolbar,
 	moveToAdjacentImage,
@@ -42,8 +47,6 @@ import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
 import { LinkExtension } from '@/editor/extensions/link/link-extension'
 import { StrictLinkify } from '@/editor/extensions/link/strict-linkify-extension'
 import { ListItemExtension } from '@/editor/extensions/list/list-item-extension'
-import { ListMarkerBackspace } from '@/editor/extensions/list/list-marker-backspace-extension'
-import { createListMarkerRevealProvider } from '@/editor/extensions/list/list-marker-reveal-provider'
 import { MarkdownClipboard } from '@/editor/extensions/markdown/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '@/editor/extensions/markdown/markdown-escaping'
 import { SearchRevealHighlight } from '@/editor/extensions/search-reveal/search-reveal-extension'
@@ -62,12 +65,9 @@ patchMarkdownEscaping()
 
 /**
  * The TipTap schema the editor runs on. `tiptap-markdown`'s table/task-list/
- * image serializers only activate when a same-named extension is
- * registered - without the nodes below, markdown-it parses them into HTML
- * that the schema then drops, and the next auto-save writes the loss to disk.
- *
- * `Code`/`Italic`/`Bold`/`Strike`/`Table` are StarterKit's defaults disabled
- * and replaced by their own file in this folder - see each for why.
+ * image serializers only activate when a same-named extension is registered -
+ * without the nodes below, markdown-it parses them into HTML that the schema
+ * then drops, and the next auto-save writes the loss to disk.
  */
 export const extensions = [
 	Color.configure({ types: [TextStyle.name, ListItemExtension.name] }),
@@ -88,13 +88,11 @@ export const extensions = [
 		italic: false,
 		heading: false,
 		blockquote: false,
-		// `Bold`/`Strike`/`Italic`/`Code`/`Heading`/`Blockquote` are StarterKit's
-		// defaults disabled and replaced by their own file in this folder or
-		// `formatting/` - see each for why.
+		// Disabled here, replaced by their own file in this folder or `formatting/`.
 		bold: false,
 		strike: false,
-		// StarterKit bundles both as of v3. Link is registered below instead
-		// (autolink disabled); underline stays unsupported (see CLAUDE.md).
+		// Bundled as of v3. Link is registered below with autolink disabled;
+		// underline stays unsupported (see CLAUDE.md).
 		link: false,
 		underline: false,
 		// Replaced below so the top-level content expression can require
@@ -103,25 +101,23 @@ export const extensions = [
 		// Replaced below by its own file in `list/` - see why.
 		listItem: false,
 	}),
-	// `frontmatter?` goes first in the content expression so at most one can
-	// exist and it can only ever be the document's first child - the schema
-	// enforces the position, no `appendTransaction` policing needed for it
-	// the way the table's header row does.
+	// `frontmatter?` first, so the schema itself enforces "at most one, always
+	// the document's first child" - no `appendTransaction` policing needed.
 	Document.extend({ content: 'frontmatter? block+' }),
 	Frontmatter,
 	CodeBlockExtension,
 	HeadingExtension,
 	BlockquoteExtension,
 	ListItemExtension,
-	// Linkifying is markdown-it's job (see `linkify` below), which `StrictLinkify`
-	// keeps to URLs with an explicit scheme. TipTap's own autolink plugin has no
-	// such restriction and runs on every transaction, so with it on a heading
-	// reading `notes.md` becomes `[notes.md](http://notes.md)`.
+	// The shared strip pass every block marker's toggle-off relies on.
+	BlockMarkers,
+	// Linkifying is markdown-it's job, kept to URLs with an explicit scheme by
+	// `StrictLinkify`. TipTap's own autolink plugin has no such restriction and
+	// runs on every transaction, turning a heading reading `notes.md` into
+	// `[notes.md](http://notes.md)`.
 	//
-	// Order nests marks: Link before Italic before Code so e.g. `*text `code`
-	// text*` nests as `*` around the backticks rather than the reverse (mark
-	// rank, not source order, decides nesting - see each file's comment for why
-	// they coexist).
+	// Registration order is mark rank, which decides nesting: Link before
+	// Italic before Code, so `*text `code` text*` nests `*` around the ticks.
 	LinkExtension.configure({ autolink: false }),
 	ItalicExtension,
 	CodeExtension,
@@ -142,20 +138,27 @@ export const extensions = [
 	// between every item.
 	TaskList.extend({
 		addAttributes: () => ({ tight: { default: true, rendered: false } }),
+		addCommands() {
+			const parent = this.parent?.()
+
+			return {
+				...parent,
+				toggleTaskList: () => (props: CommandProps) =>
+					withMarkerStrip(props, this.name, () =>
+						Boolean(parent?.toggleTaskList?.()(props))
+					),
+			}
+		},
 	}),
 	TaskItemExtension,
-	// Inline, so an image sits in a paragraph. As a block node the serializer
-	// never closes the block and the image runs into the text that follows it.
-	// `draggable` (native drag-and-drop reordering) is already the extension's
-	// default. `atom` is not: without it, ProseMirror places a text cursor next
-	// to a click on the image instead of selecting the node, so a click never
-	// produces the `NodeSelection` the bubble menu's image controls key off.
+	// Inline, so an image sits in a paragraph - as a block node the serializer
+	// never closes the block and the image runs into the text after it. `atom`
+	// is not the default: without it a click places a text cursor beside the
+	// image rather than producing the `NodeSelection` its controls key off.
 	Image.configure({ inline: true }).extend({
 		atom: true,
-		// Display only - `src` keeps the author's path, so saving does not
-		// rewrite the file with vscode-resource URIs. Outside VSCode there are
-		// no bases: the notes are served from the site root, so the browser
-		// already resolves the author's path correctly.
+		// Display only - `src` keeps the author's path, so saving never rewrites
+		// the file with vscode-resource URIs.
 		renderHTML({ HTMLAttributes }) {
 			return [
 				'img',
@@ -167,23 +170,18 @@ export const extensions = [
 				}),
 			]
 		},
-		// `renderHTML` above still drives `getHTML()`/copy-paste HTML - this only
-		// takes over the live, interactive editor, revealing `![alt](src
-		// "title")` underneath as real editable text whenever the caret sits on
-		// or beside the image (`image-view.tsx`).
+		// `renderHTML` above still drives `getHTML()` and copy-paste HTML; this
+		// takes over only the live editor, where the source reveals as text.
 		addNodeView() {
 			return ReactNodeViewRenderer(ImageView)
 		},
-		// `Tab`/`Shift-Tab` jump between images the way they jump between fields
-		// in a form; arrow keys then move into the selected image's bubble menu,
-		// the same composite-widget pattern the table handles use for their
-		// menus. Declining (returning `false`) hands the key back to the
-		// browser/other extensions - off the last image that means the page's
-		// own next focusable element, not a trap inside the editor.
+		// `Tab` jumps between images the way it jumps between form fields; arrows
+		// then move into the selected one's bubble menu, the composite-widget
+		// pattern the table handles also use. Declining hands the key back, so
+		// the last image leads out of the editor rather than trapping focus.
 		addKeyboardShortcuts() {
-			// The view goes through too: `moveToAdjacentImage` calls `view.focus()`
-			// to keep the bubble menu's `hasFocus()` check satisfied, and
-			// `focusImageToolbar` reads the rendered toolbar off the real DOM.
+			// The view goes through too - these commands need `view.focus()` and the
+			// real DOM, not just state.
 			const run =
 				(...commands: Command[]) =>
 				() =>
@@ -198,7 +196,10 @@ export const extensions = [
 			return {
 				Tab: run(moveToAdjacentImage(1)),
 				'Shift-Tab': run(moveToAdjacentImage(-1)),
-				ArrowRight: run(focusImageToolbar()),
+				// Entry comes first: `enterAdjacentImage` declines unless the
+				// selection is a plain caret, so a selected image reaches the toolbar.
+				ArrowRight: run(enterAdjacentImage(1), focusImageToolbar()),
+				ArrowLeft: run(enterAdjacentImage(-1)),
 				ArrowDown: run(focusImageToolbar()),
 				// Declines unless the image is already selected, falling through to
 				// ProseMirror's default node deletion for every other Backspace.
@@ -217,29 +218,25 @@ export const extensions = [
 	// Registered after `Markdown`, whose `onBeforeCreate` builds the parser and
 	// serializer this reads off `editor.storage`.
 	MarkdownClipboard,
-	// Decorations only, and inert until the text tools panel feeds it issues.
-	// Registered unconditionally because the editor is built once.
+	// Decorations only, inert until the text tools panel feeds it issues. All
+	// four below are registered unconditionally: the editor is built once, and a
+	// conditional extension list would tear it down on every toggle.
 	TextTools,
-	// Decorations only, and inert unless the note was opened from a search
-	// result - which is what `useSearchReveal` feeds it.
+	// Inert unless the note was opened from a search result.
 	SearchRevealHighlight,
-	// Decorations only, and inert until `useSyntaxHighlight` feeds it tokens.
+	// Inert until `useSyntaxHighlight` feeds it tokens.
 	SyntaxHighlight,
-	// Decorations only, and inert until the bubble menu's sparkles popover
-	// starts a proposal. Registered unconditionally for the same reason as
-	// `TextTools` and `SyntaxHighlight` above: the editor is built once.
+	// Inert until the bubble menu's sparkles popover starts a proposal.
 	AskSuggestion,
-	// Decorations only, and inert until the `/ask` slash command starts one.
+	// Inert until the `/ask` slash command starts one.
 	AskInlineStatus,
-	// Decorations only, hiding markdown syntax (fences, delimiters, markers)
-	// while the caret is elsewhere. Other constructs register their own
-	// provider here as they land.
+	// Hides markdown syntax while the caret is elsewhere; every revealable
+	// construct contributes a provider here.
 	SyntaxReveal.configure({
 		providers: [
 			createFenceRevealProvider(['codeBlock'], parseFence),
-			createFenceRevealProvider(['heading'], parseHeadingReveal),
-			createListMarkerRevealProvider(['listItem', 'taskItem']),
-			createBlockquoteMarkerRevealProvider('blockquote'),
+			createFenceRevealProvider(['frontmatter'], parseFrontmatterFence),
+			createMarkerRevealProvider(BLOCK_MARKER_SPECS),
 			createDelimitedMarkRevealProvider('link', linkDelimiterSpec()),
 			createDelimitedMarkRevealProvider('bold', fixedDelimiter('**')),
 			createDelimitedMarkRevealProvider('strike', fixedDelimiter('~~')),
@@ -247,20 +244,15 @@ export const extensions = [
 			createDelimitedMarkRevealProvider('code', inlineCodeDelimiterSpec()),
 		],
 	}),
-	// Otherwise unhandled, Tab is a browser default: it moves focus to the next
-	// focusable element on the page rather than indenting. Declines inside a
-	// table cell and when a node (not a text caret) is selected, so it doesn't
-	// compete with those keys' own meanings elsewhere in this file.
+	// Unhandled, Tab moves focus rather than indenting. Declines inside a table
+	// cell and on a node selection, so it never competes with those meanings.
 	TabIndent,
-	// Registered after ListItemExtension/TaskItemExtension so its Backspace
-	// handler runs before their own default deletion behavior.
-	ListMarkerBackspace,
-	// Registered after BlockquoteExtension so its Backspace handler runs before
-	// the stock Blockquote's own (see the file's own doc comment).
-	BlockquoteMarkerBackspace,
-	// The WCAG "no keyboard trap" escape hatch. Outranks TabIndent, the image
-	// node's Tab shortcut, and the table's Tab-between-cells keymap (all
-	// registered earlier); yields to SlashCommand's own popup.
+	// Registered after every marker-bearing node extension, so its Backspace
+	// handler runs before their own deletion behavior - in particular the stock
+	// Blockquote's, which treats offset 0 (before the marker) as the exit point.
+	MarkerBackspace,
+	// The WCAG "no keyboard trap" escape hatch, outranking every Tab handler
+	// registered earlier and yielding to SlashCommand's popup.
 	FocusNavigation,
 	// A plugin + keyboard handling only, no schema node, so it can sit anywhere.
 	SlashCommand,

@@ -11,6 +11,7 @@ import {
 } from '@/editor/extensions/code-block/code-fence'
 import { createEnsureFencePlugin } from '@/editor/extensions/code-block/ensure-fence-plugin'
 import { createFenceInputRule } from '@/editor/extensions/code-block/fence-input-rule'
+import { createToggleCodeBlockCommand } from '@/editor/extensions/code-block/toggle-code-block-command'
 import { unwrapCodeBlockAtFenceStart } from '@/editor/extensions/code-block/unwrap-code-block'
 import type { MarkdownIt } from '@/editor/extensions/markdown/markdown-it-types'
 
@@ -18,22 +19,16 @@ import type { MarkdownIt } from '@/editor/extensions/markdown/markdown-it-types'
 const LANGUAGE_CLASS_PREFIX = 'language-'
 
 /**
- * The name stays `codeBlock`, which is what keeps `tiptap-markdown`'s fenced
- * block serializer attached (replaced below with one that no longer needs to
- * synthesize fences, since they're now live text the block's own content
- * carries). The node view only changes how a block is drawn: a `mermaid` one
- * renders its diagram, everything else stays a `<pre>`.
+ * The name stays `codeBlock`, which keeps `tiptap-markdown`'s fenced block
+ * serializer attached. The node view only changes how a block is drawn: a
+ * `mermaid` one renders its diagram, everything else stays a `<pre>`.
  *
  * `language` is no longer a node attribute - the fence-open line is real,
- * editable text inside the block's own content (see `code-fence.ts`), so an
- * attribute kept in sync with it would be a second source of truth for the
- * same fact. Every reader of "what language is this block" parses the text
- * instead (`fenceLanguage`), which is also what makes editing the fence
- * line's language tag live-update highlighting: there's nothing else to
- * resync. `fence-input-rule.ts` and `ensure-fence-plugin.ts` are what keep
- * every path that can create a `codeBlock` node - typing, the toolbar
- * toggle, VS Code paste - honest about that: none of them can produce one
- * with no fence text in it.
+ * editable text in the block's content, and an attribute kept in sync with it
+ * would be a second source of truth. Parsing the text instead is what makes
+ * retyping the language tag live-update highlighting, with nothing to resync.
+ * The input rule and `ensure-fence-plugin.ts` keep every path that can create
+ * a block honest about there being fence text at all.
  */
 export const CodeBlockExtension = CodeBlock.extend({
 	addAttributes() {
@@ -59,21 +54,30 @@ export const CodeBlockExtension = CodeBlock.extend({
 		return ReactNodeViewRenderer(CodeBlockView)
 	},
 
-	// The stock extension's own shortcuts (`Mod-Alt-c` toggle, triple-Enter and
-	// ArrowUp/ArrowDown to exit the block) still apply - only `Backspace` is
-	// replaced, so this must spread `this.parent()` rather than return in its
-	// place, or the whole map is lost.
+	// Only `Backspace` is replaced, so this spreads `this.parent()` rather than
+	// returning in its place.
 	addKeyboardShortcuts() {
 		return {
 			...this.parent?.(),
-			// Backspacing at the very start of the fence line - `parentOffset === 0`,
-			// since the fence text is now the first thing in the block's content -
-			// unwraps the block into a plain paragraph holding its code.
+			// At the very start of the fence line, unwraps the block into a plain
+			// paragraph holding its code.
 			Backspace: () =>
 				unwrapCodeBlockAtFenceStart(this.name)(
 					this.editor.state,
 					this.editor.view.dispatch
 				),
+		}
+	},
+
+	addCommands() {
+		const parent = this.parent?.()
+
+		return {
+			...parent,
+			toggleCodeBlock: createToggleCodeBlockCommand(
+				this.name,
+				parent?.toggleCodeBlock
+			),
 		}
 	},
 
@@ -88,10 +92,8 @@ export const CodeBlockExtension = CodeBlock.extend({
 	addStorage() {
 		return {
 			markdown: {
-				// The block's text already contains its fences verbatim, so this
-				// only needs to write it back out - synthesizing them here (the
-				// stock behavior) would double them up on top of what's now real
-				// content.
+				// The text already contains its fences, so synthesizing them here -
+				// the stock behavior - would double them up.
 				serialize(state: MarkdownSerializerState, node: ProseMirrorNode) {
 					state.text(node.textContent, false)
 					state.ensureNewLine()
@@ -101,11 +103,8 @@ export const CodeBlockExtension = CodeBlock.extend({
 					setup(markdownit: MarkdownIt) {
 						markdownit.set({ langPrefix: LANGUAGE_CLASS_PREFIX })
 					},
-					// Known, accepted loss: markdown-it always normalizes to a
-					// 3-backtick fence in its rendered HTML, so a file's non-default
-					// fence length (4+ backticks) can't be recovered here -
-					// serialization stays exact afterwards, since the content is
-					// real text from then on.
+					// Accepted loss: markdown-it normalizes to a 3-backtick fence, so a
+					// file's 4+ backtick fence cannot be recovered. Exact from then on.
 					updateDOM(element: HTMLElement) {
 						insertLiteralFences(element, LANGUAGE_CLASS_PREFIX)
 					},

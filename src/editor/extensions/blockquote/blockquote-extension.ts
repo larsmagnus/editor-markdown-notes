@@ -1,7 +1,8 @@
+import type { CommandProps } from '@tiptap/core'
 import Blockquote from '@tiptap/extension-blockquote'
 
+import { withMarkerStrip } from '@/editor/extensions/block-marker/with-marker-strip'
 import { blockquoteMarkdownSerialize } from '@/editor/extensions/blockquote/blockquote-markdown-spec'
-import { createBlockquoteMarkerSyncPlugin } from '@/editor/extensions/blockquote/blockquote-marker-sync-plugin'
 import { insertLiteralBlockquoteMarker } from '@/editor/extensions/blockquote/insert-literal-blockquote-marker'
 
 /**
@@ -26,10 +27,15 @@ export const BlockquoteExtension = Blockquote.extend({
 		}
 	},
 
-	addProseMirrorPlugins() {
-		return [
-			...(this.parent?.() ?? []),
-			createBlockquoteMarkerSyncPlugin(this.type),
-		]
+	addCommands() {
+		const parent = this.parent?.()
+
+		return {
+			...parent,
+			toggleBlockquote: () => (props: CommandProps) =>
+				withMarkerStrip(props, this.name, () =>
+					Boolean(parent?.toggleBlockquote?.()(props))
+				),
+		}
 	},
 })

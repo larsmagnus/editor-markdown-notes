@@ -1,10 +1,22 @@
+import type { Editor } from '@tiptap/core'
 import { Extension } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
 import { isInTable } from '@tiptap/pm/tables'
 
-import { listItemAtMarkerBoundary } from '@/editor/extensions/list/list-item-at-marker-boundary'
+import { markerCaretAtBoundary } from '@/editor/extensions/block-marker/marker-caret'
+import { listMarkerSpec } from '@/editor/extensions/block-marker/specs'
 
 const INDENT = '  '
+
+/**
+ * The list item type whose marker the caret sits right after, or `null`. Tab
+ * only nests list items, so a blockquote's marker boundary - which resolves
+ * identically - has to fall through to plain indenting.
+ */
+function listItemAtMarkerBoundary(editor: Editor): string | null {
+	const caret = markerCaretAtBoundary(editor)
+	return caret?.spec === listMarkerSpec ? caret.nodeTypeName : null
+}
 
 /**
  * Makes Tab behave like an editor, not a web page, wherever there's a real

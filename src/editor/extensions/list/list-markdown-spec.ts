@@ -1,50 +1,21 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
-import { parseListMarker } from '@/editor/extensions/list/list-marker'
-import { paragraphWithoutLeadingText } from '@/editor/extensions/paragraph-without-leading-text'
+import { renderWithoutMarker } from '@/editor/extensions/block-marker/render-without-marker'
+import { listMarkerSpec } from '@/editor/extensions/block-marker/specs'
 
 /**
- * Renders `node`'s content with its own marker stripped from its first
- * paragraph - shared by `listItemMarkdownSerialize` and
- * `taskItemMarkdownSerialize`, which differ only in what (if anything) they
- * write back in the marker's place. See `paragraph-without-leading-text.ts`
- * for why the marker is stripped here rather than left for the wrapping
- * list to double up on.
- */
-function renderItemWithoutMarker(
-	state: MarkdownSerializerState,
-	node: ProseMirrorNode
-): void {
-	const paragraph = node.firstChild
-	if (!paragraph || paragraph.type.name !== 'paragraph') {
-		state.renderContent(node)
-		return
-	}
-
-	const markerLength = parseListMarker(paragraph.textContent)?.markerLength ?? 0
-	const stripped = paragraphWithoutLeadingText(paragraph, markerLength)
-
-	state.render(stripped, node, 0)
-	node.forEach((child, _offset, index) => {
-		if (index === 0) return
-		state.render(child, node, index)
-	})
-}
-
-/**
- * A `listItem`'s own serialize: the wrapping `bulletList`/`orderedList`
- * still synthesizes the visible marker exactly the way
- * `prosemirror-markdown` always has (`state.renderList`'s `firstDelim`),
- * unchanged - so this only has to make sure the item's own first paragraph
- * doesn't render its marker text a second time, now that it's real content
- * there too.
+ * A `listItem`'s own serialize: the wrapping `bulletList`/`orderedList` still
+ * synthesizes the visible marker exactly the way `prosemirror-markdown` always
+ * has (`state.renderList`'s `firstDelim`), unchanged - so this only has to
+ * make sure the item's own first paragraph doesn't render its marker text a
+ * second time, now that it's real content there too.
  */
 export function listItemMarkdownSerialize(
 	state: MarkdownSerializerState,
 	node: ProseMirrorNode
 ): void {
-	renderItemWithoutMarker(state, node)
+	renderWithoutMarker(state, node, listMarkerSpec)
 }
 
 /**
@@ -60,5 +31,5 @@ export function taskItemMarkdownSerialize(
 	node: ProseMirrorNode
 ): void {
 	state.write(node.attrs.checked ? '[x] ' : '[ ] ')
-	renderItemWithoutMarker(state, node)
+	renderWithoutMarker(state, node, listMarkerSpec)
 }
