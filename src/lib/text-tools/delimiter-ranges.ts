@@ -4,6 +4,7 @@ import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spe
 import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
 import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
+import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
 
 /**
  * Marks whose delimiters (see `delimited-mark-extension.ts`) are real,
@@ -19,6 +20,10 @@ const DELIMITED_MARKS: Record<string, DelimiterSpec> = {
 	bold: fixedDelimiter('**'),
 	strike: fixedDelimiter('~~'),
 	italic: italicDelimiterSpec(),
+	// A link's `](href "title")` is markup, and a URL is not prose: left in, the
+	// speller flags every host and path segment and readability counts them as
+	// words. The visible link text between the delimiters still gets checked.
+	link: linkDelimiterSpec(),
 }
 
 /**

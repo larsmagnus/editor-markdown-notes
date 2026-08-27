@@ -5,30 +5,23 @@ import type { Transaction } from '@tiptap/pm/state'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
 import { parseLinkClose } from '@/editor/extensions/link/link-close-text'
 import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
+import { anyDocChanged } from '@/editor/extensions/transaction-filters'
 
 /**
- * Keeps a link's `href`/`title` attributes matching whatever its own closing
- * delimiter text currently reads - the counterpart to `resolveClose` reading
- * attrs to *build* that text in the first place. Typing directly into a
- * revealed `(url "title")` is the primary way of editing an existing link
- * (see `link-extension.ts`), so without this the attributes - what
- * `renderHTML` reads to build the actual `<a href>` the click handler
- * navigates, and what the link popover seeds its field from - would stay
- * frozen at whatever they were when the link was first created.
+ * Keeps a link's `href`/`title` matching whatever its closing delimiter text
+ * reads - the counterpart to `resolveClose`, which builds that text from the
+ * attrs. Typing into a revealed `(url "title")` is the primary way of editing
+ * a link, and without this the rendered `<a href>` stays frozen at creation.
  *
- * Skips a run with no closing delimiter yet (a bare autolink, or a run
- * `ensure-delimiters-plugin.ts` hasn't reached in this same pass) - there is
- * nothing to read attrs back from. Skips a run whose parsed href/title
- * already match, which is what keeps this from looping: once attrs and text
- * agree, no further transaction is produced.
+ * A run with no closing delimiter yet has nothing to read attrs back from. A
+ * run whose parsed values already match produces no transaction, which is what
+ * keeps this from looping.
  */
 export function createSyncLinkAttrsPlugin(markType: MarkType): Plugin {
 	return new Plugin({
 		key: new PluginKey('linkSyncAttrs'),
 		appendTransaction: (transactions, _oldState, newState) => {
-			if (!transactions.some((transaction) => transaction.docChanged)) {
-				return null
-			}
+			if (!anyDocChanged(transactions)) return null
 
 			const spec = linkDelimiterSpec()
 			let tr: Transaction | undefined

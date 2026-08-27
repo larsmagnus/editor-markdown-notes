@@ -279,3 +279,41 @@ describe('getDocumentText', () => {
 		expect(getDocumentText(editor.state.doc).text).toBe('A quoted sentence.')
 	})
 })
+
+/**
+ * A mark's delimiters only become real text on the transaction after it is
+ * parsed, so a freshly built document never shows this - which is exactly the
+ * shape the parity harness compares against. These drive an edit through first,
+ * putting the document in the state it actually holds while being typed in.
+ */
+describe('getDocumentText once delimiters are real text', () => {
+	it('keeps a link out of the prose it hands retext', () => {
+		const editor = new Editor({
+			extensions,
+			content: 'Read [the guide](https://example.com/guide) first.',
+		})
+		editor.commands.insertContentAt(1, 'x')
+		editor.commands.deleteRange({ from: 1, to: 2 })
+
+		expect(editor.state.doc.textContent).toContain(
+			'](https://example.com/guide)'
+		)
+		expect(getDocumentText(editor.state.doc).text).toBe('Read the guide first.')
+
+		editor.destroy()
+	})
+
+	it('keeps bold delimiters out of it too', () => {
+		const editor = new Editor({
+			extensions,
+			content: 'This is **truly** fine.',
+		})
+		editor.commands.insertContentAt(1, 'x')
+		editor.commands.deleteRange({ from: 1, to: 2 })
+
+		expect(editor.state.doc.textContent).toContain('**truly**')
+		expect(getDocumentText(editor.state.doc).text).toBe('This is truly fine.')
+
+		editor.destroy()
+	})
+})
