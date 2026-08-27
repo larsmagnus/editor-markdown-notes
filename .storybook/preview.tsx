@@ -1,4 +1,4 @@
-// oxlint-disable-next-line no-restricted-imports
+// oxlint-disable-next-line no-restricted-imports no-unassigned-import
 import '../src/globals.css'
 
 import { withThemeByClassName } from '@storybook/addon-themes'

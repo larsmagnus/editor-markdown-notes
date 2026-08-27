@@ -1,4 +1,4 @@
-// oxlint-disable-next-line no-restricted-imports
+// oxlint-disable-next-line no-restricted-imports no-unassigned-import
 import './globals.css'
 
 import { StrictMode } from 'react'
