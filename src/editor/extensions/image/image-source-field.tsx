@@ -1,7 +1,13 @@
+import { CornerDownLeft } from 'lucide-react'
 import type { ChangeEvent, KeyboardEvent } from 'react'
 import { useEffect, useState } from 'react'
 
-import { Input } from '@/components/ui/input'
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupInput,
+} from '@/components/ui/input-group'
 import { parseImageMarkdown } from '@/editor/extensions/image/image-markdown-text'
 import type { ImageAttrs } from '@/editor/extensions/image/image-markdown-text'
 import {
@@ -54,8 +60,16 @@ export function ImageSourceField({
 
 	const commit = () => {
 		const parsed = parseImageMarkdown(draft)
+
+		// TODO: check if correct and clean up
+		// this is a 🔨 bugfix for not being able to delete images if emptying the image source field
 		if (!parsed) {
-			setDraft(sourceText)
+			//setDraft(sourceText)
+			onCommit({
+				src: '',
+				alt: '',
+				title: null,
+			})
 			return
 		}
 		onCommit(parsed)
@@ -78,15 +92,30 @@ export function ImageSourceField({
 
 	return (
 		<span contentEditable={false} className="mb-1 block w-full">
-			<Input
-				id={IMAGE_SOURCE_FIELD_ID}
-				aria-label="Image source"
-				value={draft}
-				onChange={handleChange}
-				onBlur={commit}
-				onKeyDown={handleKeyDown}
-				className="font-mono text-xs scroll-mt-18"
-			/>
+			<InputGroup>
+				<InputGroupInput
+					id={IMAGE_SOURCE_FIELD_ID}
+					aria-label="Image source"
+					value={draft}
+					onChange={handleChange}
+					onBlur={commit}
+					onKeyDown={handleKeyDown}
+					className="font-mono text-xs scroll-mt-18"
+				/>
+				<InputGroupAddon align="inline-end">
+					<InputGroupButton
+						size="sm"
+						className="ml-auto"
+						// Prevents the input's `onBlur` (which cancels) from firing
+						// before the click - without this, clicking the button cancels
+						// instead of submitting.
+						onMouseDown={(event) => event.preventDefault()}
+						onClick={commit}
+					>
+						<CornerDownLeft />
+					</InputGroupButton>
+				</InputGroupAddon>
+			</InputGroup>
 		</span>
 	)
 }
