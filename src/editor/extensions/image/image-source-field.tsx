@@ -85,7 +85,7 @@ export function ImageSourceField({
 				onChange={handleChange}
 				onBlur={commit}
 				onKeyDown={handleKeyDown}
-				className="font-mono text-xs"
+				className="font-mono text-xs scroll-mt-18"
 			/>
 		</span>
 	)
