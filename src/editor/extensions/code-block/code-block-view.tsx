@@ -34,7 +34,7 @@ export function CodeBlockView({ node, editor, getPos }: NodeViewProps) {
 	if (language === MERMAID_LANGUAGE) {
 		return (
 			<AppErrorBoundary
-				title="This diagram"
+				title="This diagram stopped working"
 				resetKeys={[fenceCode(node.textContent)]}
 			>
 				<MermaidBlock node={node} editor={editor} getPos={getPos} />

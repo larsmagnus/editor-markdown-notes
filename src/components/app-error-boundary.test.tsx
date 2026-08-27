@@ -30,7 +30,7 @@ afterEach(() => {
 describe('AppErrorBoundary', () => {
 	it('shows what broke and why instead of taking the page down', () => {
 		render(
-			<AppErrorBoundary title="This diagram">
+			<AppErrorBoundary title="This diagram stopped working">
 				<Diagram />
 			</AppErrorBoundary>
 		)
@@ -44,7 +44,7 @@ describe('AppErrorBoundary', () => {
 		render(
 			<div>
 				<p>The toolbar</p>
-				<AppErrorBoundary title="The editor">
+				<AppErrorBoundary title="The editor stopped working">
 					<Diagram />
 				</AppErrorBoundary>
 			</div>
@@ -59,7 +59,7 @@ describe('AppErrorBoundary', () => {
 	// failure leaves.
 	it('reports the error so it reaches the log channel', () => {
 		render(
-			<AppErrorBoundary title="The editor">
+			<AppErrorBoundary title="The editor stopped working">
 				<Diagram />
 			</AppErrorBoundary>
 		)
@@ -73,7 +73,7 @@ describe('AppErrorBoundary', () => {
 
 	it('retries the subtree when asked to try again', async () => {
 		render(
-			<AppErrorBoundary title="This diagram">
+			<AppErrorBoundary title="This diagram stopped working">
 				<Diagram />
 			</AppErrorBoundary>
 		)
@@ -89,7 +89,10 @@ describe('AppErrorBoundary', () => {
 	// a fallback that must not outlive the document that caused it.
 	it('clears itself when a reset key changes', () => {
 		const { rerender } = render(
-			<AppErrorBoundary title="The editor" resetKeys={['notes.md']}>
+			<AppErrorBoundary
+				title="The editor stopped working"
+				resetKeys={['notes.md']}
+			>
 				<Diagram />
 			</AppErrorBoundary>
 		)
@@ -98,7 +101,10 @@ describe('AppErrorBoundary', () => {
 
 		shouldThrow = false
 		rerender(
-			<AppErrorBoundary title="The editor" resetKeys={['other-note.md']}>
+			<AppErrorBoundary
+				title="The editor stopped working"
+				resetKeys={['other-note.md']}
+			>
 				<Diagram />
 			</AppErrorBoundary>
 		)

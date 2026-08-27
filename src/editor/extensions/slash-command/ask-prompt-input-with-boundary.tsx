@@ -17,7 +17,7 @@ export function AskPromptInputWithBoundary({
 	onCancel,
 }: AskPromptInputWithBoundaryProps) {
 	return (
-		<AppErrorBoundary title="Ask Claude" onRemove={onCancel}>
+		<AppErrorBoundary title="Ask Claude stopped working" onRemove={onCancel}>
 			<AskPromptInput onSubmit={onSubmit} onCancel={onCancel} />
 		</AppErrorBoundary>
 	)

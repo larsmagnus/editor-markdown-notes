@@ -32,7 +32,7 @@ export function TextToolsAside({
 	if (!viewOptions.textTools) return null
 
 	return (
-		<AppErrorBoundary title="The writing tools">
+		<AppErrorBoundary title="The writing tools stopped working">
 			<TextToolsPanel
 				analysis={analysis}
 				isAnalyzing={isAnalyzing}

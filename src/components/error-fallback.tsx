@@ -1,10 +1,12 @@
 import { X } from 'lucide-react'
+import type { ComponentProps } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
 
 import { Button } from '@/components/ui/button'
 import { errorMessage } from '@/lib/error-message'
+import { cn } from '@/lib/utils'
 
-interface ErrorFallbackProps extends FallbackProps {
+interface ErrorFallbackProps extends ComponentProps<'div'> {
 	/** What broke, in the reader's terms - "The editor", "The writing tools". */
 	title: string
 	/**
@@ -14,10 +16,12 @@ interface ErrorFallbackProps extends FallbackProps {
 	 */
 	onRemove?: () => void
 	removeLabel?: string
+	error?: FallbackProps['error']
+	resetErrorBoundary?: FallbackProps['resetErrorBoundary']
 }
 
 /**
- * What a subtree renders instead of itself once it has thrown.
+ * What a subtree renders instead of itself once it has thrown, or as an internal error alert.
  *
  * Shows the message rather than a generic apology, because the two failures
  * this is most likely to catch - a note that will not parse and a diagram that
@@ -27,16 +31,22 @@ interface ErrorFallbackProps extends FallbackProps {
  * same component anyway so every failure in the app looks the same.
  */
 export function ErrorFallback({
+	className,
 	title,
 	error,
 	resetErrorBoundary,
 	onRemove,
 	removeLabel = 'Dismiss',
+	...rest
 }: ErrorFallbackProps) {
 	return (
 		<div
 			role="alert"
-			className="not-prose relative my-2 h-fit rounded-md border border-red-300 bg-red-50 p-3 pr-8 text-sm dark:border-red-900 dark:bg-red-950/40"
+			className={cn(
+				'not-prose relative my-2 h-fit rounded-md border border-red-300 bg-red-50 p-3 pr-8 text-sm dark:border-red-900 dark:bg-red-950/40',
+				className
+			)}
+			{...rest}
 		>
 			{onRemove && (
 				<Button
@@ -51,21 +61,23 @@ export function ErrorFallback({
 					<X className="size-3.5" />
 				</Button>
 			)}
-			<p className="m-0 font-medium text-red-700 dark:text-red-300">
-				{title} stopped working
-			</p>
-			<p className="mt-1 mb-0 font-mono text-xs break-words text-red-600 dark:text-red-400">
-				{errorMessage(error)}
-			</p>
-			<Button
-				type="button"
-				variant="outline"
-				size="sm"
-				className="mt-3"
-				onClick={resetErrorBoundary}
-			>
-				Try again
-			</Button>
+			<p className="m-0 font-medium text-red-700 dark:text-red-300">{title}</p>
+			{typeof error !== 'undefined' && (
+				<p className="mt-1 mb-0 font-mono text-xs wrap-break-word text-red-600 dark:text-red-400">
+					{errorMessage(error)}
+				</p>
+			)}
+			{typeof resetErrorBoundary === 'function' && (
+				<Button
+					type="button"
+					variant="outline"
+					size="sm"
+					className="mt-3"
+					onClick={resetErrorBoundary}
+				>
+					Try again
+				</Button>
+			)}
 		</div>
 	)
 }
