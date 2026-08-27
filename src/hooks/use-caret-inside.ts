@@ -1,6 +1,6 @@
 import type { NodeViewProps } from '@tiptap/react'
 
-import { useSelectionTouchesNode } from '@/hooks/selection-touches-node'
+import { useEditorFlag } from '@/hooks/use-editor-flag'
 
 /**
  * Is the caret inside this node right now?
@@ -10,10 +10,21 @@ import { useSelectionTouchesNode } from '@/hooks/selection-touches-node'
  * without anything losing focus. The editor's own selection is the only thing
  * that tracks it - which also means arrowing into a collapsed block reveals its
  * source rather than losing the caret in it.
+ *
+ * Requires the editor to be focused, so source revealed inline in editable
+ * content hides on blur. A node whose controls live *outside* the
+ * contenteditable region needs the opposite (`use-image-selected.ts`): clicking
+ * such a control blurs the editor without moving the selection.
  */
 export function useCaretInside({
 	editor,
 	getPos,
 }: Pick<NodeViewProps, 'editor' | 'getPos'>): boolean {
-	return useSelectionTouchesNode({ editor, getPos }, { requireFocus: true })
+	return useEditorFlag({ editor, getPos }, (pos) => {
+		const node = editor.state.doc.nodeAt(pos)
+		if (!node || !editor.isFocused) return false
+
+		const { from, to } = editor.state.selection
+		return from >= pos && to <= pos + node.nodeSize
+	})
 }
