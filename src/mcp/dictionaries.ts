@@ -61,7 +61,7 @@ export function loadDictionary(language: SpellingLanguage): HunspellDictionary {
 		throw new Error(
 			`No ${language} dictionary at ${base}.aff/.dic - the build step that copies them has not run: ${
 				error instanceof Error ? error.message : String(error)
-			}`
+			}`, { cause: error }
 		)
 	}
 
