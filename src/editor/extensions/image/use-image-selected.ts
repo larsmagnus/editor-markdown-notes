@@ -1,27 +1,40 @@
+import { NodeSelection } from '@tiptap/pm/state'
 import type { NodeViewProps } from '@tiptap/react'
 
-import { useSelectionTouchesNode } from '@/hooks/selection-touches-node'
+import { useEditorFlag } from '@/hooks/use-editor-flag'
+
+// Module-level, so the subscription is not torn down and rebuilt every render.
+const EVENTS = ['selectionUpdate', 'focus'] as const
 
 /**
- * Does the current selection touch this image right now?
+ * Is this image the selected node right now?
  *
- * Deliberately not `useCaretInside`: that also requires `editor.isFocused`,
- * which is exactly wrong here - the image's own controls (the bubble menu's
- * "Edit source" button, `bubble-controls.tsx`) live *outside* the editor's
- * contenteditable region by construction, so clicking one blurs the editor
- * without changing the selection at all. Gating on focus would make the
- * revealed field disappear the instant the button meant to focus it is
- * clicked. Selection alone is what "moving the caret to the start or end"
- * means for an atom with no content of its own to hold a caret in.
+ * A bare caret never counts, however close it sits. An image is an *inline*
+ * atom, so the positions either side of it are ordinary caret positions in the
+ * same paragraph; a range test counted a caret merely next to the image as
+ * being on it, which opened the source field a keypress early and left the
+ * editor drawing its own caret alongside the field's.
  *
- * Arrow-key entry auto-focusing the revealed field, once mounted, is handled
- * by `image-source-focus-request.ts`'s own module-level keydown listener,
- * not here - see its doc comment for why that has to sit outside React's
- * component tree entirely.
+ * Deliberately not gated on `editor.isFocused`, unlike `useCaretInside`: the
+ * image's own controls (the bubble menu's "Edit source" button) live outside
+ * the contenteditable region, so clicking one blurs the editor without changing
+ * the selection, and gating on focus would make the field vanish the instant
+ * the button meant to focus it is clicked.
  */
 export function useImageSelected({
 	editor,
 	getPos,
 }: Pick<NodeViewProps, 'editor' | 'getPos'>): boolean {
-	return useSelectionTouchesNode({ editor, getPos }, { requireFocus: false })
+	return useEditorFlag(
+		{ editor, getPos },
+		(pos) => {
+			const { selection } = editor.state
+			if (selection instanceof NodeSelection) return selection.from === pos
+
+			const node = editor.state.doc.nodeAt(pos)
+			if (!node || selection.empty) return false
+			return selection.from <= pos && selection.to >= pos + node.nodeSize
+		},
+		EVENTS
+	)
 }

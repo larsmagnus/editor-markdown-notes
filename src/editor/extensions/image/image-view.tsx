@@ -35,18 +35,18 @@ export function ImageView({
 
 	return (
 		<NodeViewWrapper as="span" className="relative inline-block align-bottom">
-			<img
-				src={resolveImageSrc(attrs.src, window.imageBaseUris)}
-				alt={attrs.alt}
-				title={attrs.title ?? undefined}
-				contentEditable={false}
-			/>
 			{selected ? (
 				<ImageSourceField
 					sourceText={imageMarkdownText(attrs)}
 					onCommit={updateAttributes}
 				/>
 			) : null}
+			<img
+				src={resolveImageSrc(attrs.src, window.imageBaseUris)}
+				alt={attrs.alt}
+				title={attrs.title ?? undefined}
+				contentEditable={false}
+			/>
 		</NodeViewWrapper>
 	)
 }

@@ -12,11 +12,7 @@ export const IMAGE_TOOLBAR_ID = 'image-toolbar'
 /** The id `image-view.tsx` renders its revealed source `input` under. */
 export const IMAGE_SOURCE_FIELD_ID = 'image-source-field'
 
-/**
- * The position of the next (or previous) image relative to `from`, or `null`
- * if there is none - the doc has finitely many images, so a linear scan is
- * cheap and needs no cache invalidation as the doc changes underneath it.
- */
+/** The position of the next (or previous) image relative to `from`, or `null`. */
 function findAdjacentImagePos(
 	doc: ProseMirrorNode,
 	from: number,
@@ -27,7 +23,6 @@ function findAdjacentImagePos(
 	doc.descendants((node, pos) => {
 		if (node.type.name !== 'image') return
 		if (dir > 0 ? pos <= from : pos >= from) return
-		// The first (or, going backward, last) match in document order wins.
 		if (found === null || (dir > 0 ? pos < found : pos > found)) {
 			found = pos
 		}
@@ -51,21 +46,12 @@ function isImageSelected(state: EditorState): boolean {
 }
 
 /**
- * Moves selection to the next (or previous) image in the doc, focusing the
- * editor itself rather than the image's DOM node.
+ * Moves selection to the next (or previous) image, focusing the editor itself
+ * rather than the `<img>`: the bubble menu's `shouldShow` is a strict
+ * `activeElement === view.dom` check, which focusing a descendant fails.
  *
- * `view.hasFocus()` - which the bubble menu's default `shouldShow` keys off
- * - is a strict `activeElement === view.dom` check, so focusing the `<img>`
- * directly would hide the menu the same instant it selects the image; a real
- * mouse click never hits this because a `contenteditable="false"` leaf isn't
- * a click focus target in the first place. `view.focus()` both re-establishes
- * that and syncs the DOM selection to the new `NodeSelection`, so the image
- * still renders as selected.
- *
- * Declines - leaving `Tab`/`Shift-Tab` to the browser's default focus
- * movement - once there is no further image to reach, which is what lets
- * tabbing out of the last image continue to whatever the page's next real
- * focusable element is instead of trapping focus inside the editor.
+ * Declines once there is no further image, so tabbing out of the last one
+ * continues to the page's next focusable element instead of trapping focus.
  */
 export function moveToAdjacentImage(dir: Direction): Command {
 	return (state, dispatch, view) => {
@@ -82,10 +68,9 @@ export function moveToAdjacentImage(dir: Direction): Command {
 }
 
 /**
- * Moves DOM focus into the selected image's bubble menu, entering its
- * toolbar the same way `Tab` would move into any other composite widget.
- * Declines unless an image is currently selected, so plain arrow-key caret
- * movement is untouched everywhere else.
+ * Moves DOM focus into the selected image's bubble menu, the way `Tab` enters
+ * any composite widget. Declines unless an image is selected, leaving plain
+ * caret movement untouched.
  */
 export function focusImageToolbar(): Command {
 	return (state) => {
@@ -103,14 +88,57 @@ export function focusImageToolbar(): Command {
 }
 
 /**
- * Moves DOM focus into the selected image's already-revealed source field
- * (`image-view.tsx`) - selecting an image already satisfies `useImageSelected`,
- * so the field is already rendered by the time this runs; the caller just
- * has to move focus there. Declines unless an image is currently selected,
- * matching `focusImageToolbar`. Used both by the bubble menu's "Edit source"
- * button and by `Backspace` on an already-selected image (`extensions.ts`) -
- * without this, Backspace falls through to ProseMirror's default "delete the
- * selected node" instead of editing the field's text.
+ * Steps the caret onto an adjacent image, selecting the node itself.
+ *
+ * Both edges of an *inline* atom are ordinary caret positions inside the same
+ * paragraph, so ProseMirror's own arrow handling leaves a text caret beside
+ * the image that says nothing about being on it - and the editor draws that
+ * caret while the source field draws its own. Consuming the key matters too:
+ * left to fall through, the now-focused field handles the same press and moves
+ * its caret one character in from the edge it should have landed on.
+ */
+export function enterAdjacentImage(dir: Direction): Command {
+	return (state, dispatch) => {
+		const { selection } = state
+		if (!selection.empty) return false
+
+		// The node the caret steps over: ahead of it, or behind it going back.
+		const pos = dir > 0 ? selection.from : selection.from - 1
+		if (state.doc.nodeAt(pos)?.type.name !== 'image') return false
+
+		if (dispatch) {
+			// Before dispatching: ProseMirror updates the view synchronously, so the
+			// field can mount and consume this before `dispatch` returns.
+			setImageSourceEntryEdge(dir > 0 ? 'start' : 'end')
+			dispatch(selectImageTransaction(state, pos))
+		}
+		return true
+	}
+}
+
+/**
+ * Which end of the revealed source text the caret lands on, for the field to
+ * consume as it mounts. A module-level handoff rather than a prop: the field
+ * mounts as a child of the view deciding whether it renders at all, and React
+ * commits child effects first, so a prop would arrive a commit too late.
+ */
+let pendingEntryEdge: 'start' | 'end' | null = null
+
+function setImageSourceEntryEdge(edge: 'start' | 'end'): void {
+	pendingEntryEdge = edge
+}
+
+/** Takes the pending entry edge, clearing it. */
+export function consumeImageSourceEntryEdge(): 'start' | 'end' | null {
+	const edge = pendingEntryEdge
+	pendingEntryEdge = null
+	return edge
+}
+
+/**
+ * Moves DOM focus into the selected image's source field, which selecting the
+ * image has already rendered. Also what keeps `Backspace` on a selected image
+ * editing its source rather than deleting the node.
  */
 export function focusImageSourceField(): Command {
 	return (state) => {
@@ -126,21 +154,12 @@ export function focusImageSourceField(): Command {
 }
 
 /**
- * Where `Tab`/`Shift-Tab` go when pressed from inside the toolbar.
- *
- * Always handles the key itself rather than falling through to the browser's
- * native tab order, which would otherwise land wherever the bubble menu's
- * portal happens to sit in the DOM - often nowhere focusable at all, since
- * portals are commonly appended at the very end of `body`. `Shift-Tab`
- * returns to the image the toolbar belongs to, the composite's point of
- * entry; plain `Tab` continues on to the next image, or - once there is no
- * further image - back into the document, the same place a `Tab` press
- * declined by `moveToAdjacentImage` would have left the caret.
+ * Where `Tab`/`Shift-Tab` go from inside the toolbar. Never falls through to
+ * the native tab order, which would land wherever the bubble menu's portal
+ * sits in the DOM - usually the end of `body`, often nothing focusable at all.
  */
 export function exitImageToolbar(editor: Editor, backward: boolean): void {
 	if (backward) {
-		// Same reasoning as `moveToAdjacentImage`: focus the editor, not the
-		// `<img>` - the selection is already the image, nothing to change there.
 		if (isImageSelected(editor.state)) editor.view.focus()
 		return
 	}
