@@ -14,28 +14,22 @@ import { isWordChar } from '@/lib/word-boundary'
 let patched = false
 
 /**
- * Patches `prosemirror-markdown`'s `esc()` - there's no serializer hook to
- * override it otherwise - so it only escapes a character when leaving it
- * bare could actually be reparsed as syntax. The default escapes every
- * `` ` ``, `*`, `\`, `~`, `[`, `]` unconditionally, so e.g. `## [Unreleased]`
- * comes back as `## \[Unreleased\]` and `~44kB` as `\~44kB`.
+ * Patches `prosemirror-markdown`'s `esc()` so it escapes a character only when
+ * leaving it bare could be reparsed as syntax. The default escapes every
+ * `` ` ``, `*`, `\`, `~`, `[`, `]` unconditionally, turning `## [Unreleased]`
+ * into `## \[Unreleased\]` and `~44kB` into `\~44kB`.
  *
- * - `[` only escaped when it would start a link reference definition
- *   (`[label]: destination`); `]` only before `(` or `[` (the only
- *   link/image risk).
- * - `~` only escaped next to another `~` (needs a `~~` run to mean anything).
- * - `` ` ``/`*` only escaped when a same-length backtick run / flanking
- *   asterisk partner exists elsewhere in the string - see
- *   `markdown-escape-partners.ts`.
+ * - `[` only where it would start a link reference definition; `]` only before
+ *   `(` or `[`.
+ * - `~` only next to another `~`, which a `~~` run needs to mean anything.
+ * - `` ` ``/`*` only where a partner run exists elsewhere in the string.
  * - `_` keeps the base intraword exception; `\` always escapes.
- * - `|` only escaped inside a table row, where it would otherwise end the cell:
- *   a cell reading `Revenue | Growth` saved as two cells.
+ * - `|` only inside a table row, where a cell reading `Revenue | Growth` would
+ *   otherwise save as two cells.
  *
- * `tiptap-markdown` builds its serializer state internally and exposes no
- * way to scope a custom `esc` to it, so this patches the shared
- * `prosemirror-markdown` prototype its subclass inherits from - process-wide
- * by necessity, not by accident. The `patched` guard just keeps re-imports
- * from reassigning the same function.
+ * `tiptap-markdown` builds its serializer state internally with no way to
+ * scope a custom `esc` to it, so this patches the shared prototype its
+ * subclass inherits from - process-wide by necessity.
  */
 export function patchMarkdownEscaping(): void {
 	if (patched) return
@@ -46,11 +40,8 @@ export function patchMarkdownEscaping(): void {
 		str: string,
 		startOfLine = false
 	): string {
-		// A link's own delimiter characters - `[`, `]`, `(url "title")` - are
-		// real, marked text now (see `link-markdown-spec.ts`), and unlike every
-		// other delimited mark, a link can't use `escape: false` to protect them
-		// (it silently drops the mark's own open/close for a link wrapping only
-		// an image). `inLink` reproduces that same full bypass instead.
+		// A link's own delimiters are real marked text, and a link cannot use
+		// `escape: false` to protect them (see `link-markdown-spec.ts`).
 		if ((this as LinkSerializerState).inLink) return str
 
 		const asteriskOffsets = flankingAsteriskOffsets(str)
@@ -94,9 +85,8 @@ export function patchMarkdownEscaping(): void {
 		)
 		if (startOfLine) {
 			escaped = escaped.replace(/^(\+[ ]|[-*>])/, '\\$&')
-			// A heading's own leading `#`x`level` is real, intentional content
-			// (see `heading-extension.ts`), not prose that merely starts with one -
-			// escaping it here would corrupt every heading on save.
+			// A heading's leading `#`s are real content, not prose that starts with
+			// one - escaping them would corrupt every heading on save.
 			if (!inHeading) {
 				escaped = escaped.replace(/^(\s*)(#{1,6})(\s|$)/, '$1\\$2$3')
 			}

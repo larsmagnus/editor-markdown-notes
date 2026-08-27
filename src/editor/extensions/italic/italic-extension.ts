@@ -13,36 +13,24 @@ import { italicMarkupAttribute } from '@/editor/extensions/italic/italic-markup-
 import { italicPasteRules } from '@/editor/extensions/italic/italic-rules'
 import { DEFAULT_SETTINGS } from '@/shared/messages'
 
-// `addAttributes()`'s `parseHTML` closes over a `storage` snapshot Tiptap
-// takes at schema-build time, before that editor's own storage exists - so
-// `this.storage` inside `parseHTML` never reflects later mutations to
-// `editor.storage.italic.preferredMarkup`. `onBeforeCreate` runs synchronously
-// during `new Editor()`, after storage is set up but before any content is
-// parsed, so it captures the same live object `editor.storage.italic` is;
-// reads through it below stay live because it's the same reference, not a
-// copy. (`onCreate` fires too late - it's deferred via `setTimeout`.)
+// `parseHTML` closes over a storage snapshot taken at schema-build time,
+// before the editor's own storage exists, so `this.storage` there never sees
+// later mutations. `onBeforeCreate` runs after storage is set up and before
+// content is parsed, capturing the live object (`onCreate` is too late - it is
+// deferred via `setTimeout`).
 //
-// Module-level, so it holds only the most recently constructed editor's
-// storage - a second concurrent editor (multiple open panels) would overwrite
-// it. `editorMarkdownNotes.italicMarker` is a single global VSCode setting
-// broadcast to every panel (see `use-italic-marker.ts`), so every panel's
-// `preferredMarkup` converges on the same value; the only exposure is the
-// narrow, self-correcting window before a setting change has finished
-// broadcasting to all panels.
+// Module-level, so a second concurrent editor overwrites it. `italicMarker` is
+// one global setting broadcast to every panel, so they converge; the exposure
+// is the self-correcting window while a change is still broadcasting.
 let liveStorage: Storage['italic'] | null = null
 
 /**
- * `_italic_`/`*italic*` with real, caret-revealed delimiter text - built on
- * `delimited-mark-extension.ts`, but keeping its own open/close resolution
- * (`italic-delimiter-spec.ts`, `italic-wrap-markup.ts`) instead of a fixed
- * delimiter, since which character is CommonMark-valid depends on context
- * (`italicMarkup`'s intraword rule) and on `storage.preferredMarkup`, not on
- * a constant the way bold's `**`/strike's `~~` are.
+ * `_italic_`/`*italic*` with real, caret-revealed delimiter text, resolving
+ * its own open/close rather than taking a fixed delimiter: which character is
+ * CommonMark-valid depends on the intraword rule and on `preferredMarkup`.
  *
- * `markup` is read from `data-markup` (see `italicMarkdownSpec`). Fresh
- * italics (toolbar, bubble menu, Cmd/Ctrl+I) have no source marker, so they
- * use `storage.preferredMarkup` instead, kept live by `editor.tsx` from
- * `editorMarkdownNotes.italicMarker`.
+ * `markup` is read from `data-markup`. A fresh italic has no source marker, so
+ * it uses `preferredMarkup`, kept live from `editorMarkdownNotes.italicMarker`.
  */
 export const ItalicExtension = createDelimitedMarkExtension(ItalicMark, {
 	ensureSpec: italicDelimiterSpec(),

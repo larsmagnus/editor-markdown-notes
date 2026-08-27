@@ -6,26 +6,18 @@ import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
 import { inlineCodeFenceText } from '@/editor/extensions/formatting/inline-code/inline-code-fence-text'
 
 /**
- * Delimiter recognition/reconstruction for inline code, for `ensure-
- * delimiters-plugin.ts`. Unlike bold/strike's fixed string, the fence
- * length varies with the code's own content (`inlineCodeFenceText`'s
- * shortest-unused-backtick-run rule), so it can't be reduced to a constant.
+ * Delimiter recognition for inline code, whose fence length varies with the
+ * code's own content and so cannot be a constant.
  *
- * Detecting each edge independently (a bare leading/trailing backtick run)
- * would misread code content that itself starts or ends with a backtick run
- * - "```mermaid" is legitimate code, not an unfenced run missing only its
- * closing delimiter. A real fence needs *matching* lengths at both ends, so
- * both edges resolve through the same `matchingFenceLength` check and are
- * either both present or both absent - there's no such thing as "half
- * delimited" for a backtick pair the way there is for bold's `**`.
+ * Both edges resolve through one `matchingFenceLength` check, never
+ * independently: code content may itself start or end with a backtick run -
+ * "```mermaid" is legitimate code, not a run missing its close - so a real
+ * fence needs matching lengths at both ends. There is no "half delimited"
+ * backtick pair the way there is for bold's `**`.
  *
- * The detected length ignores the padding space `inlineCodeFenceText`
- * sometimes adds - a run repaired without that space still needs to read as
- * delimited on the next pass rather than re-triggering a repair (see
- * `ensure-delimiters-plugin.ts`'s nested-mark regression for what happens
- * when detection and reconstruction disagree). The padding only matters for
- * the markdown that gets written out, not for whether a run already "has" a
- * delimiter.
+ * Detection ignores the padding space `inlineCodeFenceText` sometimes adds:
+ * that matters for the markdown written out, not for whether a run already
+ * has a delimiter, and a disagreement between the two re-triggers repair.
  */
 export function inlineCodeDelimiterSpec(): DelimiterSpec {
 	return {

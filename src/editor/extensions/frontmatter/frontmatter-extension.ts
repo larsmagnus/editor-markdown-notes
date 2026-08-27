@@ -10,21 +10,15 @@ import { FrontmatterView } from '@/editor/extensions/frontmatter/frontmatter-vie
 
 /**
  * The note's YAML frontmatter, as a real node at the start of the document
- * rather than separate React state - see `extensions.ts`'s `doc` content
- * expression for how "at most one, always first" is enforced.
+ * rather than separate React state.
  *
- * `code: true` gives it the same text-with-embedded-newlines editing model
- * `codeBlock` already uses (marks disabled, Enter inserts `\n` instead of
- * splitting into a new node). `isolating` keeps it from merging with a
- * following paragraph on backspace/selection the way `codeBlock` doesn't need
- * to worry about, since frontmatter is always the document's very first node.
+ * `code: true` gives it `codeBlock`'s text-with-embedded-newlines editing
+ * model: marks disabled, Enter inserting `\n` rather than splitting the node.
+ * `isolating` keeps it from merging into the paragraph after it.
  *
- * markdown-it never sees a `---` character: parsing stays the regex-based
- * `splitFrontmatter` it always was, and this node is inserted programmatically
- * after `setContent` runs (see `use-frontmatter-document.ts`). `parse` is
- * therefore an empty stub, the same shape `table/extension.ts` uses for a node
- * whose parse side markdown-it already handles - except here nothing ever
- * reaches it at all.
+ * markdown-it never sees a `---`: parsing stays the regex-based
+ * `splitFrontmatter`, and the node is inserted after `setContent` runs, so
+ * `parse` is an empty stub nothing ever reaches.
  */
 export const Frontmatter = Node.create({
 	name: 'frontmatter',

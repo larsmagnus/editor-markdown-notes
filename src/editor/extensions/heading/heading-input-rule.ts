@@ -15,7 +15,7 @@ import { canSetBlockType } from '@/editor/extensions/can-set-block-type'
  * the trailing space that triggered the match *before* it reaches the
  * document, so the handler must insert it itself. Without this, the block
  * becomes a heading with a still-incomplete marker (no trailing space), and
- * `ensure-heading-marker-plugin.ts`'s safety net - seeing no valid marker at
+ * the marker sync plugin's safety net - seeing no valid marker at
  * all - prepends a fresh one on top of it.
  */
 export function createHeadingInputRule(type: NodeType): InputRule {

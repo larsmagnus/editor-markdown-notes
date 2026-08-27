@@ -10,22 +10,16 @@ import { createSyncLinkAttrsPlugin } from '@/editor/extensions/link/sync-link-at
 import { createUnlinkCommand } from '@/editor/extensions/link/unlink-command'
 
 /**
- * `[text](href "title")` with real, caret-revealed delimiter text - built on
- * `delimited-mark-extension.ts`, but keeping `href`/`title` as real schema
- * attributes rather than dropping them the way headings dropped `level`:
- * an image wrapped in a link has no text content at all to hold literal
- * syntax in (see `link-markdown-spec.ts`), so attrs stay the only source of
- * truth for that case, and doubly serve as the seed `link-delimiter-spec.ts`
- * resolves fresh delimiter text from for the text case. Ranked above
- * bold/strike/italic/code in `uniform-outer-marks.ts`'s nesting order (a
- * bolded link's `**` sits outside its brackets, not inside).
+ * `[text](href "title")` with real, caret-revealed delimiter text. Unlike a
+ * heading's `level`, `href`/`title` stay real schema attributes: an image
+ * wrapped in a link has no text content to hold literal syntax in, so attrs
+ * are the only source of truth there, and the seed fresh delimiter text is
+ * resolved from everywhere else. Outranks bold/strike/italic/code in nesting,
+ * so a bolded link's `**` sits outside its brackets.
  *
- * `createSyncLinkAttrsPlugin` is the reverse direction: typing directly into
- * a revealed `(url)` is the primary way of editing an existing link (see
- * `apply-link-command.ts`'s doc comment), so without it the attrs -
- * `renderHTML`'s `<a href>`, the click handler that navigates it, the
- * popover's seeded field - would stay frozen at whatever they were when the
- * link was first created.
+ * `createSyncLinkAttrsPlugin` runs the reverse direction: typing into a
+ * revealed `(url)` is the primary way of editing a link, and without it the
+ * rendered `<a href>` and the popover's field stay frozen at creation time.
  */
 // TODO: relative links (`[notes](./notes.md)`) currently fall through to
 // @tiptap/extension-link's default openOnClick, which calls

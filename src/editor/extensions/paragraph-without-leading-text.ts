@@ -3,22 +3,15 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
 /**
  * A copy of `paragraph` with its first `length` characters removed -
- * serialize-time only, never touching the real document. Shared by every
- * construct whose wrapping node still synthesizes its own leading markdown
- * syntax exactly the way `prosemirror-markdown` always has
- * (`list-markdown-spec.ts`'s `bulletList`/`orderedList`, `blockquote-
- * markdown-spec.ts`'s `> `) while its first child's own real, editable
- * marker text would otherwise double up on top of it: `- - text`,
- * `> > text`.
+ * serialize-time only, never touching the real document. Keeps a construct
+ * whose wrapping node still synthesizes its own leading syntax from doubling
+ * it up on the real marker text inside: `- - text`, `> > text`.
  *
- * `renderList`'s `firstDelim` write and `wrapBlock`'s `this.delim` extension
- * happen in a fixed order regardless of what `firstDelim`/the wrapped
- * callback returns - an empty first line (real marker text emitted as
- * ordinary content instead) leaves nothing to mark the output as "no longer
- * blank" before the delimiter extends, so the next line's continuation
- * indent/prefix gets wrongly applied to what should be the first line.
- * Stripping the marker here, and leaving the wrapping node's own synthesis
- * as the sole writer of it, sidesteps that rather than fighting it.
+ * The wrapping node has to stay the sole writer rather than the content:
+ * `renderList`'s `firstDelim` write and `wrapBlock`'s delimiter extension
+ * happen in a fixed order, and only a non-empty first write marks the output
+ * as no longer blank - so an empty one leaves the next line's continuation
+ * indent wrongly applied to what should be the first line.
  */
 export function paragraphWithoutLeadingText(
 	paragraph: ProseMirrorNode,

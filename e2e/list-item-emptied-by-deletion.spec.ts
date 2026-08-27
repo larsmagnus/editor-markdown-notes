@@ -6,8 +6,8 @@ test.describe('Deleting a list item down to empty in the live editor', () => {
 	// Distinct from backspace-boundaries.spec.ts's marker-boundary case: this
 	// deletes the item's *content* character by character, never touching the
 	// marker directly, until the item is empty - a separate path into
-	// list-marker-sync-plugin.ts's repair step than
-	// list-marker-backspace-extension.ts's marker-boundary keymap covers.
+	// the marker sync plugin's repair step than
+	// block-marker/marker-backspace-extension.ts's boundary keymap covers.
 	test('bullet list: deleting an item down to empty character by character does not duplicate the marker', async ({
 		page,
 	}) => {

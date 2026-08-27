@@ -5,20 +5,14 @@ import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spe
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
 
 /**
- * Deleting anywhere *inside* a run's delimiter - not just right at its
- * trailing edge - removes that whole delimiter and strips the mark from the
- * run it bounded. One keystroke, not a character at a time: the delimiter is
- * only ever fully present or fully absent, so a half-deleted `*bold**` (from
- * a Backspace landing between the two opening `*`s, say) would leave content
- * the reveal engine can't parse back into a clean run - `ensure-delimiters-
- * plugin.ts`'s repair step reads that remnant as "missing" and inserts a
- * fresh delimiter next to it instead of replacing it in place, the same
- * duplication bug class `list-marker-backspace-extension.ts` fixes for list
- * markers.
+ * Deleting anywhere inside a run's delimiter removes the whole delimiter and
+ * strips the mark from the run it bounded, in one keystroke. A delimiter is
+ * only ever fully present or fully absent: a half-deleted `*bold**` parses
+ * back into no clean run, and the repair pass reads the remnant as missing and
+ * inserts a fresh delimiter beside it rather than replacing it.
  *
- * The delimiter's length is detected per run via `spec` rather than passed
- * in fixed, since inline code's fence length varies run to run (the
- * shortest backtick run not already present inside the code itself).
+ * Length is detected per run rather than passed in fixed, inline code's fence
+ * varying with the code's own content.
  */
 function removeDelimiterAtEdge(
 	markType: MarkType,

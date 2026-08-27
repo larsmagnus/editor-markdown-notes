@@ -28,15 +28,9 @@ type BoundaryKind = 'autolink' | 'text' | 'atom'
 
 /**
  * Which of a link's three serialize cases applies at this boundary:
- *
- * - `'autolink'` (`isPlainUrlLink`): unchanged from the stock behavior, `<`/`>`.
- * - `'text'` (`[text](href "title")`): identity - the brackets and
- *   parenthetical are themselves real, marked text now (see
- *   `link-delimiter-spec.ts`), so writing them again here would double them up.
- * - `'atom'` (an image, which has no content of its own to hold literal
- *   syntax in): the classic synthesized `[`/`](href "title")`, the explicit
- *   fallback linked images need, since there is no text run for the
- *   delimiter mechanism to attach to.
+ * `'autolink'` writes `<`/`>` as stock does; `'text'` writes nothing, its
+ * brackets already being real marked text; `'atom'` synthesizes the full
+ * `[`/`](href "title")`, which a linked image has no text run to carry.
  */
 function boundaryKind(
 	mark: Mark,
@@ -47,37 +41,26 @@ function boundaryKind(
 	return parent.child(index).isText ? 'text' : 'atom'
 }
 
-/**
- * `prosemirror-markdown`'s own serializer state, plus the two fields this
- * mark needs across its own open/close pair. `inLink` is read by
- * `markdown-escaping.ts`'s `esc()` patch - see below for why this mark can't
- * use the usual `escape: false` field the way every other delimited mark does.
- */
+/** The serializer state, plus the two fields a link carries across open/close. */
 export type LinkSerializerState = MarkdownSerializerState & {
 	linkBoundaryKind?: BoundaryKind
 	inLink?: boolean
 }
 
 /**
- * A link's markdown storage, decided per boundary the same way
- * `prosemirror-markdown`'s default one does - see `boundaryKind`.
+ * A link's markdown storage, decided per boundary.
  *
- * `close` is called with `index` one past the mark's own last child - valid
- * as *a* position (`parent.forEach`'s final call, closing whatever's still
- * open, passes `parent.childCount`), but not one `parent.child(index)` can
- * read, the way `boundaryKind` needs to. Deciding the kind once, in `open`,
- * and stashing it on `state` for `close` to read back - the same trick
- * `prosemirror-markdown`'s own default link serializer uses via
- * `state.inAutolink` - sidesteps that entirely.
+ * The kind is decided in `open` and stashed on `state`, as
+ * `prosemirror-markdown`'s own link serializer does with `state.inAutolink`:
+ * `close` receives `index` one past the mark's last child, a valid position
+ * but not one `parent.child(index)` can read.
  *
- * `escape: false` (every other delimited mark's approach) is unusable here:
- * `prosemirror-markdown` special-cases an `escape: false` mark by excluding
- * it from its node's *open/close count* entirely, relying on a fallback path
- * that only fires for `isText` nodes - so for a link wrapping only an image
- * (see `boundaryKind`'s `'atom'` case), `open`/`close` would silently never
- * be called at all, dropping the link altogether. `inLink` reproduces the
- * same "don't touch my own delimiter characters" effect one layer up, via
- * `markdown-escaping.ts`'s patched `esc()`, without that exclusion.
+ * `escape: false` - every other delimited mark's approach - is unusable here.
+ * `prosemirror-markdown` excludes an `escape: false` mark from its node's
+ * open/close count and falls back to a path that only fires for `isText`
+ * nodes, so a link wrapping only an image would never open or close at all
+ * and the link would be dropped. `inLink` gets the same effect one layer up,
+ * through `markdown-escaping.ts`'s patched `esc()`.
  */
 export const LINK_MARKDOWN_SERIALIZE: DelimiterMarkdownSerialize = {
 	open(

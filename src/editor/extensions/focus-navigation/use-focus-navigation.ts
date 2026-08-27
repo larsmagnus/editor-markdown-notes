@@ -8,28 +8,22 @@ import {
 import { skipToEditorRef } from '@/editor/extensions/focus-navigation/skip-target'
 
 /**
- * Handles two Tab cases ProseMirror's keymap can't reach - both involve
- * real DOM focus on a node view's button, and `handleKeyDown` stops firing
- * once focus leaves `view.dom`. A `document`-level listener doesn't depend
- * on ProseMirror's focus tracking:
+ * Handles the two Tab cases ProseMirror's keymap cannot reach, both of which
+ * involve real DOM focus on a node view's button - `handleKeyDown` stops
+ * firing once focus leaves `view.dom`, so this listens on `document`:
  *
- * 1. Entering the editor from outside (toolbar, "Skip to editor") lands on
- *    the true first/last stop - a leading widget's button if it has one,
- *    else the start/end of the body.
- * 2. Leaving a node view's button moves to whichever comes first in
- *    document order: the next button, or a return to plain text.
+ * 1. Entering the editor from outside lands on the true first/last stop - a
+ *    leading widget's button if it has one, else the start/end of the body.
+ * 2. Leaving a node view's button moves to whichever comes first in document
+ *    order: the next button, or a return to plain text.
  *
- * Telling a real Tab-entry apart from a click needs a capture-phase
- * `keydown`/`pointerdown` listener tracking the last Tab's direction
- * (cleared by any other key or pointer interaction), plus checking the
- * `focus` event's `relatedTarget` is outside `view.dom` (`null` for a
- * click, excluding clicks for free).
+ * Telling Tab-entry from a click takes a capture-phase listener tracking the
+ * last Tab's direction, plus a `relatedTarget` outside `view.dom` - `null` for
+ * a click, which excludes clicks for free.
  *
- * Also publishes `skipToEditorRef`, the one place that knows both the live
- * `Editor` and this search - only while `active`, since the live editor now
- * stays mounted, hidden, behind raw mode (`EditorBody`) rather than
- * unmounting. Left unconditional, "Skip to editor" would keep jumping into
- * the invisible live editor even while raw view is what's on screen.
+ * Publishing `skipToEditorRef` is gated on `active` because the live editor
+ * stays mounted behind raw mode; unconditional, "Skip to editor" would jump
+ * into the invisible one.
  */
 export function useFocusNavigation(
 	editor: Editor | null,

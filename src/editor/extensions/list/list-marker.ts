@@ -3,7 +3,7 @@
  * `N.`/`N)` for an ordered item, `- [ ]`/`- [x]` for a task - the only
  * source of truth for what an item's marker currently reads as, now that it
  * lives as real text inside the item's own first paragraph (see
- * `list-marker-sync-plugin.ts`). Task is checked before bullet since its
+ * `create-marker-sync-plugin.ts`). Task is checked before bullet since its
  * pattern extends one.
  */
 export type ParsedListMarker =

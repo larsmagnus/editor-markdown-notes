@@ -7,7 +7,7 @@ import { BLOCKQUOTE_MARKER } from '@/editor/extensions/blockquote/blockquote-mar
  * text at all. Runs once per `<blockquote>` in the document, nested ones
  * included - each contributes only its own single level's marker to its own
  * first paragraph, the same "only the innermost level is ever real text"
- * design `blockquote-marker-sync-plugin.ts` documents.
+ * design `create-marker-sync-plugin.ts` documents.
  */
 export function insertLiteralBlockquoteMarker(element: Element): void {
 	element.querySelectorAll('blockquote').forEach((quote) => {

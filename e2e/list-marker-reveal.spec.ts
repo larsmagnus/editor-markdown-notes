@@ -45,7 +45,7 @@ test.describe('List markers in the live editor', () => {
 		await page.keyboard.press('Backspace')
 
 		// Its own displayed number corrects to match its new position -
-		// `list-marker-sync-plugin.ts` renumbers on any structural change, not
+		// the marker sync plugin renumbers on any structural change, not
 		// just a freshly typed marker.
 		await expect(content.locator('li', { hasText: 'Second' })).toHaveText(
 			'1. Second'

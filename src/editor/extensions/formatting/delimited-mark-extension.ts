@@ -14,19 +14,14 @@ import {
 import { PARSED_BY_MARKDOWN_IT } from '@/editor/extensions/markdown/mark-serializer'
 
 /**
- * Turns a stock fixed-delimiter mark extension (bold's `**`, strike's `~~`)
- * into one whose delimiters are real, editable, caret-revealed text -
- * everything a delimited mark needs that doesn't depend on the specific
- * command name each mark exposes (`toggleBold` vs `toggleStrike`), which
- * stays the caller's own thin `addCommands` override (see `bold-extension.ts`).
+ * Turns a stock mark extension into one whose delimiters are real, editable,
+ * caret-revealed text. Everything that does not depend on the command name a
+ * mark exposes; that stays the caller's own `addCommands` override.
  *
- * Supersedes the stock input rule entirely rather than adding to it - both
- * match the exact same trigger text, and whichever is checked first consumes
- * it, so leaving the stock one in the list would make this one dead code.
- * Paste is deliberately left on the stock paste rule (still consumes
- * delimiters into a bare mark): `ensure-delimiters-plugin.ts` re-adds them
- * afterward regardless of how a mark arrived with none, so a second,
- * paste-specific rewrite would duplicate work the safety net already covers.
+ * Supersedes the stock input rule rather than adding to it - both match the
+ * same trigger and the first checked consumes it. Paste stays on the stock
+ * rule: `ensure-delimiters-plugin.ts` re-adds delimiters however a mark
+ * arrived without them.
  */
 export function createDelimitedMarkExtension(
 	base: Mark,
@@ -45,21 +40,14 @@ export function createDelimitedMarkExtension(
 		inputRegex?: RegExp
 		/** See `uniform-outer-marks.ts` - names of delimited marks that outrank this one. */
 		outerMarkNames?: string[]
-		/**
-		 * Defaults to identity (the common case: the delimiter is already real,
-		 * marked text, nothing left to synthesize). A link needs its own - see
-		 * `link-markdown-spec.ts` for why one delimited mark can't stay identity.
-		 */
+		/** Identity by default - the delimiter is already real, marked text. */
 		serialize?: DelimiterMarkdownSerialize
 	}
 ): Mark {
 	return base.extend({
-		// The closing delimiter is real, mark-carrying text (`ensure-delimiters-
-		// plugin.ts` inserts it with the mark applied), so the mark's own range
-		// genuinely ends there. ProseMirror's default `inclusive: true` would
-		// extend it into whatever gets typed right after - exactly wrong once
-		// the caret can legitimately sit past a real closing delimiter rather
-		// than past an invisible mark boundary.
+		// The closing delimiter is real mark-carrying text, so the range genuinely
+		// ends there. The default `inclusive: true` would extend it into whatever
+		// is typed next.
 		inclusive: false,
 
 		addStorage() {
