@@ -54,6 +54,41 @@ test.describe('Image editing in the live editor', () => {
 		).toHaveValue('![New diagram](./new.png)')
 	})
 
+	// Clearing the source is how an image is deleted from the field, the field
+	// being the only editable form the image has. Restoring the old markdown
+	// there - the shape every other repair pass had - leaves no way to remove
+	// the image without leaving the field first.
+	test('clearing the revealed text deletes the image', async ({ page }) => {
+		await openInVSCode(page, 'Some text.\n\n![Diagram](./diagram.png)')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByRole('img', { name: 'Diagram' }).click()
+		const field = page.getByLabel('Image source')
+		await field.fill('')
+		await field.press('Enter')
+
+		await expect(content.getByRole('img')).toHaveCount(0)
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Some text.')
+	})
+
+	// A half-typed source is not a request to delete anything.
+	test('restores the previous source when the text is not valid markdown', async ({
+		page,
+	}) => {
+		await openInVSCode(page, 'Some text.\n\n![Diagram](./diagram.png)')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByRole('img', { name: 'Diagram' }).click()
+		const field = page.getByLabel('Image source')
+		await field.fill('![Diagram](')
+		await field.blur()
+
+		await expect(content.getByRole('img', { name: 'Diagram' })).toBeVisible()
+	})
+
 	test('the "Edit source" toolbar button focuses the revealed field', async ({
 		page,
 	}) => {

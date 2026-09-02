@@ -1,5 +1,5 @@
 import { CornerDownLeft } from 'lucide-react'
-import type { ChangeEvent, KeyboardEvent } from 'react'
+import type { ChangeEvent, FormEvent, KeyboardEvent } from 'react'
 import { useEffect, useState } from 'react'
 
 import {
@@ -17,15 +17,22 @@ import {
 
 type ImageSourceFieldProps = {
 	sourceText: string
-	onCommit: (attrs: ImageAttrs) => void
+	/** `null` where the field was cleared, meaning the image itself should go. */
+	onCommit: (attrs: ImageAttrs | null) => void
 }
 
 /**
  * The revealed `![alt](src "title")` text, editable - a controlled input
  * rather than real document content, an image having none to hold it in.
- * Committing on blur or Enter rather than per keystroke: a mid-edit `src` is
+ * Committing on submit or blur rather than per keystroke: a mid-edit `src` is
  * rarely valid image markdown, and re-parsing every character would flicker
  * the `<img>` between its old and new source.
+ *
+ * An empty field deletes the image. This is the only editable form the image
+ * has, so restoring the old text there - which is what every repair pass in
+ * the editor used to do with syntax it found missing - would leave no way to
+ * remove an image by editing it. Text that is merely unparseable is a
+ * half-typed source, not a request to delete anything, and reverts.
  *
  * Mounting alone does not claim focus. A click on the image only selects it,
  * and stealing focus would blur the editor, hiding the bubble menu's "Edit
@@ -59,20 +66,22 @@ export function ImageSourceField({
 	}, [])
 
 	const commit = () => {
-		const parsed = parseImageMarkdown(draft)
+		if (draft.trim() === '') {
+			onCommit(null)
+			return
+		}
 
-		// TODO: check if correct and clean up
-		// this is a 🔨 bugfix for not being able to delete images if emptying the image source field
+		const parsed = parseImageMarkdown(draft)
 		if (!parsed) {
-			//setDraft(sourceText)
-			onCommit({
-				src: '',
-				alt: '',
-				title: null,
-			})
+			setDraft(sourceText)
 			return
 		}
 		onCommit(parsed)
+	}
+
+	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault()
+		commit()
 	}
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -80,10 +89,6 @@ export function ImageSourceField({
 	}
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-		if (event.key === 'Enter') {
-			event.preventDefault()
-			commit()
-		}
 		if (event.key === 'Escape') {
 			event.preventDefault()
 			setDraft(sourceText)
@@ -92,30 +97,31 @@ export function ImageSourceField({
 
 	return (
 		<span contentEditable={false} className="mb-1 block w-full">
-			<InputGroup>
-				<InputGroupInput
-					id={IMAGE_SOURCE_FIELD_ID}
-					aria-label="Image source"
-					value={draft}
-					onChange={handleChange}
-					onBlur={commit}
-					onKeyDown={handleKeyDown}
-					className="font-mono text-xs scroll-mt-18"
-				/>
-				<InputGroupAddon align="inline-end">
-					<InputGroupButton
-						size="sm"
-						className="ml-auto"
-						// Prevents the input's `onBlur` (which cancels) from firing
-						// before the click - without this, clicking the button cancels
-						// instead of submitting.
-						onMouseDown={(event) => event.preventDefault()}
-						onClick={commit}
-					>
-						<CornerDownLeft />
-					</InputGroupButton>
-				</InputGroupAddon>
-			</InputGroup>
+			<form onSubmit={handleSubmit}>
+				<InputGroup>
+					<InputGroupInput
+						id={IMAGE_SOURCE_FIELD_ID}
+						aria-label="Image source"
+						value={draft}
+						onChange={handleChange}
+						onBlur={commit}
+						onKeyDown={handleKeyDown}
+						className="font-mono text-xs scroll-mt-18"
+					/>
+					<InputGroupAddon align="inline-end">
+						<InputGroupButton
+							type="submit"
+							size="sm"
+							className="ml-auto"
+							// Keeps the field's own `onBlur` from committing first, which
+							// would submit whatever the blur decided rather than the draft.
+							onMouseDown={(event) => event.preventDefault()}
+						>
+							<CornerDownLeft />
+						</InputGroupButton>
+					</InputGroupAddon>
+				</InputGroup>
+			</form>
 		</span>
 	)
 }
