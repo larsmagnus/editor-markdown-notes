@@ -8,8 +8,8 @@ import type {
 } from '@/editor/extensions/formatting/delimiter-spec'
 import { createEnsureDelimitersPlugin } from '@/editor/extensions/formatting/ensure-delimiters-plugin'
 import {
-	removeClosingDelimiterOnDelete,
-	removeOpeningDelimiterOnBackspace,
+	removeDelimiterOnBackspace,
+	removeDelimiterOnDelete,
 } from '@/editor/extensions/formatting/remove-delimiter-at-boundary'
 import { PARSED_BY_MARKDOWN_IT } from '@/editor/extensions/markdown/mark-serializer'
 
@@ -63,12 +63,12 @@ export function createDelimitedMarkExtension(
 			return {
 				...this.parent?.(),
 				Backspace: () =>
-					removeOpeningDelimiterOnBackspace(this.type, ensureSpec)(
+					removeDelimiterOnBackspace(this.type, ensureSpec)(
 						this.editor.state,
 						this.editor.view.dispatch
 					),
 				Delete: () =>
-					removeClosingDelimiterOnDelete(this.type, ensureSpec)(
+					removeDelimiterOnDelete(this.type, ensureSpec)(
 						this.editor.state,
 						this.editor.view.dispatch
 					),

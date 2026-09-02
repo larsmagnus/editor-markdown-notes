@@ -2,7 +2,8 @@ import type { MarkType } from '@tiptap/pm/model'
 import type { Command } from '@tiptap/pm/state'
 
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import { stripLinkDelimiters } from '@/editor/extensions/link/strip-link-delimiters'
+import { unwrapRun } from '@/editor/extensions/formatting/unwrap-run'
+import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
 
 /**
  * Removes a link, delimiter text included - a text run's `[`/`](href
@@ -27,7 +28,7 @@ export function createUnlinkCommand(markType: MarkType): Command {
 		if (!dispatch) return true
 
 		const tr = state.tr
-		if (run) stripLinkDelimiters(tr, run, markType)
+		if (run) unwrapRun(tr, markType, linkDelimiterSpec(), run)
 		else tr.removeMark(from, to, markType)
 		dispatch(tr)
 		return true

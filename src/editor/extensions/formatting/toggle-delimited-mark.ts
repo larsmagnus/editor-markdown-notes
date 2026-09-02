@@ -1,37 +1,16 @@
 import type { MarkType, Node as ProseMirrorNode } from '@tiptap/pm/model'
-import type { Command, Transaction } from '@tiptap/pm/state'
+import type { Command } from '@tiptap/pm/state'
 
 import type {
 	DelimiterPair,
 	DelimiterSpec,
 } from '@/editor/extensions/formatting/delimiter-spec'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
+import { unwrapRun } from '@/editor/extensions/formatting/unwrap-run'
 import {
 	wrapRangeWithDelimiter,
 	wrapSelectionWithDelimiter,
 } from '@/editor/extensions/formatting/wrap-selection-with-delimiter'
-
-/**
- * Strips one run's mark and the delimiter text at its two ends, detected via
- * `spec` rather than assumed fixed-length since inline code's fence varies run
- * to run. Deletes the closing delimiter first, so the opening one's position
- * is still the one that was read.
- */
-function unwrapRun(
-	tr: Transaction,
-	markType: MarkType,
-	spec: DelimiterSpec,
-	run: MarkRun
-): void {
-	const text = tr.doc.textBetween(run.from, run.to)
-	const openLength = spec.detectOpen(text)
-	const closeLength = spec.detectClose(text)
-
-	tr.removeMark(run.from, run.to, markType)
-	if (closeLength > 0) tr.delete(run.to - closeLength, run.to)
-	if (openLength > 0) tr.delete(run.from, run.from + openLength)
-}
 
 /** Whether every piece of text in the range already carries the mark. */
 function rangeFullyMarked(

@@ -54,3 +54,33 @@ describe('editing a link URL', () => {
 		expect(editor.state.doc.textContent).not.toContain('](./notes.md](')
 	})
 })
+
+/**
+ * The delimiter is real text, so Backspace lands in it the way it lands in any
+ * other text - and every character of it is one keystroke away from a state
+ * that no longer parses as a link.
+ */
+describe('backspacing a link delimiter', () => {
+	it('removes the whole link rather than duplicating its closing bracket', () => {
+		const editor = linkDocument(
+			'Read [the guide](https://example.com "Example Domain") now.'
+		)
+		// Just after the `(` that opens the URL - inside the closing delimiter.
+		const caret = editor.state.doc.textContent.indexOf('](') + 3
+
+		editor.commands.setTextSelection(caret)
+		editor.commands.keyboardShortcut('Backspace')
+
+		expect(editor.state.doc.textContent).toBe('Read the guide now.')
+	})
+
+	it('removes the whole link from inside its opening bracket', () => {
+		const editor = linkDocument('Read [the guide](https://example.com) now.')
+		const caret = editor.state.doc.textContent.indexOf('[') + 2
+
+		editor.commands.setTextSelection(caret)
+		editor.commands.keyboardShortcut('Backspace')
+
+		expect(editor.state.doc.textContent).toBe('Read the guide now.')
+	})
+})
