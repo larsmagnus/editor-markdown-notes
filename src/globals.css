@@ -241,10 +241,6 @@
 		@apply list-none;
 	}
 
-	.ProseMirror li.marker-revealed > label {
-		@apply hidden;
-	}
-
 	/*
 	 * Markdown syntax `syntax-reveal-extension.ts` hides while the caret is
 	 * elsewhere - fence lines, formatting delimiters, list/heading markers.

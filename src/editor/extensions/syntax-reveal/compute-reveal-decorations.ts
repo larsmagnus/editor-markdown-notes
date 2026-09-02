@@ -10,11 +10,22 @@ import type {
 /** The class every hidden syntax range gets; see `globals.css` for the technique. */
 export const SYNTAX_HIDDEN_CLASS = 'syntax-hidden'
 
-/** The class a construct gets while its own syntax is on screen. */
+/**
+ * The class a construct gets while its own syntax is on screen, so whatever it
+ * draws in that syntax's place can step aside. Only reaches constructs
+ * ProseMirror renders itself: a node view is handed its decorations rather
+ * than having them applied to its DOM, and does not re-render for a change in
+ * them, which is why `use-marker-revealed.ts` exists for the ones that have
+ * one.
+ */
 const MARKER_REVEALED_CLASS = 'marker-revealed'
 
-/** Whether a selection reaches a span's container, and so reveals its syntax. */
-function revealsContainer(
+/**
+ * Whether a selection reaches a span's container, and so reveals its syntax.
+ * Shared with the node views that draw differently while their own syntax
+ * shows - a task item cannot show both a checkbox and the `[ ]` it stands for.
+ */
+export function revealsContainer(
 	selection: Selection,
 	containerFrom: number,
 	containerTo: number
