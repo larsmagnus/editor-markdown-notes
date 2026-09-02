@@ -1,27 +1,49 @@
 import { Extension } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
+import type { Transaction } from '@tiptap/pm/state'
 
 import {
-	markerCaretAtBoundary,
 	markerCaretAtFirstContentChar,
+	markerCaretInMarker,
 } from '@/editor/extensions/block-marker/marker-caret'
+import type { MarkerCaret } from '@/editor/extensions/block-marker/marker-caret'
+
+/** Puts the caret at the start of what the construct's content now is. */
+function caretToContentStart(tr: Transaction, at: number): void {
+	tr.setSelection(TextSelection.near(tr.doc.resolve(tr.mapping.map(at))))
+}
 
 /**
- * Backspace right after a construct's own marker removes the whole marker in
- * one keystroke and leaves the construct, instead of deleting into the marker
- * a character at a time. A half-deleted marker fails the sync plugin's parse,
- * which reads it as absent and inserts a fresh one beside the remnant -
- * `- [ ] - [ ] text`. Intercepting the two positions where that can happen is
- * what keeps the malformed state unreachable; every other position falls
- * through to the stock handlers, including offset 0 and merging into the
- * following block.
+ * Steps a marker down, or removes it and the construct with it. One
+ * transaction either way: the construct and its marker text stop agreeing in
+ * between, and any state where they disagree is one the repair pass has to
+ * guess about.
+ */
+function backspaceMarker(tr: Transaction, caret: MarkerCaret): void {
+	const markerEnd = caret.markerStart + caret.markerLength
+	const demoted = caret.spec.demote(caret.text)
+
+	if (demoted !== null) {
+		tr.insertText(demoted, caret.markerStart, markerEnd)
+		caretToContentStart(tr, caret.markerStart + demoted.length)
+		return
+	}
+
+	tr.delete(caret.markerStart, markerEnd)
+	caret.spec.unwrap(tr, caret.match)
+	caretToContentStart(tr, caret.markerStart)
+}
+
+/**
+ * Backspace against a construct's own marker removes the whole marker in one
+ * keystroke - a heading dropping a level at a time, everything else going in
+ * one - and takes the construct apart once there is no marker left. Deleting
+ * into a marker a character at a time is what this exists to prevent: the
+ * remnant fails its spec's parse, and a construct carrying an unparseable
+ * marker is indistinguishable from one that never had a marker at all.
  *
- * Exit runs *before* the marker text is deleted, and as two transactions
- * rather than one chain. Deleting first leaves the node a list item or
- * blockquote for one transaction - long enough for the sync plugin to see a
- * marker-less construct and put the marker straight back. Chaining the two
- * fails differently: `liftListItem` computes its target against the chain's
- * starting state, so a preceding in-chain delete silently invalidates it.
+ * Every other position falls through to the stock handlers, including offset 0
+ * and merging into the following block.
  */
 export const MarkerBackspace = Extension.create({
 	name: 'markerBackspace',
@@ -29,20 +51,12 @@ export const MarkerBackspace = Extension.create({
 	addKeyboardShortcuts() {
 		return {
 			Backspace: () => {
-				const caret = markerCaretAtBoundary(this.editor)
+				const caret = markerCaretInMarker(this.editor)
 				if (caret) {
-					if (!caret.spec.exit?.(this.editor, caret.nodeTypeName)) return false
-
-					const { selection } = this.editor.state
-					if (!(selection instanceof TextSelection)) return false
-
-					return this.editor
-						.chain()
-						.deleteRange({
-							from: selection.from - caret.markerLength,
-							to: selection.from,
-						})
-						.run()
+					const tr = this.editor.state.tr
+					backspaceMarker(tr, caret)
+					this.editor.view.dispatch(tr)
+					return true
 				}
 
 				if (!markerCaretAtFirstContentChar(this.editor)) return false

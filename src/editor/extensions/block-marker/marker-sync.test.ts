@@ -68,3 +68,55 @@ describe('createMarkerSyncPlugin', () => {
 		expect(editor.state.doc.firstChild?.child(1).textContent).toBe('- Second')
 	})
 })
+
+describe('a marker the author deleted', () => {
+	it('unwraps a heading rather than writing the marker back', () => {
+		const editor = documentFrom('# Notes')
+		// The whole `# ` marker, which sits at the very start of the heading.
+		editor.commands.deleteRange({ from: 1, to: 3 })
+
+		expect(editor.state.doc.firstChild?.type.name).toBe('paragraph')
+		expect(editor.state.doc.firstChild?.textContent).toBe('Notes')
+	})
+
+	it('lifts a list item out of its list rather than reseeding the bullet', () => {
+		const editor = documentFrom('- Buy milk')
+		editor.commands.deleteRange({ from: 3, to: 5 })
+
+		expect(editor.state.doc.firstChild?.type.name).toBe('paragraph')
+		expect(editor.state.doc.firstChild?.textContent).toBe('Buy milk')
+	})
+
+	it('deletes a selection over a task marker on the first press', () => {
+		const editor = documentFrom('- [ ] Ship it')
+		// A selection covering the marker and the first word.
+		editor.commands.deleteRange({ from: 3, to: 13 })
+
+		expect(editor.state.doc.textContent).toBe(' it')
+	})
+
+	it('lifts a blockquote rather than reseeding its own marker', () => {
+		const editor = documentFrom('> Quoted')
+		editor.commands.deleteRange({ from: 2, to: 4 })
+
+		expect(editor.state.doc.firstChild?.type.name).toBe('paragraph')
+		expect(editor.state.doc.firstChild?.textContent).toBe('Quoted')
+	})
+
+	it('leaves a shortened but still valid heading marker alone', () => {
+		const editor = documentFrom('### Notes')
+		// One `#`, leaving `## ` - a valid marker for a level the author chose.
+		editor.commands.deleteRange({ from: 1, to: 2 })
+
+		expect(editor.state.doc.firstChild?.type.name).toBe('heading')
+		expect(editor.state.doc.firstChild?.textContent).toBe('## Notes')
+	})
+
+	it('still seeds a marker on a construct that never had one', () => {
+		const editor = documentFrom('Plain text')
+		editor.commands.setTextSelection(3)
+		editor.commands.toggleBlockquote()
+
+		expect(editor.state.doc.firstChild?.textContent).toBe('> Plain text')
+	})
+})

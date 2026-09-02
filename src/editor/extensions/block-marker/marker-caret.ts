@@ -1,6 +1,7 @@
 import type { Editor } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
 
+import type { MarkerMatch } from '@/editor/extensions/block-marker/marker-host'
 import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
 import { BLOCK_MARKER_SPECS } from '@/editor/extensions/block-marker/specs'
 
@@ -10,13 +11,19 @@ export type MarkerCaret = {
 	nodeTypeName: string
 	markerLength: number
 	parentOffset: number
+	/** The construct itself, for a spec that has to take it apart. */
+	match: MarkerMatch
+	/** Document position of the marker's first character. */
+	markerStart: number
+	/** The host textblock's own text, marker included. */
+	text: string
 }
 
 /**
  * The caret's position relative to its enclosing construct's own marker, or
- * `null` when it isn't on a marker-bearing first line at all. Only constructs
- * whose marker lives in a child paragraph can be resolved this way - the caret
- * is one depth inside them, which is what makes the enclosing node findable.
+ * `null` when it isn't on a marker-bearing first line at all. The construct is
+ * the caret's own textblock for a spec that hosts its marker itself, and its
+ * parent for one whose marker lives in a child paragraph.
  */
 function resolveMarkerCaret(editor: Editor): MarkerCaret | null {
 	const { selection } = editor.state
@@ -25,32 +32,54 @@ function resolveMarkerCaret(editor: Editor): MarkerCaret | null {
 	const { $from } = selection
 	if ($from.depth < 1) return null
 
-	const nodeDepth = $from.depth - 1
-	const node = $from.node(nodeDepth)
-	const spec = BLOCK_MARKER_SPECS.find(
-		(candidate) =>
-			candidate.markerHost === 'firstParagraph' &&
-			candidate.nodeTypes.includes(node.type.name)
+	const spec = BLOCK_MARKER_SPECS.find((candidate) =>
+		candidate.nodeTypes.includes(
+			$from.node(
+				candidate.markerHost === 'self' ? $from.depth : $from.depth - 1
+			).type.name
+		)
 	)
 	if (!spec) return null
-	if ($from.index(nodeDepth) !== 0) return null
 
-	const markerLength = spec.length($from.parent.textContent)
+	const nodeDepth = spec.markerHost === 'self' ? $from.depth : $from.depth - 1
+	if (nodeDepth < 1) return null
+	if (spec.markerHost === 'firstParagraph' && $from.index(nodeDepth) !== 0) {
+		return null
+	}
+
+	const text = $from.parent.textContent
+	const markerLength = spec.length(text)
 	if (markerLength === 0) return null
 
+	const node = $from.node(nodeDepth)
+	const pos = $from.before(nodeDepth)
 	return {
 		spec,
 		nodeTypeName: node.type.name,
 		markerLength,
 		parentOffset: $from.parentOffset,
+		match: {
+			spec,
+			node,
+			pos,
+			parent: nodeDepth > 0 ? $from.node(nodeDepth - 1) : null,
+			index: $from.index(nodeDepth - 1),
+			host: {
+				node: $from.parent,
+				nodeStart: $from.before(),
+				textStart: $from.start(),
+			},
+		},
+		markerStart: $from.start(),
+		text,
 	}
 }
 
 /**
  * The caret sits right after the marker. That is the construct's real content
  * start - offset 0 sits *before* the marker, where acting on the construct as
- * a whole would instead edit its syntax. Shared by `tab-indent-extension.ts`
- * (nest/un-nest) and the Backspace handling that exits a construct.
+ * a whole would instead edit its syntax. Used by `tab-indent-extension.ts` to
+ * nest and un-nest list items.
  */
 export function markerCaretAtBoundary(editor: Editor): MarkerCaret | null {
 	const caret = resolveMarkerCaret(editor)
@@ -59,11 +88,23 @@ export function markerCaretAtBoundary(editor: Editor): MarkerCaret | null {
 }
 
 /**
+ * The caret is somewhere within the marker, so Backspace deletes marker text.
+ * The whole marker is the unit, not the character under the caret: a
+ * half-deleted marker fails its spec's parse, and repair cannot tell that
+ * remnant from a construct that never had a marker.
+ */
+export function markerCaretInMarker(editor: Editor): MarkerCaret | null {
+	const caret = resolveMarkerCaret(editor)
+	if (!caret || caret.parentOffset === 0) return null
+	if (caret.parentOffset > caret.markerLength) return null
+	return caret
+}
+
+/**
  * The caret is one position past the marker, about to backspace the very first
  * content character. Native contenteditable deletion at that exact boundary
  * can reach across the marker's hidden span and take part of the marker with
- * it, which the sync plugin then reads as an absent marker and replaces with a
- * second one beside the remnant.
+ * it, which the repair pass then reads as a marker the author removed.
  */
 export function markerCaretAtFirstContentChar(editor: Editor): boolean {
 	const caret = resolveMarkerCaret(editor)

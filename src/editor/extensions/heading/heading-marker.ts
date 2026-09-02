@@ -10,8 +10,7 @@ const HEADING_MARKER = /^(#{1,6}) /
 /** The heading level a node's text implies, `1` for text with no marker yet. */
 export function parseHeadingLevel(text: string): number {
 	const match = HEADING_MARKER.exec(text)
-	// TODO: check if correct and clean up - without 0 (was 1) headings can't be deleted/backspaced
-	return match ? match[1].length : 0
+	return match ? match[1].length : 1
 }
 
 /** How much of a node's text is its marker, `0` for text with no marker yet. */
@@ -22,7 +21,5 @@ export function headingMarkerLength(text: string): number {
 
 /** Builds the literal marker text for a given heading level. */
 export function headingMarkerText(level: number): string {
-	// TODO: check if correct and clean up - without this headings can't be deleted/backspaced
-	if (!level) return ''
 	return '#'.repeat(level) + ' '
 }

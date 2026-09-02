@@ -1,4 +1,8 @@
 import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
+import {
+	liftOutOfConstruct,
+	unwrapToParagraph,
+} from '@/editor/extensions/block-marker/unwrap'
 import { BLOCKQUOTE_MARKER } from '@/editor/extensions/blockquote/blockquote-marker'
 import { blockquoteMarkerLength } from '@/editor/extensions/blockquote/blockquote-marker'
 import {
@@ -17,6 +21,9 @@ import {
  * A heading's `#`x`level`. `parseHeadingLevel` already answers `1` for text
  * with no marker, so resolving is the same expression whether one is present
  * or not - present markers resolve to themselves, absent ones to `# `.
+ *
+ * The only marker with a step down: Backspace against it lowers the level and
+ * only takes the heading apart once there is no level left.
  */
 const headingMarkerSpec: BlockMarkerSpec = {
 	nodeTypes: ['heading'],
@@ -24,6 +31,11 @@ const headingMarkerSpec: BlockMarkerSpec = {
 	revealScope: 'node',
 	length: headingMarkerLength,
 	resolve: ({ text }) => headingMarkerText(parseHeadingLevel(text)),
+	demote: (text) => {
+		const level = parseHeadingLevel(text)
+		return level > 1 ? headingMarkerText(level - 1) : null
+	},
+	unwrap: unwrapToParagraph,
 }
 
 /**
@@ -37,7 +49,8 @@ export const blockquoteMarkerSpec: BlockMarkerSpec = {
 	revealScope: 'marker',
 	length: blockquoteMarkerLength,
 	resolve: () => BLOCKQUOTE_MARKER,
-	exit: (editor) => editor.chain().lift('blockquote').run(),
+	demote: () => null,
+	unwrap: liftOutOfConstruct,
 }
 
 /**
@@ -72,8 +85,8 @@ export const listMarkerSpec: BlockMarkerSpec = {
 			? text.slice(0, parsed.markerLength)
 			: bulletMarkerText()
 	},
-	exit: (editor, nodeTypeName) =>
-		editor.chain().liftListItem(nodeTypeName).run(),
+	demote: () => null,
+	unwrap: liftOutOfConstruct,
 }
 
 /** Every block construct whose syntax is real leading text. */

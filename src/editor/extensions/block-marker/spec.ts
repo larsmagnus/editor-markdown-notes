@@ -1,5 +1,7 @@
-import type { Editor } from '@tiptap/core'
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
+import type { Transaction } from '@tiptap/pm/state'
+
+import type { MarkerMatch } from '@/editor/extensions/block-marker/marker-host'
 
 /**
  * Where a construct's marker text lives: on the matched node itself (a
@@ -39,10 +41,17 @@ export type BlockMarkerSpec = {
 	 */
 	resolve(context: MarkerContext): string
 	/**
-	 * Lifts the caret's block out of the construct, so Backspace against the
-	 * marker leaves it rather than deleting into it. Omitted by constructs with
-	 * no marker text to protect a caret from, which is every one whose marker
-	 * hosts itself.
+	 * The marker one step down from the one `text` currently carries, or `null`
+	 * when there is no step left and removing it means removing the construct.
+	 * A heading steps down a level at a time; every other construct's marker is
+	 * all or nothing.
 	 */
-	exit?(editor: Editor, nodeTypeName: string): boolean
+	demote(text: string): string | null
+	/**
+	 * Takes the construct apart, leaving its content as ordinary blocks. Runs
+	 * against a transaction rather than the editor so the repair pass and the
+	 * Backspace handler can share one implementation - the two used to differ,
+	 * and the repair pass could only reach the editor by not being one.
+	 */
+	unwrap(tr: Transaction, match: MarkerMatch): void
 }

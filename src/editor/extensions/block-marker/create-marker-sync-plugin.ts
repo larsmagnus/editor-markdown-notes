@@ -1,44 +1,15 @@
 import { Fragment } from '@tiptap/pm/model'
-import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state'
 import type { EditorState, Transaction } from '@tiptap/pm/state'
 
-import { forEachMarkerHost } from '@/editor/extensions/block-marker/marker-host'
+import { findMarkerActions } from '@/editor/extensions/block-marker/marker-actions'
+import type {
+	MarkerAction,
+	MarkerFix,
+} from '@/editor/extensions/block-marker/marker-actions'
 import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
+import { createDeletionProbe } from '@/editor/extensions/syntax-repair/authored-deletion'
 import { anyDocChanged } from '@/editor/extensions/transaction-filters'
-
-type MarkerFix = {
-	host: ProseMirrorNode
-	nodeStart: number
-	textStart: number
-	existingLength: number
-	marker: string
-}
-
-/** Every construct whose marker text is absent, wrong or stale, in document order. */
-function findFixes(
-	doc: ProseMirrorNode,
-	specs: BlockMarkerSpec[]
-): MarkerFix[] {
-	const fixes: MarkerFix[] = []
-
-	forEachMarkerHost(doc, specs, ({ spec, host, node, parent, index }) => {
-		const text = host.node.textContent
-		const existingLength = spec.length(text)
-		const marker = spec.resolve({ node, parent, index, text })
-		if (marker === text.slice(0, existingLength)) return
-
-		fixes.push({
-			host: host.node,
-			nodeStart: host.nodeStart,
-			textStart: host.textStart,
-			existingLength,
-			marker,
-		})
-	})
-
-	return fixes
-}
 
 /**
  * Writes one marker, replacing whatever wrong-length remnant sits there.
@@ -77,6 +48,22 @@ function recoverCursor(tr: Transaction, fix: MarkerFix): void {
 	tr.setSelection(TextSelection.near(tr.doc.resolve(target)))
 }
 
+/** The one fix, if any, whose fresh marker would land right where the caret is. */
+function fixUnderCaret(
+	actions: MarkerAction[],
+	state: EditorState
+): MarkerFix | undefined {
+	if (!state.selection.empty) return undefined
+
+	return actions
+		.filter((action) => action.kind === 'fix')
+		.map((action) => action.fix)
+		.find(
+			(fix) =>
+				fix.existingLength === 0 && fix.textStart === state.selection.from
+		)
+}
+
 /**
  * Keeps every block construct's leading marker present and correct, whichever
  * way the construct came to exist - an input rule that consumed the typed
@@ -84,35 +71,42 @@ function recoverCursor(tr: Transaction, fix: MarkerFix): void {
  * node looks right in the editor while carrying no marker text at all, and
  * serializes - then round-trips back on the next load - as a plain paragraph.
  *
+ * The one absent marker it does *not* write back is one the author just
+ * deleted, which `findMarkerActions` tells apart by asking what this batch did
+ * to the old document. Deleting a marker takes the construct apart instead.
+ * Without that distinction markdown syntax cannot be removed by editing it at
+ * all: every backspace against a marker is answered by a fresh one.
+ *
  * A construct's *kind* is never re-derived here: retyping a bullet's `-` as
  * `1.` leaves a bullet item carrying an unusual marker, not an ordered one,
  * and typing into a task item's brackets is real text editing that
- * `toggle-task-checked-command.ts` reads, not something to overwrite. Each
- * spec's `resolve` decides how much of its own marker is the author's to keep.
+ * `toggle-task-checked-command.ts` reads, not something to overwrite.
  *
- * Fixes apply in reverse document order, so writing a later marker never
+ * Actions apply in reverse document order, so writing a later marker never
  * shifts an earlier one's already-read position.
  */
 export function createMarkerSyncPlugin(specs: BlockMarkerSpec[]): Plugin {
 	return new Plugin({
 		key: new PluginKey('blockMarkerSync'),
-		appendTransaction: (transactions, _oldState, newState: EditorState) => {
+		appendTransaction: (transactions, oldState, newState: EditorState) => {
 			if (!anyDocChanged(transactions)) return null
 
-			const fixes = findFixes(newState.doc, specs)
-			if (fixes.length === 0) return null
+			const actions = findMarkerActions(
+				oldState.doc,
+				newState.doc,
+				specs,
+				createDeletionProbe(transactions)
+			)
+			if (actions.length === 0) return null
 
-			const { selection } = newState
-			const caretAtFreshMarker = selection.empty
-				? fixes.find(
-						(fix) =>
-							fix.existingLength === 0 && fix.textStart === selection.from
-					)
-				: undefined
+			const caretFix = fixUnderCaret(actions, newState)
 
 			const tr = newState.tr
-			for (const fix of fixes.reverse()) applyFix(tr, fix)
-			if (caretAtFreshMarker) recoverCursor(tr, caretAtFreshMarker)
+			for (const action of actions.reverse()) {
+				if (action.kind === 'fix') applyFix(tr, action.fix)
+				else action.spec.unwrap(tr, action.match)
+			}
+			if (caretFix) recoverCursor(tr, caretFix)
 
 			return tr
 		},
