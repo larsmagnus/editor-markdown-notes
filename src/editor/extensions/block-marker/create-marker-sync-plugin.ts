@@ -24,13 +24,19 @@ import { anyDocChanged } from '@/editor/extensions/transaction-filters'
  */
 function applyFix(tr: Transaction, fix: MarkerFix): void {
 	if (fix.host.content.size === 0) {
-		const marker = tr.doc.type.schema.text(fix.marker)
+		const text = tr.doc.type.schema.text(fix.marker + (fix.trailing ?? ''))
 		tr.replaceWith(
 			fix.nodeStart,
 			fix.nodeStart + fix.host.nodeSize,
-			fix.host.copy(Fragment.from(marker))
+			fix.host.copy(Fragment.from(text))
 		)
 		return
+	}
+
+	// The closing marker first, so the opening one's positions still hold.
+	if (fix.trailing !== undefined) {
+		const end = fix.textStart + fix.host.textContent.length
+		tr.insertText(fix.trailing, end, end)
 	}
 
 	tr.insertText(fix.marker, fix.textStart, fix.textStart + fix.existingLength)

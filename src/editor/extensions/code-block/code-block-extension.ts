@@ -9,10 +9,8 @@ import {
 	fenceLanguage,
 	insertLiteralFences,
 } from '@/editor/extensions/code-block/code-fence'
-import { createEnsureFencePlugin } from '@/editor/extensions/code-block/ensure-fence-plugin'
 import { createFenceInputRule } from '@/editor/extensions/code-block/fence-input-rule'
 import { createToggleCodeBlockCommand } from '@/editor/extensions/code-block/toggle-code-block-command'
-import { unwrapCodeBlockAtFenceStart } from '@/editor/extensions/code-block/unwrap-code-block'
 import type { MarkdownIt } from '@/editor/extensions/markdown/markdown-it-types'
 
 /** Never reconfigured elsewhere in this project - see the stock extension's own default. */
@@ -27,8 +25,10 @@ const LANGUAGE_CLASS_PREFIX = 'language-'
  * editable text in the block's content, and an attribute kept in sync with it
  * would be a second source of truth. Parsing the text instead is what makes
  * retyping the language tag live-update highlighting, with nothing to resync.
- * The input rule and `ensure-fence-plugin.ts` keep every path that can create
- * a block honest about there being fence text at all.
+ * The input rule and `block-marker/` keep every path that can create a block
+ * honest about there being fence text at all - the fences are that mechanism's
+ * leading and trailing markers, so deleting one unwraps the block exactly as
+ * deleting a heading's `#` unwraps a heading.
  */
 export const CodeBlockExtension = CodeBlock.extend({
 	addAttributes() {
@@ -54,21 +54,6 @@ export const CodeBlockExtension = CodeBlock.extend({
 		return ReactNodeViewRenderer(CodeBlockView)
 	},
 
-	// Only `Backspace` is replaced, so this spreads `this.parent()` rather than
-	// returning in its place.
-	addKeyboardShortcuts() {
-		return {
-			...this.parent?.(),
-			// At the very start of the fence line, unwraps the block into a plain
-			// paragraph holding its code.
-			Backspace: () =>
-				unwrapCodeBlockAtFenceStart(this.name)(
-					this.editor.state,
-					this.editor.view.dispatch
-				),
-		}
-	},
-
 	addCommands() {
 		const parent = this.parent?.()
 
@@ -83,10 +68,6 @@ export const CodeBlockExtension = CodeBlock.extend({
 
 	addInputRules() {
 		return [createFenceInputRule(this.type)]
-	},
-
-	addProseMirrorPlugins() {
-		return [createEnsureFencePlugin(this.type)]
 	},
 
 	addStorage() {

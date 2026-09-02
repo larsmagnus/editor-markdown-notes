@@ -24,7 +24,6 @@ import { withMarkerStrip } from '@/editor/extensions/block-marker/with-marker-st
 import { BlockquoteExtension } from '@/editor/extensions/blockquote/blockquote-extension'
 import { CodeBlockExtension } from '@/editor/extensions/code-block/code-block-extension'
 import { CodeExtension } from '@/editor/extensions/code-block/code-extension'
-import { parseFence } from '@/editor/extensions/code-block/code-fence'
 import { FocusNavigation } from '@/editor/extensions/focus-navigation/focus-navigation-extension'
 import { BoldExtension } from '@/editor/extensions/formatting/bold-extension'
 import { createDelimitedMarkRevealProvider } from '@/editor/extensions/formatting/create-delimited-mark-reveal-provider'
@@ -32,7 +31,6 @@ import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 import { inlineCodeDelimiterSpec } from '@/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
 import { StrikeExtension } from '@/editor/extensions/formatting/strike-extension'
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
-import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import { HeadingExtension } from '@/editor/extensions/heading/heading-extension'
 import { ImageView } from '@/editor/extensions/image/image-view'
 import {
@@ -52,7 +50,6 @@ import { patchMarkdownEscaping } from '@/editor/extensions/markdown/markdown-esc
 import { SearchRevealHighlight } from '@/editor/extensions/search-reveal/search-reveal-extension'
 import { SlashCommand } from '@/editor/extensions/slash-command/slash-command-extension'
 import { SyntaxHighlight } from '@/editor/extensions/syntax-highlight/syntax-highlight-extension'
-import { createFenceRevealProvider } from '@/editor/extensions/syntax-reveal/create-fence-reveal-provider'
 import { SyntaxReveal } from '@/editor/extensions/syntax-reveal/syntax-reveal-extension'
 import { TabIndent } from '@/editor/extensions/tab-indent/tab-indent-extension'
 import { TableCommands } from '@/editor/extensions/table/commands'
@@ -234,8 +231,6 @@ export const extensions = [
 	// construct contributes a provider here.
 	SyntaxReveal.configure({
 		providers: [
-			createFenceRevealProvider(['codeBlock'], parseFence),
-			createFenceRevealProvider(['frontmatter'], parseFrontmatterFence),
 			createMarkerRevealProvider(BLOCK_MARKER_SPECS),
 			createDelimitedMarkRevealProvider('link', linkDelimiterSpec()),
 			createDelimitedMarkRevealProvider('bold', fixedDelimiter('**')),

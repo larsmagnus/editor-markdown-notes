@@ -33,14 +33,16 @@ describe('TabIndent', () => {
 		const editor = documentFrom('# Roadmap')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
-			content: [{ type: 'text', text: 'title: Roadmap' }],
+			content: [{ type: 'text', text: '---\ntitle: Roadmap\n---' }],
 		})
-		// Position 1 is the very start of the frontmatter node's text content.
-		editor.commands.setTextSelection(1)
+		// Position 1 opens the node's text content; the YAML starts after `---\n`.
+		editor.commands.setTextSelection(5)
 
 		editor.commands.keyboardShortcut('Tab')
 
-		expect(editor.state.doc.firstChild?.textContent).toBe('  title: Roadmap')
+		expect(editor.state.doc.firstChild?.textContent).toBe(
+			'---\n  title: Roadmap\n---'
+		)
 	})
 
 	it('inserts an indent inside a code block', () => {
@@ -60,26 +62,30 @@ describe('TabIndent', () => {
 		const editor = documentFrom('# Roadmap')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
-			content: [{ type: 'text', text: '  title: Roadmap' }],
+			content: [{ type: 'text', text: '---\n  title: Roadmap\n---' }],
 		})
-		editor.commands.setTextSelection(3)
+		editor.commands.setTextSelection(7)
 
 		editor.commands.keyboardShortcut('Shift-Tab')
 
-		expect(editor.state.doc.firstChild?.textContent).toBe('title: Roadmap')
+		expect(editor.state.doc.firstChild?.textContent).toBe(
+			'---\ntitle: Roadmap\n---'
+		)
 	})
 
 	it('does nothing to indent when there is no preceding indent to remove', () => {
 		const editor = documentFrom('# Roadmap')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
-			content: [{ type: 'text', text: 'title: Roadmap' }],
+			content: [{ type: 'text', text: '---\ntitle: Roadmap\n---' }],
 		})
-		editor.commands.setTextSelection(1)
+		editor.commands.setTextSelection(5)
 
 		editor.commands.keyboardShortcut('Shift-Tab')
 
-		expect(editor.state.doc.firstChild?.textContent).toBe('title: Roadmap')
+		expect(editor.state.doc.firstChild?.textContent).toBe(
+			'---\ntitle: Roadmap\n---'
+		)
 	})
 
 	it('does not indent when a node, not a text caret, is selected', () => {

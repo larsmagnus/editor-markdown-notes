@@ -1,4 +1,4 @@
-import type { FenceRange } from '@/editor/extensions/syntax-reveal/create-fence-reveal-provider'
+import type { FenceRange } from '@/editor/extensions/block-marker/fence-spec'
 import { findClosingFence } from '@/editor/extensions/syntax-reveal/find-closing-fence'
 
 /**
@@ -6,7 +6,7 @@ import { findClosingFence } from '@/editor/extensions/syntax-reveal/find-closing
  * YAML between them - mirrors `code-fence.ts`, minus a language tag, since
  * the fence marker here is always the literal `---`. Field names match
  * `FenceRange` (`codeFrom`/`codeTo`, not `yamlFrom`/`yamlTo`) so this parser
- * plugs directly into the shared `createFenceRevealProvider`.
+ * plugs directly into the shared `createFenceMarkerSpec`.
  */
 export type ParsedFrontmatterFence = FenceRange
 

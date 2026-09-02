@@ -12,6 +12,8 @@ export type MarkerFix = {
 	textStart: number
 	existingLength: number
 	marker: string
+	/** Written at the host's very end, for a construct that closes itself. */
+	trailing?: string
 }
 
 /**
@@ -69,8 +71,16 @@ export function findMarkerActions(
 			return
 		}
 
-		const marker = spec.resolve({ node, parent, index, text })
-		if (marker === text.slice(0, existingLength)) return
+		const context = { node, parent, index, text }
+		const marker = spec.resolve(context)
+		const trailing =
+			spec.trailingLength?.(text) === 0
+				? spec.resolveTrailing?.(context)
+				: undefined
+
+		if (marker === text.slice(0, existingLength) && trailing === undefined) {
+			return
+		}
 
 		actions.push({
 			kind: 'fix',
@@ -80,6 +90,7 @@ export function findMarkerActions(
 				textStart: host.textStart,
 				existingLength,
 				marker,
+				trailing,
 			},
 		})
 	})

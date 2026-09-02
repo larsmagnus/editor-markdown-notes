@@ -35,11 +35,18 @@ export type BlockMarkerSpec = {
 	/** How much of `text` is marker, `0` when there is none yet. */
 	length(text: string): number
 	/**
+	 * How much of `text`'s tail is a closing marker, for the constructs that
+	 * have one - a code block's or frontmatter block's closing fence.
+	 */
+	trailingLength?(text: string): number
+	/**
 	 * The marker this node should be carrying. Returning the text already
 	 * present is how a spec says "leave it alone"; returning something else is
 	 * how an ordered list renumbers.
 	 */
 	resolve(context: MarkerContext): string
+	/** The same, for the closing marker of a construct that has one. */
+	resolveTrailing?(context: MarkerContext): string
 	/**
 	 * The marker one step down from the one `text` currently carries, or `null`
 	 * when there is no step left and removing it means removing the construct.
