@@ -14,7 +14,7 @@ import { headingMarkerLength } from '@/editor/extensions/heading/heading-marker'
  * marker still in place.
  *
  * Blocks are stripped in *reverse* document order - the same reason
- * `ensure-fence-plugin.ts` is - so deleting a later block's marker never
+ * the marker sync plugin is - so deleting a later block's marker never
  * shifts an earlier block's already-read position.
  */
 export const stripHeadingMarkerCommand: Command = (state, dispatch) => {

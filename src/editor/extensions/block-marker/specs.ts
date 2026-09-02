@@ -1,4 +1,7 @@
-import { createFenceMarkerSpec } from '@/editor/extensions/block-marker/fence-spec'
+import {
+	codeBlockMarkerSpec,
+	frontmatterMarkerSpec,
+} from '@/editor/extensions/block-marker/fenced-specs'
 import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
 import {
 	liftOutOfConstruct,
@@ -6,8 +9,6 @@ import {
 } from '@/editor/extensions/block-marker/unwrap'
 import { BLOCKQUOTE_MARKER } from '@/editor/extensions/blockquote/blockquote-marker'
 import { blockquoteMarkerLength } from '@/editor/extensions/blockquote/blockquote-marker'
-import { parseFence } from '@/editor/extensions/code-block/code-fence'
-import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import {
 	headingMarkerLength,
 	headingMarkerText,
@@ -96,29 +97,6 @@ export const listMarkerSpec: BlockMarkerSpec = {
 	demote: () => null,
 	unwrap: liftOutOfConstruct,
 }
-
-/**
- * A code block's fence lines. The language tag lives on the opening one, which
- * is why it resolves to whatever is already there rather than being rebuilt.
- */
-const codeBlockMarkerSpec = createFenceMarkerSpec({
-	nodeTypes: ['codeBlock'],
-	parse: parseFence,
-	fenceChar: '`',
-	seed: true,
-})
-
-/**
- * Frontmatter's `---` lines, for the reveal and for the author deleting one.
- * Nothing seeds them: `detect.ts` only ever builds the node with both already
- * in it.
- */
-const frontmatterMarkerSpec = createFenceMarkerSpec({
-	nodeTypes: ['frontmatter'],
-	parse: parseFrontmatterFence,
-	fenceChar: '-',
-	seed: false,
-})
 
 /**
  * A horizontal rule, whose marker is its whole content - there is nothing to a

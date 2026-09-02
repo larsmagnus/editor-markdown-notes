@@ -12,7 +12,7 @@ const CHECKED_CHAR_OFFSET = 3
 /**
  * Flips a task item's checked state by editing its own marker text directly
  * - the checkbox UI's route into the same "text is the source of truth" model
- * every other edit to a task item's marker goes through. `list-marker-sync-
+ * every other edit to a task item's marker goes through. `create-marker-sync-
  * plugin.ts` picks up the resulting text/attr mismatch afterward and
  * resyncs `checked` to match, the same one-directional flow typing an `x`
  * into the bracket by hand produces.

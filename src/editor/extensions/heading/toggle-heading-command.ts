@@ -100,7 +100,7 @@ export function createSetHeadingCommand(
  * level and a paragraph: back to paragraph when every touched block is
  * already at that level, otherwise forward to the heading, replacing
  * whatever marker (if any) was already there. Blocks are rewritten in
- * *reverse* document order - the same reason `ensure-fence-plugin.ts` is -
+ * *reverse* document order - the same reason the marker sync plugin is -
  * so replacing a later block's marker never shifts an earlier block's
  * already-read position.
  */
