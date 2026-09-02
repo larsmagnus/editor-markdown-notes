@@ -32,6 +32,7 @@ import { inlineCodeDelimiterSpec } from '@/editor/extensions/formatting/inline-c
 import { StrikeExtension } from '@/editor/extensions/formatting/strike-extension'
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
 import { HeadingExtension } from '@/editor/extensions/heading/heading-extension'
+import { HorizontalRuleExtension } from '@/editor/extensions/horizontal-rule/horizontal-rule-extension'
 import { ImageView } from '@/editor/extensions/image/image-view'
 import {
 	enterAdjacentImage,
@@ -97,12 +98,16 @@ export const extensions = [
 		document: false,
 		// Replaced below by its own file in `list/` - see why.
 		listItem: false,
+		// Replaced below: a rule holds its own `---` as text, which a leaf atom
+		// cannot do.
+		horizontalRule: false,
 	}),
 	// `frontmatter?` first, so the schema itself enforces "at most one, always
 	// the document's first child" - no `appendTransaction` policing needed.
 	Document.extend({ content: 'frontmatter? block+' }),
 	Frontmatter,
 	CodeBlockExtension,
+	HorizontalRuleExtension,
 	HeadingExtension,
 	BlockquoteExtension,
 	ListItemExtension,

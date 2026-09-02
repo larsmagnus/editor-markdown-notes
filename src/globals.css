@@ -232,6 +232,15 @@
 	}
 
 	/*
+	 * A rule's `---` is its whole content, so the line is drawn on the node
+	 * itself rather than by an `<hr>`. The text collapses to nothing while
+	 * hidden, which is why the height comes from padding rather than content.
+	 */
+	.ProseMirror [data-type='horizontalRule'] {
+		@apply my-6 border-t border-border font-mono text-muted-foreground;
+	}
+
+	/*
 	 * A construct whose own marker text is on screen drops whatever it draws in
 	 * that marker's place - the browser's bullet or number, a task item's
 	 * checkbox - so only ever one of the two is visible. `list-style` alone,

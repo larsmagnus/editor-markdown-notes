@@ -1,12 +1,11 @@
 import { mergeAttributes, Node } from '@tiptap/core'
-import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { ReactNodeViewRenderer } from '@tiptap/react'
-import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
 import { detectFrontmatter } from '@/editor/extensions/frontmatter/detect'
 import { isAtFrontmatterEdge } from '@/editor/extensions/frontmatter/frontmatter-edge-keymap'
 import { FrontmatterView } from '@/editor/extensions/frontmatter/frontmatter-view'
+import { serializeVerbatim } from '@/editor/extensions/markdown/serialize-verbatim'
 
 /**
  * The note's YAML frontmatter, as a real node at the start of the document
@@ -64,13 +63,7 @@ export const Frontmatter = Node.create({
 	addStorage() {
 		return {
 			markdown: {
-				// The block's text already contains its `---` fences verbatim (see
-				// `frontmatter-fence.ts`), so this only needs to write it back out.
-				serialize(state: MarkdownSerializerState, node: ProseMirrorNode) {
-					state.text(node.textContent, false)
-					state.ensureNewLine()
-					state.closeBlock(node)
-				},
+				serialize: serializeVerbatim,
 				parse: {},
 			},
 		}

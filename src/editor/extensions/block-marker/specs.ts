@@ -14,6 +14,10 @@ import {
 	parseHeadingLevel,
 } from '@/editor/extensions/heading/heading-marker'
 import {
+	HORIZONTAL_RULE_TEXT,
+	horizontalRuleLength,
+} from '@/editor/extensions/horizontal-rule/horizontal-rule-marker'
+import {
 	bulletMarkerText,
 	orderedMarkerText,
 	parseListMarker,
@@ -116,6 +120,23 @@ const frontmatterMarkerSpec = createFenceMarkerSpec({
 	seed: false,
 })
 
+/**
+ * A horizontal rule, whose marker is its whole content - there is nothing to a
+ * rule but its own syntax, so revealing it shows the node's entire text and
+ * editing that text into something that is no longer a rule leaves a paragraph
+ * holding whatever was typed.
+ */
+const horizontalRuleMarkerSpec: BlockMarkerSpec = {
+	nodeTypes: ['horizontalRule'],
+	markerHost: 'self',
+	revealScope: 'node',
+	length: horizontalRuleLength,
+	resolve: ({ text }) =>
+		horizontalRuleLength(text) > 0 ? text : HORIZONTAL_RULE_TEXT,
+	demote: () => null,
+	unwrap: unwrapToParagraph,
+}
+
 /** Every block construct whose syntax is real text in the construct itself. */
 export const BLOCK_MARKER_SPECS: BlockMarkerSpec[] = [
 	headingMarkerSpec,
@@ -123,4 +144,5 @@ export const BLOCK_MARKER_SPECS: BlockMarkerSpec[] = [
 	listMarkerSpec,
 	codeBlockMarkerSpec,
 	frontmatterMarkerSpec,
+	horizontalRuleMarkerSpec,
 ]

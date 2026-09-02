@@ -1,8 +1,6 @@
 import { mergeAttributes } from '@tiptap/core'
 import CodeBlock from '@tiptap/extension-code-block'
-import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import { ReactNodeViewRenderer } from '@tiptap/react'
-import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
 import { CodeBlockView } from '@/editor/extensions/code-block/code-block-view'
 import {
@@ -12,6 +10,7 @@ import {
 import { createFenceInputRule } from '@/editor/extensions/code-block/fence-input-rule'
 import { createToggleCodeBlockCommand } from '@/editor/extensions/code-block/toggle-code-block-command'
 import type { MarkdownIt } from '@/editor/extensions/markdown/markdown-it-types'
+import { serializeVerbatim } from '@/editor/extensions/markdown/serialize-verbatim'
 
 /** Never reconfigured elsewhere in this project - see the stock extension's own default. */
 const LANGUAGE_CLASS_PREFIX = 'language-'
@@ -73,13 +72,7 @@ export const CodeBlockExtension = CodeBlock.extend({
 	addStorage() {
 		return {
 			markdown: {
-				// The text already contains its fences, so synthesizing them here -
-				// the stock behavior - would double them up.
-				serialize(state: MarkdownSerializerState, node: ProseMirrorNode) {
-					state.text(node.textContent, false)
-					state.ensureNewLine()
-					state.closeBlock(node)
-				},
+				serialize: serializeVerbatim,
 				parse: {
 					setup(markdownit: MarkdownIt) {
 						markdownit.set({ langPrefix: LANGUAGE_CLASS_PREFIX })
