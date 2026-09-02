@@ -41,6 +41,9 @@ export function createMarkerRevealProvider(
 						? pos + node.nodeSize
 						: host.textStart + markerLength,
 					syntaxRanges,
+					revealedNode: spec.drawsMarkerStandIn
+						? [pos, pos + node.nodeSize]
+						: undefined,
 				})
 			})
 

@@ -232,6 +232,20 @@
 	}
 
 	/*
+	 * A construct whose own marker text is on screen drops whatever it draws in
+	 * that marker's place - the browser's bullet or number, a task item's
+	 * checkbox - so only ever one of the two is visible. `list-style` alone,
+	 * leaving the indent, so revealing a marker does not shift the line.
+	 */
+	.ProseMirror li.marker-revealed {
+		@apply list-none;
+	}
+
+	.ProseMirror li.marker-revealed > label {
+		@apply hidden;
+	}
+
+	/*
 	 * Markdown syntax `syntax-reveal-extension.ts` hides while the caret is
 	 * elsewhere - fence lines, formatting delimiters, list/heading markers.
 	 * Not `display: none`: contenteditable places and moves the caret through

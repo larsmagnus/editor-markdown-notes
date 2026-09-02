@@ -48,6 +48,12 @@ export type BlockMarkerSpec = {
 	/** The same, for the closing marker of a construct that has one. */
 	resolveTrailing?(context: MarkerContext): string
 	/**
+	 * This construct draws something in place of its marker - a list item's
+	 * bullet, a task item's checkbox - which has to step aside while the marker
+	 * text itself is revealed.
+	 */
+	drawsMarkerStandIn?: boolean
+	/**
 	 * The marker one step down from the one `text` currently carries, or `null`
 	 * when there is no step left and removing it means removing the construct.
 	 * A heading steps down a level at a time; every other construct's marker is

@@ -10,12 +10,11 @@ import type {
 /** The class every hidden syntax range gets; see `globals.css` for the technique. */
 export const SYNTAX_HIDDEN_CLASS = 'syntax-hidden'
 
-/**
- * Whether a selection reaches a span's container, and so reveals its syntax.
- * Shared with the node views that draw differently while their own syntax
- * shows - a task item cannot show both a checkbox and the `[ ]` it stands for.
- */
-export function revealsContainer(
+/** The class a construct gets while its own syntax is on screen. */
+const MARKER_REVEALED_CLASS = 'marker-revealed'
+
+/** Whether a selection reaches a span's container, and so reveals its syntax. */
+function revealsContainer(
 	selection: Selection,
 	containerFrom: number,
 	containerTo: number
@@ -47,57 +46,71 @@ function collectSpans(
 	return cachedSpans
 }
 
+/** What the current document and selection imply: ranges to hide, nodes to mark. */
+type RevealRanges = {
+	hidden: [number, number][]
+	revealedNodes: [number, number][]
+}
+
+function revealRanges(
+	doc: ProseMirrorNode,
+	selection: Selection,
+	providers: RevealProvider[]
+): RevealRanges {
+	const hidden: [number, number][] = []
+	const revealedNodes: [number, number][] = []
+
+	for (const span of collectSpans(doc, providers)) {
+		if (revealsContainer(selection, span.containerFrom, span.containerTo)) {
+			if (span.revealedNode) revealedNodes.push(span.revealedNode)
+			continue
+		}
+
+		for (const [from, to] of span.syntaxRanges) {
+			if (from >= to || to > doc.content.size) continue
+			hidden.push([from, to])
+		}
+	}
+
+	return { hidden, revealedNodes }
+}
+
 /**
- * The hidden ranges this document and selection imply, as one comparable
- * value. Two states with equal keys hide exactly the same text, so a
- * decoration set built for either is valid for the other once mapped.
+ * The decorations this document and selection imply, as one comparable value.
+ * Two states with equal keys decorate exactly the same text, so a decoration
+ * set built for either is valid for the other once mapped.
  */
 export function revealKey(
 	doc: ProseMirrorNode,
 	selection: Selection,
 	providers: RevealProvider[]
 ): string {
-	return hiddenRanges(doc, selection, providers)
-		.map(([from, to]) => `${from}:${to}`)
-		.join(',')
-}
+	const { hidden, revealedNodes } = revealRanges(doc, selection, providers)
+	const format = (ranges: [number, number][]) =>
+		ranges.map(([from, to]) => `${from}:${to}`).join(',')
 
-/** Every syntax range the selection does not currently reveal. */
-function hiddenRanges(
-	doc: ProseMirrorNode,
-	selection: Selection,
-	providers: RevealProvider[]
-): [number, number][] {
-	const ranges: [number, number][] = []
-
-	for (const span of collectSpans(doc, providers)) {
-		if (revealsContainer(selection, span.containerFrom, span.containerTo)) {
-			continue
-		}
-
-		for (const [from, to] of span.syntaxRanges) {
-			if (from >= to || to > doc.content.size) continue
-			ranges.push([from, to])
-		}
-	}
-
-	return ranges
+	return `${format(hidden)}|${format(revealedNodes)}`
 }
 
 /**
- * Hides every syntax range the selection does not reach. Overlap, not full
- * containment - dragging from inside a code block out into the paragraph after
- * it reveals the block's syntax rather than needing the whole block selected.
+ * Hides every syntax range the selection does not reach, and marks the
+ * constructs whose syntax it does. Overlap, not full containment - dragging
+ * from inside a code block out into the paragraph after it reveals the block's
+ * syntax rather than needing the whole block selected.
  */
 export function computeRevealDecorations(
 	doc: ProseMirrorNode,
 	selection: Selection,
 	providers: RevealProvider[]
 ): DecorationSet {
-	return DecorationSet.create(
-		doc,
-		hiddenRanges(doc, selection, providers).map(([from, to]) =>
+	const { hidden, revealedNodes } = revealRanges(doc, selection, providers)
+
+	return DecorationSet.create(doc, [
+		...hidden.map(([from, to]) =>
 			Decoration.inline(from, to, { class: SYNTAX_HIDDEN_CLASS })
-		)
-	)
+		),
+		...revealedNodes.map(([from, to]) =>
+			Decoration.node(from, to, { class: MARKER_REVEALED_CLASS })
+		),
+	])
 }

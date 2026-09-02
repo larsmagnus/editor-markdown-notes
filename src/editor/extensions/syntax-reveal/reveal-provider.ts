@@ -11,6 +11,13 @@ export type RevealSpan = {
 	containerFrom: number
 	containerTo: number
 	syntaxRanges: [number, number][]
+	/**
+	 * A node to mark while this span *is* revealed, for a construct drawing
+	 * something that stands in for its own syntax - a list item's bullet, a
+	 * task item's checkbox. That stand-in has to step aside while the real text
+	 * is on screen, or the item reads `• - Buy milk`.
+	 */
+	revealedNode?: [number, number]
 }
 
 /**
