@@ -71,6 +71,47 @@ test.describe('Toggling a style at a bare caret', () => {
 		).toHaveValue('Ship\n\nBelow.')
 	})
 
+	// `_` is the only marker CommonMark refuses to read inside a word, so the
+	// one flush against a word has to fall back to `*`. The others (`**`, `~~`,
+	// a backtick, a link) parse intraword and are left as they are.
+	test('falls back to * for italic written flush against a word', async ({
+		page,
+	}) => {
+		await openInVSCode(page, 'Ship')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('Ship').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('End')
+		await page.waitForTimeout(100)
+		await page.keyboard.press('ControlOrMeta+i')
+		await page.keyboard.type('ping')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Ship*ping*')
+	})
+
+	test('leaves bold flush against a word as **, which parses intraword', async ({
+		page,
+	}) => {
+		await openInVSCode(page, 'Ship')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('Ship').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('End')
+		await page.waitForTimeout(100)
+		await page.keyboard.press('ControlOrMeta+b')
+		await page.keyboard.type('ping')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Ship**ping**')
+	})
+
 	test('pressing it again at the caret removes the empty pair', async ({
 		page,
 	}) => {

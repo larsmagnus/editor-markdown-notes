@@ -19,7 +19,14 @@ Measured on this branch, four consecutive `pnpm test:e2e` runs (89 tests, 1
 minutes rather than the usual 15 seconds, which is the clearest signal that
 machine load is the variable: the same spec passes in isolation every time.
 
-No spec has ever failed in isolation.
+`e2e/copy-paste.spec.ts:57` failed once too, on a run where the two specs
+before it passed - its click-then-`Home`/`Shift+End` selection is the same
+pattern.
+
+No spec has ever failed in isolation. The population so far:
+`link-reveal.spec.ts:37`, `keyboard-navigation.spec.ts:51`,
+`backspace-boundaries.spec.ts:30`, `unformat-by-backspace.spec.ts:64`,
+`copy-paste.spec.ts:57` - five specs, one shared shape.
 
 ## Why it is not simply "add a wait"
 
@@ -56,9 +63,9 @@ flush is late often enough to matter. Two further wrinkles seen on this branch:
 - `e2e/lib/helpers.ts` — `openInVSCode`, `pasteText`/`pasteHtml`,
   `copySelectionHtml`, `tabUntilFocused`. Any new synchronisation primitive
   belongs here.
-- The four specs listed above, plus `link-reveal.spec.ts` and
-  `keyboard-navigation.spec.ts`, are the failing population. All of them press
-  keys and assert on caret-dependent results.
+- The five specs named above are the observed failing population, but the
+  shape is shared by every spec that clicks and then presses a key, so treat
+  the list as a sample rather than the boundary.
 
 ## Alternatives worth evaluating
 
