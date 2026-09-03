@@ -43,7 +43,17 @@ function resolveMarkerCaret(editor: Editor): MarkerCaret | null {
 
 	const nodeDepth = spec.markerHost === 'self' ? $from.depth : $from.depth - 1
 	if (nodeDepth < 1) return null
-	if (spec.markerHost === 'firstParagraph' && $from.index(nodeDepth) !== 0) {
+
+	// Keeps this in step with `resolveMarkerHost`, which resolves the same
+	// construct's marker line the same way: the marker text is read off
+	// whatever textblock the caret is in, so that textblock must be the one the
+	// spec actually keeps its marker in. Nothing reaches it today - a heading or
+	// code block inside a blockquote is claimed by its own spec first - but the
+	// two must not be able to disagree about where a marker lives.
+	if (
+		spec.markerHost === 'firstParagraph' &&
+		($from.index(nodeDepth) !== 0 || $from.parent.type.name !== 'paragraph')
+	) {
 		return null
 	}
 
