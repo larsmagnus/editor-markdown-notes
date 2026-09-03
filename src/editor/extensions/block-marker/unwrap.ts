@@ -56,7 +56,10 @@ export function liftOutOfConstruct(tr: Transaction, match: MarkerMatch): void {
  */
 export function unwrapFenced(fenceChar: string) {
 	const open = new RegExp(`^${fenceChar}{3,}[^\\n]*\\n?`)
-	const close = new RegExp(`\\n?${fenceChar}{3,}[ \\t]*$`)
+	// Any number of fence characters, none included: this runs *because* the
+	// author deleted the fence, so what survives on that last line may be two
+	// characters, one, or nothing but the newline that held it.
+	const close = new RegExp(`\\n${fenceChar}*[ \\t]*$`)
 
 	return (tr: Transaction, match: MarkerMatch): void => {
 		const node = tr.doc.nodeAt(match.pos)

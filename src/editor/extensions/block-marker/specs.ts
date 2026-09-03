@@ -37,6 +37,7 @@ const headingMarkerSpec: BlockMarkerSpec = {
 	nodeTypes: ['heading'],
 	markerHost: 'self',
 	revealScope: 'node',
+	backspaceRemovesMarker: true,
 	length: headingMarkerLength,
 	resolve: ({ text }) => headingMarkerText(parseHeadingLevel(text)),
 	demote: (text) => {
@@ -55,6 +56,7 @@ export const blockquoteMarkerSpec: BlockMarkerSpec = {
 	nodeTypes: ['blockquote'],
 	markerHost: 'firstParagraph',
 	revealScope: 'marker',
+	backspaceRemovesMarker: true,
 	length: blockquoteMarkerLength,
 	resolve: () => BLOCKQUOTE_MARKER,
 	demote: () => null,
@@ -73,6 +75,7 @@ export const listMarkerSpec: BlockMarkerSpec = {
 	markerHost: 'firstParagraph',
 	revealScope: 'marker',
 	drawsMarkerStandIn: true,
+	backspaceRemovesMarker: true,
 	length: (text) => parseListMarker(text)?.markerLength ?? 0,
 	resolve: ({ node, parent, index, text }) => {
 		const parsed = parseListMarker(text)

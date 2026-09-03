@@ -54,6 +54,19 @@ export type BlockMarkerSpec = {
 	 */
 	drawsMarkerStandIn?: boolean
 	/**
+	 * Backspace inside the marker removes the whole thing in one keystroke,
+	 * rather than a character at a time. True where the marker sits immediately
+	 * before the construct's content and native deletion at that boundary can
+	 * reach across it - a heading's `#`s, a bullet, a `> `.
+	 *
+	 * False where the marker is a line of its own that the author writes into: a
+	 * code block's fence carries its language tag, and eating the line whole
+	 * would make that tag uneditable. A fence deleted for real is caught by the
+	 * repair pass instead, which is where every route other than this one is
+	 * caught anyway.
+	 */
+	backspaceRemovesMarker?: boolean
+	/**
 	 * The marker one step down from the one `text` currently carries, or `null`
 	 * when there is no step left and removing it means removing the construct.
 	 * A heading steps down a level at a time; every other construct's marker is

@@ -40,6 +40,80 @@ describe('a fence the author deleted', () => {
 		expect(editor.state.doc.firstChild?.textContent).toBe('graph TD')
 	})
 
+	it('does not grow a new fence when one backtick of the closing one goes', () => {
+		const editor = documentFrom('```js\nconst x = 1\n```')
+		const end = editor.state.doc.firstChild!.nodeSize - 1
+
+		editor.commands.deleteRange({ from: end - 1, to: end })
+
+		expect(editor.state.doc.firstChild?.textContent).not.toContain('``\n```')
+	})
+
+	it('unwraps a code block whose closing fence the author deleted', () => {
+		const editor = documentFrom('```js\nconst x = 1\n```')
+		const end = editor.state.doc.firstChild!.nodeSize - 1
+
+		editor.commands.deleteRange({ from: end - 3, to: end })
+
+		expect(editor.state.doc.firstChild?.type.name).toBe('paragraph')
+		expect(editor.state.doc.firstChild?.textContent).toBe('const x = 1')
+	})
+
+	it('unwraps a mermaid block whose closing fence the author deleted', () => {
+		const editor = documentFrom('```mermaid\ngraph TD\n```')
+		const end = editor.state.doc.firstChild!.nodeSize - 1
+
+		editor.commands.deleteRange({ from: end - 3, to: end })
+
+		expect(editor.state.doc.firstChild?.type.name).toBe('paragraph')
+		expect(editor.state.doc.firstChild?.textContent).toBe('graph TD')
+	})
+
+	// The node is built directly: the app splits frontmatter off before anything
+	// reaches TipTap, so `setContent` on a note that opens with `---` gives a
+	// horizontal rule, not this.
+	it('does not grow a new fence when a frontmatter block loses its closing one', () => {
+		const editor = documentFrom('# Notes')
+		editor.commands.insertContentAt(0, {
+			type: 'frontmatter',
+			content: [{ type: 'text', text: '---\ntitle: Roadmap\n---' }],
+		})
+		const end = editor.state.doc.firstChild!.nodeSize - 1
+
+		editor.commands.deleteRange({ from: end - 1, to: end })
+
+		expect(editor.state.doc.firstChild?.textContent).not.toContain('--\n---')
+	})
+
+	// The fence line carries the language tag, which is ordinary editable text -
+	// `code-block-extension.ts` reads it back to drive highlighting. Treating the
+	// whole line as one marker made a single Backspace in it destroy the block.
+	// The character deletion itself is the browser's, so this asserts only that
+	// nothing claims the key; `e2e/code-block-fence.spec.ts` covers the edit.
+	it('leaves Backspace in the language tag to ordinary text editing', () => {
+		const editor = documentFrom('```javascript\nconst x = 1\n```')
+		// The end of the fence line, right after "javascript".
+		editor.commands.setTextSelection(14)
+
+		editor.commands.keyboardShortcut('Backspace')
+
+		expect(editor.state.doc.firstChild?.type.name).toBe('codeBlock')
+	})
+
+	it('edits a frontmatter fence line rather than unwrapping the block', () => {
+		const editor = documentFrom('# Notes')
+		editor.commands.insertContentAt(0, {
+			type: 'frontmatter',
+			content: [{ type: 'text', text: '---\ntitle: Roadmap\n---' }],
+		})
+		// Inside the YAML, one past the opening fence's newline.
+		editor.commands.setTextSelection(6)
+
+		editor.commands.keyboardShortcut('Backspace')
+
+		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
+	})
+
 	it('still fences a code block that never had one', () => {
 		const editor = documentFrom('Plain text')
 		editor.commands.setTextSelection(3)

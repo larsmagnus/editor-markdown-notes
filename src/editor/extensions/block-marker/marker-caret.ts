@@ -95,7 +95,8 @@ export function markerCaretAtBoundary(editor: Editor): MarkerCaret | null {
  */
 export function markerCaretInMarker(editor: Editor): MarkerCaret | null {
 	const caret = resolveMarkerCaret(editor)
-	if (!caret || caret.parentOffset === 0) return null
+	if (!caret?.spec.backspaceRemovesMarker) return null
+	if (caret.parentOffset === 0) return null
 	if (caret.parentOffset > caret.markerLength) return null
 	return caret
 }

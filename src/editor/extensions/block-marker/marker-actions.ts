@@ -38,14 +38,28 @@ function findAuthoredRemovals(
 	const removed = new Set<number>()
 
 	forEachMarkerHost(oldDoc, specs, ({ spec, host, pos }) => {
-		const length = spec.length(host.node.textContent)
-		if (length === 0) return
-		if (!probe.deleted(host.textStart, host.textStart + length)) return
+		const text = host.node.textContent
+		const leading = spec.length(text)
+		const trailing = spec.trailingLength?.(text) ?? 0
+		const textEnd = host.textStart + text.length
 
-		removed.add(probe.forward(pos, -1))
+		// Either end counts. A fenced construct's closing fence is as much its
+		// syntax as its opening one, and backspacing at it means the same thing.
+		const gone =
+			(leading > 0 &&
+				probe.deleted(host.textStart, host.textStart + leading)) ||
+			(trailing > 0 && probe.deleted(textEnd - trailing, textEnd))
+
+		if (gone) removed.add(probe.forward(pos, -1))
 	})
 
 	return removed
+}
+
+/** Whether a construct is now missing syntax it had at either end. */
+function missingSyntax(spec: BlockMarkerSpec, text: string): boolean {
+	if (spec.length(text) === 0) return true
+	return spec.trailingLength !== undefined && spec.trailingLength(text) === 0
 }
 
 /**
@@ -66,7 +80,7 @@ export function findMarkerActions(
 		const text = host.node.textContent
 		const existingLength = spec.length(text)
 
-		if (existingLength === 0 && removed.has(pos)) {
+		if (missingSyntax(spec, text) && removed.has(pos)) {
 			actions.push({ kind: 'unwrap', spec, match })
 			return
 		}
