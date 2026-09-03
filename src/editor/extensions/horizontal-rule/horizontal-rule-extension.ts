@@ -1,5 +1,7 @@
-import { mergeAttributes, Node, textblockTypeInputRule } from '@tiptap/core'
+import { mergeAttributes, Node } from '@tiptap/core'
+import { TextSelection } from '@tiptap/pm/state'
 
+import { createHorizontalRuleInputRule } from '@/editor/extensions/horizontal-rule/horizontal-rule-input-rule'
 import {
 	HORIZONTAL_RULE_TEXT,
 	insertLiteralRules,
@@ -54,32 +56,36 @@ export const HorizontalRuleExtension = Node.create({
 	 * Enter leaves the rule rather than splitting it or, `code` being set,
 	 * adding a newline inside it. A rule is one line by definition, and having
 	 * just typed `---` the caret is still in it - as a leaf atom it never was,
-	 * so there was nothing to step out of.
+	 * so there was nothing to step out of. Moving the caret into the new
+	 * paragraph is the whole point: left behind, the next thing typed lands in
+	 * the rule and stops it being one.
 	 */
 	addKeyboardShortcuts() {
 		return {
-			Enter: () => {
-				if (!this.editor.isActive(this.name)) return false
+			// Written onto the command's own transaction rather than dispatched
+			// separately: a shortcut invoked through `commands.keyboardShortcut`
+			// runs inside a chain, whose transaction is built from the state
+			// before this ran and would put the selection back.
+			Enter: () =>
+				this.editor.commands.command(({ tr, state, dispatch }) => {
+					const { $from } = state.selection
+					if ($from.parent.type.name !== this.name) return false
 
-				const after = this.editor.state.selection.$from.after()
-				return this.editor
-					.chain()
-					.insertContentAt(after, { type: 'paragraph' })
-					.setTextSelection(after + 1)
-					.run()
-			},
+					const paragraph = state.schema.nodes.paragraph
+					if (!paragraph) return false
+					if (!dispatch) return true
+
+					const after = $from.after()
+					tr.insert(after, paragraph.create())
+					tr.setSelection(TextSelection.near(tr.doc.resolve(after + 1)))
+					tr.scrollIntoView()
+					return true
+				}),
 		}
 	},
 
-	// Typed rather than matched on completion: the marker is the node's whole
-	// content, so the rule keeps the text it consumed instead of dropping it.
 	addInputRules() {
-		return [
-			textblockTypeInputRule({
-				find: /^(?:---|\*\*\*|___)$/,
-				type: this.type,
-			}),
-		]
+		return [createHorizontalRuleInputRule(this.type)]
 	},
 
 	addStorage() {

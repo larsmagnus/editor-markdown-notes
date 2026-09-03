@@ -54,6 +54,15 @@ export type BlockMarkerSpec = {
 	 */
 	drawsMarkerStandIn?: boolean
 	/**
+	 * Text that no longer parses as this construct's marker means the construct
+	 * is over, whether or not anything was deleted to get there. True only where
+	 * the marker is the construct's *entire* content - a horizontal rule - so
+	 * there is no state in which repairing one back could be right. Everywhere
+	 * else a marker leads content the author is writing, and its absence is
+	 * repaired unless the author deleted it.
+	 */
+	unwrapWhenUnparseable?: boolean
+	/**
 	 * Backspace inside the marker removes the whole thing in one keystroke,
 	 * rather than a character at a time. True where the marker sits immediately
 	 * before the construct's content and native deletion at that boundary can

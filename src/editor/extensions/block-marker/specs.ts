@@ -111,6 +111,7 @@ const horizontalRuleMarkerSpec: BlockMarkerSpec = {
 	nodeTypes: ['horizontalRule'],
 	markerHost: 'self',
 	revealScope: 'node',
+	unwrapWhenUnparseable: true,
 	length: horizontalRuleLength,
 	resolve: ({ text }) =>
 		horizontalRuleLength(text) > 0 ? text : HORIZONTAL_RULE_TEXT,

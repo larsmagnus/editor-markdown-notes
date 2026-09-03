@@ -48,10 +48,33 @@ test.describe('A horizontal rule in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 
 		await content.getByText('Above.').click()
+		await expect(content).toBeFocused()
 		await page.keyboard.press('End')
+		await page.waitForTimeout(100)
 		await page.keyboard.press('Enter')
+		await page.waitForTimeout(100)
 		await page.keyboard.type('---')
 
-		await expect(content.locator('[data-type="horizontalRule"]')).toHaveCount(1)
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Above.\n\n---\n')
+	})
+
+	// Matching is anchored to the block's start but stops at the caret, so
+	// without a guard this swallows the text after it into a rule.
+	test('typing --- in front of existing text makes no rule', async ({
+		page,
+	}) => {
+		await openInVSCode(page, 'Above.')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('Above.').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('Home')
+		await page.waitForTimeout(100)
+		await page.keyboard.type('---')
+
+		await expect(content.locator('[data-type="horizontalRule"]')).toHaveCount(0)
 	})
 })

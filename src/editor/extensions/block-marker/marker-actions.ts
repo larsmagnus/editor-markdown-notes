@@ -80,7 +80,8 @@ export function findMarkerActions(
 		const text = host.node.textContent
 		const existingLength = spec.length(text)
 
-		if (missingSyntax(spec, text) && removed.has(pos)) {
+		const missing = missingSyntax(spec, text)
+		if (missing && (removed.has(pos) || spec.unwrapWhenUnparseable)) {
 			actions.push({ kind: 'unwrap', spec, match })
 			return
 		}

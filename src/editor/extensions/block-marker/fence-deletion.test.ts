@@ -114,6 +114,20 @@ describe('a fence the author deleted', () => {
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
 	})
 
+	// A rule's marker is its entire content, so text that no longer reads as a
+	// rule is no longer a rule - there is no state where one should be repaired
+	// back. Seeding a fresh `---` there prepends it to whatever was typed.
+	it('unwraps a horizontal rule typed into rather than reseeding its dashes', () => {
+		const editor = documentFrom('Above.\n\n---\n\nBelow.')
+		const rule = editor.state.doc.child(1)
+		expect(rule.type.name).toBe('horizontalRule')
+
+		editor.commands.insertContentAt(10, 'x')
+
+		expect(editor.state.doc.child(1).type.name).toBe('paragraph')
+		expect(editor.state.doc.child(1).textContent).not.toContain('------')
+	})
+
 	it('still fences a code block that never had one', () => {
 		const editor = documentFrom('Plain text')
 		editor.commands.setTextSelection(3)
