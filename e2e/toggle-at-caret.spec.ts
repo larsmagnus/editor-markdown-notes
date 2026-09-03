@@ -49,6 +49,28 @@ test.describe('Toggling a style at a bare caret', () => {
 		).toHaveValue('Ship _the notes_')
 	})
 
+	// An empty pair is not valid markdown - `Ship****` parses back to plain
+	// text - so one left behind is literal rubbish in the file. Putting the
+	// delimiters down before there is anything between them is the whole
+	// mechanism, so they have to be taken away again if nothing arrives.
+	test('takes the pair back out when the caret leaves without typing', async ({
+		page,
+	}) => {
+		await openInVSCode(page, 'Ship\n\nBelow.')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('Ship').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('End')
+		await page.keyboard.press('ControlOrMeta+b')
+		await content.getByText('Below.').click()
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Ship\n\nBelow.')
+	})
+
 	test('pressing it again at the caret removes the empty pair', async ({
 		page,
 	}) => {

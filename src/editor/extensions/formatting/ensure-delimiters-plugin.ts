@@ -1,6 +1,6 @@
 import type { MarkType, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
-import type { Transaction } from '@tiptap/pm/state'
+import type { Selection, Transaction } from '@tiptap/pm/state'
 
 import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
@@ -40,6 +40,26 @@ function findAuthoredRemovals(
 	return removed
 }
 
+/**
+ * A run holding its two delimiters and nothing else - what a toggle at a bare
+ * caret puts down for the author to type into. Valid only while the caret is
+ * still in it: `**` with nothing between parses as literal text, so one left
+ * behind reaches the file as rubbish.
+ */
+function isAbandonedEmptyPair(
+	doc: ProseMirrorNode,
+	spec: DelimiterSpec,
+	run: MarkRun,
+	selection: Selection
+): boolean {
+	const text = doc.textBetween(run.from, run.to)
+	if (!text || spec.detectOpen(text) + spec.detectClose(text) !== text.length) {
+		return false
+	}
+
+	return !(selection.from >= run.from && selection.to <= run.to)
+}
+
 /** Delimiter text this run is missing, or `null` when it needs none. */
 function missingDelimiters(
 	doc: ProseMirrorNode,
@@ -71,6 +91,9 @@ function missingDelimiters(
  * the mark going together. Reinstating it there is what makes bold text
  * impossible to unbold by backspacing at its own `**`.
  *
+ * The reverse case is an empty pair the caret has moved away from, which is
+ * swept the moment that happens - see `isAbandonedEmptyPair`.
+ *
  * The inserted text carries the mark explicitly rather than letting `tr.insert`
  * infer one from the insertion point, plus any outer delimited mark this run
  * nests inside: without those, `**_text_**` oscillates forever, each mark
@@ -87,7 +110,11 @@ export function createEnsureDelimitersPlugin(
 	return new Plugin({
 		key: new PluginKey(`ensureDelimiters$${markType.name}`),
 		appendTransaction: (transactions, oldState, newState) => {
-			if (!anyDocChanged(transactions)) return null
+			const docChanged = anyDocChanged(transactions)
+			// Selection changes count too, and only for the empty-pair sweep: the
+			// caret leaving one is the event that makes it rubbish, and no document
+			// change need accompany it.
+			if (!docChanged && oldState.selection.eq(newState.selection)) return null
 
 			const removed = findAuthoredRemovals(
 				oldState.doc,
@@ -99,6 +126,13 @@ export function createEnsureDelimitersPlugin(
 			let tr: Transaction | undefined
 
 			for (const run of [...runs].reverse()) {
+				if (isAbandonedEmptyPair(newState.doc, spec, run, newState.selection)) {
+					tr = tr ?? newState.tr
+					tr.delete(run.from, run.to)
+					continue
+				}
+				if (!docChanged) continue
+
 				// Asked before the removal check, so a run whose delimiter was
 				// rewritten rather than dropped - `apply-link-command.ts` replacing a
 				// URL - is left alone by both branches.
