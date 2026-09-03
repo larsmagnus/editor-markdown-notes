@@ -22,6 +22,12 @@ const INSERTERS = [
  * the same attribute-less `heading`. Without the marker, the repair pass has
  * nothing to go on and gives every level `# `.
  *
+ * Only for HTML from elsewhere. ProseMirror stamps its own clipboard slices
+ * with `data-pm-slice`, and those already carry every marker as real text -
+ * this schema is what put it there. Reinstating one on top turns a copied
+ * `## Heading` into `## ## Heading` and a `> Quoted` into `> > &gt; Quoted`,
+ * both of which reach the file.
+ *
  * Reuses each construct's own inserter, keeping the tag-to-marker mapping in
  * one place rather than written a second time for paste.
  */
@@ -30,6 +36,8 @@ export function createPasteLiteralMarkersPlugin(): Plugin {
 		key: new PluginKey('pasteLiteralMarkers'),
 		props: {
 			transformPastedHTML(html: string) {
+				if (html.includes('data-pm-slice')) return html
+
 				const container = document.createElement('div')
 				container.innerHTML = html
 				for (const insert of INSERTERS) insert(container)

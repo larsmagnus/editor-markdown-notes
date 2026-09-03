@@ -1,0 +1,82 @@
+import { expect, test } from '@playwright/test'
+
+import { copySelectionHtml, openInVSCode, pasteHtml } from '@/e2e/lib/helpers'
+
+/**
+ * Every block construct's marker is real text, so the editor's own clipboard
+ * HTML already carries it. Reinstating one on the way back in - which is the
+ * right thing for HTML from anywhere else - doubles it.
+ */
+test.describe('Copying and pasting within the editor', () => {
+	test('pasting a copied heading does not double its marker', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '## Heading\n\nBody.')
+		const content = page.getByRole('textbox').first()
+
+		// Triple-click, so the slice carries the `<h2>` itself - a selection
+		// within the line copies inline content, which has no marker to double.
+		await content.getByText('Heading').click({ clickCount: 3 })
+		await expect(content).toBeFocused()
+		const html = await copySelectionHtml(content)
+
+		await content.getByText('Body.').click()
+		await page.keyboard.press('End')
+		await page.keyboard.press('Enter')
+		await pasteHtml(content, html, '## Heading')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).not.toHaveValue(/## ##/)
+	})
+
+	test('pasting a copied list item does not double its bullet', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '- Buy milk\n\nBody.')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('Buy milk').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('Home')
+		await page.keyboard.press('Shift+End')
+		const html = await copySelectionHtml(content)
+
+		await content.getByText('Body.').click()
+		await page.keyboard.press('End')
+		await page.keyboard.press('Enter')
+		await pasteHtml(content, html, '- Buy milk')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		const raw = page.getByRole('textbox', { name: 'Raw markdown' })
+		await expect(raw).not.toHaveValue(/- \\-/)
+		await expect(raw).not.toHaveValue(/- - /)
+	})
+
+	test('pasting a copied blockquote does not double its marker', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '> Quoted\n\nBody.')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('Quoted').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('Home')
+		await page.keyboard.press('Shift+End')
+		const html = await copySelectionHtml(content)
+
+		await content.getByText('Body.').click()
+		await page.keyboard.press('End')
+		await page.keyboard.press('Enter')
+		await pasteHtml(content, html, '> Quoted')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		// Pasting a quote beside one merges the two, so a nested `> > ` here is
+		// correct. What must not appear is an escaped `&gt;` - that is the marker
+		// having been reinstated on top of itself and left as literal prose.
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).not.toHaveValue(/&gt;/)
+	})
+})
