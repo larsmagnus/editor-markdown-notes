@@ -22,17 +22,19 @@ export function createToggleItalicCommand(
 	return ({ state, dispatch, chain }: CommandProps): boolean => {
 		const preferredMarkup = getPreferredMarkup()
 
-		if (!state.selection.empty) {
-			const { from, to } = state.selection
-			const markup = italicWrapMarkup(state.doc, from, to, preferredMarkup)
-			const wrapDelimiters = { open: markup, close: markup }
-			if (
-				toggleDelimitedMark(markType, italicDelimiterSpec(), wrapDelimiters, {
-					markup,
-				})(state, dispatch)
-			) {
-				return true
-			}
+		// An empty selection goes through too: `italicWrapMarkup` reads the
+		// context around the caret, and the toggle puts down a pair to type into.
+		const { from, to } = state.selection
+		const markup = italicWrapMarkup(state.doc, from, to, preferredMarkup)
+		if (
+			toggleDelimitedMark(
+				markType,
+				italicDelimiterSpec(),
+				{ open: markup, close: markup },
+				{ markup }
+			)(state, dispatch)
+		) {
+			return true
 		}
 
 		return chain().toggleMark(markName, { markup: preferredMarkup }).run()

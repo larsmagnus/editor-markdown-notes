@@ -60,7 +60,9 @@ describe('toggleDelimitedMark', () => {
 		)
 	})
 
-	it('declines on an empty selection', () => {
+	// The caret lands between the two delimiters, which is what makes the text
+	// typed next land inside the run rather than after it.
+	it('puts down an empty pair at a bare caret', () => {
 		const editor = new Editor({ extensions: [StarterKit], content: '' })
 		editor.commands.setContent('<p>hello world</p>')
 		editor.commands.setTextSelection(7)
@@ -71,7 +73,28 @@ describe('toggleDelimitedMark', () => {
 			{ open: '**', close: '**' }
 		)(editor.state, editor.view.dispatch)
 
-		expect(applied).toBe(false)
+		expect(applied).toBe(true)
+		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
+			'hello ****world'
+		)
+		expect(editor.state.selection.from).toBe(9)
+	})
+
+	it('takes the pair back out when toggled again inside it', () => {
+		const editor = new Editor({ extensions: [StarterKit], content: '' })
+		editor.commands.setContent('<p>hello <strong>****</strong>world</p>')
+		editor.commands.setTextSelection(9)
+
+		const applied = toggleDelimitedMark(
+			editor.schema.marks.bold,
+			fixedDelimiter('**'),
+			{ open: '**', close: '**' }
+		)(editor.state, editor.view.dispatch)
+
+		expect(applied).toBe(true)
+		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
+			'hello world'
+		)
 	})
 
 	// `findMarkRuns` stops extending a run at any non-text node, so a selection

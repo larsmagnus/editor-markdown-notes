@@ -14,20 +14,18 @@ import { toggleDelimitedMark } from '@/editor/extensions/formatting/toggle-delim
  */
 export function createToggleCodeCommand(markType: MarkType, markName: string) {
 	return ({ state, dispatch, chain }: CommandProps): boolean => {
-		if (!state.selection.empty) {
-			const { from, to } = state.selection
-			const wrapDelimiters = inlineCodeFenceText(
-				state.doc.textBetween(from, to)
-			)
-			if (
-				toggleDelimitedMark(
-					markType,
-					inlineCodeDelimiterSpec(),
-					wrapDelimiters
-				)(state, dispatch)
-			) {
-				return true
-			}
+		// An empty selection goes through too: the fence for no text at all is a
+		// single backtick, and the toggle puts down a pair to type into.
+		const { from, to } = state.selection
+		const wrapDelimiters = inlineCodeFenceText(state.doc.textBetween(from, to))
+		if (
+			toggleDelimitedMark(
+				markType,
+				inlineCodeDelimiterSpec(),
+				wrapDelimiters
+			)(state, dispatch)
+		) {
+			return true
 		}
 
 		return chain().toggleMark(markName).run()

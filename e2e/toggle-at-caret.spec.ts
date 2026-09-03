@@ -1,0 +1,70 @@
+import { expect, test } from '@playwright/test'
+
+import { openInVSCode } from '@/e2e/lib/helpers'
+
+/**
+ * Pressing a style shortcut with no selection, then typing, is one of the most
+ * common ways to write styled text. The delimiters are real text, so this has
+ * to put both of them down and leave the caret between - a stored mark alone
+ * styles only the first character, because the closing delimiter is what ends
+ * the run and the mark is deliberately not inclusive.
+ */
+test.describe('Toggling a style at a bare caret', () => {
+	test('styles everything typed after it, not just the first character', async ({
+		page,
+	}) => {
+		await openInVSCode(page, 'Ship')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('Ship').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('End')
+		// Typed, not part of the fixture: markdown-it strips a paragraph's
+		// trailing space, so the caret would otherwise sit flush against `Ship`.
+		await page.keyboard.type(' ')
+		await page.keyboard.press('ControlOrMeta+b')
+		await page.keyboard.type('the notes')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Ship **the notes**')
+	})
+
+	// `_`, not `*`: the italic marker is a setting, and `_` is its default.
+	test('does the same for italic', async ({ page }) => {
+		await openInVSCode(page, 'Ship')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('Ship').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('End')
+		await page.keyboard.type(' ')
+		await page.keyboard.press('ControlOrMeta+i')
+		await page.keyboard.type('the notes')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Ship _the notes_')
+	})
+
+	test('pressing it again at the caret removes the empty pair', async ({
+		page,
+	}) => {
+		await openInVSCode(page, 'Ship')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('Ship').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('End')
+		await page.keyboard.type(' ')
+		await page.keyboard.press('ControlOrMeta+b')
+		await page.keyboard.press('ControlOrMeta+b')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Ship ')
+	})
+})

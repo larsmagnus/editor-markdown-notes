@@ -1,5 +1,6 @@
 import type { MarkType, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { Command } from '@tiptap/pm/state'
+import { TextSelection } from '@tiptap/pm/state'
 
 import type {
 	DelimiterPair,
@@ -11,6 +12,48 @@ import {
 	wrapRangeWithDelimiter,
 	wrapSelectionWithDelimiter,
 } from '@/editor/extensions/formatting/wrap-selection-with-delimiter'
+
+/**
+ * Toggling with nothing selected, which is how most styled text gets written:
+ * press the shortcut, then type. Both delimiters go down and the caret lands
+ * between them, so what follows is typed *inside* the run.
+ *
+ * A stored mark cannot do this. The closing delimiter is real mark-carrying
+ * text and the mark is deliberately not inclusive, so a stored mark reaches
+ * only the first character typed - `**w**orld`. With the closing delimiter
+ * already in front of the caret, every character goes in with the mark on both
+ * sides of it.
+ *
+ * Inside an existing run the toggle means off, and takes that run apart -
+ * including the empty pair a previous press just put down.
+ */
+function toggleDelimitedMarkAtCaret(
+	markType: MarkType,
+	spec: DelimiterSpec,
+	pair: DelimiterPair,
+	attrs?: Record<string, unknown>
+): Command {
+	return (state, dispatch) => {
+		const { from } = state.selection
+		// Strictly inside, so a caret resting against a run's outer edge starts a
+		// new one rather than unwrapping the neighbour.
+		const enclosing = findMarkRuns(state.doc, markType).find(
+			(run) => run.from < from && run.to > from
+		)
+
+		if (!dispatch) return true
+
+		const tr = state.tr
+		if (enclosing) {
+			unwrapRun(tr, markType, spec, enclosing)
+		} else {
+			wrapRangeWithDelimiter(tr, markType, pair, from, from, attrs)
+			tr.setSelection(TextSelection.create(tr.doc, from + pair.open.length))
+		}
+		dispatch(tr)
+		return true
+	}
+}
 
 /** Whether every piece of text in the range already carries the mark. */
 function rangeFullyMarked(
@@ -34,8 +77,11 @@ function rangeFullyMarked(
  * rather than leaving their delimiters stranded inside a new pair as
  * `**plain **bold** more**`.
  *
- * Declines (returns `false`) on an empty selection, and on one that straddles
- * a run - part inside, part outside - which has no single right answer. The
+ * With nothing selected it puts down an empty pair and leaves the caret inside
+ * it, so typing continues into the run (see `toggleDelimitedMarkAtCaret`).
+ *
+ * Declines (returns `false`) only on a selection that straddles a run - part
+ * inside, part outside - which has no single right answer. The
  * caller falls back to the stock `toggleMark` for those, which knows nothing
  * about delimiters; `ensure-delimiters-plugin.ts` is the backstop that keeps
  * mark and delimiter text consistent regardless.
@@ -53,7 +99,14 @@ export function toggleDelimitedMark(
 ): Command {
 	return (state, dispatch) => {
 		const { selection } = state
-		if (selection.empty) return false
+		if (selection.empty) {
+			return toggleDelimitedMarkAtCaret(
+				markType,
+				spec,
+				wrapDelimiters,
+				attrs
+			)(state, dispatch)
+		}
 
 		const { from, to } = selection
 		const runs = findMarkRuns(state.doc, markType)
