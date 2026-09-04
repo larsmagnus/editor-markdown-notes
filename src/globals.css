@@ -259,10 +259,17 @@
 	 * to the hidden text, and `white-space: nowrap` keeps multi-character
 	 * syntax (a language tag, a marker) from wrapping onto its own line while
 	 * collapsed.
+	 *
+	 * `line-height: 0` is what keeps it out of the line it sits in. An
+	 * inline-block that clips its overflow takes its baseline from its bottom
+	 * margin edge rather than its text, so a full-height one hangs entirely
+	 * above the baseline and grows the line box - enough to push a task item's
+	 * text visibly below its own checkbox.
 	 */
 	.ProseMirror .syntax-hidden {
 		display: inline-block;
 		width: 0;
+		line-height: 0;
 		overflow: hidden;
 		white-space: nowrap;
 	}

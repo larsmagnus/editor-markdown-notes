@@ -33,16 +33,29 @@ pattern.
 No spec has ever failed in isolation. The population so far:
 `link-reveal.spec.ts:37`, `keyboard-navigation.spec.ts:51`,
 `backspace-boundaries.spec.ts:30`, `unformat-by-backspace.spec.ts:64`,
-`copy-paste.spec.ts:57`, `code-block-fence.spec.ts:73` - six specs, one
-shared shape.
+`copy-paste.spec.ts:57`, `code-block-fence.spec.ts:73`,
+`mermaid-source.spec.ts:16` - seven specs, one shared shape.
 
-`mermaid-source.spec.ts:16` was a seventh until a `waitForTimeout(100)` was
-added to it, and it is the clearest specimen of the mechanism: it presses ten
-`ArrowRight`s and then a `Backspace`, and under load _every one of the arrows_
-was dropped, leaving the Backspace to act at the block's first character.
-Neither `toBeFocused`, nor waiting for the collapsed source to render, nor
-waiting for the reveal decoration to clear (alternative 5 below) prevented it -
-each is satisfied while the editor still will not act on a key.
+`mermaid-source.spec.ts:16` is the seventh, and the clearest specimen of the
+mechanism: it presses ten `ArrowRight`s and then a `Backspace`, and under load
+_every one of the arrows_ is dropped, leaving the Backspace to act at the
+block's first character. Three things were tried on it and are worth not
+repeating:
+
+- `toBeFocused`, waiting for the collapsed source to render, and waiting for
+  the reveal decoration to clear (alternative 5) are all satisfied while the
+  editor still will not act on a key. Adding `waitForTimeout(100)` on top took
+  it from failing 1 run in 2 to roughly 1 in 7 - the current state.
+- Replacing the eleven key presses with a single `page.mouse.click` at
+  coordinates measured from a `Range` over the fence tag made it **worse**
+  (3 failures in 5 runs). Whatever the editor is catching up on, it drops a
+  click the same way it drops a key, so reducing the number of events is not
+  the axis that matters.
+- The underlying defect - the node view swapping the element the caret is in -
+  does **not** reproduce in vitest. TipTap owns the content DOM and re-parents
+  the same `<code>` element, so element identity, parent identity and
+  attachment are all unchanged across the swap in happy-dom, on the broken code
+  as well as the fixed. Only a real browser's selection sees it.
 
 ## Why it is not simply "add a wait"
 
