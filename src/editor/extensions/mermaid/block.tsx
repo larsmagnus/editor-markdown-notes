@@ -32,11 +32,15 @@ export function MermaidBlock({ node, editor, getPos }: MermaidBlockProps) {
 	const startEditing = () => focusBlockContentStart(editor, getPos)
 
 	return (
-		<NodeViewWrapper className="group relative not-prose my-4">
+		<NodeViewWrapper className="group relative">
 			{!showSource && result && 'svg' in result ? (
 				// Everything the viewport draws is generated, not authored, so it
 				// stays outside what ProseMirror treats as editable content.
-				<div contentEditable={false}>
+				// `not-prose` covers the generated markup only: the source below is a
+				// code block like any other and takes the same typography, or the
+				// block visibly restyles itself the moment its fence tag stops
+				// saying `mermaid`.
+				<div contentEditable={false} className="not-prose my-4">
 					<PanZoom
 						// The border is always drawn, unlike the rest of the editor's
 						// hover affordances: a diagram taller than the cap is clipped,
@@ -69,9 +73,7 @@ export function MermaidBlock({ node, editor, getPos }: MermaidBlockProps) {
 			{/* The content DOM has to stay mounted for ProseMirror to map positions
 			    into it. `display: none` would leave it unmeasurable, so it is
 			    collapsed out of the layout instead. */}
-			<pre
-				className={cn('m-0', !showSource && 'absolute h-0 w-0 overflow-hidden')}
-			>
+			<pre className={cn(!showSource && 'absolute h-0 w-0 overflow-hidden')}>
 				<NodeViewContent<'code'>
 					as="code"
 					className={`language-${MERMAID_LANGUAGE}`}

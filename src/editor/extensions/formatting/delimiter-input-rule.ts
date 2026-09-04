@@ -13,6 +13,14 @@ import type { MarkType } from '@tiptap/pm/model'
  * is what commits it. Stock never notices, deleting the delimiters anyway;
  * keeping them as real text means inserting the missing tail here.
  *
+ * A match whose opening delimiter is already part of a run of the same mark is
+ * declined: on a line that has one run, the delimiter that opens the next is
+ * preceded by the first run's closing one, and a regex reading text alone sees
+ * a pair spanning the gap between them. Applied, it styles the words between
+ * the two runs and takes the first run's closing delimiter for its own -
+ * `` `code` and ` `` collapsing into a single span over the whole line. A
+ * delimiter with no partner of its own stays literal text until one arrives.
+ *
  * `find`'s first capture group must be the whole delimited span and its last
  * the inner text - the shape `@tiptap/extension-*`'s `*InputRegex` exports.
  */
@@ -28,6 +36,10 @@ export function createDelimiterInputRule(
 			if (!outer) return null
 
 			const outerStart = range.from + match[0].indexOf(outer)
+			if (state.doc.rangeHasMark(outerStart, outerStart + 1, markType)) {
+				return null
+			}
+
 			const alreadyCommitted = range.to - outerStart
 			const missingTail = outer.slice(alreadyCommitted)
 
