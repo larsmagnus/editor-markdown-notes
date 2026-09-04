@@ -34,7 +34,7 @@ export const ListItemExtension = ListItem.extend({
 	 */
 	addCommands() {
 		const toggle = (listName: string) => () => (props: CommandProps) =>
-			withMarkerStrip(props, listName, () =>
+			withMarkerStrip(props, { toggled: listName, marker: this.name }, () =>
 				props.commands.toggleList(listName, this.name, true)
 			)
 

@@ -34,8 +34,16 @@ function matchingFenceLength(text: string): number {
 	let close = 0
 	while (text[text.length - 1 - close] === '`') close++
 
-	if (open === 0 || open !== close || open + close > text.length) return 0
-	return open
+	if (open === 0) return 0
+
+	// Backticks the whole way through, so the two runs are the same characters
+	// counted twice. An even number of them is the empty pair a toggle at a bare
+	// caret puts down; an odd number splits into no pair at all.
+	if (open + close > text.length) {
+		return text.length % 2 === 0 ? text.length / 2 : 0
+	}
+
+	return open === close ? open : 0
 }
 
 function resolveEdge(

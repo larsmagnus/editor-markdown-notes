@@ -50,6 +50,17 @@ describe('pasting HTML from outside the editor', () => {
 		expect(editor.storage.markdown.getMarkdown()).toContain('> quoted')
 	})
 
+	// An `hr` is void, so a rule pasted from a browser arrives as a node with no
+	// text at all - and a rule is nothing but its own text, so it used to be
+	// read as unparseable and unwrapped into an empty paragraph on arrival.
+	it('keeps a pasted horizontal rule', () => {
+		const editor = emptyEditor()
+
+		editor.view.pasteHTML('<p>Above</p><hr><p>Below</p>')
+
+		expect(editor.storage.markdown.getMarkdown()).toContain('---')
+	})
+
 	it('leaves markdown arriving through markdown-it alone', () => {
 		const editor = emptyEditor()
 

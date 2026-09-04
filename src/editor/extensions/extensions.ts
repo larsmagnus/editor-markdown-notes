@@ -146,8 +146,10 @@ export const extensions = [
 			return {
 				...parent,
 				toggleTaskList: () => (props: CommandProps) =>
-					withMarkerStrip(props, this.name, () =>
-						Boolean(parent?.toggleTaskList?.()(props))
+					withMarkerStrip(
+						props,
+						{ toggled: this.name, marker: 'taskItem' },
+						() => Boolean(parent?.toggleTaskList?.()(props))
 					),
 			}
 		},

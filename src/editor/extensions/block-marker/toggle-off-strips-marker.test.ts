@@ -75,6 +75,30 @@ describe('toggling a block construct off', () => {
 		expect(editor.storage.markdown.getMarkdown()).toBe('const total = 1')
 	})
 
+	// Only the toggled construct's own marker may go. A quote holding a list
+	// used to lose the list's bullets too - the strip walked the whole selection
+	// and matched every spec against every paragraph, so unquoting silently
+	// stopped those lines being list items at all.
+	it('leaves a list inside a toggled-off blockquote intact', () => {
+		const editor = documentFrom('> Note\n>\n> - Buy milk')
+		editor.commands.setTextSelection({ from: 2, to: 20 })
+
+		editor.chain().toggleBlockquote().run()
+
+		expect(editor.storage.markdown.getMarkdown()).toBe('Note\n\n- Buy milk')
+	})
+
+	// The inner quote is still a quote afterwards, so its own marker is the one
+	// thing on that line that has to survive.
+	it('leaves a nested blockquote its own marker when the outer one is toggled off', () => {
+		const editor = documentFrom('> Outer\n>\n> > Inner')
+		editor.commands.setTextSelection({ from: 2, to: 18 })
+
+		editor.chain().toggleBlockquote().run()
+
+		expect(editor.storage.markdown.getMarkdown()).toBe('Outer\n\n> Inner')
+	})
+
 	it('leaves no marker behind for a heading', () => {
 		const editor = documentFrom('## A title')
 		editor.commands.setTextSelection(4)

@@ -33,7 +33,7 @@ export const BlockquoteExtension = Blockquote.extend({
 		return {
 			...parent,
 			toggleBlockquote: () => (props: CommandProps) =>
-				withMarkerStrip(props, this.name, () =>
+				withMarkerStrip(props, { toggled: this.name, marker: this.name }, () =>
 					Boolean(parent?.toggleBlockquote?.()(props))
 				),
 		}

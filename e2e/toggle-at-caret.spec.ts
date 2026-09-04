@@ -49,6 +49,27 @@ test.describe('Toggling a style at a bare caret', () => {
 		).toHaveValue('Ship _the notes_')
 	})
 
+	// Inline code's fence length varies with the code's own backticks, so its
+	// empty pair is the one shape where the two delimiters are the whole run and
+	// nothing separates them - read as undelimited, the run gets a second pair
+	// written around it and the author types into `` ` `` ` `` instead.
+	test('does the same for inline code', async ({ page }) => {
+		await openInVSCode(page, 'Ship')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('Ship').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('End')
+		await page.keyboard.type(' ')
+		await page.keyboard.press('ControlOrMeta+e')
+		await page.keyboard.type('the notes')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Ship `the notes`')
+	})
+
 	// An empty pair is not valid markdown - `Ship****` parses back to plain
 	// text - so one left behind is literal rubbish in the file. Putting the
 	// delimiters down before there is anything between them is the whole

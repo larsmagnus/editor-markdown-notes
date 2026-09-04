@@ -9,10 +9,17 @@ export function anyDocChanged(transactions: readonly Transaction[]): boolean {
 	return transactions.some((transaction) => transaction.docChanged)
 }
 
-/** Whether any of a batch carries `key`, the way a command signals its intent. */
-export function anyMeta(
+/**
+ * What a batch carries under `key`, the way a command names its intent to the
+ * plugin that answers it - `undefined` when no transaction set one.
+ */
+export function metaString(
 	transactions: readonly Transaction[],
 	key: string
-): boolean {
-	return transactions.some((transaction) => transaction.getMeta(key))
+): string | undefined {
+	for (const transaction of transactions) {
+		const value: unknown = transaction.getMeta(key)
+		if (typeof value === 'string') return value
+	}
+	return undefined
 }

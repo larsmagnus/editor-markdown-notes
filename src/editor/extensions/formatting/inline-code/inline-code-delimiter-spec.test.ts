@@ -52,6 +52,32 @@ describe('inlineCodeDelimiterSpec', () => {
 		expect(spec.detectClose('```')).toBe(0)
 	})
 
+	// The empty pair `toggle-delimited-mark.ts` puts down at a bare caret. Read
+	// as undelimited, it gets a second pair written around it and the author
+	// types into `` ` `` ` `` instead of an empty code span; read as delimited,
+	// it is also the shape `ensure-delimiters-plugin.ts` sweeps away when the
+	// caret leaves without anything being typed.
+	it('detects the empty pair as one backtick at each end', () => {
+		const spec = inlineCodeDelimiterSpec()
+
+		expect(spec.detectOpen('``')).toBe(1)
+		expect(spec.detectClose('``')).toBe(1)
+	})
+
+	it('detects an empty pair written with a longer fence', () => {
+		const spec = inlineCodeDelimiterSpec()
+
+		expect(spec.detectOpen('````')).toBe(2)
+		expect(spec.detectClose('````')).toBe(2)
+	})
+
+	it('reports no delimiter for a lone backtick, which cannot be a pair', () => {
+		const spec = inlineCodeDelimiterSpec()
+
+		expect(spec.detectOpen('`')).toBe(0)
+		expect(spec.detectClose('`')).toBe(0)
+	})
+
 	it('resolves a fresh pair of backticks for a run with no fence yet', () => {
 		// `new Editor({ content })`'s initial parse never runs `ensure-
 		// delimiters-plugin.ts` (only a later real transaction does - see
