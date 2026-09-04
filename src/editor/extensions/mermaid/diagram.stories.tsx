@@ -3,17 +3,17 @@ import { EditorContent, useEditor } from '@tiptap/react'
 
 import { extensions } from '@/editor/extensions/extensions'
 
-type MermaidBlockPreviewProps = { content: string }
+type MermaidDiagramPreviewProps = { content: string }
 
 /**
- * Mounts a real editor on a single fenced `mermaid` block, so `MermaidBlock`
+ * Mounts a real editor on a single fenced `mermaid` block, so `MermaidDiagram`
  * renders through the same `CodeBlockView` node view production uses -
  * `NodeViewProps` come from TipTap itself and cannot be built by hand.
- * `component` targets this wrapper rather than `MermaidBlock` directly for
+ * `component` targets this wrapper rather than `MermaidDiagram` directly for
  * the same reason: its own props are that same TipTap-only-constructible
  * shape.
  */
-function MermaidBlockPreview({ content }: MermaidBlockPreviewProps) {
+function MermaidDiagramPreview({ content }: MermaidDiagramPreviewProps) {
 	const editor = useEditor({ extensions, content })
 
 	if (!editor) return null
@@ -22,11 +22,11 @@ function MermaidBlockPreview({ content }: MermaidBlockPreviewProps) {
 }
 
 const meta = {
-	component: MermaidBlockPreview,
+	component: MermaidDiagramPreview,
 	parameters: {
 		layout: 'centered',
 	},
-} satisfies Meta<typeof MermaidBlockPreview>
+} satisfies Meta<typeof MermaidDiagramPreview>
 
 export default meta
 type Story = StoryObj<typeof meta>

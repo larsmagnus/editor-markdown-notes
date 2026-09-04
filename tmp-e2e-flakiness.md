@@ -33,13 +33,23 @@ pattern.
 No spec has ever failed in isolation. The population so far:
 `link-reveal.spec.ts:37`, `keyboard-navigation.spec.ts:51`,
 `backspace-boundaries.spec.ts:30`, `unformat-by-backspace.spec.ts:64`,
-`copy-paste.spec.ts:57` - five specs, one shared shape.
+`copy-paste.spec.ts:57`, `code-block-fence.spec.ts:73` - six specs, one
+shared shape.
+
+`mermaid-source.spec.ts:16` was a seventh until a `waitForTimeout(100)` was
+added to it, and it is the clearest specimen of the mechanism: it presses ten
+`ArrowRight`s and then a `Backspace`, and under load _every one of the arrows_
+was dropped, leaving the Backspace to act at the block's first character.
+Neither `toBeFocused`, nor waiting for the collapsed source to render, nor
+waiting for the reveal decoration to clear (alternative 5 below) prevented it -
+each is satisfied while the editor still will not act on a key.
 
 ## Why it is not simply "add a wait"
 
 The current mitigation is `await page.waitForTimeout(100)` between presses,
 sprinkled through `backspace-boundaries.spec.ts`, `code-block-fence.spec.ts`,
-`horizontal-rule.spec.ts` and `unformat-by-backspace.spec.ts`. It is a guess:
+`mermaid-source.spec.ts`, `horizontal-rule.spec.ts` and
+`unformat-by-backspace.spec.ts`. It is a guess:
 it slows the suite, it does not scale with CPU contention, and it encodes no
 actual condition. `backspace-boundaries.spec.ts` still failed once _with_ the
 waits in place.
@@ -70,7 +80,7 @@ flush is late often enough to matter. Two further wrinkles seen on this branch:
 - `e2e/lib/helpers.ts` — `openInVSCode`, `pasteText`/`pasteHtml`,
   `copySelectionHtml`, `tabUntilFocused`. Any new synchronisation primitive
   belongs here.
-- The five specs named above are the observed failing population, but the
+- The specs named above are the observed failing population, but the
   shape is shared by every spec that clicks and then presses a key, so treat
   the list as a sample rather than the boundary.
 
@@ -96,8 +106,10 @@ flush is late often enough to matter. Two further wrinkles seen on this branch:
 5. **Wait on a rendered consequence instead of the caret.** Entering a
    construct reveals its syntax, so `await expect(locator('.syntax-hidden'))
 .toHaveCount(0)` is an observable, meaningful signal that the editor has
-   processed the caret move. Likely the cheapest real fix for the reveal-
-   related specs.
+   processed the caret move. Tried in `mermaid-source.spec.ts` and **not
+   sufficient on its own**: the decoration clears the moment the selection is
+   set, which is earlier than the editor acting on a key. Worth combining with
+   (1) rather than treating as a replacement for it.
 
 ## Definition of done
 

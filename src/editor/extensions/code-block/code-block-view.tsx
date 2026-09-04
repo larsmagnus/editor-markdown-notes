@@ -1,23 +1,24 @@
 import type { NodeViewProps } from '@tiptap/react'
-import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
+import { NodeViewWrapper } from '@tiptap/react'
 
-import { AppErrorBoundary } from '@/components/app-error-boundary'
-import { ButtonCopy } from '@/components/button-copy'
+import { CodeBlockSource } from '@/editor/extensions/code-block/code-block-source'
 import {
 	fenceCode,
 	fenceLanguage,
 } from '@/editor/extensions/code-block/code-fence'
-import { MermaidBlock } from '@/editor/extensions/mermaid/block'
+import { focusBlockContentStart } from '@/editor/extensions/focus-block-content-start'
+import { MermaidDiagram } from '@/editor/extensions/mermaid/diagram'
 import { MERMAID_LANGUAGE } from '@/editor/extensions/mermaid/language'
-import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
+import { useMermaidSource } from '@/hooks/use-mermaid-source'
 
 /**
- * The node view every code block renders through.
+ * The node view every code block renders through: its source, and for a
+ * `mermaid` block the diagram drawn in front of it.
  *
- * A `mermaid` block shows its diagram and hides its source until it is clicked;
- * any other language keeps TipTap's `<pre><code>` output. The source itself is
- * untouched either way, so the markdown round trip is the same as it was before
- * this node view existed.
+ * Both are always mounted, and in that order, because the fence tag is editable
+ * text - a block stops and starts being a diagram *as it is typed into*.
+ * Choosing between two different trees instead would tear the content DOM out
+ * from under the caret on the keystroke that ends the word `mermaid`.
  *
  * Syntax highlighting needs nothing here: `SyntaxHighlight` colors the tokens
  * through decorations, and the block's own background and foreground come from
@@ -26,35 +27,27 @@ import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
  */
 export function CodeBlockView({ node, editor, getPos }: NodeViewProps) {
 	const language = fenceLanguage(node.textContent)
-	const [copied, handleCopy] = useCopyToClipboard(fenceCode(node.textContent))
+	const code = fenceCode(node.textContent)
+	const { result, showSource } = useMermaidSource({
+		editor,
+		getPos,
+		code,
+		isMermaid: language === MERMAID_LANGUAGE,
+	})
 
-	// TipTap mounts each node view as its own React root, so this is the only
-	// place a boundary can contain one diagram without taking the document with
-	// it - a boundary around the editor would catch the throw far too late.
-	if (language === MERMAID_LANGUAGE) {
-		return (
-			<AppErrorBoundary
-				title="This diagram stopped working"
-				resetKeys={[fenceCode(node.textContent)]}
-			>
-				<MermaidBlock node={node} editor={editor} getPos={getPos} />
-			</AppErrorBoundary>
-		)
-	}
+	// Moving the caret into the block is what reveals the source - there is no
+	// separate editing flag to set.
+	const startEditing = () => focusBlockContentStart(editor, getPos)
 
 	return (
-		<NodeViewWrapper as="pre" className="group relative">
-			<ButtonCopy
-				copied={copied}
-				label="Copy code"
-				size="icon"
-				className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
-				onClick={handleCopy}
+		<NodeViewWrapper className="group relative">
+			<MermaidDiagram
+				code={code}
+				result={result}
+				showSource={showSource}
+				onEdit={startEditing}
 			/>
-			<NodeViewContent<'code'>
-				as="code"
-				className={language ? `language-${language}` : undefined}
-			/>
+			<CodeBlockSource code={code} language={language} visible={showSource} />
 		</NodeViewWrapper>
 	)
 }
