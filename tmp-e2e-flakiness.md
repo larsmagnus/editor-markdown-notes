@@ -10,9 +10,12 @@ yet where the preceding click or arrow key put it, so the key acts at the wrong
 position and the assertion sees the wrong document. They pass in isolation and
 fail perhaps one run in four in a full-suite run.
 
-Measured on this branch, four consecutive `pnpm test:e2e` runs (89 tests, 1
-`test.fixme`): runs 1, 3, 4 fully green; run 2 failed
-`e2e/link-reveal.spec.ts:37`. Earlier in the same session
+Measured on this branch, four consecutive `pnpm test:e2e` runs (89 tests at the
+time, 102 now, 1 `test.fixme`): runs 1, 3, 4 fully green; run 2 failed
+`e2e/link-reveal.spec.ts:37`. A later run failed two at once
+(`backspace-boundaries.spec.ts:30` and `keyboard-navigation.spec.ts:51`) and
+the next was green, so the rate rises with the suite rather than being tied to
+one spec. Earlier in the same session
 `e2e/keyboard-navigation.spec.ts:51` and
 `e2e/backspace-boundaries.spec.ts:30` each failed once and passed on re-run.
 `e2e/unformat-by-backspace.spec.ts:64` failed once on a run that took 1.1

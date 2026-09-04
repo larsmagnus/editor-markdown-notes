@@ -31,6 +31,66 @@ test.describe('A code block fence in the live editor', () => {
 		await expect(raw).not.toHaveValue(/javascript/)
 	})
 
+	// Backspace at the very start of the fence line means "this is not a code
+	// block", so the fences go and the code stays. Left to the stock handler the
+	// block becomes a paragraph still holding its ``` lines as literal text -
+	// which markdown-it reads straight back as a code block, so the unwrap
+	// silently undoes itself on the next load.
+	test('backspacing at the fence start unwraps to the code alone', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '```ts\nconst a = 1\n```')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('const a = 1').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('ArrowUp')
+		await page.waitForTimeout(100)
+		await page.keyboard.press('Home')
+		await page.waitForTimeout(100)
+		await page.keyboard.press('Backspace')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('const a = 1')
+	})
+
+	test('Mod-Alt-c still toggles a code block on', async ({ page }) => {
+		await openInVSCode(page, 'const total = 1')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('const total = 1').click()
+		await expect(content).toBeFocused()
+		await page.keyboard.press('ControlOrMeta+Alt+c')
+
+		await expect(content.locator('pre')).toHaveCount(1)
+	})
+
+	// Regression: returning only a `Backspace` entry from
+	// `addKeyboardShortcuts` replaces the stock map wholesale rather than adding
+	// to it, which took triple-Enter-to-exit with it and left a keyboard trap.
+	test('triple Enter at the end still exits the block', async ({ page }) => {
+		await openInVSCode(page, '```ts\nconst a = 1\n```')
+		const content = page.getByRole('textbox').first()
+
+		await content.getByText('const a = 1').click()
+		await expect(content).toBeFocused()
+		// The block's last line is its closing fence, so the caret has to get
+		// past the code line first - `End` alone stops at the end of that line.
+		await page.keyboard.press('ArrowDown')
+		await page.waitForTimeout(100)
+		await page.keyboard.press('End')
+		await page.waitForTimeout(100)
+		for (let index = 0; index < 3; index += 1) {
+			await page.keyboard.press('Enter')
+			await page.waitForTimeout(100)
+		}
+		await page.keyboard.type('after')
+
+		await expect(content.locator('p', { hasText: 'after' })).toHaveCount(1)
+	})
+
 	test('backspacing at the closing fence does not grow another one', async ({
 		page,
 	}) => {

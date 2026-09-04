@@ -2,6 +2,7 @@ import { mergeAttributes } from '@tiptap/core'
 import CodeBlock from '@tiptap/extension-code-block'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
+import { unwrapConstructAtCaret } from '@/editor/extensions/block-marker/unwrap-at-caret'
 import { CodeBlockView } from '@/editor/extensions/code-block/code-block-view'
 import {
 	fenceLanguage,
@@ -51,6 +52,30 @@ export const CodeBlockExtension = CodeBlock.extend({
 
 	addNodeView() {
 		return ReactNodeViewRenderer(CodeBlockView)
+	},
+
+	/**
+	 * Backspace at the very start of the fence line means "this is not a code
+	 * block", and has to take the fences with it. The stock handler leaves them
+	 * behind as literal paragraph text, which markdown-it reads straight back as
+	 * a code block - so the unwrap undoes itself on the next load.
+	 *
+	 * Spread, not returned alone: `addKeyboardShortcuts` on an extended node
+	 * replaces the stock map rather than adding to it, and the stock map is what
+	 * carries `Mod-Alt-c` and triple-Enter-to-exit.
+	 */
+	addKeyboardShortcuts() {
+		return {
+			...this.parent?.(),
+			Backspace: () =>
+				this.editor.commands.command(({ state, dispatch }) => {
+					const { $from, empty } = state.selection
+					if (!empty || $from.parent.type !== this.type) return false
+					if ($from.parentOffset !== 0) return false
+
+					return unwrapConstructAtCaret(this.name)(state, dispatch)
+				}),
+		}
 	},
 
 	addCommands() {
