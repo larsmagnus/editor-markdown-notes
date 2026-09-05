@@ -57,7 +57,7 @@ export function EditorSurface({
 			    height instead of collapsing to the document's own content
 			    height, so the whole column is a click target - not just the
 			    text. The sticky text-tools panel stays top-aligned. */}
-			<div className="relative min-w-0 flex-1 self-stretch">
+			<div className="relative min-w-xs flex-1 self-stretch">
 				<p id={EDITOR_KEYBOARD_HINT_ID} className="sr-only">
 					Press Escape, then Tab, to move keyboard focus out of the document
 					text.
