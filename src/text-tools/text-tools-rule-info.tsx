@@ -1,4 +1,4 @@
-import { Info } from 'lucide-react'
+import { CheckCircle, Info, TriangleAlert } from 'lucide-react'
 
 import { PopoverArrow } from '@/components/popover-arrow'
 import { Button } from '@/components/ui/button'
@@ -37,21 +37,27 @@ export function TextToolsRuleInfo({ ruleId }: TextToolsRuleInfoProps) {
 					</Button>
 				}
 			/>
-			<PopoverContent side="left" align="start" className="text-xs">
+			<PopoverContent side="left" align="start" className="text-sm">
 				<PopoverHeader>
 					<PopoverTitle>{rule.label}</PopoverTitle>
 					<PopoverDescription className="text-xs">
 						{rule.description}
 					</PopoverDescription>
 				</PopoverHeader>
-				<p className="text-xs leading-relaxed">{rule.explanation}</p>
-				<dl className="flex flex-col gap-1.5 rounded-md bg-muted/60 p-2 text-xs">
-					<div className="flex flex-col gap-0.5">
-						<dt className="text-muted-foreground">Try</dt>
+				<p className="text-sm leading-relaxed">{rule.explanation}</p>
+				<dl className="flex flex-col gap-2">
+					<div className="flex flex-col gap-1 bg-green-300/15 dark:bg-green-300/10 p-2 rounded-md">
+						<dt className="text-xs flex items-center gap-1 text-muted-foreground">
+							<CheckCircle className="size-3 text-green-700 dark:text-green-300" />{' '}
+							Try
+						</dt>
 						<dd>{rule.example.after}</dd>
 					</div>
-					<div className="flex flex-col gap-0.5">
-						<dt className="text-muted-foreground">Instead of</dt>
+					<div className="flex flex-col gap-1 bg-amber-300/15 dark:bg-amber-300/10 p-2 rounded-md">
+						<dt className="text-xs flex items-center gap-1 text-muted-foreground">
+							<TriangleAlert className="size-3 text-amber-700 dark:text-amber-300" />{' '}
+							Instead of
+						</dt>
 						<dd>
 							{rule.example.before.map((segment, index) => (
 								<span
