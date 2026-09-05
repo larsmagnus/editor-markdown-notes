@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 const NOTE = ['```mermaid', 'graph TD', '  A-->B', '```'].join('\n')
 
@@ -19,36 +19,30 @@ test.describe('A mermaid block showing its source', () => {
 		await openInVSCode(page, NOTE)
 		const content = page.getByRole('textbox').first()
 
-		await page.getByRole('button', { name: 'Edit diagram source' }).click()
+		await actionSettled(page, () =>
+			page.getByRole('button', { name: 'Edit diagram source' }).click()
+		)
 		await expect(content).toBeFocused()
-		// The diagram's own toolbar going away is the editor's signal that the
-		// block has re-rendered around the source; pressing keys before that
-		// sends them at a collapsed block with no geometry to move a caret over.
+		// The toolbar going away is the signal that the block has re-rendered
+		// around the source; keys pressed before that hit a collapsed block with
+		// no geometry to move a caret over.
 		await expect(
 			page.getByRole('button', { name: 'Edit diagram source' })
 		).toBeHidden()
-		// Revealed fences mean the editor has processed the caret landing inside
-		// the block. Keys pressed before that are dropped, and the caret is still
-		// at the block's first character when the Backspace arrives.
 		const code = content.locator('code').first()
 		await expect(code).toBeVisible()
 		await expect(code.locator('.syntax-hidden')).toHaveCount(0)
-		// A guess, and the same one the other caret-sensitive specs make: nothing
-		// observable separates "the caret is in the block" from "the editor will
-		// act on the next key", and under load the arrows below are otherwise
-		// dropped. See `tmp-e2e-flakiness.md`.
-		await page.waitForTimeout(100)
 		// Arrowed rather than `End`: the caret starts at the block's first
 		// character, and this counts exactly to the end of "```mermaid".
 		for (let step = 0; step < '```mermaid'.length; step++) {
-			await page.keyboard.press('ArrowRight')
+			await pressKeySettled(page, 'ArrowRight')
 		}
-		await page.keyboard.press('Backspace')
+		await pressKeySettled(page, 'Backspace')
 		await page.keyboard.type('d')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
-		// The trailing newline is the serializer's, not the edit's: a document
-		// ending in a code block gets one the moment it is written back out.
+		// The trailing newline is the serializer's: a document ending in a code
+		// block gets one the moment it is written back out.
 		await expect(
 			page.getByRole('textbox', { name: 'Raw markdown' })
 		).toHaveValue(`${NOTE}\n`)

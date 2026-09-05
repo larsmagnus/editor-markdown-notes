@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 test.describe('Headings in the live editor', () => {
 	test('typing "# " creates a real heading and saves it back out unchanged', async ({
@@ -47,8 +47,8 @@ test.describe('Headings in the live editor', () => {
 
 		await expect(content.locator('h1')).toBeVisible()
 
-		await content.locator('h1').click()
-		await page.keyboard.press('Home')
+		await actionSettled(page, () => content.locator('h1').click())
+		await pressKeySettled(page, 'Home')
 		await page.keyboard.type('#')
 
 		await expect(content.locator('h2')).toBeVisible()

@@ -114,8 +114,8 @@ export async function tabUntilFocused(
  * position inside it, so a walk legitimately revisits it between widgets -
  * the caret's own anchor node/offset disambiguates that one case.
  *
- * Duplicated into `tab-walk.ts`'s `page.waitForFunction` call: that
- * predicate runs entirely in the browser and can't call this function.
+ * Duplicated into `tab-walk.ts`'s `page.waitForFunction` call, which runs
+ * entirely in the browser and can't call this function.
  */
 export async function focusedElementSignature(
 	page: Page

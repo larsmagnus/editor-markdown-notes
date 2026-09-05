@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 /**
  * Realistic multi-step editing sessions spanning several constructs in
@@ -17,14 +17,10 @@ test.describe('Live editing workflows', () => {
 
 		// Select "bold", collapse to its right edge, then step past the two
 		// revealed closing-delimiter characters to land right after the run.
-		await content.locator('strong').dblclick()
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowRight')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowRight')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowRight')
-		await page.waitForTimeout(100)
+		await actionSettled(page, () => content.locator('strong').dblclick())
+		await pressKeySettled(page, 'ArrowRight')
+		await pressKeySettled(page, 'ArrowRight')
+		await pressKeySettled(page, 'ArrowRight')
 		await page.keyboard.type('!')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
@@ -39,11 +35,11 @@ test.describe('Live editing workflows', () => {
 		await openInVSCode(page, '')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('p').click()
+		await actionSettled(page, () => content.locator('p').click())
 		await page.keyboard.type('# Shopping list')
-		await page.keyboard.press('Enter')
+		await pressKeySettled(page, 'Enter')
 		await page.keyboard.type('- Milk')
-		await page.keyboard.press('Enter')
+		await pressKeySettled(page, 'Enter')
 		// Continuing a list item already seeds its own marker - only the text
 		// itself is typed here.
 		await page.keyboard.type('**Bread**')
@@ -51,7 +47,7 @@ test.describe('Live editing workflows', () => {
 		// right after that marker (the very position the caret already sits at)
 		// lifts it back out, the same case backspace-boundaries.spec.ts exercises
 		// per-construct.
-		await page.keyboard.press('Enter')
+		await pressKeySettled(page, 'Enter')
 
 		await expect(
 			content.getByRole('heading', { name: 'Shopping list', level: 1 })
@@ -62,8 +58,7 @@ test.describe('Live editing workflows', () => {
 		).toBeVisible()
 		await expect(content.locator('li')).toHaveCount(3)
 
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Backspace')
+		await pressKeySettled(page, 'Backspace')
 		await expect(content.locator('li')).toHaveCount(2)
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()

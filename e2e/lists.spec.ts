@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs'
 
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode, pasteText } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 test.describe('Lists in the live editor', () => {
 	test('typing "- " creates a bullet list item', async ({ page }) => {
@@ -47,9 +47,9 @@ test.describe('Lists in the live editor', () => {
 		await openInVSCode(page, '')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('p').click()
+		await actionSettled(page, () => content.locator('p').click())
 		await page.keyboard.type('- First item')
-		await page.keyboard.press('Enter')
+		await pressKeySettled(page, 'Enter')
 		await page.keyboard.type('Second item')
 
 		// The `- ` marker is real, marked text now (see `list-marker.ts`), not
@@ -67,12 +67,12 @@ test.describe('Lists in the live editor', () => {
 		await openInVSCode(page, '')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('p').click()
+		await actionSettled(page, () => content.locator('p').click())
 		await page.keyboard.type('- First item')
-		await page.keyboard.press('Enter')
-		await page.keyboard.press('Tab')
+		await pressKeySettled(page, 'Enter')
+		await pressKeySettled(page, 'Tab')
 		await page.keyboard.type('Nested item')
-		await page.keyboard.press('Enter')
+		await pressKeySettled(page, 'Enter')
 		await page.keyboard.type('Nested sibling')
 
 		const nestedList = content
@@ -91,10 +91,10 @@ test.describe('Lists in the live editor', () => {
 		await openInVSCode(page, '')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('p').click()
+		await actionSettled(page, () => content.locator('p').click())
 		await page.keyboard.type('- First item')
-		await page.keyboard.press('Enter')
-		await page.keyboard.press('Tab')
+		await pressKeySettled(page, 'Enter')
+		await pressKeySettled(page, 'Tab')
 		await page.keyboard.type('Second item')
 
 		const nestedList = content
@@ -109,11 +109,11 @@ test.describe('Lists in the live editor', () => {
 		await openInVSCode(page, '')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('p').click()
+		await actionSettled(page, () => content.locator('p').click())
 		await page.keyboard.type('- First item')
-		await page.keyboard.press('Enter')
-		await page.keyboard.press('Tab')
-		await page.keyboard.press('Shift+Tab')
+		await pressKeySettled(page, 'Enter')
+		await pressKeySettled(page, 'Tab')
+		await pressKeySettled(page, 'Shift+Tab')
 		await page.keyboard.type('Second item')
 
 		const topLevelList = content.locator('ul').filter({ hasText: 'First item' })

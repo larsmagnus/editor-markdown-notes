@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 /**
  * A horizontal rule's `---` is real text like every other construct's syntax,
@@ -25,9 +25,9 @@ test.describe('A horizontal rule in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 		const rule = content.locator('[data-type="horizontalRule"]')
 
-		await content.getByText('Above.').click()
-		await page.keyboard.press('End')
-		await page.keyboard.press('ArrowDown')
+		await actionSettled(page, () => content.getByText('Above.').click())
+		await pressKeySettled(page, 'End')
+		await pressKeySettled(page, 'ArrowDown')
 
 		await expect(rule.locator('.syntax-hidden')).toHaveCount(0)
 		await expect(rule).toHaveText('---')
@@ -47,12 +47,10 @@ test.describe('A horizontal rule in the live editor', () => {
 		await openInVSCode(page, 'Above.')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Above.').click()
+		await actionSettled(page, () => content.getByText('Above.').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('End')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Enter')
-		await page.waitForTimeout(100)
+		await pressKeySettled(page, 'End')
+		await pressKeySettled(page, 'Enter')
 		await page.keyboard.type('---')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
@@ -69,10 +67,9 @@ test.describe('A horizontal rule in the live editor', () => {
 		await openInVSCode(page, 'Above.')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Above.').click()
+		await actionSettled(page, () => content.getByText('Above.').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('Home')
-		await page.waitForTimeout(100)
+		await pressKeySettled(page, 'Home')
 		await page.keyboard.type('---')
 
 		await expect(content.locator('[data-type="horizontalRule"]')).toHaveCount(0)

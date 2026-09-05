@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 /**
  * Pressing a style shortcut with no selection, then typing, is one of the most
@@ -16,9 +16,9 @@ test.describe('Toggling a style at a bare caret', () => {
 		await openInVSCode(page, 'Ship')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Ship').click()
+		await actionSettled(page, () => content.getByText('Ship').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('End')
+		await pressKeySettled(page, 'End')
 		// Typed, not part of the fixture: markdown-it strips a paragraph's
 		// trailing space, so the caret would otherwise sit flush against `Ship`.
 		await page.keyboard.type(' ')
@@ -36,9 +36,9 @@ test.describe('Toggling a style at a bare caret', () => {
 		await openInVSCode(page, 'Ship')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Ship').click()
+		await actionSettled(page, () => content.getByText('Ship').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('End')
+		await pressKeySettled(page, 'End')
 		await page.keyboard.type(' ')
 		await page.keyboard.press('ControlOrMeta+i')
 		await page.keyboard.type('the notes')
@@ -57,9 +57,9 @@ test.describe('Toggling a style at a bare caret', () => {
 		await openInVSCode(page, 'Ship')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Ship').click()
+		await actionSettled(page, () => content.getByText('Ship').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('End')
+		await pressKeySettled(page, 'End')
 		await page.keyboard.type(' ')
 		await page.keyboard.press('ControlOrMeta+e')
 		await page.keyboard.type('the notes')
@@ -80,9 +80,9 @@ test.describe('Toggling a style at a bare caret', () => {
 		await openInVSCode(page, 'Ship\n\nBelow.')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Ship').click()
+		await actionSettled(page, () => content.getByText('Ship').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('End')
+		await pressKeySettled(page, 'End')
 		await page.keyboard.press('ControlOrMeta+b')
 		await content.getByText('Below.').click()
 
@@ -101,10 +101,9 @@ test.describe('Toggling a style at a bare caret', () => {
 		await openInVSCode(page, 'Ship')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Ship').click()
+		await actionSettled(page, () => content.getByText('Ship').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('End')
-		await page.waitForTimeout(100)
+		await pressKeySettled(page, 'End')
 		await page.keyboard.press('ControlOrMeta+i')
 		await page.keyboard.type('ping')
 
@@ -120,10 +119,9 @@ test.describe('Toggling a style at a bare caret', () => {
 		await openInVSCode(page, 'Ship')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Ship').click()
+		await actionSettled(page, () => content.getByText('Ship').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('End')
-		await page.waitForTimeout(100)
+		await pressKeySettled(page, 'End')
 		await page.keyboard.press('ControlOrMeta+b')
 		await page.keyboard.type('ping')
 
@@ -139,9 +137,9 @@ test.describe('Toggling a style at a bare caret', () => {
 		await openInVSCode(page, 'Ship')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Ship').click()
+		await actionSettled(page, () => content.getByText('Ship').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('End')
+		await pressKeySettled(page, 'End')
 		await page.keyboard.type(' ')
 		await page.keyboard.press('ControlOrMeta+b')
 		await page.keyboard.press('ControlOrMeta+b')

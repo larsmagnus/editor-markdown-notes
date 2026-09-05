@@ -1,5 +1,8 @@
-import { expect, test } from '@playwright/test'
-
+import {
+	backspaceAtEndOf,
+	backspaceIntoStartOf,
+} from '@/e2e/lib/caret-navigation'
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
 
 /**
@@ -21,13 +24,7 @@ test.describe('Backspacing a closing delimiter', () => {
 	for (const { style, markdown } of cases) {
 		test(`unformats ${style} text`, async ({ page }) => {
 			await openInVSCode(page, markdown)
-			const content = page.getByRole('textbox').first()
-
-			await content.getByText('the notes').click()
-			await expect(content).toBeFocused()
-			await page.keyboard.press('End')
-			await page.waitForTimeout(100)
-			await page.keyboard.press('Backspace')
+			await backspaceAtEndOf(page, 'the notes')
 
 			await page.getByRole('button', { name: 'Raw editor' }).click()
 			await expect(
@@ -40,13 +37,7 @@ test.describe('Backspacing a closing delimiter', () => {
 		page,
 	}) => {
 		await openInVSCode(page, 'Read [the guide](https://example.com)')
-		const content = page.getByRole('textbox').first()
-
-		await content.getByText('the guide').click()
-		await expect(content).toBeFocused()
-		await page.keyboard.press('End')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Backspace')
+		await backspaceAtEndOf(page, 'the guide')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -65,15 +56,7 @@ test.describe('Backspacing a heading marker', () => {
 		await openInVSCode(page, '### Notes')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Notes').click()
-		await expect(content).toBeFocused()
-		await page.keyboard.press('Home')
-		await page.waitForTimeout(100)
-		for (let index = 0; index < 4; index += 1) {
-			await page.keyboard.press('ArrowRight')
-			await page.waitForTimeout(100)
-		}
-		await page.keyboard.press('Backspace')
+		await backspaceIntoStartOf(page, 'Notes', 4)
 
 		await expect(content.locator('h2')).toHaveText('## Notes')
 	})
@@ -82,17 +65,8 @@ test.describe('Backspacing a heading marker', () => {
 		page,
 	}) => {
 		await openInVSCode(page, '# Notes')
-		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Notes').click()
-		await expect(content).toBeFocused()
-		await page.keyboard.press('Home')
-		await page.waitForTimeout(100)
-		for (let index = 0; index < 2; index += 1) {
-			await page.keyboard.press('ArrowRight')
-			await page.waitForTimeout(100)
-		}
-		await page.keyboard.press('Backspace')
+		await backspaceIntoStartOf(page, 'Notes', 2)
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(

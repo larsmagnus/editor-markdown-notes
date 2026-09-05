@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 /**
  * The browser-drawn bullet or number stands in for the `- ` or `1. ` the item
@@ -24,8 +24,8 @@ test.describe('A list item marker in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 		const item = content.locator('li').first()
 
-		await item.getByText('Buy milk').click()
-		await page.keyboard.press('Home')
+		await actionSettled(page, () => item.getByText('Buy milk').click())
+		await pressKeySettled(page, 'Home')
 
 		await expect(item.locator('.syntax-hidden')).toHaveCount(0)
 		await expect(item).toHaveCSS('list-style-type', 'none')
@@ -38,8 +38,8 @@ test.describe('A list item marker in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 		const item = content.locator('li').first()
 
-		await item.getByText('Buy milk').click()
-		await page.keyboard.press('Home')
+		await actionSettled(page, () => item.getByText('Buy milk').click())
+		await pressKeySettled(page, 'Home')
 
 		await expect(item).toHaveCSS('list-style-type', 'none')
 	})

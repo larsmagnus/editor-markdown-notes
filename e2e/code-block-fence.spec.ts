@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 /**
  * A code block's fences are real text, so they are edited like any other text.
@@ -16,12 +16,9 @@ test.describe('A code block fence in the live editor', () => {
 
 		// Clicking the fence line directly is unreliable while it is still
 		// collapsed to zero width - the caret has to be in the block first.
-		await content.getByText('const x = 1').click()
-		await page.keyboard.press('ArrowUp')
-		// ProseMirror's DOMObserver batches native-arrow selection changes, so a
-		// press landing immediately after another can read a stale selection.
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Backspace')
+		await actionSettled(page, () => content.getByText('const x = 1').click())
+		await pressKeySettled(page, 'ArrowUp')
+		await pressKeySettled(page, 'Backspace')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		const raw = page.getByRole('textbox', { name: 'Raw markdown' })
@@ -42,13 +39,11 @@ test.describe('A code block fence in the live editor', () => {
 		await openInVSCode(page, '```ts\nconst a = 1\n```')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('const a = 1').click()
+		await actionSettled(page, () => content.getByText('const a = 1').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('ArrowUp')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Home')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Backspace')
+		await pressKeySettled(page, 'ArrowUp')
+		await pressKeySettled(page, 'Home')
+		await pressKeySettled(page, 'Backspace')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -74,17 +69,14 @@ test.describe('A code block fence in the live editor', () => {
 		await openInVSCode(page, '```ts\nconst a = 1\n```')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('const a = 1').click()
+		await actionSettled(page, () => content.getByText('const a = 1').click())
 		await expect(content).toBeFocused()
 		// The block's last line is its closing fence, so the caret has to get
 		// past the code line first - `End` alone stops at the end of that line.
-		await page.keyboard.press('ArrowDown')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('End')
-		await page.waitForTimeout(100)
+		await pressKeySettled(page, 'ArrowDown')
+		await pressKeySettled(page, 'End')
 		for (let index = 0; index < 3; index += 1) {
-			await page.keyboard.press('Enter')
-			await page.waitForTimeout(100)
+			await pressKeySettled(page, 'Enter')
 		}
 		await page.keyboard.type('after')
 
@@ -97,10 +89,10 @@ test.describe('A code block fence in the live editor', () => {
 		await openInVSCode(page, '```js\nconst x = 1\n```')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('const x = 1').click()
-		await page.keyboard.press('ArrowDown')
-		await page.keyboard.press('End')
-		await page.keyboard.press('Backspace')
+		await actionSettled(page, () => content.getByText('const x = 1').click())
+		await pressKeySettled(page, 'ArrowDown')
+		await pressKeySettled(page, 'End')
+		await pressKeySettled(page, 'Backspace')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		const raw = page.getByRole('textbox', { name: 'Raw markdown' })

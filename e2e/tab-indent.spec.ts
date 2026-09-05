@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 /**
  * Tab means "indent" wherever there is a real text caret, rather than moving
@@ -12,11 +12,10 @@ test.describe('Tab in the live editor', () => {
 		await openInVSCode(page, 'Some text.')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Some text.').click()
+		await actionSettled(page, () => content.getByText('Some text.').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('Home')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Tab')
+		await pressKeySettled(page, 'Home')
+		await pressKeySettled(page, 'Tab')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -28,11 +27,10 @@ test.describe('Tab in the live editor', () => {
 		await openInVSCode(page, '```ts\nconst a = 1\n```')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('const a = 1').click()
+		await actionSettled(page, () => content.getByText('const a = 1').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('Home')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Tab')
+		await pressKeySettled(page, 'Home')
+		await pressKeySettled(page, 'Tab')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -45,10 +43,9 @@ test.describe('Tab in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 
 		await page.getByLabel('Edit frontmatter source').click()
-		await content.getByText('title: Roadmap').click()
-		await page.keyboard.press('Home')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Tab')
+		await actionSettled(page, () => content.getByText('title: Roadmap').click())
+		await pressKeySettled(page, 'Home')
+		await pressKeySettled(page, 'Tab')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -60,15 +57,12 @@ test.describe('Tab in the live editor', () => {
 		await openInVSCode(page, '```ts\n  const a = 1\n```')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('const a = 1').click()
+		await actionSettled(page, () => content.getByText('const a = 1').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('Home')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowRight')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowRight')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Shift+Tab')
+		await pressKeySettled(page, 'Home')
+		await pressKeySettled(page, 'ArrowRight')
+		await pressKeySettled(page, 'ArrowRight')
+		await pressKeySettled(page, 'Shift+Tab')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -82,11 +76,10 @@ test.describe('Tab in the live editor', () => {
 		await openInVSCode(page, 'Some text.')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Some text.').click()
+		await actionSettled(page, () => content.getByText('Some text.').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('Home')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Shift+Tab')
+		await pressKeySettled(page, 'Home')
+		await pressKeySettled(page, 'Shift+Tab')
 
 		await expect(content).toBeFocused()
 		await page.getByRole('button', { name: 'Raw editor' }).click()
@@ -101,15 +94,13 @@ test.describe('Tab in the live editor', () => {
 		await openInVSCode(page, '- [ ] First\n- [ ] Second')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Second').click()
+		await actionSettled(page, () => content.getByText('Second').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('Home')
-		await page.waitForTimeout(100)
+		await pressKeySettled(page, 'Home')
 		for (let index = 0; index < 6; index += 1) {
-			await page.keyboard.press('ArrowRight')
-			await page.waitForTimeout(100)
+			await pressKeySettled(page, 'ArrowRight')
 		}
-		await page.keyboard.press('Tab')
+		await pressKeySettled(page, 'Tab')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -123,11 +114,10 @@ test.describe('Tab in the live editor', () => {
 		await openInVSCode(page, '- Buy milk')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Buy milk').click()
+		await actionSettled(page, () => content.getByText('Buy milk').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('End')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Tab')
+		await pressKeySettled(page, 'End')
+		await pressKeySettled(page, 'Tab')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(

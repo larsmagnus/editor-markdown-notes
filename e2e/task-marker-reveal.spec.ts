@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 /**
  * The checkbox stands in for the `- [ ] ` the item actually holds, so exactly
@@ -23,8 +23,8 @@ test.describe('A task item marker in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 		const item = content.locator('[data-type="taskItem"]').first()
 
-		await item.getByText('Buy milk').click()
-		await page.keyboard.press('Home')
+		await actionSettled(page, () => item.getByText('Buy milk').click())
+		await pressKeySettled(page, 'Home')
 
 		await expect(item.locator('.syntax-hidden')).toHaveCount(0)
 		await expect(item.getByRole('checkbox')).toHaveCount(0)

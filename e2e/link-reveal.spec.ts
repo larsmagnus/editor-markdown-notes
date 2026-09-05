@@ -1,6 +1,7 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled } from '@/e2e/lib/press-key-settled'
+import { selectSubstring } from '@/e2e/lib/select-text'
 
 test.describe('Links in the live editor', () => {
 	test('a parsed link saves back out unchanged', async ({ page }) => {
@@ -41,25 +42,20 @@ test.describe('Links in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 		const link = content.locator('a')
 
-		// Clicking the link reveals `](https://old.example.com)`. Wait for both
-		// the editor's own focus and the reveal to actually land before
-		// navigating by keyboard, or a click that hasn't settled yet races the
-		// keys that follow - which land in the browser's default caret position
-		// instead (see `keyboard-navigation.spec.ts`'s own comment on the same
-		// race with Escape/Tab).
-		await link.click()
+		// A click that hasn't settled yet races the keys that follow (see
+		// `keyboard-navigation.spec.ts`'s Escape/Tab race for the same issue).
+		await actionSettled(page, () => link.click())
 		await expect(content).toBeFocused()
 		await expect(link.locator('.syntax-hidden')).toHaveCount(0)
 
-		// Walk the caret back from the line's end to just after `old`
-		// (`.example.com) first.` is 20 characters) and select it (3
-		// characters, backward) to replace just that token.
-		await page.keyboard.press('End')
-		for (let i = 0; i < 20; i += 1) await page.keyboard.press('ArrowLeft')
-		await page.keyboard.down('Shift')
-		for (let i = 0; i < 3; i += 1) await page.keyboard.press('ArrowLeft')
-		await page.keyboard.up('Shift')
-		await page.keyboard.type('new')
+		// Selects `old` via the Selection API rather than walking there with arrow
+		// presses - the point is what typing over a selection does, not how a
+		// user's arrows would build one. `insertText`, not `type`/
+		// `pressSequentially`: those dispatch one synthetic keydown per character,
+		// and replacing a selection that way intermittently drops characters, a
+		// CDP artifact not seen with real input or `insertText`'s atomic event.
+		await actionSettled(page, () => selectSubstring(link, 'old'))
+		await page.keyboard.insertText('new')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(

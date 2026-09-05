@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 test.describe('Blockquotes in the live editor', () => {
 	test('typing "> " creates a real blockquote and saves it back out unchanged', async ({
@@ -32,18 +32,16 @@ test.describe('Blockquotes in the live editor', () => {
 		await body.click()
 		await expect(marker).toHaveCount(1)
 
-		// Clicking the quote's own text (not its marker) must not reveal it -
-		// the same over-eager-reveal bug list-marker-reveal.spec.ts guards
-		// against for list markers.
-		await quote.getByText('Ship', { exact: false }).dblclick()
+		// Clicking the quote's own text (not its marker) must not reveal it - the
+		// same over-eager-reveal bug list-marker-reveal.spec.ts guards against.
+		await actionSettled(page, () =>
+			quote.getByText('Ship', { exact: false }).dblclick()
+		)
 		await expect(marker).toHaveCount(1)
 
-		// Home from inside the quote's text lands the caret at the marker's
-		// own start, which does reveal it - a keyboard-driven equivalent of
-		// clicking the marker's own (zero-width, effectively unclickable by
-		// coordinate) span.
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Home')
+		// Home lands the caret at the marker's own (zero-width) start, which
+		// does reveal it.
+		await pressKeySettled(page, 'Home')
 		await expect(marker).toHaveCount(0)
 
 		await body.click()
@@ -56,13 +54,11 @@ test.describe('Blockquotes in the live editor', () => {
 		await openInVSCode(page, '> Ship it')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('blockquote p').click()
-		await page.keyboard.press('Home')
-		await page.keyboard.press('ArrowRight')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowRight')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Backspace')
+		await actionSettled(page, () => content.locator('blockquote p').click())
+		await pressKeySettled(page, 'Home')
+		await pressKeySettled(page, 'ArrowRight')
+		await pressKeySettled(page, 'ArrowRight')
+		await pressKeySettled(page, 'Backspace')
 
 		await expect(content.locator('blockquote')).toHaveCount(0)
 
@@ -78,14 +74,10 @@ test.describe('Blockquotes in the live editor', () => {
 		await openInVSCode(page, '> Hi')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('blockquote p').click()
-		await page.waitForTimeout(100)
-		await page.keyboard.press('End')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Backspace')
-		await page.waitForTimeout(150)
-		await page.keyboard.press('Backspace')
-		await page.waitForTimeout(150)
+		await actionSettled(page, () => content.locator('blockquote p').click())
+		await pressKeySettled(page, 'End')
+		await pressKeySettled(page, 'Backspace')
+		await pressKeySettled(page, 'Backspace')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(

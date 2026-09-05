@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { copySelectionHtml, openInVSCode, pasteHtml } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 /**
  * Every block construct's marker is real text, so the editor's own clipboard
@@ -16,13 +16,15 @@ test.describe('Copying and pasting within the editor', () => {
 
 		// Triple-click, so the slice carries the `<h2>` itself - a selection
 		// within the line copies inline content, which has no marker to double.
-		await content.getByText('Heading').click({ clickCount: 3 })
+		await actionSettled(page, () =>
+			content.getByText('Heading').click({ clickCount: 3 })
+		)
 		await expect(content).toBeFocused()
 		const html = await copySelectionHtml(content)
 
-		await content.getByText('Body.').click()
-		await page.keyboard.press('End')
-		await page.keyboard.press('Enter')
+		await actionSettled(page, () => content.getByText('Body.').click())
+		await pressKeySettled(page, 'End')
+		await pressKeySettled(page, 'Enter')
 		await pasteHtml(content, html, '## Heading')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
@@ -37,15 +39,15 @@ test.describe('Copying and pasting within the editor', () => {
 		await openInVSCode(page, '- Buy milk\n\nBody.')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Buy milk').click()
+		await actionSettled(page, () => content.getByText('Buy milk').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('Home')
-		await page.keyboard.press('Shift+End')
+		await pressKeySettled(page, 'Home')
+		await pressKeySettled(page, 'Shift+End')
 		const html = await copySelectionHtml(content)
 
-		await content.getByText('Body.').click()
-		await page.keyboard.press('End')
-		await page.keyboard.press('Enter')
+		await actionSettled(page, () => content.getByText('Body.').click())
+		await pressKeySettled(page, 'End')
+		await pressKeySettled(page, 'Enter')
 		await pasteHtml(content, html, '- Buy milk')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
@@ -60,15 +62,15 @@ test.describe('Copying and pasting within the editor', () => {
 		await openInVSCode(page, '> Quoted\n\nBody.')
 		const content = page.getByRole('textbox').first()
 
-		await content.getByText('Quoted').click()
+		await actionSettled(page, () => content.getByText('Quoted').click())
 		await expect(content).toBeFocused()
-		await page.keyboard.press('Home')
-		await page.keyboard.press('Shift+End')
+		await pressKeySettled(page, 'Home')
+		await pressKeySettled(page, 'Shift+End')
 		const html = await copySelectionHtml(content)
 
-		await content.getByText('Body.').click()
-		await page.keyboard.press('End')
-		await page.keyboard.press('Enter')
+		await actionSettled(page, () => content.getByText('Body.').click())
+		await pressKeySettled(page, 'End')
+		await pressKeySettled(page, 'Enter')
 		await pasteHtml(content, html, '> Quoted')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()

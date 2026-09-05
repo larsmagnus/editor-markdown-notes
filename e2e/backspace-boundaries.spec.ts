@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 /**
  * One named test per construct's marker/delimiter, exercising Backspace at
@@ -14,17 +14,11 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		page: import('@playwright/test').Page,
 		markerLength: number
 	) {
-		await page.keyboard.press('Home')
+		await pressKeySettled(page, 'Home')
 		for (let i = 0; i < markerLength; i++) {
-			await page.keyboard.press('ArrowRight')
-			// A real user's keystrokes are never this rapid - ProseMirror's
-			// DOMObserver batches native-arrow-driven selection changes, and a
-			// synthetic press-immediately-after-press sequence can outrun it,
-			// leaving `editor.state.selection` briefly stale relative to the DOM.
-			// Generous under parallel-worker CPU contention, not just locally.
-			await page.waitForTimeout(100)
+			await pressKeySettled(page, 'ArrowRight')
 		}
-		await page.keyboard.press('Backspace')
+		await pressKeySettled(page, 'Backspace')
 	}
 
 	test('bullet list: backspace right after the marker removes it and exits the list, not duplicates it', async ({
@@ -33,8 +27,8 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		await openInVSCode(page, '- Buy milk')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('li').click()
-		await backspaceRightAfterMarker(page, 2) // "- "
+		await actionSettled(page, () => content.locator('li').click())
+		await backspaceRightAfterMarker(page, '- '.length)
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -48,8 +42,8 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		await openInVSCode(page, '1. Buy milk')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('li').click()
-		await backspaceRightAfterMarker(page, 3) // "1. "
+		await actionSettled(page, () => content.locator('li').click())
+		await backspaceRightAfterMarker(page, '1. '.length)
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -63,8 +57,8 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		await openInVSCode(page, '- [ ] Buy milk')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('li').click()
-		await backspaceRightAfterMarker(page, 6) // "- [ ] "
+		await actionSettled(page, () => content.locator('li').click())
+		await backspaceRightAfterMarker(page, '- [ ] '.length)
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -78,8 +72,8 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		await openInVSCode(page, '- [x] Buy milk')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('li').click()
-		await backspaceRightAfterMarker(page, 6) // "- [x] "
+		await actionSettled(page, () => content.locator('li').click())
+		await backspaceRightAfterMarker(page, '- [x] '.length)
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
@@ -94,15 +88,10 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 
 		// Reveals the delimiters (real text) so ArrowLeft can land between them.
-		// Delays between presses avoid the same ProseMirror-state-staleness
-		// window `backspaceRightAfterMarker` above works around.
-		await content.locator('strong').dblclick()
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowLeft') // caret before "bold", after "**"
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowLeft') // caret between the two "*"
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Backspace')
+		await actionSettled(page, () => content.locator('strong').dblclick())
+		await pressKeySettled(page, 'ArrowLeft')
+		await pressKeySettled(page, 'ArrowLeft')
+		await pressKeySettled(page, 'Backspace')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		const raw = page.getByRole('textbox', { name: 'Raw markdown' })
@@ -115,13 +104,10 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		await openInVSCode(page, 'Some ~~struck~~ text')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('s').dblclick()
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowLeft')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowLeft')
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Backspace')
+		await actionSettled(page, () => content.locator('s').dblclick())
+		await pressKeySettled(page, 'ArrowLeft')
+		await pressKeySettled(page, 'ArrowLeft')
+		await pressKeySettled(page, 'Backspace')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		const raw = page.getByRole('textbox', { name: 'Raw markdown' })
@@ -134,11 +120,9 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		await openInVSCode(page, 'Some `code` text')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('code').dblclick()
-		await page.waitForTimeout(100)
-		await page.keyboard.press('ArrowLeft') // caret right after the opening `
-		await page.waitForTimeout(100)
-		await page.keyboard.press('Backspace')
+		await actionSettled(page, () => content.locator('code').dblclick())
+		await pressKeySettled(page, 'ArrowLeft')
+		await pressKeySettled(page, 'Backspace')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		const raw = page.getByRole('textbox', { name: 'Raw markdown' })

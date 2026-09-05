@@ -1,7 +1,8 @@
-import { expect, test } from '@playwright/test'
 import type { Locator, Page } from '@playwright/test'
 
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 function caretPosition(field: Locator) {
 	return field.evaluate((el: HTMLInputElement) => [
@@ -20,11 +21,10 @@ async function arrowUntilFieldOpens(page: Page, key: string): Promise<Locator> {
 
 	for (let press = 0; press < 20; press++) {
 		if ((await field.count()) > 0) return field
-		await page.keyboard.press(key)
-		// Let React commit the field before deciding whether to press again. A
-		// press that lands while the image is already selected is handled as
-		// "move into the toolbar" instead, which steals the focus this asserts on.
-		await page.waitForTimeout(50)
+		// Waits for the editor's own selection to settle, not the field itself - a
+		// press landing while the image is already selected is handled as "move
+		// into the toolbar" instead, stealing the focus this asserts on.
+		await pressKeySettled(page, key)
 	}
 
 	await expect(field).toHaveCount(1)
@@ -56,12 +56,10 @@ test.describe('Arrow-key entry onto an image in the live editor', () => {
 	})
 
 	// ProseMirror resolves the positions either side of an inline atom to the
-	// same number, so arriving from the right is not distinguishable from
-	// arriving from the left by selection alone, and the caret slides past the
-	// image instead of entering it. Entry from the left and every other symptom
-	// (the doubled caret, the field opening a keypress early) are fixed; this
-	// direction needs a view-level `handleKeyDown` reading the DOM selection
-	// before ProseMirror normalises it.
+	// same number, so arriving from the right is indistinguishable from arriving
+	// from the left by selection alone, and the caret slides past the image
+	// instead of entering it. Needs a view-level `handleKeyDown` reading the DOM
+	// selection before ProseMirror normalises it.
 	test.fixme('arrowing on from the text after it opens the field with the caret at its end', async ({
 		page,
 	}) => {
@@ -102,12 +100,14 @@ test.describe('Arrow-key entry onto an image in the live editor', () => {
 		await openInVSCode(page, 'Before ![Diagram](./diagram.png)')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('p').click({ position: { x: 2, y: 2 } })
+		await actionSettled(page, () =>
+			content.locator('p').click({ position: { x: 2, y: 2 } })
+		)
 		await expect(content).toBeFocused()
 		// One short of entry: the caret reaches the end of "Before ", adjacent to
 		// the image but not on it.
 		for (let press = 0; press < 'Before '.length; press++) {
-			await page.keyboard.press('ArrowRight')
+			await pressKeySettled(page, 'ArrowRight')
 		}
 
 		await expect(page.getByLabel('Image source')).toHaveCount(0)

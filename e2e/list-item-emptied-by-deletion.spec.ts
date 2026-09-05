@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from '@/e2e/lib/fixtures'
 import { openInVSCode } from '@/e2e/lib/helpers'
+import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
 
 test.describe('Deleting a list item down to empty in the live editor', () => {
 	// Distinct from backspace-boundaries.spec.ts's marker-boundary case: this
@@ -14,13 +14,10 @@ test.describe('Deleting a list item down to empty in the live editor', () => {
 		await openInVSCode(page, '- Eggs')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('li').click()
-		await page.waitForTimeout(100)
-		await page.keyboard.press('End')
-		await page.waitForTimeout(100)
+		await actionSettled(page, () => content.locator('li').click())
+		await pressKeySettled(page, 'End')
 		for (let i = 0; i < 'Eggs'.length; i++) {
-			await page.keyboard.press('Backspace')
-			await page.waitForTimeout(100)
+			await pressKeySettled(page, 'Backspace')
 		}
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()

@@ -7,9 +7,7 @@ import { focusedElementSignature } from '@/e2e/lib/helpers'
  * `page.waitForFunction`'s in-browser polling rather than a Node-side loop:
  * Playwright's `press` can fire the next keydown before a just-dispatched
  * ProseMirror transaction's DOM update has landed, reading a still-stale
- * "focus didn't move" - a rate no real Tab-pressing user reaches. Hundreds
- * of Node-side `page.evaluate` round-trips polling for the same thing also
- * measurably starves the page's own event loop.
+ * "focus didn't move" at a rate no real Tab-pressing user reaches.
  *
  * Returns `previous` unchanged once `timeoutMs` elapses with no change - a
  * press that genuinely doesn't move focus (the walk's true end) is expected
@@ -68,8 +66,8 @@ async function waitForFocusChange(
  * Presses Tab (Escape first, whenever a plain text caret has real focus) up
  * to `maxPresses` times, recording the focus signature after each settles,
  * until a press stops moving focus or `maxPresses` is reached. Duplicates
- * are left in on purpose: a test asserting on the list directly is what
- * catches focus looping rather than continuing to a new stop.
+ * are left in on purpose: the caller asserts on the list directly to catch
+ * focus looping.
  */
 export async function collectTabWalk(
 	page: Page,
