@@ -9,6 +9,13 @@ export type TextStats = {
 
 const WORDS_PER_MINUTE = 200
 
+const numberFormatter = new Intl.NumberFormat()
+
+/** Formats a count with thousand separators, e.g. `12345` → `"12,345"`. */
+export function formatCount(value: number): string {
+	return numberFormatter.format(value)
+}
+
 /**
  * Word, character and reading-time counts for the document.
  *
