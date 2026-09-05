@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 
 import { expect, test } from '@playwright/test'
 
-import { openInVSCode } from '@/e2e/lib/helpers'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 test.describe('Raw view', () => {
 	test('switching from the live view to the raw view keeps the whole document visible', async ({

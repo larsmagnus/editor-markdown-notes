@@ -1,6 +1,6 @@
 import { expect, test } from '@/e2e/lib/fixtures'
-import { openInVSCode } from '@/e2e/lib/helpers'
 import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 /**
  * Pressing a style shortcut with no selection, then typing, is one of the most

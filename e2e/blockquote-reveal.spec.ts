@@ -1,6 +1,6 @@
 import { expect, test } from '@/e2e/lib/fixtures'
-import { openInVSCode } from '@/e2e/lib/helpers'
 import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 test.describe('Blockquotes in the live editor', () => {
 	test('typing "> " creates a real blockquote and saves it back out unchanged', async ({
@@ -33,7 +33,7 @@ test.describe('Blockquotes in the live editor', () => {
 		await expect(marker).toHaveCount(1)
 
 		// Clicking the quote's own text (not its marker) must not reveal it - the
-		// same over-eager-reveal bug list-marker-reveal.spec.ts guards against.
+		// same over-eager-reveal bug lists-marker-reveal.spec.ts guards against.
 		await actionSettled(page, () =>
 			quote.getByText('Ship', { exact: false }).dblclick()
 		)

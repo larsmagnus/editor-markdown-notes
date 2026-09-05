@@ -1,6 +1,7 @@
+import { copySelectionHtml, pasteHtml } from '@/e2e/lib/clipboard'
 import { expect, test } from '@/e2e/lib/fixtures'
-import { copySelectionHtml, openInVSCode, pasteHtml } from '@/e2e/lib/helpers'
 import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 /**
  * Every block construct's marker is real text, so the editor's own clipboard

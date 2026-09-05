@@ -1,6 +1,7 @@
+import { backspaceIntoStartOf } from '@/e2e/lib/backspace-positions'
 import { expect, test } from '@/e2e/lib/fixtures'
-import { openInVSCode } from '@/e2e/lib/helpers'
 import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 test.describe('Headings in the live editor', () => {
 	test('typing "# " creates a real heading and saves it back out unchanged', async ({
@@ -53,5 +54,34 @@ test.describe('Headings in the live editor', () => {
 
 		await expect(content.locator('h2')).toBeVisible()
 		await expect(content.locator('h2')).toHaveText('## Roadmap')
+	})
+})
+
+/**
+ * A heading's marker steps down a level at a time and only takes the heading
+ * apart once there is none left, which is what makes a heading reachable back
+ * to a paragraph by editing alone.
+ */
+test.describe('Backspacing a heading marker', () => {
+	test('drops one level at a time', async ({ page }) => {
+		await openInVSCode(page, '### Notes')
+		const content = page.getByRole('textbox').first()
+
+		await backspaceIntoStartOf(page, 'Notes', 4)
+
+		await expect(content.locator('h2')).toHaveText('## Notes')
+	})
+
+	test('turns the heading into a paragraph once no level is left', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '# Notes')
+
+		await backspaceIntoStartOf(page, 'Notes', 2)
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue('Notes')
 	})
 })

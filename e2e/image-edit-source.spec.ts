@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { openInVSCode } from '@/e2e/lib/helpers'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 test.describe('Image editing in the live editor', () => {
 	test('selecting the image reveals its markdown as editable text, image still visible', async ({

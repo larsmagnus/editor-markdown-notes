@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { openInVSCode } from '@/e2e/lib/helpers'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 const NOTE = '---\nname: notes\n---\n\nBody text.'
 

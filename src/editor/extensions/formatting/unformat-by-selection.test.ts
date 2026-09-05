@@ -28,7 +28,7 @@ function documentFrom(markdown: string): Editor {
  * all reach repair as a run whose delimiter is simply gone - the deletion
  * arriving as a transaction rather than a keystroke, which is what makes this
  * the half of the behaviour worth asserting here. The keystroke half is
- * `e2e/unformat-by-backspace.spec.ts`: single-character deletion is the
+ * `e2e/inline-marks-unformat-backspace.spec.ts`: single-character deletion is the
  * browser's own, and no keymap handler sees it.
  */
 describe('deleting a delimiter by selection', () => {

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { openInVSCode } from '@/e2e/lib/helpers'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 /**
  * Writing a second styled run on a line that already has one. The delimiter

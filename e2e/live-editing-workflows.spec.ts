@@ -1,11 +1,11 @@
 import { expect, test } from '@/e2e/lib/fixtures'
-import { openInVSCode } from '@/e2e/lib/helpers'
 import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 /**
  * Realistic multi-step editing sessions spanning several constructs in
  * sequence - the "does the whole session hold together" net that isolated
- * per-construct specs can't catch. `backspace-boundaries.spec.ts` covers
+ * per-construct specs can't catch. `marker-backspace-boundary.spec.ts` covers
  * exhaustive per-construct boundary cases; this file covers workflows.
  */
 test.describe('Live editing workflows', () => {
@@ -45,7 +45,7 @@ test.describe('Live editing workflows', () => {
 		await page.keyboard.type('**Bread**')
 		// Enter seeds a third, empty item (marker only, no text) - Backspace
 		// right after that marker (the very position the caret already sits at)
-		// lifts it back out, the same case backspace-boundaries.spec.ts exercises
+		// lifts it back out, the same case marker-backspace-boundary.spec.ts exercises
 		// per-construct.
 		await pressKeySettled(page, 'Enter')
 

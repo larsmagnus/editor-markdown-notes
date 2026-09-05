@@ -1,7 +1,7 @@
 import { expect, test } from '@/e2e/lib/fixtures'
-import { openInVSCode } from '@/e2e/lib/helpers'
 import { actionSettled } from '@/e2e/lib/press-key-settled'
 import { selectSubstring } from '@/e2e/lib/select-text'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 test.describe('Links in the live editor', () => {
 	test('a parsed link saves back out unchanged', async ({ page }) => {

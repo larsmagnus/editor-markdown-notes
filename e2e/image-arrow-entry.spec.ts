@@ -1,8 +1,8 @@
 import type { Locator, Page } from '@playwright/test'
 
 import { expect, test } from '@/e2e/lib/fixtures'
-import { openInVSCode } from '@/e2e/lib/helpers'
 import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 function caretPosition(field: Locator) {
 	return field.evaluate((el: HTMLInputElement) => [

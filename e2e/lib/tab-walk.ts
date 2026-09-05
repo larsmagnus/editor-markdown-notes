@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import { focusedElementSignature } from '@/e2e/lib/helpers'
+import { focusedElementSignature } from '@/e2e/lib/focus'
 
 /**
  * Waits for the focus signature to differ from `previous`, using

@@ -1,9 +1,10 @@
 import { readFileSync } from 'fs'
 
 import { expect, test } from '@/e2e/lib/fixtures'
-import { openInVSCode, tabUntilFocused } from '@/e2e/lib/helpers'
+import { tabUntilFocused } from '@/e2e/lib/focus'
 import { actionSettled } from '@/e2e/lib/press-key-settled'
 import { collectTabWalk } from '@/e2e/lib/tab-walk'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 test.describe('Keyboard navigation in the live editor', () => {
 	test('Tab walks every interactive element in the document and the text tools sidebar exactly once', async ({

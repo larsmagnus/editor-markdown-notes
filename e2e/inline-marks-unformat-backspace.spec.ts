@@ -1,9 +1,6 @@
-import {
-	backspaceAtEndOf,
-	backspaceIntoStartOf,
-} from '@/e2e/lib/caret-navigation'
+import { backspaceAtEndOf } from '@/e2e/lib/backspace-positions'
 import { expect, test } from '@/e2e/lib/fixtures'
-import { openInVSCode } from '@/e2e/lib/helpers'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 /**
  * Backspacing at a delimiter is how a writer unformats text without reaching
@@ -43,34 +40,5 @@ test.describe('Backspacing a closing delimiter', () => {
 		await expect(
 			page.getByRole('textbox', { name: 'Raw markdown' })
 		).toHaveValue('Read the guide')
-	})
-})
-
-/**
- * A heading's marker steps down a level at a time and only takes the heading
- * apart once there is none left, which is what makes a heading reachable back
- * to a paragraph by editing alone.
- */
-test.describe('Backspacing a heading marker', () => {
-	test('drops one level at a time', async ({ page }) => {
-		await openInVSCode(page, '### Notes')
-		const content = page.getByRole('textbox').first()
-
-		await backspaceIntoStartOf(page, 'Notes', 4)
-
-		await expect(content.locator('h2')).toHaveText('## Notes')
-	})
-
-	test('turns the heading into a paragraph once no level is left', async ({
-		page,
-	}) => {
-		await openInVSCode(page, '# Notes')
-
-		await backspaceIntoStartOf(page, 'Notes', 2)
-
-		await page.getByRole('button', { name: 'Raw editor' }).click()
-		await expect(
-			page.getByRole('textbox', { name: 'Raw markdown' })
-		).toHaveValue('Notes')
 	})
 })
