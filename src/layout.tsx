@@ -37,7 +37,7 @@ function Layout({ defaultFileName }: LayoutProps) {
 			<SkipLinks raw={viewOptions.raw} textToolsOpen={viewOptions.textTools} />
 
 			{!settings.hideToolbar && (
-				<AppErrorBoundary title="The toolbar">
+				<AppErrorBoundary title="The toolbar stopped working">
 					<Suspense fallback={null}>
 						<Toolbar
 							files={files}

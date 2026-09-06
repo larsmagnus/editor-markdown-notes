@@ -1,5 +1,7 @@
 import type { ChainedCommands } from '@tiptap/react'
 
+import { stripHeadingMarkerCommand } from '@/editor/extensions/heading/strip-heading-marker-command'
+
 export type TextStyle =
 	| 'italic'
 	| 'bold'
@@ -14,21 +16,13 @@ type TextStyleCommand = {
 	apply: (chain: ChainedCommands) => ChainedCommands
 	/** The mark or node `editor.isActive` checks. */
 	activeName: string
-	/**
-	 * Whether `editor.can()` gives a meaningful answer. The styles marked false
-	 * always apply, and asking about them used to fall off the end of a switch and
-	 * return `undefined` - which read as "cannot", leaving both buttons in the
-	 * menu bar permanently disabled.
-	 */
+	/** Whether `editor.can()` gives a meaningful answer; the rest always apply. */
 	queryable: boolean
 }
 
 /**
  * Every text style, and the three things the editor needs to know about each.
- *
- * A table rather than parallel switch statements: apply, is-active and can-apply
- * used to be three separate dispatches that had to be kept in step by hand, and
- * the one that drifted asked its question by performing the toggle.
+ * A table rather than three parallel switch statements kept in step by hand.
  */
 export const TEXT_STYLE_COMMANDS: Record<TextStyle, TextStyleCommand> = {
 	bold: {
@@ -62,7 +56,12 @@ export const TEXT_STYLE_COMMANDS: Record<TextStyle, TextStyleCommand> = {
 		queryable: true,
 	},
 	paragraph: {
-		apply: (chain) => chain.setParagraph(),
+		apply: (chain) =>
+			chain
+				.command(({ state, dispatch }) =>
+					stripHeadingMarkerCommand(state, dispatch)
+				)
+				.setParagraph(),
 		activeName: 'paragraph',
 		queryable: false,
 	},

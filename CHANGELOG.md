@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added a real, editable `>` marker to blockquotes in the live editor, shown only while the cursor is on it
 - Added a way to move keyboard focus out of the document text with Escape then Tab, previously trapped indenting once the cursor reached a line with nothing after it
 - Added "Skip to editor" and "Skip to text tools" links, reachable with the first Tab press, plus a link back to the editor from inside the writing tools panel
 - Changed task list checkboxes in the live editor to match the app's other checkboxes

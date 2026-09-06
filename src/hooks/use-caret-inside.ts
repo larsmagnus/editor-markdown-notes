@@ -1,5 +1,6 @@
 import type { NodeViewProps } from '@tiptap/react'
-import { useEffect, useState } from 'react'
+
+import { useEditorFlag } from '@/hooks/use-editor-flag'
 
 /**
  * Is the caret inside this node right now?
@@ -9,49 +10,21 @@ import { useEffect, useState } from 'react'
  * without anything losing focus. The editor's own selection is the only thing
  * that tracks it - which also means arrowing into a collapsed block reveals its
  * source rather than losing the caret in it.
+ *
+ * Requires the editor to be focused, so source revealed inline in editable
+ * content hides on blur. A node whose controls live *outside* the
+ * contenteditable region needs the opposite (`use-image-selected.ts`): clicking
+ * such a control blurs the editor without moving the selection.
  */
 export function useCaretInside({
 	editor,
 	getPos,
 }: Pick<NodeViewProps, 'editor' | 'getPos'>): boolean {
-	const [inside, setInside] = useState(false)
+	return useEditorFlag({ editor, getPos }, (pos) => {
+		const node = editor.state.doc.nodeAt(pos)
+		if (!node || !editor.isFocused) return false
 
-	useEffect(() => {
-		const update = () => {
-			// Guarded on the position rather than on `getPos` itself: a node view
-			// ProseMirror has already detached keeps its `getPos` function, which
-			// then returns `undefined`. Replacing the document dispatches
-			// `selectionUpdate` synchronously, before React runs the dead view's
-			// effect cleanup, so this listener does fire - and `nodeAt(undefined)`
-			// throws out of the effect and takes the editor down with it.
-			const start = typeof getPos === 'function' ? getPos() : undefined
-			if (start === undefined) return setInside(false)
-
-			const node = editor.state.doc.nodeAt(start)
-			const { from, to } = editor.state.selection
-
-			setInside(
-				Boolean(node) &&
-					editor.isFocused &&
-					from >= start &&
-					to <= start + (node?.nodeSize ?? 0)
-			)
-		}
-
-		// Deliberately not called for the selection the block mounts with. The
-		// editor does not autofocus, but a document replaced in place carries its
-		// old selection over, and a block that inherits it would open showing
-		// source nobody asked to edit.
-		editor.on('selectionUpdate', update)
-		editor.on('focus', update)
-		editor.on('blur', update)
-
-		return () => {
-			editor.off('selectionUpdate', update)
-			editor.off('focus', update)
-			editor.off('blur', update)
-		}
-	}, [editor, getPos])
-
-	return inside
+		const { from, to } = editor.state.selection
+		return from >= pos && to <= pos + node.nodeSize
+	})
 }

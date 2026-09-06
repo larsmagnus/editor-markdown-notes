@@ -21,7 +21,7 @@ export function AskInlineErrorWidget({
 }: AskInlineErrorWidgetProps) {
 	return (
 		<ErrorFallback
-			title="Ask Claude"
+			title="Ask Claude stopped working"
 			error={new Error(error)}
 			resetErrorBoundary={onRetry}
 			onRemove={onDismiss}

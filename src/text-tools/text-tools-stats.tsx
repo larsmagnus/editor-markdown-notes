@@ -9,6 +9,7 @@ import {
 import {
 	computeTextStats,
 	countParagraphs,
+	formatCount,
 } from '@/lib/text-tools/document-stats'
 
 type TextToolsStatsProps = {
@@ -48,13 +49,13 @@ export function TextToolsStats({ sentenceCount }: TextToolsStatsProps) {
 				<AccordionContent>
 					<dl className="grid grid-cols-2 items-end gap-x-2 gap-y-1">
 						<dt className="text-muted-foreground">Words</dt>
-						<dd className="text-right">{words}</dd>
+						<dd className="text-right">{formatCount(words)}</dd>
 						<dt className="text-muted-foreground">Characters</dt>
-						<dd className="text-right">{characters}</dd>
+						<dd className="text-right">{formatCount(characters)}</dd>
 						<dt className="text-muted-foreground">Sentences</dt>
-						<dd className="text-right">{sentenceCount}</dd>
+						<dd className="text-right">{formatCount(sentenceCount)}</dd>
 						<dt className="text-muted-foreground">Paragraphs</dt>
-						<dd className="text-right">{paragraphs}</dd>
+						<dd className="text-right">{formatCount(paragraphs)}</dd>
 						<dt className="text-muted-foreground">Avg. words/sentence</dt>
 						<dd className="text-right">{averageWordsPerSentence}</dd>
 						<dt className="text-muted-foreground">Reading time</dt>

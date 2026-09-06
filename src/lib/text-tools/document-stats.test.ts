@@ -5,6 +5,7 @@ import { extensions } from '@/editor/extensions/extensions'
 import {
 	computeTextStats,
 	countParagraphs,
+	formatCount,
 } from '@/lib/text-tools/document-stats'
 
 describe('computeTextStats', () => {
@@ -58,6 +59,24 @@ describe('computeTextStats', () => {
 		expect(stats.characters).toBe(6)
 		expect(stats.charactersNoSpaces).toBe(6)
 		expect(stats.words).toBe(2)
+	})
+})
+
+describe('formatCount', () => {
+	it('leaves small numbers unchanged', () => {
+		expect(formatCount(42)).toBe('42')
+	})
+
+	it('adds a thousand separator for numbers in the thousands', () => {
+		expect(formatCount(12345)).toBe('12,345')
+	})
+
+	it('adds multiple thousand separators for larger numbers', () => {
+		expect(formatCount(1234567)).toBe('1,234,567')
+	})
+
+	it('formats zero as "0"', () => {
+		expect(formatCount(0)).toBe('0')
 	})
 })
 

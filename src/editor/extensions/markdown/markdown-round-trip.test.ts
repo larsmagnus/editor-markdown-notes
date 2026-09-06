@@ -227,6 +227,27 @@ describe('images and links', () => {
 			'Docs live at <https://example.com> today.'
 		)
 	})
+
+	it('keeps a link with a title', () => {
+		const markdown = 'Read [the guide](https://example.com "The guide") first.'
+		expect(roundTrip(markdown)).toBe(markdown)
+	})
+
+	// Regression: nesting bold inside a link's own text used to be lost the
+	// same way inline code nested inside bold was - see `uniform-outer-marks.ts`.
+	it('keeps bold nested inside a link', () => {
+		expect(roundTrip('Read [**the guide**](https://example.com) first.')).toBe(
+			'Read [**the guide**](https://example.com) first.'
+		)
+	})
+
+	it('keeps a link whose text contains a literal bracket-then-paren, unescaped', () => {
+		// Coincidental `](` in plain prose is escaped (see the escaping
+		// describe block below); a real link's own `](` must not be.
+		expect(roundTrip('[a link](https://example.com)')).toBe(
+			'[a link](https://example.com)'
+		)
+	})
 })
 
 describe('features that already worked keep working', () => {
@@ -248,11 +269,35 @@ describe('features that already worked keep working', () => {
 		expect(roundTrip(markdown)).toBe(markdown)
 	})
 
+	// Regression: the heading's own `#` marker is real, unmarked text right
+	// alongside the marked run - `esc()`'s startOfLine heading guard
+	// (`markdown-escaping.ts`) must not swallow it into the mark's own escaping.
+	it('keeps bold text inside a heading', () => {
+		expect(roundTrip('## Ship the **release**')).toBe('## Ship the **release**')
+	})
+
 	it('keeps bold, italic and strikethrough, preserving whichever italic marker was used', () => {
 		expect(
 			roundTrip('**Bold text** and _italic text_ and ~~struck text~~')
 		).toBe('**Bold text** and _italic text_ and ~~struck text~~')
 		expect(roundTrip('*italic text*')).toBe('*italic text*')
+	})
+
+	// Regression: nesting two delimited marks on the same run used to make
+	// `ensure-delimiters-plugin.ts` oscillate forever - see
+	// `uniform-outer-marks.ts`.
+	it('keeps nested bold and italic in a fixed outer-to-inner order', () => {
+		expect(roundTrip('**_bold and italic_**')).toBe('**_bold and italic_**')
+		expect(roundTrip('**~~bold and struck~~**')).toBe('**~~bold and struck~~**')
+		expect(roundTrip('~~_struck and italic_~~')).toBe('~~_struck and italic_~~')
+	})
+
+	// Regression: the same nesting bug `ensure-delimiters-plugin.ts` had for
+	// bold+italic also applies to inline code, whose fence length varies -
+	// `uniform-outer-marks.ts` covers it via the same fixed priority order.
+	it('keeps inline code nested inside bold, italic, and strike all at once', () => {
+		expect(roundTrip('**_Add `x` command_**')).toBe('**_Add `x` command_**')
+		expect(roundTrip('~~Add `x` command~~')).toBe('~~Add `x` command~~')
 	})
 
 	it('keeps one contiguous bold run around inline code', () => {

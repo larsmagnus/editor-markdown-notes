@@ -1,7 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Editor, EditorContext } from '@tiptap/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { BubbleMenuContent } from '@/components/bubble-menu-content'
 import { extensions } from '@/editor/extensions/extensions'
@@ -37,7 +37,9 @@ describe('headings', () => {
 		await userEvent.click(screen.getByTitle('Heading'))
 		await userEvent.click(screen.getByTitle('Heading 2'))
 
-		expect(editor.getHTML()).toContain('<h2>Some notes</h2>')
+		// The `##` marker is real, marked text now (see `heading-extension.ts`),
+		// not markup synthesized only at save time.
+		expect(editor.getHTML()).toContain('<h2>## Some notes</h2>')
 	})
 })
 
@@ -54,7 +56,9 @@ describe('text styles', () => {
 
 		await userEvent.click(screen.getByTitle('bold'))
 
-		expect(editor.getHTML()).toContain('<strong>notes</strong>')
+		// The `**` delimiters are real, marked text now (see `formatting/`),
+		// not markup synthesized only at save time.
+		expect(editor.getHTML()).toContain('<strong>**notes**</strong>')
 	})
 
 	it('italicises the selection', async () => {
@@ -69,7 +73,9 @@ describe('text styles', () => {
 
 		await userEvent.click(screen.getByTitle('italic'))
 
-		expect(editor.getHTML()).toContain('<em>notes</em>')
+		// The `_` delimiters are real, marked text now (see `formatting/`),
+		// not markup synthesized only at save time.
+		expect(editor.getHTML()).toContain('<em>_notes_</em>')
 	})
 
 	it('strikes through the selection', async () => {
@@ -84,7 +90,9 @@ describe('text styles', () => {
 
 		await userEvent.click(screen.getByTitle('strike'))
 
-		expect(editor.getHTML()).toContain('<s>notes</s>')
+		// The `~~` delimiters are real, marked text now (see `formatting/`),
+		// not markup synthesized only at save time.
+		expect(editor.getHTML()).toContain('<s>~~notes~~</s>')
 	})
 })
 
@@ -104,8 +112,10 @@ describe('links', () => {
 		await userEvent.type(screen.getByLabelText('URL'), 'https://example.com')
 		await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
 
+		// The `[`/`](url)` delimiters are real, marked text now (see
+		// `link-extension.ts`), not markup synthesized only at save time.
 		expect(editor.getHTML()).toContain('href="https://example.com"')
-		expect(editor.getHTML()).toContain('>notes</a>')
+		expect(editor.getHTML()).toContain('>[notes](https://example.com)</a>')
 	})
 
 	it('removes an existing link', async () => {
@@ -143,6 +153,33 @@ describe('links', () => {
 		await userEvent.click(screen.getByTitle('Link'))
 
 		expect(screen.getByLabelText('URL')).toHaveValue('https://example.com')
+	})
+
+	// Regression: applying a new URL over an existing link used to only touch
+	// the mark's attrs, leaving the old URL's literal text - now the visible
+	// source of truth - sitting stale right beside it.
+	it('replaces the literal URL text when editing an existing link', async () => {
+		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
+		editor.commands.setContent('Read the [notes](https://old.example.com)')
+		editor.commands.setTextSelection({ from: 10, to: 15 })
+		render(
+			<EditorContext.Provider value={{ editor }}>
+				<BubbleMenuContent />
+			</EditorContext.Provider>
+		)
+
+		await userEvent.click(screen.getByTitle('Link'))
+		await userEvent.clear(screen.getByLabelText('URL'))
+		await userEvent.type(
+			screen.getByLabelText('URL'),
+			'https://new.example.com'
+		)
+		await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
+
+		const markdown = editor.storage.markdown.getMarkdown() as string
+		expect(markdown).toContain('[notes](https://new.example.com)')
+		expect(markdown).not.toContain('old.example.com')
 	})
 })
 
@@ -201,346 +238,5 @@ describe('colours', () => {
 		).toBe(false)
 		expect(editor.getHTML()).toContain('<h2>')
 		expect(editor.getHTML()).toContain('<strong>')
-	})
-})
-
-describe('images', () => {
-	it('shows only image controls when an image is selected', async () => {
-		const editor = new Editor({
-			extensions,
-			content: '<img src="./diagram.png" alt="Diagram">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-
-		expect(screen.getByTitle('Edit image')).toBeInTheDocument()
-		expect(screen.getByTitle('Delete image')).toBeInTheDocument()
-		expect(screen.queryByTitle('Heading')).not.toBeInTheDocument()
-		expect(screen.queryByTitle('bold')).not.toBeInTheDocument()
-	})
-
-	it('seeds the edit popover with the image current src and alt', async () => {
-		const editor = new Editor({
-			extensions,
-			content: '<img src="./diagram.png" alt="Diagram">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-
-		await userEvent.click(screen.getByTitle('Edit image'))
-
-		expect(screen.getByLabelText('Src')).toHaveValue('./diagram.png')
-		expect(screen.getByLabelText('Alt')).toHaveValue('Diagram')
-	})
-
-	it('updates the image src and alt text', async () => {
-		const editor = new Editor({
-			extensions,
-			content: '<img src="./diagram.png" alt="Diagram">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-
-		await userEvent.click(screen.getByTitle('Edit image'))
-		await userEvent.clear(screen.getByLabelText('Src'))
-		await userEvent.type(screen.getByLabelText('Src'), './new-diagram.png')
-		await userEvent.clear(screen.getByLabelText('Alt'))
-		await userEvent.type(screen.getByLabelText('Alt'), 'New diagram')
-		await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
-
-		expect(editor.getHTML()).toContain('src="./new-diagram.png"')
-		expect(editor.getHTML()).toContain('alt="New diagram"')
-	})
-
-	it('deletes the image', async () => {
-		const editor = new Editor({
-			extensions,
-			content: '<img src="./diagram.png" alt="Diagram">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-
-		await userEvent.click(screen.getByTitle('Delete image'))
-
-		expect(editor.getHTML()).not.toContain('<img')
-	})
-
-	it('wraps the image in a link', async () => {
-		const editor = new Editor({
-			extensions,
-			content: '<img src="./diagram.png" alt="Diagram">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-
-		await userEvent.click(screen.getByTitle('Link'))
-		await userEvent.clear(screen.getByLabelText('URL'))
-		await userEvent.type(screen.getByLabelText('URL'), 'https://example.com')
-		await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
-
-		expect(editor.getHTML()).toContain('href="https://example.com"')
-		expect(editor.getHTML()).toContain('<img')
-	})
-
-	it('unwraps a linked image', async () => {
-		const editor = new Editor({
-			extensions,
-			content:
-				'<a href="https://example.com"><img src="./diagram.png" alt="Diagram"></a>',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-		expect(editor.getHTML()).toContain('href="https://example.com"')
-
-		await userEvent.click(screen.getByTitle('Unlink'))
-
-		expect(editor.getHTML()).not.toContain('href=')
-		expect(editor.getHTML()).toContain('<img')
-	})
-
-	// The slash command's "image" action inserts exactly this shape outside
-	// VS Code - an empty, selected image - since there is no file dialog to
-	// fill the src in first.
-	describe('an image with no src yet', () => {
-		it('opens the edit popover on its own', () => {
-			const editor = new Editor({
-				extensions,
-				content: '<img src="" alt="">',
-			})
-			currentEditor = editor
-			editor.commands.setNodeSelection(1)
-			render(
-				<EditorContext.Provider value={{ editor }}>
-					<BubbleMenuContent />
-				</EditorContext.Provider>
-			)
-
-			expect(screen.getByLabelText('Src')).toBeInTheDocument()
-		})
-
-		it('deletes the image if the popover closes without a src', async () => {
-			const editor = new Editor({
-				extensions,
-				content: '<img src="" alt="">',
-			})
-			currentEditor = editor
-			editor.commands.setNodeSelection(1)
-			render(
-				<EditorContext.Provider value={{ editor }}>
-					<BubbleMenuContent />
-				</EditorContext.Provider>
-			)
-			expect(screen.getByLabelText('Src')).toBeInTheDocument()
-
-			await userEvent.keyboard('{Escape}')
-
-			expect(editor.getHTML()).not.toContain('<img')
-		})
-
-		it('keeps the image once a src has been typed and applied', async () => {
-			const editor = new Editor({
-				extensions,
-				content: '<img src="" alt="">',
-			})
-			currentEditor = editor
-			editor.commands.setNodeSelection(1)
-			render(
-				<EditorContext.Provider value={{ editor }}>
-					<BubbleMenuContent />
-				</EditorContext.Provider>
-			)
-
-			await userEvent.type(screen.getByLabelText('Src'), './diagram.png')
-			await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
-
-			expect(editor.getHTML()).toContain('src="./diagram.png"')
-		})
-
-		// `useImagePopover` re-checks on every `selectionUpdate` rather than only
-		// on mount: the bubble menu stays mounted across a Tab between two
-		// images (both stay `isActive('image')`), so a mount-only check would
-		// never see the second one.
-		it('auto-opens for a second, empty-src image reached without leaving the bubble menu mounted', () => {
-			const editor = new Editor({
-				extensions,
-				content: '<img src="./diagram.png" alt="Diagram"><img src="" alt="">',
-			})
-			currentEditor = editor
-			editor.commands.setNodeSelection(1)
-			render(
-				<EditorContext.Provider value={{ editor }}>
-					<BubbleMenuContent />
-				</EditorContext.Provider>
-			)
-			expect(screen.queryByLabelText('Src')).not.toBeInTheDocument()
-
-			fireEvent.keyDown(editor.view.dom, { key: 'Tab' })
-
-			expect(screen.getByLabelText('Src')).toBeInTheDocument()
-		})
-	})
-
-	it('does not delete an existing image when its manually opened edit is cancelled with the src cleared', async () => {
-		const editor = new Editor({
-			extensions,
-			content: '<img src="./diagram.png" alt="Diagram">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-
-		await userEvent.click(screen.getByTitle('Edit image'))
-		await userEvent.clear(screen.getByLabelText('Src'))
-		await userEvent.keyboard('{Escape}')
-
-		expect(editor.getHTML()).toContain('src="./diagram.png"')
-	})
-})
-
-describe('image keyboard navigation', () => {
-	it('moves focus into the toolbar when ArrowRight is pressed on a selected image', () => {
-		const editor = new Editor({
-			extensions,
-			content: '<img src="./diagram.png" alt="Diagram">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-
-		fireEvent.keyDown(editor.view.dom, { key: 'ArrowRight' })
-
-		expect(screen.getByTitle('Edit image')).toHaveFocus()
-	})
-
-	it('cycles through the toolbar buttons with arrow keys, wrapping at the ends', async () => {
-		const editor = new Editor({
-			extensions,
-			content: '<img src="./diagram.png" alt="Diagram">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-		screen.getByTitle('Edit image').focus()
-
-		await userEvent.keyboard('{ArrowRight}')
-		expect(screen.getByTitle('Link')).toHaveFocus()
-
-		await userEvent.keyboard('{ArrowRight}')
-		expect(screen.getByTitle('Unlink')).toHaveFocus()
-
-		await userEvent.keyboard('{ArrowRight}')
-		expect(screen.getByTitle('Delete image')).toHaveFocus()
-
-		await userEvent.keyboard('{ArrowRight}')
-		expect(screen.getByTitle('Edit image')).toHaveFocus()
-
-		await userEvent.keyboard('{ArrowLeft}')
-		expect(screen.getByTitle('Delete image')).toHaveFocus()
-	})
-
-	it('moves Tab from a toolbar button on to the next image', async () => {
-		const editor = new Editor({
-			extensions,
-			content:
-				'<img src="./first.png" alt="First"><img src="./second.png" alt="Second">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-		screen.getByTitle('Edit image').focus()
-
-		await userEvent.keyboard('{Tab}')
-
-		expect(editor.getAttributes('image').alt).toBe('Second')
-	})
-
-	it('returns Shift-Tab from a toolbar button to the image', async () => {
-		const editor = new Editor({
-			extensions,
-			content: '<img src="./diagram.png" alt="Diagram">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-		// `editor.view.dom` never mounts into `document` in these tests (see the
-		// file banner), so `document.activeElement` can't observe this focus -
-		// a spy is the only thing that can. It's the editor that regains focus,
-		// not the `<img>` - see `exitImageToolbar`'s comment for why.
-		const focusEditor = vi.spyOn(editor.view, 'focus')
-		screen.getByTitle('Edit image').focus()
-
-		await userEvent.keyboard('{Shift>}{Tab}{/Shift}')
-
-		expect(focusEditor).toHaveBeenCalled()
-	})
-
-	it('moves Tab between fields inside the edit popover instead of to the next image', async () => {
-		const editor = new Editor({
-			extensions,
-			content: '<img src="./diagram.png" alt="Diagram">',
-		})
-		currentEditor = editor
-		editor.commands.setNodeSelection(1)
-		render(
-			<EditorContext.Provider value={{ editor }}>
-				<BubbleMenuContent />
-			</EditorContext.Provider>
-		)
-
-		await userEvent.click(screen.getByTitle('Edit image'))
-		screen.getByLabelText('Src').focus()
-		await userEvent.keyboard('{Tab}')
-
-		expect(screen.getByLabelText('Alt')).toHaveFocus()
 	})
 })

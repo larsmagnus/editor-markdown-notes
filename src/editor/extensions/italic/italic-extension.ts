@@ -1,55 +1,47 @@
 import type { Storage } from '@tiptap/core'
-import ItalicMark from '@tiptap/extension-italic'
+import ItalicMark, {
+	starInputRegex,
+	underscoreInputRegex,
+} from '@tiptap/extension-italic'
 
+import { createDelimitedMarkExtension } from '@/editor/extensions/formatting/delimited-mark-extension'
+import { createDelimiterInputRule } from '@/editor/extensions/formatting/delimiter-input-rule'
+import { createToggleItalicCommand } from '@/editor/extensions/italic/create-toggle-italic-command'
+import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
 import { italicMarkdownSpec } from '@/editor/extensions/italic/italic-markdown-spec'
-import {
-	italicInputRules,
-	italicPasteRules,
-} from '@/editor/extensions/italic/italic-rules'
+import { italicMarkupAttribute } from '@/editor/extensions/italic/italic-markup-attribute'
+import { italicPasteRules } from '@/editor/extensions/italic/italic-rules'
 import { DEFAULT_SETTINGS } from '@/shared/messages'
 
-// `addAttributes()`'s `parseHTML` closes over a `storage` snapshot Tiptap
-// takes at schema-build time, before that editor's own storage exists - so
-// `this.storage` inside `parseHTML` never reflects later mutations to
-// `editor.storage.italic.preferredMarkup`. `onBeforeCreate` runs synchronously
-// during `new Editor()`, after storage is set up but before any content is
-// parsed, so it captures the same live object `editor.storage.italic` is;
-// reads through it below stay live because it's the same reference, not a
-// copy. (`onCreate` fires too late - it's deferred via `setTimeout`.)
+// `parseHTML` closes over a storage snapshot taken at schema-build time,
+// before the editor's own storage exists, so `this.storage` there never sees
+// later mutations. `onBeforeCreate` runs after storage is set up and before
+// content is parsed, capturing the live object (`onCreate` is too late - it is
+// deferred via `setTimeout`).
 //
-// Module-level, so it holds only the most recently constructed editor's
-// storage - a second concurrent editor (multiple open panels) would overwrite
-// it. `editorMarkdownNotes.italicMarker` is a single global VSCode setting
-// broadcast to every panel (see `use-italic-marker.ts`), so every panel's
-// `preferredMarkup` converges on the same value; the only exposure is the
-// narrow, self-correcting window before a setting change has finished
-// broadcasting to all panels.
+// Module-level, so a second concurrent editor overwrites it. `italicMarker` is
+// one global setting broadcast to every panel, so they converge; the exposure
+// is the self-correcting window while a change is still broadcasting.
 let liveStorage: Storage['italic'] | null = null
 
 /**
- * Preserves whichever italic marker (`_` or `*`) a file was written with,
- * instead of the default serializer's hardcoded `*`. `markup` is read from
- * `data-markup` (see `italicMarkdownSpec`). Fresh italics (toolbar, bubble
- * menu, Cmd/Ctrl+I) have no source marker, so they use
- * `storage.preferredMarkup` instead, kept live by `editor.tsx` from
- * `editorMarkdownNotes.italicMarker`.
+ * `_italic_`/`*italic*` with real, caret-revealed delimiter text, resolving
+ * its own open/close rather than taking a fixed delimiter: which character is
+ * CommonMark-valid depends on the intraword rule and on `preferredMarkup`.
+ *
+ * `markup` is read from `data-markup`. A fresh italic has no source marker, so
+ * it uses `preferredMarkup`, kept live from `editorMarkdownNotes.italicMarker`.
  */
-export const ItalicExtension = ItalicMark.extend({
+export const ItalicExtension = createDelimitedMarkExtension(ItalicMark, {
+	ensureSpec: italicDelimiterSpec(),
+	// Nests inside bold and strike - see `uniform-outer-marks.ts`.
+	outerMarkNames: ['link', 'bold', 'strike'],
+}).extend({
 	onBeforeCreate() {
 		liveStorage = this.editor.storage.italic
 	},
 	addAttributes() {
-		return {
-			markup: {
-				default: DEFAULT_SETTINGS.italicMarker,
-				parseHTML: (element: HTMLElement) =>
-					element.getAttribute('data-markup') ||
-					liveStorage?.preferredMarkup ||
-					DEFAULT_SETTINGS.italicMarker,
-				renderHTML: () => ({}),
-				rendered: false,
-			},
-		}
+		return { markup: italicMarkupAttribute(() => liveStorage) }
 	},
 	addStorage() {
 		return {
@@ -65,14 +57,12 @@ export const ItalicExtension = ItalicMark.extend({
 					commands.setMark(this.name, {
 						markup: this.storage.preferredMarkup,
 					}),
-			toggleItalic:
-				() =>
-				({ commands, editor }) => {
-					if (editor.isActive(this.name)) return commands.unsetMark(this.name)
-					return commands.setMark(this.name, {
-						markup: this.storage.preferredMarkup,
-					})
-				},
+			toggleItalic: () =>
+				createToggleItalicCommand(
+					this.type,
+					this.name,
+					() => this.storage.preferredMarkup
+				),
 			unsetItalic:
 				() =>
 				({ commands }) =>
@@ -80,7 +70,14 @@ export const ItalicExtension = ItalicMark.extend({
 		}
 	},
 	addInputRules() {
-		return italicInputRules(this.type)
+		return [
+			createDelimiterInputRule(this.type, starInputRegex, () => ({
+				markup: '*',
+			})),
+			createDelimiterInputRule(this.type, underscoreInputRegex, () => ({
+				markup: '_',
+			})),
+		]
 	},
 	addPasteRules() {
 		return italicPasteRules(this.type)

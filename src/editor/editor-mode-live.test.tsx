@@ -81,8 +81,10 @@ describe('Editor Mode Live', () => {
 
 		const table = await screen.findByRole('table')
 		expect(table.querySelector('p')).toBeNull()
-		expect(screen.getByRole('cell', { name: '1.2M' })).toContainHTML(
-			'<strong>1.2M</strong>'
+		// The `**` delimiters are real, marked text now (see `formatting/`), so
+		// they're part of both the cell's accessible name and its markup.
+		expect(screen.getByRole('cell', { name: '**1.2M**' })).toContainHTML(
+			'<strong>**1.2M**</strong>'
 		)
 	})
 
@@ -135,15 +137,58 @@ describe('Editor Mode Live', () => {
 	// `- ` makes a plain bullet before `[ ] ` is typed, which used to leave
 	// `[ ] ` as literal text - see `task-item-extension.ts` for why.
 	it('converts a typed "- [ ] " into a task item, not literal text', async () => {
-		render(<EditorModeLive content="" />)
+		const { container } = render(<EditorModeLive content="" />)
 
 		await userEvent.click(screen.getByRole('textbox'))
 		await userEvent.keyboard('- {[} {]} Ship footnotes')
 
 		const checkbox = await screen.findByRole('checkbox')
 		expect(checkbox).not.toBeChecked()
-		expect(screen.getByText('Ship footnotes')).toBeInTheDocument()
-		expect(screen.queryByText(/\[ \]/)).not.toBeInTheDocument()
+		// The `- [ ] ` marker is real, marked text now (see `list-marker.ts`),
+		// not markup synthesized only at save time - `textContent` (unlike
+		// `getByText`) still finds it while it's CSS-hidden, which it is here
+		// since the caret sits at the end of "Ship footnotes", not on the
+		// marker itself (`create-marker-reveal-provider.ts`).
+		expect(container.querySelector('li')?.textContent).toBe(
+			'- [ ] Ship footnotes'
+		)
+	})
+
+	// Regression: the stock `CodeBlock` extension's own backtick input rule
+	// only sets a `language` attribute, which this schema no longer has - the
+	// resulting block used to have no fence text in it at all (nothing to
+	// syntax-highlight, and unfenced plain text on save). `code-block-extension.ts`
+	// supersedes it with one that inserts a real fence instead.
+	it('typing a fenced code block trigger inserts real fence text, language included', async () => {
+		const { container } = render(<EditorModeLive content="" />)
+
+		await userEvent.click(screen.getByRole('textbox'))
+		await userEvent.keyboard('```ts ')
+
+		const code = container.querySelector('pre code.language-ts')
+		expect(code).not.toBeNull()
+		expect(code?.textContent).toBe('```ts\n\n```')
+	})
+
+	// Regression: the input rule's handler ran before the very keystroke that
+	// completed its own trigger (the closing `*`/`~`) had reached the document
+	// - `state.doc` was one character short of the match it had just
+	// recognized. Continuing to type afterward then found a "run" one
+	// character short of its own closing delimiter on every subsequent
+	// keystroke, and the safety net kept re-wrapping it - `**b**o**l**d**`
+	// from typing "bold" straight through after the trigger.
+	it('typing "**bold**" and continuing to type does not corrupt the run', async () => {
+		const { container } = render(<EditorModeLive content="" />)
+
+		await userEvent.click(screen.getByRole('textbox'))
+		await userEvent.keyboard('Some **bold** text')
+
+		const strongs = container.querySelectorAll('strong')
+		expect(strongs).toHaveLength(1)
+		expect(strongs[0].textContent).toBe('**bold**')
+		expect(container.querySelector('[role="textbox"]')?.textContent).toBe(
+			'Some **bold** text'
+		)
 	})
 
 	// Outside VSCode the notes are served from the site root, so the author's
@@ -175,6 +220,15 @@ describe('Editor Mode Live', () => {
 			'https://file+.vscode-resource.vscode-cdn.net/Users/dev/notes/docs/diagram.png'
 		)
 	})
+
+	// Images have no text content of their own to reveal via the caret the way
+	// every other construct does (see `image-view.tsx`), so selecting one is
+	// what stands in for "the caret is on it".
+	// Selecting an image and committing an edited source live in
+	// `e2e/image-edit-source.spec.ts`. Both need the `NodeSelection` a click on
+	// an `atom: true` node produces, and only a real browser produces it -
+	// happy-dom leaves a plain caret, which used to satisfy a looser check here
+	// and hid the bug where a caret merely *beside* the image opened its field.
 
 	it('renders a mermaid block as a diagram, not as source', async () => {
 		render(<EditorModeLive content={MERMAID_NOTE} />)
@@ -343,7 +397,7 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={'# Roadmap\n\nShip it.'} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			await userEvent.click(screen.getByText('Ship it.'))
 			await userEvent.keyboard(' Today.')
 
@@ -360,12 +414,12 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={'# Roadmap\n\nShip it.'} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 
 			rerender(<EditorModeLive content={'# Backlog\n\nSoon.'} />)
 
 			expect(
-				await screen.findByRole('heading', { name: 'Backlog' })
+				await screen.findByRole('heading', { name: '# Backlog' })
 			).toBeInTheDocument()
 			expect(screen.getByText('Soon.')).toBeInTheDocument()
 		})
@@ -422,7 +476,7 @@ describe('Editor Mode Live', () => {
 		it('saves a note the author has emptied entirely', async () => {
 			render(<EditorModeLive content={'# Roadmap\n\nShip it.'} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			await userEvent.click(screen.getByText('Ship it.'))
 			await userEvent.keyboard('{Control>}a{/Control}{Backspace}')
 
@@ -437,7 +491,7 @@ describe('Editor Mode Live', () => {
 		it('autosaves an ordinary edit once the typing pauses', async () => {
 			render(<EditorModeLive content={'# Roadmap\n\nShip it.'} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			await userEvent.click(screen.getByText('Ship it.'))
 			await userEvent.keyboard(' Today.')
 
@@ -468,7 +522,7 @@ describe('Editor Mode Live', () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
 
 			expect(
-				await screen.findByRole('heading', { name: 'Roadmap' })
+				await screen.findByRole('heading', { name: '# Roadmap' })
 			).toBeInTheDocument()
 		})
 
@@ -481,7 +535,7 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={FRONTMATTER_NOTE} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			const before = container.querySelector('.ProseMirror')?.textContent
 
 			await userEvent.keyboard('{Control>}z{/Control}')
@@ -496,7 +550,7 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={FRONTMATTER_NOTE} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			const block = container.querySelector('[data-type="frontmatter"]')
 			expect(block?.textContent).toContain('title: Roadmap')
 			expect(block?.textContent).toContain('status: draft')
@@ -511,26 +565,36 @@ describe('Editor Mode Live', () => {
 			const note = ['---', 'title: Roadmap', '---', '', '# Roadmap'].join('\n')
 			const { container } = render(<EditorModeLive content={note} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
-			// Clicking the first token rather than the full line: syntax
-			// highlighting may or may not have split the text into spans by the
-			// time this runs, and 'title' alone is a match either way.
-			await userEvent.click(screen.getByText(/^title/))
-			for (let index = 0; index < 20; index += 1) {
+			await screen.findByRole('heading', { name: '# Roadmap' })
+			// Caret entry alone no longer reveals the raw fences (Phase 1.1) -
+			// "Edit source" is required to reach the editable text this test
+			// navigates through.
+			await userEvent.click(screen.getByLabelText('Edit frontmatter source'))
+			// Clicking anywhere in the block's text, then overshooting with
+			// ArrowLeft, reaches its very start regardless of exactly where the
+			// click landed - the raw view is now the whole fence-included text
+			// as one block (Phase 1.1), longer than the single "title" span this
+			// used to click, so the overshoot count is generous rather than
+			// tied to one exact offset.
+			await userEvent.click(screen.getByText(/title/))
+			for (let index = 0; index < 40; index += 1) {
 				await userEvent.keyboard('{ArrowLeft}')
 			}
 			await userEvent.keyboard('{ArrowUp}')
 			await userEvent.keyboard('x')
 
+			// Typing right before the opening fence breaks it too - Phase 1.1
+			// surfaces that with a visible error rather than silently rendering
+			// as if the block were still well-formed.
 			expect(
 				container.querySelector('[data-type="frontmatter"]')?.textContent
-			).toBe('Frontmatterxtitle: Roadmap')
+			).toBe('FrontmatterNeeds a closing --- fencex---\ntitle: Roadmap\n---')
 		})
 
 		it('hides the add-frontmatter button for a note that already has one', async () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			expect(
 				screen.queryByRole('button', { name: 'Add frontmatter' })
 			).not.toBeInTheDocument()
@@ -539,7 +603,7 @@ describe('Editor Mode Live', () => {
 		it('shows the add-frontmatter button for a note without one', async () => {
 			render(<EditorModeLive content={'# Roadmap\n\nShip it.'} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			expect(
 				screen.getByRole('button', { name: 'Add frontmatter' })
 			).toBeInTheDocument()
@@ -552,7 +616,7 @@ describe('Editor Mode Live', () => {
 		it('saves a body the author has emptied, keeping the frontmatter', async () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			await userEvent.click(screen.getByText('Ship it.'))
 			await userEvent.keyboard('{Backspace}'.repeat('Ship it.'.length))
 
@@ -572,7 +636,10 @@ describe('Editor Mode Live', () => {
 		it('saves edits made directly in the frontmatter block, fences preserved', async () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
+			// Caret entry alone no longer reveals the raw fences (Phase 1.1) -
+			// "Edit source" is required to reach the editable text below.
+			await userEvent.click(screen.getByLabelText('Edit frontmatter source'))
 			// Syntax highlighting splits the block's text into several `<span>`s
 			// ('status', ': ', 'draft') - clicking the last one lands the cursor at
 			// its end, the same place a click already lands in the plain-paragraph
@@ -595,7 +662,7 @@ describe('Editor Mode Live', () => {
 
 		it('copies the frontmatter text via its copy button', async () => {
 			render(<EditorModeLive content={FRONTMATTER_NOTE} />)
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 
 			await userEvent.click(screen.getByLabelText('Copy frontmatter'))
 
@@ -609,7 +676,7 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={FRONTMATTER_NOTE} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			// A real pause, not a scripting convenience: the load and the delete
 			// need to land in separate `prosemirror-history` groups (grouped by
 			// wall-clock proximity, ~500ms) for the later Ctrl+Z to undo only the
@@ -639,7 +706,7 @@ describe('Editor Mode Live', () => {
 				<EditorModeLive content={'# Roadmap\n\nShip it.'} />
 			)
 
-			await screen.findByRole('heading', { name: 'Roadmap' })
+			await screen.findByRole('heading', { name: '# Roadmap' })
 			await userEvent.click(
 				screen.getByRole('button', { name: 'Add frontmatter' })
 			)

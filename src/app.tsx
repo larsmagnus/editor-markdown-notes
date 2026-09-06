@@ -19,7 +19,7 @@ function App({
 	return (
 		// Outermost, so a throw from the providers themselves still reports rather
 		// than leaving the panel blank with nothing in the log channel.
-		<AppErrorBoundary title="The editor">
+		<AppErrorBoundary title="The editor stopped working">
 			<SettingsProvider
 				initialViewOptions={initialViewOptions}
 				initialSettings={initialSettings}

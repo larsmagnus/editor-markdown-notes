@@ -6,6 +6,7 @@ import {
 	findFocusableInDirection,
 } from '@/editor/extensions/focus-navigation/focusable-elements'
 import type { FocusDirection } from '@/editor/extensions/focus-navigation/focusable-elements'
+import { skipHeadingMarker } from '@/editor/extensions/focus-navigation/skip-heading-marker'
 
 /**
  * Places the caret at `pos` (or the nearest real text position) and gives
@@ -27,7 +28,8 @@ function focusAtPosition(
 ): void {
 	editor.commands.command(({ tr, dispatch }) => {
 		if (dispatch) {
-			tr.setSelection(TextSelection.near(tr.doc.resolve(pos), direction))
+			const target = skipHeadingMarker(tr.doc, pos, direction)
+			tr.setSelection(TextSelection.near(tr.doc.resolve(target), direction))
 		}
 		return true
 	})

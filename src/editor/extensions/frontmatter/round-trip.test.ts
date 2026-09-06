@@ -2,6 +2,7 @@ import { Editor } from '@tiptap/react'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { extensions } from '@/editor/extensions/extensions'
+import { frontmatterFenceText } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import { splitFrontmatter } from '@/lib/host/frontmatter'
 
 const editors: Editor[] = []
@@ -29,10 +30,12 @@ function roundTripWithFrontmatter(markdown: string): string {
 	editors.push(editor)
 	const { frontmatter, body } = splitFrontmatter(markdown)
 	editor.commands.setContent(body)
-	editor.commands.insertContentAt(0, {
-		type: 'frontmatter',
-		content: frontmatter ? [{ type: 'text', text: frontmatter }] : [],
-	})
+	if (frontmatter !== null) {
+		editor.commands.insertContentAt(0, {
+			type: 'frontmatter',
+			content: [{ type: 'text', text: frontmatterFenceText(frontmatter) }],
+		})
+	}
 	return String(editor.storage.markdown.getMarkdown()).trimEnd()
 }
 

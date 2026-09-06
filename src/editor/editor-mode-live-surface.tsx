@@ -57,7 +57,7 @@ export function EditorSurface({
 			    height instead of collapsing to the document's own content
 			    height, so the whole column is a click target - not just the
 			    text. The sticky text-tools panel stays top-aligned. */}
-			<div className="relative min-w-0 flex-1 self-stretch">
+			<div className="relative min-w-xs flex-1 self-stretch">
 				<p id={EDITOR_KEYBOARD_HINT_ID} className="sr-only">
 					Press Escape, then Tab, to move keyboard focus out of the document
 					text.
@@ -70,6 +70,7 @@ export function EditorSurface({
 								includeProseBaseClassNames &&
 									'prose dark:prose-invert prose-headings:font-bold prose-headings:text-black dark:prose-headings:text-white',
 								'prose-code:before:content-none prose-code:after:content-none',
+								'prose-blockquote:not-italic prose-blockquote:[&_p:first-of-type]:before:content-none prose-blockquote:[&_p:last-of-type]:after:content-none',
 								'prose-headings:first:mt-0 prose-p:first:mt-0',
 								className
 							)}

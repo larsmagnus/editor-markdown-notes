@@ -37,7 +37,7 @@ describe('ButtonAdd', () => {
 		).not.toBeInTheDocument()
 	})
 
-	it('inserts an empty frontmatter node at the top of the document when clicked', async () => {
+	it('inserts a fenced, empty frontmatter node at the top of the document when clicked', async () => {
 		const editor = new Editor({ extensions, content: '# Roadmap' })
 		editors.push(editor)
 
@@ -47,6 +47,8 @@ describe('ButtonAdd', () => {
 		)
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('')
+		expect(editor.state.doc.firstChild?.textContent).toBe('---\n\n---')
+		// The caret lands on the blank line between the fences, ready to type.
+		expect(editor.state.selection.from).toBe(5)
 	})
 })

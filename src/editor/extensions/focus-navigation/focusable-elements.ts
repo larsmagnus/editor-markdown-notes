@@ -1,5 +1,3 @@
-import { IMAGE_TOOLBAR_ID } from '@/editor/extensions/image/keyboard-nav'
-
 /** Direction to search in: forward toward the end of the page, or back. */
 export type FocusDirection = 1 | -1
 
@@ -40,10 +38,10 @@ function isUnfocusableInlineMark(element: HTMLElement): boolean {
  * pairs it with a visible `role="checkbox"` element). `checkVisibility`
  * (CSS only, not opacity) excludes `display: none`/detached/`visibility:
  * hidden` elements while still keeping the `opacity-0` hover-reveal buttons
- * on code blocks and the mermaid toolbar, which are genuinely focusable
- * today. Excludes the image bubble menu and Radix popovers, which have
- * their own Tab/arrow-key navigation, and the ProseMirror root itself - the
- * frame of reference this measures against, never a destination.
+ * on code blocks, the mermaid toolbar, and the image toolbar, which are all
+ * genuinely focusable today. Excludes Radix popovers, which have their own
+ * Tab/arrow-key navigation, and the ProseMirror root itself - the frame of
+ * reference this measures against, never a destination.
  */
 export function getPageFocusableElements(): HTMLElement[] {
 	return Array.from(
@@ -55,9 +53,7 @@ export function getPageFocusableElements(): HTMLElement[] {
 			element.checkVisibility({ checkVisibilityCSS: true }) &&
 			element.contentEditable !== 'true' &&
 			!isUnfocusableInlineMark(element) &&
-			!element.closest(
-				`#${IMAGE_TOOLBAR_ID}, [data-radix-popper-content-wrapper]`
-			)
+			!element.closest('[data-radix-popper-content-wrapper]')
 	)
 }
 

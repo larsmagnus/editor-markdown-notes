@@ -9,6 +9,10 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
+import {
+	fenceText,
+	parseFence,
+} from '@/editor/extensions/code-block/code-fence'
 import { MERMAID_LANGUAGE } from '@/editor/extensions/mermaid/language'
 import { runAskCommand } from '@/editor/extensions/slash-command/ask-command'
 import { runInsertImageCommand } from '@/editor/extensions/slash-command/insert-image-command'
@@ -58,10 +62,15 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
 		run: (editor, range) =>
 			runWithRange(editor, range, (chain) =>
 				chain
-					.setCodeBlock({ language: MERMAID_LANGUAGE })
+					.setCodeBlock()
 					// A JSON text node, not a markdown/HTML string: `insertContent`
 					// parses a string as HTML by default, which double-escapes `-->`.
-					.insertContent({ type: 'text', text: 'graph TD\n  A --> B' })
+					// `language` is no longer a node attribute (see `code-block-extension.ts`),
+					// so the fence line carries it as real text instead.
+					.insertContent({
+						type: 'text',
+						text: fenceText('graph TD\n  A --> B', MERMAID_LANGUAGE),
+					})
 			),
 	},
 	{
@@ -69,8 +78,25 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
 		label: 'Code block',
 		keywords: ['code', 'snippet', 'fence', 'pre'],
 		icon: Code2,
-		run: (editor, range) =>
-			runWithRange(editor, range, (chain) => chain.setCodeBlock()),
+		run: (editor, range) => {
+			// A blank line between the fences, not `fenceText('', '')` (which
+			// collapses to "```\n```", no gap) - that builder exists to
+			// round-trip an already-empty block byte-for-byte, but here the
+			// author is about to type, and typing right where the fences touch
+			// would run straight into the closing one.
+			const text = '```\n\n```'
+			runWithRange(editor, range, (chain) =>
+				chain
+					.setCodeBlock()
+					.insertContent({ type: 'text', text })
+					// `setCodeBlock` converts the block in place, so `range.from` is
+					// already the content's own start position (unlike `button-add.tsx`,
+					// which inserts a brand new node and has to add 1 for it) - derived
+					// from the fence's own parse rather than hand-counted, which is what
+					// let this drift out of sync with the text above once already.
+					.setTextSelection(range.from + parseFence(text).codeFrom)
+			)
+		},
 	},
 	{
 		id: 'task-list',

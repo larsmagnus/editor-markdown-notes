@@ -1,10 +1,18 @@
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
-import type { ProseExclusion } from '@/lib/text-tools/prose-policy'
+import { blockquoteMarkerLength } from '@/editor/extensions/blockquote/blockquote-marker'
+import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
+import { headingMarkerLength } from '@/editor/extensions/heading/heading-marker'
+import { parseListMarker } from '@/editor/extensions/list/list-marker'
+import {
+	appendTextblockChildren,
+	IGNORED_NODES,
+} from '@/lib/text-tools/append-textblock-children'
+import { delimiterRanges } from '@/lib/text-tools/delimiter-ranges'
+import type { TextSlice } from '@/lib/text-tools/delimiter-ranges'
 import {
 	BLOCK_SEPARATOR,
 	frontmatterLineOffsets,
-	PROSE_SUBSTITUTE,
 } from '@/lib/text-tools/prose-policy'
 
 /**
@@ -12,49 +20,38 @@ import {
  * enough of a trail to turn the offsets it reports back into positions.
  */
 
-/** A run of text and the document position its first character sits at. */
-type TextSlice = {
-	/** Offset of this run within the flattened text. */
-	offset: number
-	length: number
-	/** Position of the run's first character in the ProseMirror document. */
-	from: number
-}
-
 export type DocumentText = {
 	text: string
 	slices: TextSlice[]
 }
 
 /**
- * This document's own name for each excluded construct.
- *
- * Keyed by `ProseExclusion` so a construct added to the shared policy fails to
- * compile here until this walk handles it too. `atomInline` is empty because it
- * is the fallback for every inline node that carries no text of its own, and
- * `inlineCode` names a mark rather than a node.
+ * How much of `node`'s own leading text is markup, not prose - a heading's
+ * `#`x`level`, a list item's own bullet/ordered/task marker, or a
+ * blockquote's own `"> "` (each real text held by its *first paragraph*,
+ * `node` here, not the `listItem`/`taskItem`/`blockquote` wrapping it - that
+ * wrapper is never itself a textblock, so the walk below never visits it
+ * directly).
  */
-const PROSE_MIRROR_NAMES: Record<ProseExclusion, readonly string[]> = {
-	// Code is not prose, and skipping the node also keeps mermaid sources
-	// unlinted.
-	codeBlock: ['codeBlock'],
-	// An inline `code` span holds identifiers, commands and paths - `useEffect`,
-	// `pnpm run build` - which no writing check has an opinion worth hearing
-	// about, and which the speller would flag almost without exception.
-	inlineCode: ['code'],
-	hardBreak: ['hardBreak'],
-	atomInline: [],
+function leadingMarkerLength(
+	node: ProseMirrorNode,
+	parent: ProseMirrorNode | null,
+	index: number
+): number {
+	if (node.type.name === 'heading') return headingMarkerLength(node.textContent)
+
+	if (index !== 0) return 0
+
+	if (parent?.type.name === 'listItem' || parent?.type.name === 'taskItem') {
+		return parseListMarker(node.textContent)?.markerLength ?? 0
+	}
+
+	if (parent?.type.name === 'blockquote') {
+		return blockquoteMarkerLength(node.textContent)
+	}
+
+	return 0
 }
-
-const IGNORED_NODES = new Set(PROSE_MIRROR_NAMES.codeBlock)
-const IGNORED_MARKS = new Set(PROSE_MIRROR_NAMES.inlineCode)
-
-/** What an inline node that carries no text of its own stands in as. */
-const INLINE_PLACEHOLDER = new Map(
-	PROSE_MIRROR_NAMES.hardBreak.map(
-		(name) => [name, PROSE_SUBSTITUTE.hardBreak] as const
-	)
-)
 
 /**
  * Splits a frontmatter block into one "block" per YAML line rather than
@@ -80,10 +77,17 @@ function appendFrontmatterLines(
 ): string {
 	let result = text
 
-	// `pos` is the frontmatter node itself; its content starts one inside, and
-	// `offset` walks `textContent`, which - `content: 'text*'`, no marks - lines
-	// up with document positions one-for-one.
-	for (const { value, offset } of frontmatterLineOffsets(node.textContent)) {
+	// The block's own `---` fence lines are real text in its content now (see
+	// `frontmatter-fence.ts`), not just markup added at save time - stripped
+	// here the same way `frontmatter-prose.ts` strips them on the MCP side, or
+	// the fence lines themselves would reach retext as if they were YAML prose.
+	const { codeFrom, codeTo } = parseFrontmatterFence(node.textContent)
+	const yaml = node.textContent.slice(codeFrom, codeTo)
+
+	// `pos` is the frontmatter node itself; its content starts one inside, then
+	// `codeFrom` past the opening fence line, and `offset` walks `yaml`, which -
+	// `content: 'text*'`, no marks - lines up with document positions one-for-one.
+	for (const { value, offset } of frontmatterLineOffsets(yaml)) {
 		// Reuses the same "already have text" check the block separator uses
 		// everywhere else, so a line joins the block before it exactly the way
 		// the block itself joins whatever textblock came before it.
@@ -91,7 +95,7 @@ function appendFrontmatterLines(
 		slices.push({
 			offset: result.length,
 			length: value.text.length,
-			from: pos + 1 + offset + value.start,
+			from: pos + 1 + codeFrom + offset + value.start,
 		})
 		result += value.text
 	}
@@ -102,8 +106,10 @@ function appendFrontmatterLines(
 export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 	const slices: TextSlice[] = []
 	let text = ''
+	const exclusions = delimiterRanges(doc)
+	const cursor = { index: 0 }
 
-	doc.descendants((node, pos) => {
+	doc.descendants((node, pos, parent, index) => {
 		if (IGNORED_NODES.has(node.type.name)) return false
 		if (!node.isTextblock) return true
 
@@ -114,38 +120,15 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 
 		if (text) text += BLOCK_SEPARATOR
 
-		// Inline children are walked rather than using `textContent`, because a
-		// paragraph split by marks holds several text nodes and only their own
-		// positions place them correctly.
-		node.forEach((child, childOffset) => {
-			// Stood in for rather than dropped, for the same reason an image is:
-			// `the `code` span` would otherwise reach retext as `the span`, and
-			// text on either side of a bare `` `x` `` would weld into one word.
-			if (child.marks.some((mark) => IGNORED_MARKS.has(mark.type.name))) {
-				text += PROSE_SUBSTITUTE.inlineCode
-				return
-			}
-
-			if (!child.isText || !child.text) {
-				// An unmapped separator, so the text on either side of an image or a
-				// hard break is not welded into one word. `line<br>second` would
-				// otherwise reach retext as `linesecond`, which it counts as a single
-				// long word and scores the sentence's readability against.
-				if (child.isInline)
-					text +=
-						INLINE_PLACEHOLDER.get(child.type.name) ??
-						PROSE_SUBSTITUTE.atomInline
-				return
-			}
-
-			slices.push({
-				offset: text.length,
-				length: child.text.length,
-				// `pos` is the textblock itself; its content starts one inside.
-				from: pos + 1 + childOffset,
-			})
-			text += child.text
-		})
+		text = appendTextblockChildren(
+			node,
+			pos,
+			text,
+			exclusions,
+			cursor,
+			slices,
+			leadingMarkerLength(node, parent, index)
+		)
 
 		return false
 	})

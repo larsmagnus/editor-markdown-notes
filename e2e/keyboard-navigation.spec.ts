@@ -1,9 +1,10 @@
 import { readFileSync } from 'fs'
 
-import { expect, test } from '@playwright/test'
-
-import { openInVSCode, tabUntilFocused } from '@/e2e/lib/helpers'
+import { expect, test } from '@/e2e/lib/fixtures'
+import { tabUntilFocused } from '@/e2e/lib/focus'
+import { actionSettled } from '@/e2e/lib/press-key-settled'
 import { collectTabWalk } from '@/e2e/lib/tab-walk'
+import { openInVSCode } from '@/e2e/lib/vscode-host'
 
 test.describe('Keyboard navigation in the live editor', () => {
 	test('Tab walks every interactive element in the document and the text tools sidebar exactly once', async ({
@@ -15,11 +16,11 @@ test.describe('Keyboard navigation in the live editor', () => {
 
 		const signatures = await collectTabWalk(page)
 
-		// A repeat is what focus looping back onto an earlier stop looks like.
 		expect(new Set(signatures).size).toBe(signatures.length)
 		// Sanity check the walk covered real content, not just the toolbar.
 		expect(signatures.length).toBeGreaterThan(30)
 	})
+
 	test('Tab from outside the editor reaches the frontmatter panel before the body, in visual order', async ({
 		page,
 	}) => {
@@ -41,8 +42,10 @@ test.describe('Keyboard navigation in the live editor', () => {
 		await page.keyboard.press('Tab')
 		await page.keyboard.press('Q')
 
+		// The `#` marker is real, marked text now (see `heading-extension.ts`),
+		// not markup synthesized only at save time.
 		await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-			/^QEditor Markdown Notes/
+			/^# QEditor Markdown Notes/
 		)
 	})
 
@@ -67,7 +70,19 @@ test.describe('Keyboard navigation in the live editor', () => {
 		const paragraph = content.locator('p').first()
 		const copyButtons = page.getByRole('button', { name: 'Copy code' })
 
-		await paragraph.click()
+		// Escape reads its arm position from ProseMirror's selection state, so the
+		// click has to have settled first or it arms at a stale position. Shiki's
+		// async re-render of each code block can still be in flight too - wait for
+		// both to finish coloring, or the re-render can land between Escape and Tab
+		// and lose the one-shot.
+		await actionSettled(page, () => paragraph.click())
+		await expect(content).toBeFocused()
+		await expect(
+			content.locator('pre code span[style*="color"]').first()
+		).toBeVisible()
+		await expect(
+			content.locator('pre code span[style*="color"]').last()
+		).toBeVisible()
 		await page.keyboard.press('Escape')
 		await page.keyboard.press('Tab')
 
@@ -101,7 +116,8 @@ test.describe('Keyboard navigation in the live editor', () => {
 		await openInVSCode(page, 'Just a paragraph with nothing interactive.')
 		const content = page.getByRole('textbox').first()
 
-		await content.locator('p').click()
+		await actionSettled(page, () => content.locator('p').click())
+		await expect(content).toBeFocused()
 		await page.keyboard.press('Escape')
 		await page.keyboard.press('Shift+Tab')
 
@@ -149,7 +165,7 @@ test.describe('Keyboard navigation in the live editor', () => {
 		await page.keyboard.press('Enter')
 		await expect(sidebar).not.toBeFocused()
 		await expect(
-			page.getByRole('button', { name: 'Copy frontmatter' })
+			page.getByRole('button', { name: 'Edit frontmatter source' })
 		).toBeFocused()
 	})
 })

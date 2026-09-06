@@ -3,6 +3,8 @@ import { Fragment } from '@tiptap/pm/model'
 import { Selection } from '@tiptap/pm/state'
 import type { EditorState, Transaction } from '@tiptap/pm/state'
 
+import { frontmatterFenceText } from '@/editor/extensions/frontmatter/frontmatter-fence'
+
 /**
  * A paragraph made only of text (and marks) - the shape a line of typed YAML
  * takes. Images are inline nodes, so a paragraph holding one still passes a
@@ -19,19 +21,13 @@ function isPlainParagraph(node: ProseMirrorNode): boolean {
 }
 
 /**
- * Promotes a manually typed `---`/content/`---` block at the very top of the
- * document into a real `frontmatter` node, the instant the closing fence
- * completes.
+ * Promotes a typed `---`/content/`---` block at the top of the document into a
+ * real `frontmatter` node the instant the closing fence completes.
  *
- * markdown-it's own autoformat is what turns a bare `---` line into a
- * `horizontalRule` node - by the time this runs the fences are already
- * separate block nodes, so the pattern to catch is `horizontalRule → content →
- * horizontalRule` sitting at the very start of the doc, not a text pattern.
- *
- * A document that legitimately opens with two horizontal rules and plain-text
- * content between them (rare, but real) is indistinguishable from typed
- * frontmatter by shape alone and gets promoted too - an accepted false
- * positive, not solved here.
+ * The pattern to catch is `horizontalRule → content → horizontalRule`, not a
+ * text pattern: markdown-it has already turned each bare `---` into its own
+ * block node by the time this runs. A document that genuinely opens with two
+ * rules around plain text is indistinguishable by shape and gets promoted too.
  */
 export function detectFrontmatter(state: EditorState): Transaction | null {
 	const { doc, schema } = state
@@ -59,15 +55,12 @@ export function detectFrontmatter(state: EditorState): Transaction | null {
 	// No closing fence yet - still typing.
 	if (closingIndex === -1) return null
 
-	// Anything richer than plain paragraphs between the fences (headings,
-	// images, lists, tables, ...) is far more likely to be unrelated content
-	// that happens to sit above some other horizontal rule lower in the
-	// document than intentional YAML - sweeping all of it into frontmatter
-	// would silently swallow real structure. Only the fence just typed becomes
-	// an (empty) frontmatter block in that case; everything else, the closing
-	// fence included, is left exactly as it was.
+	// Anything richer than plain paragraphs is far likelier to be real content
+	// sitting above an unrelated horizontal rule than intentional YAML, and
+	// sweeping it in would swallow real structure. Only the typed fence becomes
+	// an empty frontmatter block; everything else is left as it was.
 	if (!allPlain) {
-		const node = frontmatter.create()
+		const node = frontmatter.create(null, schema.text(frontmatterFenceText('')))
 		const tr = state.tr.replaceWith(0, doc.firstChild.nodeSize, node)
 		tr.setSelection(Selection.near(tr.doc.resolve(node.nodeSize)))
 		return tr
@@ -80,9 +73,7 @@ export function detectFrontmatter(state: EditorState): Transaction | null {
 	const text = lines.join('\n')
 
 	const end = closingPos + doc.child(closingIndex).nodeSize
-	const node = text
-		? frontmatter.create(null, schema.text(text))
-		: frontmatter.create()
+	const node = frontmatter.create(null, schema.text(frontmatterFenceText(text)))
 
 	// `block+` requires at least one block after frontmatter - a document that
 	// was nothing but the typed pattern needs an empty paragraph to stay valid.

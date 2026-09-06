@@ -9,13 +9,10 @@ import type { Occurrence } from '@/editor/extensions/search-reveal/find-occurren
 /**
  * Highlights the matches a note was opened on from the search view.
  *
- * Deliberately dumb, the same shape as `text-tools-extension.ts`: React finds
- * the ranges and hands them down, the extension only draws them. `useEditor`
- * builds the editor once, so an extension list that varied with whether a
- * reveal exists would tear the editor down.
- *
- * The name matches no `tiptap-markdown` serializer, so nothing here can reach
- * what gets written back to disk.
+ * Deliberately dumb: React finds the ranges and hands them down, the extension
+ * only draws them, because `useEditor` builds the editor once and a
+ * conditional extension list would tear it down. The name matches no
+ * `tiptap-markdown` serializer, so nothing here can reach disk.
  */
 
 const searchRevealPluginKey = new PluginKey<DecorationSet>('searchReveal')
@@ -37,9 +34,8 @@ function toDecorations(
 		if (occurrence.to > doc.content.size) return []
 
 		return Decoration.inline(occurrence.from, occurrence.to, {
-			// The first, which is the one scrolled to: the host names one match and
-			// the rest are found by looking for the same text, so document order is
-			// all there is to go on.
+			// The first is the one scrolled to: the host names one match and the
+			// rest are found by the same text, so document order is all there is.
 			class:
 				index === 0
 					? `search-reveal-match ${SEARCH_REVEAL_TARGET_CLASS}`
@@ -97,17 +93,14 @@ export const SearchRevealHighlight = Extension.create({
 				searchRevealPluginKey,
 				toDecorations,
 				{
-					// The first thing to change the document after a reveal is not the
-					// reader: the trailing-paragraph and frontmatter housekeeping
-					// transactions both land after mount, and clearing on those wiped
-					// every highlight before it was ever seen. A real edit clears
-					// through `handleDOMEvents` below instead - mapping, not dropping,
-					// is what keeps the highlight alive until then.
+					// The first document change after a reveal is not the reader's: the
+					// trailing-paragraph and frontmatter housekeeping transactions land
+					// after mount, and clearing on those wiped every highlight before it
+					// was seen. A real edit clears through `handleDOMEvents` instead.
 					clearable: true,
 					props: {
-						// The reveal answers one click and is finished, so the first thing
-						// the reader does with the note takes it down. Never handles the
-						// event - it only watches for one.
+						// The reveal answers one click and is finished, so the reader's first
+						// interaction takes it down. Never handles the event, only watches.
 						handleDOMEvents: {
 							mousedown: clearOnInteraction,
 							keydown: clearOnInteraction,

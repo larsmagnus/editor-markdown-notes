@@ -82,7 +82,9 @@ describe('getDocumentText', () => {
 		editor.commands.setContent('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
-			content: [{ type: 'text', text: 'title: Roadmap\nstatus: draft' }],
+			content: [
+				{ type: 'text', text: '---\ntitle: Roadmap\nstatus: draft\n---' },
+			],
 		})
 
 		// Joined the same way separate blocks are elsewhere - retext has no
@@ -95,13 +97,32 @@ describe('getDocumentText', () => {
 		)
 	})
 
+	// Regression: the `---` fence lines are real text in the node's own content
+	// now, not markup added only at save time - fed to `getDocumentText`
+	// unstripped, they used to reach retext as if they were YAML prose lines.
+	it('excludes the --- fence lines from the analyzed text', () => {
+		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
+		editor.commands.setContent('Real prose here.')
+		editor.commands.insertContentAt(0, {
+			type: 'frontmatter',
+			content: [{ type: 'text', text: '---\ntitle: Roadmap\n---' }],
+		})
+
+		const { text } = getDocumentText(editor.state.doc)
+		expect(text).not.toContain('-')
+		expect(text).toBe('Roadmap\n\nReal prose here.')
+	})
+
 	it('drops a blank line inside frontmatter rather than emitting an empty block', () => {
 		const editor = new Editor({ extensions, content: '' })
 		currentEditor = editor
 		editor.commands.setContent('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
-			content: [{ type: 'text', text: 'title: Roadmap\n\nstatus: draft' }],
+			content: [
+				{ type: 'text', text: '---\ntitle: Roadmap\n\nstatus: draft\n---' },
+			],
 		})
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
@@ -115,7 +136,9 @@ describe('getDocumentText', () => {
 		editor.commands.setContent('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
-			content: [{ type: 'text', text: 'tags:\n  - Some prose in a list' }],
+			content: [
+				{ type: 'text', text: '---\ntags:\n  - Some prose in a list\n---' },
+			],
 		})
 
 		// A bare `tags:` has no value to keep, so it contributes nothing; the
@@ -129,7 +152,10 @@ describe('getDocumentText', () => {
 		const editor = new Editor({ extensions, content: '' })
 		currentEditor = editor
 		editor.commands.setContent('Real prose here.')
-		editor.commands.insertContentAt(0, { type: 'frontmatter' })
+		editor.commands.insertContentAt(0, {
+			type: 'frontmatter',
+			content: [{ type: 'text', text: '---\n---' }],
+		})
 
 		expect(getDocumentText(editor.state.doc).text).toBe('Real prose here.')
 	})
@@ -169,6 +195,68 @@ describe('getDocumentText', () => {
 		expect(getDocumentText(editor.state.doc).text).toBe('see here')
 	})
 
+	// Regression: once a mark's delimiters are ensured into real document text
+	// (`ensure-delimiters-plugin.ts`), a run built directly with that text -
+	// the shape any already-open document actually has, since `new Editor({
+	// content })` alone never runs that safety net - used to reach retext with
+	// its `**`/`~~` intact, which can hide a phrase-level issue the delimiter
+	// breaks apart.
+	it('strips bold and strike delimiters but keeps the marked text as prose', () => {
+		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{
+					type: 'paragraph',
+					content: [
+						{ type: 'text', text: 'This is ' },
+						{ type: 'text', marks: [{ type: 'bold' }], text: '**truly**' },
+						{ type: 'text', text: ' and ' },
+						{ type: 'text', marks: [{ type: 'strike' }], text: '~~struck~~' },
+						{ type: 'text', text: ' fine.' },
+					],
+				},
+			],
+		})
+
+		const documentText = getDocumentText(editor.state.doc)
+		expect(documentText.text).toBe('This is truly and struck fine.')
+
+		const from = offsetToPosition(
+			documentText,
+			documentText.text.indexOf('fine')
+		)
+		expect(from).not.toBeNull()
+		expect(editor.state.doc.textBetween(from ?? 0, (from ?? 0) + 4)).toBe(
+			'fine'
+		)
+	})
+
+	it('strips italic delimiters but keeps the marked text as prose', () => {
+		const editor = new Editor({ extensions, content: '' })
+		currentEditor = editor
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{
+					type: 'paragraph',
+					content: [
+						{ type: 'text', text: 'This is ' },
+						{
+							type: 'text',
+							marks: [{ type: 'italic', attrs: { markup: '_' } }],
+							text: '_truly_',
+						},
+						{ type: 'text', text: ' fine.' },
+					],
+				},
+			],
+		})
+
+		expect(getDocumentText(editor.state.doc).text).toBe('This is truly fine.')
+	})
+
 	it('reads headings and list items as prose too', () => {
 		const editor = new Editor({
 			extensions,
@@ -179,5 +267,53 @@ describe('getDocumentText', () => {
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'A heading\n\nOne item\n\nAnother'
 		)
+	})
+
+	it('reads a blockquote as prose too, without its own leading "> "', () => {
+		const editor = new Editor({
+			extensions,
+			content: '> A quoted sentence.',
+		})
+		currentEditor = editor
+
+		expect(getDocumentText(editor.state.doc).text).toBe('A quoted sentence.')
+	})
+})
+
+/**
+ * A mark's delimiters only become real text on the transaction after it is
+ * parsed, so a freshly built document never shows this - which is exactly the
+ * shape the parity harness compares against. These drive an edit through first,
+ * putting the document in the state it actually holds while being typed in.
+ */
+describe('getDocumentText once delimiters are real text', () => {
+	it('keeps a link out of the prose it hands retext', () => {
+		const editor = new Editor({
+			extensions,
+			content: 'Read [the guide](https://example.com/guide) first.',
+		})
+		editor.commands.insertContentAt(1, 'x')
+		editor.commands.deleteRange({ from: 1, to: 2 })
+
+		expect(editor.state.doc.textContent).toContain(
+			'](https://example.com/guide)'
+		)
+		expect(getDocumentText(editor.state.doc).text).toBe('Read the guide first.')
+
+		editor.destroy()
+	})
+
+	it('keeps bold delimiters out of it too', () => {
+		const editor = new Editor({
+			extensions,
+			content: 'This is **truly** fine.',
+		})
+		editor.commands.insertContentAt(1, 'x')
+		editor.commands.deleteRange({ from: 1, to: 2 })
+
+		expect(editor.state.doc.textContent).toContain('**truly**')
+		expect(getDocumentText(editor.state.doc).text).toBe('This is truly fine.')
+
+		editor.destroy()
 	})
 })

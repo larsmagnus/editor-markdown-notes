@@ -15,7 +15,7 @@ type Story = StoryObj<typeof meta>
 
 export const Primary: Story = {
 	args: {
-		title: 'The editor',
+		title: 'The editor stopped working',
 		error: new Error('Cannot read properties of undefined (reading “nodeAt”)'),
 		resetErrorBoundary: fn(),
 	},
@@ -24,7 +24,7 @@ export const Primary: Story = {
 /** One diagram failing, contained to its own block inside the document. */
 export const Diagram: Story = {
 	args: {
-		title: 'This diagram',
+		title: 'This diagram stopped working',
 		error: new Error(
 			'Parse error on line 2: expected one of “graph”, “flowchart”'
 		),
@@ -34,7 +34,7 @@ export const Diagram: Story = {
 
 export const WritingTools: Story = {
 	args: {
-		title: 'The writing tools',
+		title: 'The writing tools stopped working',
 		error: new Error('Failed to fetch dynamically imported module'),
 		resetErrorBoundary: fn(),
 	},
@@ -46,7 +46,7 @@ export const WritingTools: Story = {
  */
 export const ThrownValueIsNotAnError: Story = {
 	args: {
-		title: 'The editor',
+		title: 'The editor stopped working',
 		error: 'worker exited before the analysis returned',
 		resetErrorBoundary: fn(),
 	},
@@ -58,7 +58,7 @@ export const ThrownValueIsNotAnError: Story = {
  */
 export const LongMessage: Story = {
 	args: {
-		title: 'The editor',
+		title: 'The editor stopped working',
 		error: new Error(
 			'RangeError: Index 55 out of range for <heading("other-note.md"), paragraph("This is the companion fixture to notes.md"), codeBlock("flowchart LR")>'
 		),
@@ -73,7 +73,7 @@ export const LongMessage: Story = {
  */
 export const WithDismissButton: Story = {
 	args: {
-		title: 'Ask Claude',
+		title: 'Ask Claude stopped working',
 		error: new Error('Cannot read properties of undefined (reading "text")'),
 		resetErrorBoundary: fn(),
 		onRemove: fn(),

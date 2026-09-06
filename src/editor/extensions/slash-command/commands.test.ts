@@ -36,22 +36,30 @@ describe('mermaid', () => {
 
 		expect(editor.getJSON().content?.[0]).toMatchObject({
 			type: 'codeBlock',
-			attrs: { language: 'mermaid' },
-			content: [{ type: 'text', text: 'graph TD\n  A --> B' }],
+			content: [{ type: 'text', text: '```mermaid\ngraph TD\n  A --> B\n```' }],
 		})
 	})
 })
 
 describe('code', () => {
-	it('turns the current block into an empty code block', () => {
+	it('turns the current block into an empty, fenced code block', () => {
 		const editor = new Editor({ extensions, content: '' })
 		currentEditor = editor
 
 		commandFor('code').run(editor, { from: 1, to: 1 })
 
 		expect(editor.isActive('codeBlock')).toBe(true)
-		expect(editor.getJSON().content?.[0]).toMatchObject({ type: 'codeBlock' })
-		expect(editor.getJSON().content?.[0]?.content).toBeUndefined()
+		expect(editor.getJSON().content?.[0]).toMatchObject({
+			type: 'codeBlock',
+			content: [{ type: 'text', text: '```\n\n```' }],
+		})
+		// Regression: this used to land one character too far, on the closing
+		// fence's first backtick instead of the blank line between the fences -
+		// typing immediately would corrupt the fence.
+		expect(editor.state.selection.from).toBe(5)
+		expect(editor.state.doc.textBetween(1, editor.state.selection.from)).toBe(
+			'```\n'
+		)
 	})
 })
 
@@ -111,7 +119,7 @@ describe('image', () => {
 	})
 
 	describe('outside VS Code', () => {
-		it('inserts an empty, selected image node instead of picking one', () => {
+		it('inserts an empty image node and reveals its source for editing', () => {
 			const editor = new Editor({ extensions, content: '' })
 			currentEditor = editor
 
@@ -119,8 +127,7 @@ describe('image', () => {
 
 			expect(pickImage).not.toHaveBeenCalled()
 			expect(editor.getHTML()).toContain('<img')
-			expect(editor.isActive('image')).toBe(true)
-			expect(editor.getAttributes('image').src).toBe('')
+			expect(editor.isActive('imageSource')).toBe(true)
 		})
 	})
 })

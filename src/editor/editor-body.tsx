@@ -54,7 +54,10 @@ export function EditorBody({
 			{/* Contained rather than fatal, so the toolbar survives and raw mode
 			    stays reachable as the escape hatch for a note that will not parse. */}
 			<EditorModeSlot active={!raw}>
-				<AppErrorBoundary title="The editor" resetKeys={[content]}>
+				<AppErrorBoundary
+					title="The editor stopped working"
+					resetKeys={[content]}
+				>
 					<EditorModeLive
 						content={content}
 						syncContent={syncContent}

@@ -24,7 +24,9 @@ describe('detectFrontmatter', () => {
 		)
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('title: Roadmap')
+		expect(editor.state.doc.firstChild?.textContent).toBe(
+			'---\ntitle: Roadmap\n---'
+		)
 	})
 
 	it('does not convert without a closing fence', () => {
@@ -47,7 +49,7 @@ describe('detectFrontmatter', () => {
 		const editor = documentFrom(['---', '', '---', '', '# Roadmap'].join('\n'))
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('')
+		expect(editor.state.doc.firstChild?.textContent).toBe('---\n---')
 	})
 
 	it('creates an empty block and leaves the rest untouched when a heading sits between the fences', () => {
@@ -66,11 +68,13 @@ describe('detectFrontmatter', () => {
 		)
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('')
+		expect(editor.state.doc.firstChild?.textContent).toBe('---\n---')
 		// Everything after the empty block - including the fence that would have
 		// closed a real frontmatter block - survives exactly as typed.
 		expect(editor.state.doc.child(1).type.name).toBe('heading')
-		expect(editor.state.doc.child(1).textContent).toBe('Roadmap')
+		// The `#` marker is real, marked text now (see `heading-extension.ts`),
+		// not markup synthesized only at save time.
+		expect(editor.state.doc.child(1).textContent).toBe('# Roadmap')
 		expect(editor.state.doc.child(2).textContent).toBe('Ship it.')
 		expect(editor.state.doc.child(3).type.name).toBe('horizontalRule')
 		expect(editor.state.doc.child(4).textContent).toBe('More text.')
@@ -82,19 +86,24 @@ describe('detectFrontmatter', () => {
 		)
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('')
+		expect(editor.state.doc.firstChild?.textContent).toBe('---\n---')
 		expect(editor.state.doc.child(1).firstChild?.type.name === 'image').toBe(
 			true
 		)
 	})
 
+	// Bold's own `**` delimiters are real text now (see `formatting/`), so the
+	// swept line keeps them verbatim rather than the bare "title" a bold mark
+	// with no adjacent text used to leave behind.
 	it('sweeps plain paragraphs between the fences as before, marks and all', () => {
 		const editor = documentFrom(
 			['---', '', '**title**: Roadmap', '', '---', '', '# Roadmap'].join('\n')
 		)
 
 		expect(editor.state.doc.firstChild?.type.name).toBe('frontmatter')
-		expect(editor.state.doc.firstChild?.textContent).toBe('title: Roadmap')
+		expect(editor.state.doc.firstChild?.textContent).toBe(
+			'---\n**title**: Roadmap\n---'
+		)
 	})
 
 	it('adds a trailing empty paragraph when the whole document is the pattern', () => {

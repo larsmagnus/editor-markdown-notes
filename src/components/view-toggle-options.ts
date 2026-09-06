@@ -8,10 +8,9 @@ type BooleanViewOption = 'fullWidth' | 'textTools'
 /**
  * The toolbar's boolean toggles, in display order.
  *
- * One table drives both directions. The toggle group hands back the whole list
- * of pressed values, so the handler rebuilds every option from it - and a toggle
- * missing from either the forward or the inverse mapping used to be silently
- * reset the next time any other one was used.
+ * One table drives both directions: the toggle group hands back the whole list
+ * of pressed values, so the handler rebuilds every option from it, and a toggle
+ * present in only one of two mappings would be silently reset by any other.
  */
 export const VIEW_TOGGLES: {
 	/** The toggle group's own value. Historically a class name, hence `max-w-full`. */
