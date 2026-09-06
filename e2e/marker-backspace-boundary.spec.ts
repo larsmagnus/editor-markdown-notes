@@ -129,16 +129,22 @@ test.describe('Backspace at construct boundaries in the live editor', () => {
 		await expect(raw).not.toHaveValue(/``/)
 	})
 
-	test('image: backspace right after clicking it edits the revealed field, not the image node', async ({
+	test('image: backspace right after clicking it deletes the selected image node', async ({
 		page,
 	}) => {
 		await openInVSCode(page, '![Diagram](./diagram.png)')
 		const content = page.getByRole('textbox').first()
 		const image = content.getByRole('img', { name: 'Diagram' })
 
-		await image.click()
+		// Top edge, clear of the toolbar row overlaid on the image - a broken
+		// image (this fixture's `./diagram.png` never resolves) renders far
+		// smaller than any real note image, so its center sits under the
+		// toolbar's buttons. Off-center enough to still land on the node
+		// itself rather than resolve to a position before it.
+		const { width } = (await image.boundingBox()) ?? { width: 0 }
+		await image.click({ position: { x: width / 2, y: 5 } })
 		await page.keyboard.press('Backspace')
 
-		await expect(image).toBeVisible()
+		await expect(image).not.toBeVisible()
 	})
 })

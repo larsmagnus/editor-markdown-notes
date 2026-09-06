@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed Tab from the toolbar landing partway through the document instead of the frontmatter block or the very start
 - Fixed undo history being lost when switching to the raw markdown view or backgrounding a note's tab
 - Fixed a save made right after an outside edit (another program, git) overwriting that edit with the editor's own reformatting of it
+- Fixed images being unclickable, unable to be selected, dragged or moved with Tab
 
 ## [0.22.0] - 2026-08-21
 

@@ -71,7 +71,11 @@ export function ImageView({
 					alt={attrs.alt}
 					title={attrs.title ?? undefined}
 					contentEditable={false}
-					className="max-w-full h-auto m-0"
+					// `react-zoom-pan-pinch`'s own CSS sets `pointer-events: none` on any
+					// `img` inside its content div, so dragging always pans rather than
+					// triggering the browser's native image drag - it also silently
+					// blocks the click this needs for a `NodeSelection`.
+					className="max-w-full h-auto m-0 pointer-events-auto!"
 				/>
 			</PanZoom>
 		</NodeViewWrapper>
