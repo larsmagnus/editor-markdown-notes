@@ -3,6 +3,7 @@ import type { ReactZoomPanPinchContextState } from 'react-zoom-pan-pinch'
 import { useControls, useTransformComponent } from 'react-zoom-pan-pinch'
 
 import { ButtonAction } from '@/components/button-action'
+import { OverlayToolbar } from '@/components/overlay-toolbar'
 import { ButtonActions } from '@/editor/extensions/mermaid/button-actions'
 
 /** `useTransformComponent` keeps its callback in a dependency array, so this
@@ -47,10 +48,7 @@ export function MermaidToolbar({ code, svg, onEdit }: MermaidToolbarProps) {
 	}
 
 	return (
-		<div
-			contentEditable={false}
-			className="absolute top-2 right-2 flex items-center gap-0.5 rounded-lg border border-border bg-background/90 p-0.5 opacity-0 shadow-sm backdrop-blur-xs transition-opacity group-hover:opacity-100 focus-within:opacity-100"
-		>
+		<OverlayToolbar>
 			<ButtonAction
 				icon={<ZoomOut />}
 				label="Zoom out"
@@ -72,6 +70,6 @@ export function MermaidToolbar({ code, svg, onEdit }: MermaidToolbarProps) {
 			/>
 
 			<ButtonActions code={code} svg={svg} />
-		</div>
+		</OverlayToolbar>
 	)
 }

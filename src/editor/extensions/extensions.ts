@@ -1,15 +1,12 @@
 import type { CommandProps } from '@tiptap/core'
 import { Color } from '@tiptap/extension-color'
 import Document from '@tiptap/extension-document'
-import Image from '@tiptap/extension-image'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
 import TaskList from '@tiptap/extension-task-list'
 import { TextStyle } from '@tiptap/extension-text-style'
 import type { TextStyleOptions } from '@tiptap/extension-text-style'
-import type { Command } from '@tiptap/pm/state'
-import { mergeAttributes, ReactNodeViewRenderer } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import type { MarkdownStorage } from 'tiptap-markdown'
 import { Markdown } from 'tiptap-markdown'
@@ -33,13 +30,8 @@ import { StrikeExtension } from '@/editor/extensions/formatting/strike-extension
 import { Frontmatter } from '@/editor/extensions/frontmatter/frontmatter-extension'
 import { HeadingExtension } from '@/editor/extensions/heading/heading-extension'
 import { HorizontalRuleExtension } from '@/editor/extensions/horizontal-rule/horizontal-rule-extension'
-import { ImageView } from '@/editor/extensions/image/image-view'
-import {
-	enterAdjacentImage,
-	focusImageSourceField,
-	focusImageToolbar,
-	moveToAdjacentImage,
-} from '@/editor/extensions/image/keyboard-nav'
+import { ImageSource } from '@/editor/extensions/image/edit-source'
+import { ImageExtension } from '@/editor/extensions/image/image-extension'
 import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
 import { ItalicExtension } from '@/editor/extensions/italic/italic-extension'
 import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
@@ -57,7 +49,6 @@ import { TableCommands } from '@/editor/extensions/table/commands'
 import { MarkdownTable } from '@/editor/extensions/table/table-extension'
 import { TaskItemExtension } from '@/editor/extensions/task-item/task-item-extension'
 import { TextTools } from '@/editor/extensions/text-tools/text-tools-extension'
-import { resolveImageSrc } from '@/lib/host/resolve-image-src'
 
 patchMarkdownEscaping()
 
@@ -155,62 +146,8 @@ export const extensions = [
 		},
 	}),
 	TaskItemExtension,
-	// Inline, so an image sits in a paragraph - as a block node the serializer
-	// never closes the block and the image runs into the text after it. `atom`
-	// is not the default: without it a click places a text cursor beside the
-	// image rather than producing the `NodeSelection` its controls key off.
-	Image.configure({ inline: true }).extend({
-		atom: true,
-		// Display only - `src` keeps the author's path, so saving never rewrites
-		// the file with vscode-resource URIs.
-		renderHTML({ HTMLAttributes }) {
-			return [
-				'img',
-				mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-					src: resolveImageSrc(
-						String(HTMLAttributes.src ?? ''),
-						window.imageBaseUris
-					),
-				}),
-			]
-		},
-		// `renderHTML` above still drives `getHTML()` and copy-paste HTML; this
-		// takes over only the live editor, where the source reveals as text.
-		addNodeView() {
-			return ReactNodeViewRenderer(ImageView)
-		},
-		// `Tab` jumps between images the way it jumps between form fields; arrows
-		// then move into the selected one's bubble menu, the composite-widget
-		// pattern the table handles also use. Declining hands the key back, so
-		// the last image leads out of the editor rather than trapping focus.
-		addKeyboardShortcuts() {
-			// The view goes through too - these commands need `view.focus()` and the
-			// real DOM, not just state.
-			const run =
-				(...commands: Command[]) =>
-				() =>
-					commands.some((command) =>
-						command(
-							this.editor.state,
-							this.editor.view.dispatch,
-							this.editor.view
-						)
-					)
-
-			return {
-				Tab: run(moveToAdjacentImage(1)),
-				'Shift-Tab': run(moveToAdjacentImage(-1)),
-				// Entry comes first: `enterAdjacentImage` declines unless the
-				// selection is a plain caret, so a selected image reaches the toolbar.
-				ArrowRight: run(enterAdjacentImage(1), focusImageToolbar()),
-				ArrowLeft: run(enterAdjacentImage(-1)),
-				ArrowDown: run(focusImageToolbar()),
-				// Declines unless the image is already selected, falling through to
-				// ProseMirror's default node deletion for every other Backspace.
-				Backspace: run(focusImageSourceField()),
-			}
-		},
-	}),
+	ImageExtension,
+	ImageSource,
 	Markdown.configure({
 		// No p inside li in md
 		tightLists: true,

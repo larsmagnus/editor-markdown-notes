@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+	imageMarkdownSource,
 	imageMarkdownText,
 	parseImageMarkdown,
 } from '@/editor/extensions/image/image-markdown-text'
@@ -32,6 +33,38 @@ describe('imageMarkdownText', () => {
 		expect(
 			imageMarkdownText({ src: './a.png', alt: '', title: 'A "great" shot' })
 		).toBe('![](./a.png "A \\"great\\" shot")')
+	})
+})
+
+describe('imageMarkdownSource', () => {
+	it('marks the path range as the text between the parens, with no title', () => {
+		const { text, pathFrom, pathTo } = imageMarkdownSource({
+			src: './diagram.png',
+			alt: 'Diagram',
+			title: null,
+		})
+		expect(text).toBe('![Diagram](./diagram.png)')
+		expect(text.slice(pathFrom, pathTo)).toBe('./diagram.png')
+	})
+
+	it('marks the path range as covering the title too', () => {
+		const { text, pathFrom, pathTo } = imageMarkdownSource({
+			src: './diagram.png',
+			alt: 'Diagram',
+			title: 'Architecture',
+		})
+		expect(text).toBe('![Diagram](./diagram.png "Architecture")')
+		expect(text.slice(pathFrom, pathTo)).toBe('./diagram.png "Architecture"')
+	})
+
+	it('marks the path range using the escaped src', () => {
+		const { text, pathFrom, pathTo } = imageMarkdownSource({
+			src: './a(1).png',
+			alt: '',
+			title: null,
+		})
+		expect(text).toBe('![](./a\\(1\\).png)')
+		expect(text.slice(pathFrom, pathTo)).toBe('./a\\(1\\).png')
 	})
 })
 

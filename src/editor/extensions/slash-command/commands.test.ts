@@ -119,7 +119,7 @@ describe('image', () => {
 	})
 
 	describe('outside VS Code', () => {
-		it('inserts an empty, selected image node instead of picking one', () => {
+		it('inserts an empty image node and reveals its source for editing', () => {
 			const editor = new Editor({ extensions, content: '' })
 			currentEditor = editor
 
@@ -127,8 +127,7 @@ describe('image', () => {
 
 			expect(pickImage).not.toHaveBeenCalled()
 			expect(editor.getHTML()).toContain('<img')
-			expect(editor.isActive('image')).toBe(true)
-			expect(editor.getAttributes('image').src).toBe('')
+			expect(editor.isActive('imageSource')).toBe(true)
 		})
 	})
 })

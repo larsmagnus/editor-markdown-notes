@@ -1,15 +1,39 @@
 export type ImageAttrs = { src: string; alt: string; title: string | null }
 
+export type ImageMarkdownSource = {
+	text: string
+	/** Offsets of the path - `src` and an optional `title` - within `text`, excluding the parens. */
+	pathFrom: number
+	pathTo: number
+}
+
 /**
- * The literal `![alt](src "title")` an image's attrs read as - what
- * `image-view.tsx` reveals as real, editable text once the caret sits
- * adjacent to the image, mirroring `link-close-text.ts`'s escaping (a
- * literal paren in `src`, a literal quote in `title`).
+ * The literal `![alt](src "title")` an image's attrs read as, plus where its
+ * path (`src`/`title`, the part inside the parens) falls within that text -
+ * what `edit-source.ts` selects when revealing it as real, editable text.
+ * Escaping mirrors `link-close-text.ts` (a literal paren in `src`, a literal
+ * quote in `title`).
  */
-export function imageMarkdownText({ src, alt, title }: ImageAttrs): string {
+export function imageMarkdownSource({
+	src,
+	alt,
+	title,
+}: ImageAttrs): ImageMarkdownSource {
 	const escapedSrc = src.replace(/[()]/g, '\\$&')
 	const titlePart = title ? ` "${title.replace(/"/g, '\\"')}"` : ''
-	return `![${alt}](${escapedSrc}${titlePart})`
+	const prefix = `![${alt}](`
+	const path = `${escapedSrc}${titlePart}`
+
+	return {
+		text: `${prefix}${path})`,
+		pathFrom: prefix.length,
+		pathTo: prefix.length + path.length,
+	}
+}
+
+/** The literal `![alt](src "title")` an image's attrs read as. */
+export function imageMarkdownText(attrs: ImageAttrs): string {
+	return imageMarkdownSource(attrs).text
 }
 
 const IMAGE_MARKDOWN_PATTERN =

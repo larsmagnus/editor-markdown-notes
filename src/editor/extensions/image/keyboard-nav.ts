@@ -1,16 +1,15 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { Command, EditorState } from '@tiptap/pm/state'
-import { NodeSelection } from '@tiptap/pm/state'
-import type { Editor } from '@tiptap/react'
+import {
+	NodeSelection,
+	Plugin,
+	PluginKey,
+	TextSelection,
+} from '@tiptap/pm/state'
+import type { EditorView } from '@tiptap/pm/view'
 
 /** Which way the search goes: forward toward the end of the doc, or back. */
 type Direction = 1 | -1
-
-/** The id `ImageBubbleControls` renders its toolbar `div` under. */
-export const IMAGE_TOOLBAR_ID = 'image-toolbar'
-
-/** The id `image-view.tsx` renders its revealed source `input` under. */
-export const IMAGE_SOURCE_FIELD_ID = 'image-source-field'
 
 /** The position of the next (or previous) image relative to `from`, or `null`. */
 function findAdjacentImagePos(
@@ -38,20 +37,10 @@ function selectImageTransaction(state: EditorState, pos: number) {
 		.scrollIntoView()
 }
 
-function isImageSelected(state: EditorState): boolean {
-	return (
-		state.selection instanceof NodeSelection &&
-		state.selection.node.type.name === 'image'
-	)
-}
-
 /**
- * Moves selection to the next (or previous) image, focusing the editor itself
- * rather than the `<img>`: the bubble menu's `shouldShow` is a strict
- * `activeElement === view.dom` check, which focusing a descendant fails.
- *
- * Declines once there is no further image, so tabbing out of the last one
- * continues to the page's next focusable element instead of trapping focus.
+ * Moves selection to the next (or previous) image. Declines once there is no
+ * further image, so tabbing out of the last one continues to the page's next
+ * focusable element instead of trapping focus.
  */
 export function moveToAdjacentImage(dir: Direction): Command {
 	return (state, dispatch, view) => {
@@ -68,107 +57,80 @@ export function moveToAdjacentImage(dir: Direction): Command {
 }
 
 /**
- * Moves DOM focus into the selected image's bubble menu, the way `Tab` enters
- * any composite widget. Declines unless an image is selected, leaving plain
- * caret movement untouched.
+ * Where an arrow press would land if it stepped straight onto/over an
+ * adjacent image, or `null` if the image isn't the very next thing in that
+ * direction. Two ways to be adjacent: sitting directly beside the image in
+ * the same parent (ordinary mid-paragraph text), or sitting at the edge of
+ * an enclosing node whose own next/previous sibling is the image (exiting a
+ * revealed `imageSource` node the caret is inside, back onto the image it
+ * belongs to) - `nodeAt` alone only ever sees the first.
  */
-export function focusImageToolbar(): Command {
-	return (state) => {
-		if (!isImageSelected(state)) return false
+function findStepOverTarget(state: EditorState, dir: Direction): number | null {
+	const { selection, doc } = state
+	if (!selection.empty) return null
 
-		const firstButton = document
-			.getElementById(IMAGE_TOOLBAR_ID)
-			?.querySelector('button')
+	const nodeAtInBounds = (pos: number) =>
+		pos >= 0 && pos < doc.content.size ? doc.nodeAt(pos) : null
 
-		if (!(firstButton instanceof HTMLElement)) return false
-
-		firstButton.focus()
-		return true
+	const directPos = dir > 0 ? selection.from : selection.from - 1
+	if (nodeAtInBounds(directPos)?.type.name === 'image') {
+		return dir > 0 ? directPos + 1 : directPos
 	}
+
+	const $pos = doc.resolve(selection.from)
+	const atEdge =
+		dir > 0
+			? $pos.parentOffset === $pos.parent.content.size
+			: $pos.parentOffset === 0
+	if (!atEdge || $pos.depth === 0) return null
+
+	if (dir > 0) {
+		const boundary = $pos.after($pos.depth)
+		if (nodeAtInBounds(boundary)?.type.name !== 'image') return null
+		return boundary + 1
+	}
+
+	const boundary = $pos.before($pos.depth)
+	if (nodeAtInBounds(boundary - 1)?.type.name !== 'image') return null
+	return boundary - 1
 }
 
 /**
- * Steps the caret onto an adjacent image, selecting the node itself.
+ * Steps a plain arrow key straight past an adjacent image, as a collapsed
+ * caret on its far side, rather than letting the browser's own arrow-key
+ * handling reach it.
  *
- * Both edges of an *inline* atom are ordinary caret positions inside the same
- * paragraph, so ProseMirror's own arrow handling leaves a text caret beside
- * the image that says nothing about being on it - and the editor draws that
- * caret while the source field draws its own. Consuming the key matters too:
- * left to fall through, the now-focused field handles the same press and moves
- * its caret one character in from the edge it should have landed on.
+ * `contenteditable={false}` makes the image a non-editable island; stepping
+ * onto one via native arrow-key handling doesn't move a caret there, since
+ * there's nowhere inside it for one - it leaves a *Range* selecting the whole
+ * atom instead. That's invisible until the very next keystroke, when typing
+ * (or another arrow key building on that Range) replaces the selection, and
+ * the image is silently deleted. Consuming the keydown ourselves and setting
+ * an explicit `TextSelection` past the image is what keeps every arrow press
+ * a real, single-character-equivalent caret move - never a stuck caret,
+ * never a `NodeSelection` a hard focus would need Tab to leave, and never a
+ * Range an ordinary keystroke can eat the image through.
  */
-export function enterAdjacentImage(dir: Direction): Command {
-	return (state, dispatch) => {
-		const { selection } = state
-		if (!selection.empty) return false
+export function createImageStepOverPlugin(): Plugin {
+	return new Plugin({
+		key: new PluginKey('imageStepOver'),
+		props: {
+			handleKeyDown(view: EditorView, event: KeyboardEvent) {
+				if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+					return false
+				}
 
-		// The node the caret steps over: ahead of it, or behind it going back.
-		const pos = dir > 0 ? selection.from : selection.from - 1
-		if (state.doc.nodeAt(pos)?.type.name !== 'image') return false
+				const dir: Direction = event.key === 'ArrowRight' ? 1 : -1
+				const target = findStepOverTarget(view.state, dir)
+				if (target === null) return false
 
-		if (dispatch) {
-			// Before dispatching: ProseMirror updates the view synchronously, so the
-			// field can mount and consume this before `dispatch` returns.
-			setImageSourceEntryEdge(dir > 0 ? 'start' : 'end')
-			dispatch(selectImageTransaction(state, pos))
-		}
-		return true
-	}
-}
-
-/**
- * Which end of the revealed source text the caret lands on, for the field to
- * consume as it mounts. A module-level handoff rather than a prop: the field
- * mounts as a child of the view deciding whether it renders at all, and React
- * commits child effects first, so a prop would arrive a commit too late.
- */
-let pendingEntryEdge: 'start' | 'end' | null = null
-
-function setImageSourceEntryEdge(edge: 'start' | 'end'): void {
-	pendingEntryEdge = edge
-}
-
-/** Takes the pending entry edge, clearing it. */
-export function consumeImageSourceEntryEdge(): 'start' | 'end' | null {
-	const edge = pendingEntryEdge
-	pendingEntryEdge = null
-	return edge
-}
-
-/**
- * Moves DOM focus into the selected image's source field, which selecting the
- * image has already rendered. Also what keeps `Backspace` on a selected image
- * editing its source rather than deleting the node.
- */
-export function focusImageSourceField(): Command {
-	return (state) => {
-		if (!isImageSelected(state)) return false
-
-		const field = document.getElementById(IMAGE_SOURCE_FIELD_ID)
-		if (!(field instanceof HTMLInputElement)) return false
-
-		field.focus()
-		field.scrollIntoView({ block: 'nearest' })
-		return true
-	}
-}
-
-/**
- * Where `Tab`/`Shift-Tab` go from inside the toolbar. Never falls through to
- * the native tab order, which would land wherever the bubble menu's portal
- * sits in the DOM - usually the end of `body`, often nothing focusable at all.
- */
-export function exitImageToolbar(editor: Editor, backward: boolean): void {
-	if (backward) {
-		if (isImageSelected(editor.state)) editor.view.focus()
-		return
-	}
-
-	const movedToNextImage = moveToAdjacentImage(1)(
-		editor.state,
-		editor.view.dispatch,
-		editor.view
-	)
-
-	if (!movedToNextImage) editor.view.dom.focus()
+				view.dispatch(
+					view.state.tr.setSelection(
+						TextSelection.create(view.state.doc, target)
+					)
+				)
+				return true
+			},
+		},
+	})
 }

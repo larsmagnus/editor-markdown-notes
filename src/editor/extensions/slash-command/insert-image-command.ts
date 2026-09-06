@@ -1,9 +1,10 @@
 import type { Editor, Range } from '@tiptap/core'
 
+import { enterImageEditSource } from '@/editor/extensions/image/edit-source'
 import { pickImage } from '@/lib/pick-image'
 import { isVSCodeWebview } from '@/lib/vscode-api'
 
-/** Inserts an empty, selected image node, for `ImagePopover` to open itself over. */
+/** Inserts an empty image node and opens its source for editing right away. */
 function insertEmptyImage(editor: Editor, range: Range) {
 	const pos = range.from
 
@@ -12,7 +13,9 @@ function insertEmptyImage(editor: Editor, range: Range) {
 		.focus()
 		.deleteRange(range)
 		.insertContentAt(pos, { type: 'image', attrs: { src: '' } })
-		.setNodeSelection(pos)
+		.command(({ state, dispatch }) =>
+			enterImageEditSource(pos)(state, dispatch)
+		)
 		.run()
 }
 
@@ -22,8 +25,8 @@ function insertEmptyImage(editor: Editor, range: Range) {
  * In VS Code, opens the host's native file dialog and inserts whatever path
  * comes back. Outside VS Code there is no filesystem to pick from (the
  * standalone build's save path is already a stub, per CLAUDE.md), so this
- * inserts an empty image node instead and lets `ImagePopover` open itself
- * over it - the form the user actually sees, rather than what would
+ * inserts an empty image node instead and reveals its source for editing
+ * right away - the form the user actually sees, rather than what would
  * otherwise look like nothing happening at all.
  */
 export function runInsertImageCommand(editor: Editor, range: Range) {
