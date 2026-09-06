@@ -40,9 +40,12 @@ test.describe('Blockquotes in the live editor', () => {
 		await expect(marker).toHaveCount(1)
 
 		// Home lands the caret at the marker's own (zero-width) start, which
-		// does reveal it.
+		// does reveal it. The reveal decoration re-renders off the same
+		// transaction but on a later paint than the DOM selection change
+		// `pressKeySettled` waits for, so a loaded CI runner needs more than
+		// the default timeout to catch up.
 		await pressKeySettled(page, 'Home')
-		await expect(marker).toHaveCount(0)
+		await expect(marker).toHaveCount(0, { timeout: 10000 })
 
 		await body.click()
 		await expect(marker).toHaveCount(1)
