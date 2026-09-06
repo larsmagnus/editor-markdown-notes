@@ -6,12 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-- Added a real, editable `>` marker to blockquotes in the live editor, shown only while the cursor is on it
+- Added real, editable markdown syntax to bold, italic, strikethrough, inline code, headings, links, lists, images, code blocks, Mermaid diagrams, frontmatter, horizontal rules and blockquotes in the live editor, shown only while the cursor is on it
+- Clearing an image's source now deletes the image, and images also get an Edit source button
+- Changed document stats to show word, character, sentence and paragraph counts with thousand separators
+- Changed the writing tools' rule explanations to mark the suggested fix and the example to avoid more clearly
+- Fixed the toolbar cutting off its buttons instead of scrolling when the panel is narrow
+- Fixed the editor column narrowing further than is readable when the writing tools panel is open
 - Added a way to move keyboard focus out of the document text with Escape then Tab, previously trapped indenting once the cursor reached a line with nothing after it
 - Added "Skip to editor" and "Skip to text tools" links, reachable with the first Tab press, plus a link back to the editor from inside the writing tools panel
 - Changed task list checkboxes in the live editor to match the app's other checkboxes
 - Changed saving to VS Code's own mechanism, so Save All, autosave and the close prompt all work, and the file is only ever written by VS Code itself
-- Fixed typing `- [ ] ` not converting into a task item, leaving the brackets as literal text
+- Fixed typing `- [ ] `not converting into a task item, leaving the brackets as literal text
 - Fixed Tab at the start of a list item indenting its text instead of nesting the item
 - Fixed Tab from the toolbar landing partway through the document instead of the frontmatter block or the very start
 - Fixed undo history being lost when switching to the raw markdown view or backgrounding a note's tab
