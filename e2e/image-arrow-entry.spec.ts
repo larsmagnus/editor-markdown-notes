@@ -59,8 +59,12 @@ test.describe('Arrow-key movement across an image in the live editor', () => {
 		const content = page.getByRole('textbox').first()
 		const image = content.getByRole('img', { name: 'Diagram' })
 
-		const box = await image.boundingBox()
-		if (!box) throw new Error('image has no bounding box')
+		// Past the image's own *frame*, not just the `<img>` - the frame has its
+		// own minimum-size floor to fit the toolbar, wider than a broken test
+		// image, so an offset from the `<img>` alone can still land inside it.
+		const frame = image.locator('xpath=../..')
+		const box = await frame.boundingBox()
+		if (!box) throw new Error('image frame has no bounding box')
 		await page.mouse.click(box.x + box.width + 10, box.y + box.height / 2)
 		await pressKeySettled(page, 'End')
 

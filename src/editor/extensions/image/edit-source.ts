@@ -33,12 +33,10 @@ let originalAttrs: ImageAttrs | null = null
  * captured; after, against the DOM selection sync `dispatch` only performs
  * while the view already has focus.
  *
- * Every image's toolbar is hover-revealed independently of the caret, so
- * clicking it on a second image while a first one's source is still open is
- * reachable without ever leaving that first edit through the keyboard. Since
- * `findImageSource` (and everything built on it) assumes at most one
- * `imageSource` node exists, that prior one is finalized first, in the same
- * transaction, before the new one is inserted.
+ * Finalizes any still-open source on another image first, in the same
+ * transaction: every toolbar is hover-revealed independently of the caret,
+ * so opening a second image's source without leaving the first is reachable,
+ * and `findImageSource` assumes at most one `imageSource` node exists.
  */
 export function enterImageEditSource(pos: number): Command {
 	return (state, dispatch) => {

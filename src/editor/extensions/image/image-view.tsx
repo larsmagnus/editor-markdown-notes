@@ -2,9 +2,11 @@ import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewWrapper } from '@tiptap/react'
 
 import { PanZoom } from '@/components/pan-zoom'
-import { enterImageEditSource } from '@/editor/extensions/image/edit-source'
 import { ImageToolbar } from '@/editor/extensions/image/toolbar'
 import { useImageCaretAdjacent } from '@/hooks/use-image-caret-adjacent'
+import { useImageCopy } from '@/hooks/use-image-copy'
+import { useImageEditSource } from '@/hooks/use-image-edit-source'
+import { useImageLink } from '@/hooks/use-image-link'
 import { resolveImageSrc } from '@/lib/host/resolve-image-src'
 import { cn } from '@/lib/utils'
 
@@ -33,18 +35,9 @@ export function ImageView({
 	}
 
 	const softFocused = useImageCaretAdjacent({ editor, getPos })
-
-	const handleEditSource = () => {
-		const pos = getPos()
-		if (pos === undefined) return
-		editor
-			.chain()
-			.focus()
-			.command(({ state, dispatch }) =>
-				enterImageEditSource(pos)(state, dispatch)
-			)
-			.run()
-	}
+	const link = useImageLink({ node, editor, getPos })
+	const [copied, onCopy] = useImageCopy(attrs)
+	const handleEditSource = useImageEditSource({ editor, getPos })
 
 	return (
 		// `not-prose` and the img's own `m-0`: Tailwind's typography plugin gives
@@ -58,17 +51,17 @@ export function ImageView({
 		>
 			<PanZoom
 				className={cn(
-					// `min-w`/`min-h`: the toolbar overlay has its own minimum size
-					// (two buttons plus padding) regardless of the image's - without
-					// a floor here, an image smaller than that spills the toolbar out
-					// past its own frame, and "Edit source" becomes unreachable.
-					'max-h-[32rem] min-w-20 min-h-14 rounded-md border border-border/50 p-2 hover:border-border',
+					// `min-w`/`min-h`: floors the frame to the toolbar's own size, so a
+					// small image doesn't spill it off the page edge.
+					'max-h-[32rem] min-w-40 min-h-14 rounded-md border border-border/50 p-2 hover:border-border',
 					softFocused && 'border-ring ring-3 ring-ring/50'
 				)}
 				controls={
 					<ImageToolbar
 						onEditSource={handleEditSource}
 						onDelete={deleteNode}
+						copy={{ copied, onCopy }}
+						link={link}
 						visible={softFocused}
 					/>
 				}
