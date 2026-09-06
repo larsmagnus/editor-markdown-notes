@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-09-06
+
 - Added real, editable markdown syntax to bold, italic, strikethrough, inline code, headings, links, lists, images, code blocks, Mermaid diagrams, frontmatter, horizontal rules and blockquotes in the live editor, shown only while the cursor is on it
 - Clearing an image's source now deletes the image, and images also get an Edit source button
 - Changed document stats to show word, character, sentence and paragraph counts with thousand separators
