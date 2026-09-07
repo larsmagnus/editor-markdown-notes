@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.23.1] - 2026-09-07
+
+- Fixed pressing Enter on an empty bullet, numbered or task list item adding another empty item instead of ending the list
+- Fixed Shift+Tab on a list item with no outer list to move into writing its own bullet into the text as `\- item`, rather than leaving the list
+
 ## [0.23.0] - 2026-09-06
 
 - Added real, editable markdown syntax to bold, italic, strikethrough, inline code, headings, links, lists, images, code blocks, Mermaid diagrams, frontmatter, horizontal rules and blockquotes in the live editor, shown only while the cursor is on it
