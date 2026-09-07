@@ -37,6 +37,7 @@ import { ItalicExtension } from '@/editor/extensions/italic/italic-extension'
 import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
 import { LinkExtension } from '@/editor/extensions/link/link-extension'
 import { StrictLinkify } from '@/editor/extensions/link/strict-linkify-extension'
+import { ListEnter } from '@/editor/extensions/list/list-enter-extension'
 import { ListItemExtension } from '@/editor/extensions/list/list-item-extension'
 import { MarkdownClipboard } from '@/editor/extensions/markdown/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '@/editor/extensions/markdown/markdown-escaping'
@@ -146,6 +147,8 @@ export const extensions = [
 		},
 	}),
 	TaskItemExtension,
+	// After both item types, so its Enter outranks their own `splitListItem`.
+	ListEnter,
 	ImageExtension,
 	ImageSource,
 	Markdown.configure({

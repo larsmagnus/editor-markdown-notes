@@ -25,7 +25,7 @@ export type MarkerCaret = {
  * the caret's own textblock for a spec that hosts its marker itself, and its
  * parent for one whose marker lives in a child paragraph.
  */
-function resolveMarkerCaret(editor: Editor): MarkerCaret | null {
+export function resolveMarkerCaret(editor: Editor): MarkerCaret | null {
 	const { selection } = editor.state
 	if (!(selection instanceof TextSelection) || !selection.empty) return null
 

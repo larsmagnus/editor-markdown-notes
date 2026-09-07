@@ -4,18 +4,20 @@ import { TextSelection } from '@tiptap/pm/state'
 import { isInTable } from '@tiptap/pm/tables'
 
 import { markerCaretAtBoundary } from '@/editor/extensions/block-marker/marker-caret'
+import type { MarkerCaret } from '@/editor/extensions/block-marker/marker-caret'
 import { listMarkerSpec } from '@/editor/extensions/block-marker/specs'
+import { outdentListItem } from '@/editor/extensions/list/outdent-list-item'
 
 const INDENT = '  '
 
 /**
- * The list item type whose marker the caret sits right after, or `null`. Tab
- * only nests list items, so a blockquote's marker boundary - which resolves
+ * The list item whose marker the caret sits right after, or `null`. Tab only
+ * nests list items, so a blockquote's marker boundary - which resolves
  * identically - has to fall through to plain indenting.
  */
-function listItemAtMarkerBoundary(editor: Editor): string | null {
+function listItemAtMarkerBoundary(editor: Editor): MarkerCaret | null {
 	const caret = markerCaretAtBoundary(editor)
-	return caret?.spec === listMarkerSpec ? caret.nodeTypeName : null
+	return caret?.spec === listMarkerSpec ? caret : null
 }
 
 /**
@@ -31,7 +33,9 @@ function listItemAtMarkerBoundary(editor: Editor): string | null {
  * competing, unrelated meaning here.
  *
  * Right after a list item's bullet, number, or checkbox, Tab/Shift-Tab
- * nest/un-nest the item instead (`listItemAtMarkerBoundary`).
+ * nest/un-nest the item instead (`listItemAtMarkerBoundary`). Un-nesting goes
+ * through `outdentListItem` rather than `liftListItem` directly, since an item
+ * with no outer list to land in has to shed its marker on the way out.
  */
 export const TabIndent = Extension.create({
 	name: 'tabIndent',
@@ -53,8 +57,11 @@ export const TabIndent = Extension.create({
 
 		return {
 			Tab: () => {
-				const listItemType = listItemAtMarkerBoundary(this.editor)
-				if (listItemType && this.editor.commands.sinkListItem(listItemType)) {
+				const listItem = listItemAtMarkerBoundary(this.editor)
+				if (
+					listItem &&
+					this.editor.commands.sinkListItem(listItem.nodeTypeName)
+				) {
 					return true
 				}
 
@@ -63,9 +70,9 @@ export const TabIndent = Extension.create({
 				return insertIndent()
 			},
 			'Shift-Tab': () => {
-				const listItemType = listItemAtMarkerBoundary(this.editor)
-				if (listItemType) {
-					this.editor.commands.liftListItem(listItemType)
+				const listItem = listItemAtMarkerBoundary(this.editor)
+				if (listItem) {
+					outdentListItem(this.editor, listItem)
 					return true
 				}
 

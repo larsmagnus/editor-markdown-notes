@@ -1,17 +1,12 @@
 import { Extension } from '@tiptap/core'
-import { TextSelection } from '@tiptap/pm/state'
 import type { Transaction } from '@tiptap/pm/state'
 
+import { caretToContentStart } from '@/editor/extensions/block-marker/caret-to-content-start'
 import {
 	markerCaretAtFirstContentChar,
 	markerCaretInMarker,
 } from '@/editor/extensions/block-marker/marker-caret'
 import type { MarkerCaret } from '@/editor/extensions/block-marker/marker-caret'
-
-/** Puts the caret at the start of what the construct's content now is. */
-function caretToContentStart(tr: Transaction, at: number): void {
-	tr.setSelection(TextSelection.near(tr.doc.resolve(tr.mapping.map(at))))
-}
 
 /**
  * Steps a marker down, or removes it and the construct with it. One

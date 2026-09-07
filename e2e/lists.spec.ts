@@ -176,6 +176,99 @@ test.describe('Lists in the live editor', () => {
 	})
 })
 
+/**
+ * A blank item still carries its `- `/`N. `/`- [ ] ` as real text, so nothing
+ * downstream can recognise it as empty by its content alone - which is what made
+ * Enter split it forever rather than end the list.
+ */
+test.describe('Enter on a blank list item in the live editor', () => {
+	test('bullet list: a blank item becomes a paragraph, ending the list', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await actionSettled(page, () => content.locator('p').click())
+		await page.keyboard.type('- First item')
+		await pressKeySettled(page, 'Enter')
+		await pressKeySettled(page, 'Enter')
+		await page.keyboard.type('After the list')
+
+		await expect(content.locator('ul li')).toHaveText(['- First item'])
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue(/^- First item\n\nAfter the list\n?$/)
+	})
+
+	test('ordered list: a blank item becomes a paragraph, ending the list', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await actionSettled(page, () => content.locator('p').click())
+		await page.keyboard.type('1. First item')
+		await pressKeySettled(page, 'Enter')
+		await pressKeySettled(page, 'Enter')
+		await page.keyboard.type('After the list')
+
+		await expect(content.locator('ol li')).toHaveText(['1. First item'])
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue(/^1\. First item\n\nAfter the list\n?$/)
+	})
+
+	test('task list: a blank item becomes a paragraph, ending the list', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await actionSettled(page, () => content.locator('p').click())
+		await page.keyboard.type('- [ ] First item')
+		await pressKeySettled(page, 'Enter')
+		await pressKeySettled(page, 'Enter')
+		await page.keyboard.type('After the list')
+
+		await expect(content.locator('ul[data-type="taskList"] li')).toHaveText([
+			'- [ ] First item',
+		])
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Raw markdown' })
+		).toHaveValue(/^- \[ \] First item\n\nAfter the list\n?$/)
+	})
+
+	test('a blank nested item outdents one level rather than ending the list', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await actionSettled(page, () => content.locator('p').click())
+		await page.keyboard.type('- First item')
+		await pressKeySettled(page, 'Enter')
+		await pressKeySettled(page, 'Tab')
+		await page.keyboard.type('Nested item')
+		await pressKeySettled(page, 'Enter')
+		await pressKeySettled(page, 'Enter')
+		await page.keyboard.type('Back at the top level')
+
+		await expect(
+			content.locator('li', { hasText: 'First item' }).locator('ul li')
+		).toHaveText(['- Nested item'])
+
+		const topLevelItems = content.locator('> ul > li')
+		await expect(topLevelItems).toHaveCount(2)
+		await expect(topLevelItems.nth(1)).toHaveText('- Back at the top level')
+	})
+})
+
 test.describe('Deleting a list item down to empty in the live editor', () => {
 	// Distinct from marker-backspace-boundary.spec.ts's marker-boundary case:
 	// this deletes the item's *content* character by character, never touching
