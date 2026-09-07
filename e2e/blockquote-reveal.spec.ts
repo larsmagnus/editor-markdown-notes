@@ -35,17 +35,14 @@ test.describe('Blockquotes in the live editor', () => {
 		// Clicking the quote's own text (not its marker) must not reveal it - the
 		// same over-eager-reveal bug lists-marker-reveal.spec.ts guards against.
 		await actionSettled(page, () =>
-			quote.getByText('Ship', { exact: false }).dblclick()
+			quote.getByText('Ship', { exact: false }).click()
 		)
 		await expect(marker).toHaveCount(1)
 
 		// Home lands the caret at the marker's own (zero-width) start, which
-		// does reveal it. The reveal decoration re-renders off the same
-		// transaction but on a later paint than the DOM selection change
-		// `pressKeySettled` waits for, so a loaded CI runner needs more than
-		// the default timeout to catch up.
+		// does reveal it.
 		await pressKeySettled(page, 'Home')
-		await expect(marker).toHaveCount(0, { timeout: 10000 })
+		await expect(marker).toHaveCount(0)
 
 		await body.click()
 		await expect(marker).toHaveCount(1)
