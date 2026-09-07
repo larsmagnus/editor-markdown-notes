@@ -7,29 +7,19 @@ An integrated live markdown editor for VS Code, built for the AI-first era
 ## Why
 
 - Markdown is ideal for simple editing of plain text, but not for reading or improving the quality of the text. I want one tool that excels at all these without compromising on any.
-
 - There's more markdown than ever in development — specs, prompts, agent definitions, and config. A better writing and reading experience matters
-
 - I love [Obsidian](https://obsidian.md) but prefer not switching windows.
 
 ## Features
 
 - Live, raw and text edit modes
-
 - Contextual formatting and editing tools
-
 - Claude Code integration for opening, asking and rewriting
-
 - Writing checks flag passive voice, weak words and hard-to-read sentences
-
 - Text quality checks exposed to AI agents over MCP
-
 - Code blocks and frontmatter editing with syntax highlighting (matches your VS Code theme)
-
 - Table and image editing tools
-
 - Mermaid diagrams render inline
-
 - Toolbar settings persist across tabs and sessions
 
 ## Usage
