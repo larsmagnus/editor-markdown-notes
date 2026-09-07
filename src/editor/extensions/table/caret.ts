@@ -1,5 +1,5 @@
 import type { ResolvedPos } from '@tiptap/pm/model'
-import type { Command, EditorState } from '@tiptap/pm/state'
+import type { Command, EditorState, Selection } from '@tiptap/pm/state'
 import { TextSelection } from '@tiptap/pm/state'
 import { nextCell, TableMap } from '@tiptap/pm/tables'
 
@@ -9,6 +9,19 @@ import { cellAt, outOfText } from '@/editor/extensions/table/cell-selection'
 type Direction = 1 | -1
 
 type Dispatch = Parameters<Command>[1]
+
+/**
+ * Moves the caret, or reports that it could move when this is `editor.can()`
+ * asking rather than a real keystroke.
+ */
+function placeCaret(
+	state: EditorState,
+	dispatch: Dispatch,
+	caret: Selection
+): true {
+	if (dispatch) dispatch(state.tr.setSelection(caret).scrollIntoView())
+	return true
+}
 
 /** Is the caret's cell the last one in the whole table, or the first? */
 function atTableCorner($cell: ResolvedPos, dir: Direction): boolean {
@@ -41,9 +54,7 @@ function leaveTable(
 	if (!caret.$head.parent.isTextblock) return false
 	if (caret.head > start && caret.head < end) return false
 
-	if (dispatch) dispatch(state.tr.setSelection(caret).scrollIntoView())
-
-	return true
+	return placeCaret(state, dispatch, caret)
 }
 
 /**
@@ -92,9 +103,7 @@ export function moveCaretToCellBeyond(dir: Direction): Command {
 		// `+ 1` to land inside the cell's text rather than on the cell node.
 		const caret = TextSelection.near(state.doc.resolve($next.pos + 1), dir)
 
-		if (dispatch) dispatch(state.tr.setSelection(caret).scrollIntoView())
-
-		return true
+		return placeCaret(state, dispatch, caret)
 	}
 }
 

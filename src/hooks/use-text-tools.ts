@@ -2,22 +2,17 @@ import type { Editor } from '@tiptap/react'
 import { useEffect, useRef, useState } from 'react'
 
 import { useAnalysisOptions } from '@/hooks/use-analysis-options'
+import type { AnalysisRequest } from '@/hooks/use-analysis-options'
 import { useAnalyzer } from '@/hooks/use-analyzer'
 import { useDocumentRevision } from '@/hooks/use-document-revision'
 import { getDocumentText } from '@/lib/text-tools/document-text'
 import { placeIssues } from '@/lib/text-tools/place-issues'
 import type { Analysis } from '@/lib/text-tools/types'
-import type { SpellingLanguage, TextToolRuleId } from '@/shared/messages'
 
 const EMPTY_ANALYSIS: Analysis = { issues: [], sentenceCount: 0 }
 
-type UseTextToolsOptions = {
+type UseTextToolsOptions = AnalysisRequest & {
 	editor: Editor | null
-	enabled: boolean
-	rules: TextToolRuleId[]
-	targetAge: number
-	spellingLanguage: SpellingLanguage
-	spellingIgnoreWords: string[]
 }
 
 /**

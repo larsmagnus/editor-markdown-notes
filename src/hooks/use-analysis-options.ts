@@ -2,7 +2,8 @@ import { useSpellingDictionary } from '@/hooks/use-spelling-dictionary'
 import type { PipelineOptions } from '@/lib/text-tools/types'
 import type { SpellingLanguage, TextToolRuleId } from '@/shared/messages'
 
-type UseAnalysisOptionsInput = {
+/** What the writing checks are asked to run, shared with their caller. */
+export type AnalysisRequest = {
 	enabled: boolean
 	rules: TextToolRuleId[]
 	targetAge: number
@@ -25,7 +26,7 @@ export function useAnalysisOptions({
 	targetAge,
 	spellingLanguage,
 	spellingIgnoreWords,
-}: UseAnalysisOptionsInput) {
+}: AnalysisRequest) {
 	const wantsSpelling = rules.includes('spelling')
 	const { dictionary, hasFailed } = useSpellingDictionary(
 		spellingLanguage,

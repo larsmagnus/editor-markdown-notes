@@ -1,8 +1,8 @@
 import { Plugin, PluginKey } from '@tiptap/pm/state'
-import type { Command } from '@tiptap/pm/state'
 import { moveTableColumn, moveTableRow } from '@tiptap/pm/tables'
 import { Extension } from '@tiptap/react'
 
+import { commandRunner } from '@/editor/extensions/run-command'
 import { alignColumn } from '@/editor/extensions/table/alignment'
 import type { TableAlign } from '@/editor/extensions/table/alignment'
 import {
@@ -66,10 +66,7 @@ export const TableCommands = Extension.create({
 	},
 
 	addKeyboardShortcuts() {
-		// The view goes through too: deciding whether a cell has another line to
-		// reach is a question about layout, not about the document.
-		const run = (command: Command) => () =>
-			command(this.editor.state, this.editor.view.dispatch, this.editor.view)
+		const run = commandRunner(this.editor)
 
 		return {
 			Backspace: run(removeCellSelection),

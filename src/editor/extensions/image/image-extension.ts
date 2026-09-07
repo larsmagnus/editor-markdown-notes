@@ -1,5 +1,4 @@
 import Image from '@tiptap/extension-image'
-import type { Command } from '@tiptap/pm/state'
 import { mergeAttributes, ReactNodeViewRenderer } from '@tiptap/react'
 
 import { ImageView } from '@/editor/extensions/image/image-view'
@@ -8,6 +7,7 @@ import {
 	moveToAdjacentImage,
 } from '@/editor/extensions/image/keyboard-nav'
 import { createImageSourcePlugin } from '@/editor/extensions/image/sync-image-source-plugin'
+import { commandRunner } from '@/editor/extensions/run-command'
 import { resolveImageSrc } from '@/lib/host/resolve-image-src'
 
 /**
@@ -53,8 +53,7 @@ export const ImageExtension = Image.configure({ inline: true }).extend({
 	// image's own Backspace falls through to ProseMirror's default node
 	// deletion.
 	addKeyboardShortcuts() {
-		const run = (command: Command) => () =>
-			command(this.editor.state, this.editor.view.dispatch, this.editor.view)
+		const run = commandRunner(this.editor)
 
 		return {
 			Tab: run(moveToAdjacentImage(1)),
