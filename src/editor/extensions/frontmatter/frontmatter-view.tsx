@@ -39,7 +39,7 @@ export function FrontmatterView({ node, editor, getPos }: NodeViewProps) {
 	return (
 		<NodeViewWrapper
 			data-type="frontmatter"
-			className="not-prose relative mb-3 rounded-md border bg-muted/50 focus-within:ring-2"
+			className="not-typeset relative mb-3 rounded-md border bg-muted/50 focus-within:ring-2"
 		>
 			<div
 				className="flex items-center justify-between border-b px-3 py-1.5"

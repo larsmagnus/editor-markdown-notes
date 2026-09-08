@@ -16,7 +16,7 @@ export const Primary: Story = {
 	args: {
 		content: '# Hello\n\nSome **markdown** content.',
 		showMenu: true,
-		includeProseBaseClassNames: true,
+		includeTypesetClassNames: true,
 	},
 }
 
@@ -38,6 +38,6 @@ export const DiagramThatWillNotParse: Story = {
 			'The rest of the note keeps rendering.',
 		].join('\n'),
 		showMenu: true,
-		includeProseBaseClassNames: true,
+		includeTypesetClassNames: true,
 	},
 }

@@ -1,9 +1,9 @@
 @import 'tailwindcss';
 @import 'shadcn/tailwind.css';
+@import './typeset.css';
 
 @custom-variant dark (&:is(.dark *));
 
-@plugin '@tailwindcss/typography';
 @plugin 'tailwindcss-animate';
 
 @theme inline {
@@ -113,6 +113,16 @@
 	--sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+/*
+ * The document's own typeset preset. Headings fall back to the body font
+ * because typeset reaches for a `--font-heading` this theme does not define.
+ */
+@layer components {
+	.typeset-note {
+		--typeset-font-heading: inherit;
+	}
+}
+
 @layer utilities {
 	.tiptap {
 		@apply min-h-full w-full bg-transparent text-base placeholder:text-muted-foreground
@@ -148,7 +158,7 @@
 	}
 
 	/*
-	 * ProseMirror table plumbing. Typography styles the table itself, but the
+	 * ProseMirror table plumbing. Typeset styles the table itself, but the
 	 * fixed layout, cell borders and cell-selection overlay are ours to provide.
 	 */
 	.ProseMirror table {
@@ -219,8 +229,14 @@
 		@apply flex items-start gap-2;
 	}
 
+	/*
+	 * A task item's text sits in a `div` beside the checkbox rather than
+	 * directly in the `li`, so the typeset rule that drops a first child's
+	 * leading space does not reach it - and that space would push the text a
+	 * whole line below its own checkbox.
+	 */
 	.ProseMirror ul[data-type='taskList'] li p {
-		@apply mb-0;
+		@apply m-0;
 	}
 
 	.ProseMirror ul[data-type='taskList'] li > label {
@@ -277,14 +293,13 @@
 	/*
 	 * Code blocks take both colors from the resolved Shiki theme, published as
 	 * custom properties by `useCodeBlockStyle`. Both, not just the foreground:
-	 * token colors assume their own theme's background, while Typography's `pre`
-	 * shade is a fixed dark one in light mode too - which would leave a light
-	 * theme's dark-on-white palette unreadable. Typography's own values are the
-	 * fallback, so an unresolved theme looks exactly as it did before.
+	 * token colors assume their own theme's background, so a light theme's
+	 * dark-on-white palette would be unreadable on anything else. Typeset's own
+	 * `pre` colors are the fallback, so an unresolved theme looks untouched.
 	 */
 	.ProseMirror pre {
-		background-color: var(--shiki-bg, var(--tw-prose-pre-bg));
-		color: var(--shiki-fg, var(--tw-prose-pre-code));
+		background-color: var(--shiki-bg, var(--color-muted));
+		color: var(--shiki-fg, inherit);
 	}
 
 	/* Text tools findings. Underlines rather than background fills for the

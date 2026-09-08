@@ -62,7 +62,7 @@ export function EditorBody({
 						content={content}
 						syncContent={syncContent}
 						active={!raw}
-						includeProseBaseClassNames
+						includeTypesetClassNames
 						className={className}
 					/>
 				</AppErrorBoundary>

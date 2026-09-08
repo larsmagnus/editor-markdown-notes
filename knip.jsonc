@@ -7,9 +7,8 @@
 	// `.vscode-test.mjs` points at `out/test/**/*.test.js`, compiled output with
 	// no path back to source.
 	"entry": ["src/test/**/*.test.ts"],
-	// `.css` is in here so the Tailwind v4 `@plugin` directives in
-	// `src/globals.css` count as usage of `@tailwindcss/typography` and
-	// `tailwindcss-animate`.
+	// `.css` is in here so the Tailwind v4 `@plugin` directive in
+	// `src/globals.css` counts as usage of `tailwindcss-animate`.
 	"project": ["src/**/*.{ts,tsx,css}"],
 	"ignoreIssues": {
 		// Vendored shadcn/ui primitives. They deliberately re-export the full

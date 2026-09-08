@@ -16,7 +16,7 @@ interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 	 *  mounted regardless, so its undo history survives the toggle. */
 	active?: boolean
 	showMenu?: boolean
-	includeProseBaseClassNames?: boolean
+	includeTypesetClassNames?: boolean
 }
 
 function EditorModeLive({
@@ -24,7 +24,7 @@ function EditorModeLive({
 	syncContent,
 	active = true,
 	showMenu,
-	includeProseBaseClassNames,
+	includeTypesetClassNames,
 	...props
 }: EditorProps) {
 	const { editor, analysis, isAnalyzing, hasSpellingFailed, codeBlockStyle } =
@@ -37,7 +37,7 @@ function EditorModeLive({
 			{showMenu ? <MenuBar /> : null}
 			<ButtonAdd editor={editor} />
 			<EditorSurface
-				includeProseBaseClassNames={includeProseBaseClassNames}
+				includeTypesetClassNames={includeTypesetClassNames}
 				codeBlockStyle={codeBlockStyle}
 				panel={
 					<TextToolsAside

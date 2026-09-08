@@ -43,7 +43,7 @@ export function ErrorFallback({
 		<div
 			role="alert"
 			className={cn(
-				'not-prose relative my-2 h-fit rounded-md border border-red-300 bg-red-50 p-3 pr-8 text-sm dark:border-red-900 dark:bg-red-950/40',
+				'not-typeset relative my-2 h-fit rounded-md border border-red-300 bg-red-50 p-3 pr-8 text-sm dark:border-red-900 dark:bg-red-950/40',
 				className
 			)}
 			{...rest}

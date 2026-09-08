@@ -1,8 +1,11 @@
+/** The reading measure. A markdown source line is capped at the same count. */
+const MEASURE = 'max-w-[65ch]'
+
 /**
  * How wide the document renders.
  *
- * `max-w-full` overrides the prose plugin's built-in 65ch cap; `mx-auto` centres
- * the content against that cap instead.
+ * The one answer for both the rendered document and the markdown source, so
+ * toggling between them does not reflow the column.
  */
 export function contentWidthClassName({
 	fullWidth,
@@ -13,5 +16,5 @@ export function contentWidthClassName({
 }): string {
 	if (fullWidth) return 'max-w-full'
 
-	return centerContent ? 'mx-auto' : ''
+	return centerContent ? `${MEASURE} mx-auto` : MEASURE
 }

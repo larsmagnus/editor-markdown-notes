@@ -20,7 +20,7 @@ export const LIVE_EDITOR_ID = 'live-editor'
 export const EDITOR_KEYBOARD_HINT_ID = 'editor-keyboard-hint'
 
 type EditorSurfaceProps = Omit<EditorContentProps, 'editor'> & {
-	includeProseBaseClassNames?: boolean
+	includeTypesetClassNames?: boolean
 	/**
 	 * Rendered beside the document; omitted entirely when the tools are off.
 	 *
@@ -43,7 +43,7 @@ type EditorSurfaceProps = Omit<EditorContentProps, 'editor'> & {
  * this container is all every `pre` below it needs.
  */
 export function EditorSurface({
-	includeProseBaseClassNames,
+	includeTypesetClassNames,
 	panel,
 	className,
 	codeBlockStyle,
@@ -67,11 +67,7 @@ export function EditorSurface({
 						<EditorContent
 							editor={editor}
 							className={cn(
-								includeProseBaseClassNames &&
-									'prose dark:prose-invert prose-headings:font-bold prose-headings:text-black dark:prose-headings:text-white',
-								'prose-code:before:content-none prose-code:after:content-none',
-								'prose-blockquote:not-italic prose-blockquote:[&_p:first-of-type]:before:content-none prose-blockquote:[&_p:last-of-type]:after:content-none',
-								'prose-headings:first:mt-0 prose-p:first:mt-0',
+								includeTypesetClassNames && 'typeset typeset-note',
 								className
 							)}
 							{...rest}

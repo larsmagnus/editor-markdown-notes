@@ -39,7 +39,7 @@ export function MermaidDiagram({
 				// Everything the viewport draws is generated, not authored, so it
 				// stays outside what ProseMirror treats as editable content, and
 				// outside the typography the authored source takes.
-				<div contentEditable={false} className="not-prose my-4">
+				<div contentEditable={false} className="not-typeset my-4">
 					<PanZoom
 						// The border is always drawn, unlike the rest of the editor's
 						// hover affordances: a diagram taller than the cap is clipped,

@@ -40,14 +40,14 @@ export function ImageView({
 	const handleEditSource = useImageEditSource({ editor, getPos })
 
 	return (
-		// `not-prose` and the img's own `m-0`: Tailwind's typography plugin gives
-		// `img` a default vertical margin, invisible on the image's own rect but
+		// `not-typeset` and the img's own `m-0`: typeset gives `img` a leading
+		// vertical margin, invisible on the image's own rect but
 		// real in its container's layout - `PanZoom`'s wrapper sizes itself to
 		// that margined height, then clips the excess against its own
 		// `max-h-[32rem]`, cutting the image's actual bottom edge off.
 		<NodeViewWrapper
 			as="span"
-			className="group relative not-prose inline-block align-bottom"
+			className="group relative not-typeset inline-block align-bottom"
 		>
 			<PanZoom
 				className={cn(

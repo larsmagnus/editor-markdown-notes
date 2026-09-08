@@ -133,7 +133,10 @@ export function EditorModeRaw({
 			spellCheck={false}
 			aria-label="Raw markdown"
 			className={cn(
-				'w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre outline-none field-sizing-content',
+				// `pre-wrap` rather than `pre`: the source shares the rendered
+				// document's measure, so a line longer than it has to wrap rather
+				// than run off the side of a column it cannot scroll.
+				'w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre-wrap outline-none field-sizing-content',
 				className
 			)}
 		/>
