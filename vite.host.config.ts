@@ -1,41 +1,55 @@
-import { readdirSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { readdirSync, readFileSync } from 'node:fs'
+import { relative } from 'node:path'
 
 import { defineConfig } from 'vite'
 
-const srcRoot = join(import.meta.dirname, 'src')
+import { parseJsonc } from '#src/lib/host/jsonc'
+
+const repoRoot = import.meta.dirname
+const srcRoot = `${repoRoot}/src`
 
 /**
- * Every host source file, as a `{ out/-relative path: absolute .ts path }`
- * entry map - the same file set `tsconfig.host.json`'s `include`/`exclude`
- * names.
+ * Every file `tsconfig.host.json` includes, minus its vitest-only `*.test.ts`
+ * files, as a `{ out/-relative path: absolute .ts path }` entry map.
  *
- * One Rollup entry per file, not one entry at `host.ts`, because
- * `.vscode-test.mjs` globs `out/test/**\/*.test.js` directly (mocha's own
- * discovery model, unrelated to what `host.ts` imports) and `src/test/**`
- * imports individual host modules directly for whitebox coverage - both need
- * every file to keep existing as its own requirable output, which is what
- * `output.preserveModules` below does with this entry map.
+ * Reads `tsconfig.host.json`'s own `include` array rather than a second,
+ * hand-kept directory list, so the two can't drift. One Rollup entry per
+ * file, not one entry at `host.ts`, because both `.vscode-test.mjs` (globs
+ * `out/test/**\/*.test.js` directly - mocha's own discovery, unrelated to
+ * `host.ts`'s import graph) and `src/test/**` (imports individual host
+ * modules directly for whitebox coverage) need every file to keep existing
+ * as its own requirable output - what `output.preserveModules` below does
+ * with this entry map.
  */
 function hostEntries(): Record<string, string> {
-	const entries: Record<string, string> = { host: join(srcRoot, 'host.ts') }
+	const { include } = parseJsonc(
+		readFileSync(`${repoRoot}/tsconfig.host.json`, 'utf8')
+	) as { include: string[] }
 
-	for (const dir of ['host', 'shared', 'test', 'lib/host']) {
-		const absDir = join(srcRoot, dir)
-		for (const file of readdirSync(absDir, { recursive: true })) {
-			if (typeof file !== 'string' || !file.endsWith('.ts')) continue
-			const absFile = join(absDir, file)
-			if (absFile.endsWith('agent-sdk-bundle.ts')) continue
-			// `*.test.ts` under these three is vitest coverage that `tsconfig.app.json`
-			// already runs from `src/` directly - `tsc` compiled it into `out/` too
-			// as a harmless side effect of its broad `include`, but nothing ever ran
-			// it from there, and bundling it for real (unlike `tsc`) would pull the
-			// actual `vitest`/`chai` packages into the output. `src/test/**` is
-			// different: `.vscode-test.mjs` genuinely globs `out/test/**/*.test.js`.
-			if (dir !== 'test' && absFile.endsWith('.test.ts')) continue
+	const entries: Record<string, string> = {}
+	const addFile = (absFile: string) => {
+		// Its own `vite.agent-sdk.config.ts`, not this one - see that file.
+		if (absFile.endsWith('agent-sdk-bundle.ts')) return
+		// vitest coverage under host/**, shared/** that `tsconfig.app.json`
+		// already runs from `src/` directly - `tsconfig.host.json` includes it
+		// too as a side effect of its broad glob, but nothing ever runs it from
+		// `out/`. `src/test/**` is the one directory where a `.test.ts` file is
+		// real output: `.vscode-test.mjs` genuinely globs it there.
+		if (absFile.endsWith('.test.ts') && !absFile.includes('/src/test/')) return
 
-			const key = relative(srcRoot, absFile).replace(/\.ts$/, '')
-			entries[key] = absFile
+		entries[relative(srcRoot, absFile).replace(/\.ts$/, '')] = absFile
+	}
+
+	for (const pattern of include) {
+		const dir = pattern.match(/^(.*)\/\*\*\/\*$/)?.[1]
+		if (!dir) {
+			addFile(`${repoRoot}/${pattern}`)
+			continue
+		}
+		for (const file of readdirSync(`${repoRoot}/${dir}`, { recursive: true })) {
+			if (typeof file === 'string' && file.endsWith('.ts')) {
+				addFile(`${repoRoot}/${dir}/${file}`)
+			}
 		}
 	}
 
