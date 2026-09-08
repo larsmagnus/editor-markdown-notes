@@ -11,6 +11,8 @@ const srcRoot = join(import.meta.dirname, 'src')
 // (the retext stack, hunspell dictionaries) rather than assume anything is
 // already installed.
 export default defineConfig({
+	// Not a webview build - don't copy `public/`'s assets into the output.
+	publicDir: false,
 	resolve: {
 		// Mirrors `vite.config.ts`'s alias - Rollup/Rolldown doesn't resolve the
 		// root `package.json`'s `imports` field on its own.

@@ -7,6 +7,8 @@ import { defineConfig } from 'vite'
 // true for Rollup/Rolldown's `es` output, unlike a `cjs` target, which would
 // need to shim it to an empty value.
 export default defineConfig({
+	// Not a webview build - don't copy `public/`'s assets into the output.
+	publicDir: false,
 	// No `resolve.alias` needed - this is a one-line re-export
 	// (`src/host/agent-sdk-bundle.ts`) with no `#src/*` imports of its own.
 	ssr: { noExternal: true },
