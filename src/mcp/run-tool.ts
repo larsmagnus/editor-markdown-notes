@@ -1,4 +1,4 @@
-import { describe, log } from '@/mcp/log'
+import { describe, log } from '#src/mcp/log'
 
 /**
  * Runs one tool call: logs it, and shapes whatever comes back.

@@ -1,10 +1,10 @@
 import { Editor } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { markerCaretAtBoundary } from '@/editor/extensions/block-marker/marker-caret'
-import { parseListMarker } from '@/editor/extensions/list/list-marker'
-import { outdentListItem } from '@/editor/extensions/list/outdent-list-item'
-import { createEditor } from '@/test-utils/editor'
+import { markerCaretAtBoundary } from '#src/editor/extensions/block-marker/marker-caret'
+import { parseListMarker } from '#src/editor/extensions/list/list-marker'
+import { outdentListItem } from '#src/editor/extensions/list/outdent-list-item'
+import { createEditor } from '#src/test-utils/editor'
 
 // `setContent` runs the plugins that seed and renumber marker text;
 // constructing with `content` directly does not (see `marker-sync.test.ts`).

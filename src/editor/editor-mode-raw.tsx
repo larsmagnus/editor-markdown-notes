@@ -2,11 +2,11 @@ import { cn } from 'cn'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
-import { useFlushOnDeactivate } from '@/hooks/use-flush-on-deactivate'
-import { useNoteSync } from '@/hooks/use-note-sync'
-import { useSettings } from '@/hooks/use-settings'
-import { findRawSearchRange } from '@/lib/raw-search-reveal'
-import { takeSearchReveal } from '@/lib/search-reveal'
+import { useFlushOnDeactivate } from '#src/hooks/use-flush-on-deactivate'
+import { useNoteSync } from '#src/hooks/use-note-sync'
+import { useSettings } from '#src/hooks/use-settings'
+import { findRawSearchRange } from '#src/lib/raw-search-reveal'
+import { takeSearchReveal } from '#src/lib/search-reveal'
 
 interface RawMarkdownEditorProps {
 	content: string

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createAskClient } from '@/lib/ask/ask-client'
+import { createAskClient } from '#src/lib/ask/ask-client'
 
 function postFromHost(data: unknown) {
 	window.dispatchEvent(new MessageEvent('message', { data }))

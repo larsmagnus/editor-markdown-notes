@@ -5,8 +5,7 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import { DocumentWriter } from '../host/document-updates'
-
+import { DocumentWriter } from '#src/host/document-updates'
 import {
 	captureNextPanel,
 	isUpdateMessage,
@@ -15,7 +14,7 @@ import {
 	spyOnPostedMessages,
 	spyOnReceivedMessages,
 	VIEW_TYPE,
-} from './webview-panel-restore-support'
+} from '#src/test/webview-panel-restore-support'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 const log = { info: () => {}, warn: () => {}, error: () => {} }

@@ -1,15 +1,14 @@
 import * as vscode from 'vscode'
 
-import { EXTENSION_ID } from '../shared/constants'
-import type { ViewOptions } from '../shared/messages'
-
-import { addDictionaryWords } from './dictionary-words-command'
-import { openFile } from './open-file-command'
-import { openInTextEditor } from './open-in-text-editor-command'
-import type { SettingsStore } from './settings-store'
-import { pickSpellingLanguage } from './spelling-picker'
-import { pickTheme } from './theme-picker'
-import { toggleHideToolbar } from './toggle-hide-toolbar-command'
+import { addDictionaryWords } from '#src/host/dictionary-words-command'
+import { openFile } from '#src/host/open-file-command'
+import { openInTextEditor } from '#src/host/open-in-text-editor-command'
+import type { SettingsStore } from '#src/host/settings-store'
+import { pickSpellingLanguage } from '#src/host/spelling-picker'
+import { pickTheme } from '#src/host/theme-picker'
+import { toggleHideToolbar } from '#src/host/toggle-hide-toolbar-command'
+import { EXTENSION_ID } from '#src/shared/constants'
+import type { ViewOptions } from '#src/shared/messages'
 
 /** The view options a command can flip, keyed by the command that flips them. */
 const VIEW_OPTION_TOGGLES = {

@@ -1,9 +1,9 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
-import { resolveEntryChunk } from '../lib/host/vite-manifest'
-import type { EntryChunk, ViteManifestChunk } from '../lib/host/vite-manifest'
-import type { Logger } from '../shared/logger'
+import { resolveEntryChunk } from '#src/lib/host/vite-manifest'
+import type { EntryChunk, ViteManifestChunk } from '#src/lib/host/vite-manifest'
+import type { Logger } from '#src/shared/logger'
 
 /**
  * The built entry chunk, found through the manifest `pnpm build` writes into

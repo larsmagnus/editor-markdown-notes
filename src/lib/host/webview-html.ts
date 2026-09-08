@@ -1,9 +1,8 @@
-// Relative, not `@/`: this module is also compiled by `tsconfig.host.json`,
-// which has no `paths` mapping precisely so aliases cannot reach the host build.
-import type { Config, ImageBaseUris, SearchReveal } from '../../shared/messages'
-
 // oxlint-disable-next-line no-restricted-imports
-import { toScriptLiteral } from './script-literal'
+import { toScriptLiteral } from '#src/lib/host/script-literal'
+// Relative, not `#src/`: this module is also compiled by `tsconfig.host.json`,
+// which has no `paths` mapping precisely so aliases cannot reach the host build.
+import type { Config, ImageBaseUris, SearchReveal } from '#src/shared/messages'
 
 export type WebviewHtmlInput = {
 	/** Webview URI of the built entry chunk. */

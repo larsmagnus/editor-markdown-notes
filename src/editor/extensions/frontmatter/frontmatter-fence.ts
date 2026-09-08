@@ -1,5 +1,5 @@
-import type { FenceRange } from '@/editor/extensions/block-marker/fence-spec'
-import { findClosingFence } from '@/editor/extensions/syntax-reveal/find-closing-fence'
+import type { FenceRange } from '#src/editor/extensions/block-marker/fence-spec'
+import { findClosingFence } from '#src/editor/extensions/syntax-reveal/find-closing-fence'
 
 /**
  * A frontmatter block's own text, split into its `---` fence lines and the

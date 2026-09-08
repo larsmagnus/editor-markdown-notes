@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/core'
 
-import { caretToContentStart } from '@/editor/extensions/block-marker/caret-to-content-start'
-import type { MarkerCaret } from '@/editor/extensions/block-marker/marker-caret'
+import { caretToContentStart } from '#src/editor/extensions/block-marker/caret-to-content-start'
+import type { MarkerCaret } from '#src/editor/extensions/block-marker/marker-caret'
 
 /**
  * Whether `liftListItem` would outdent this item into the list above it rather

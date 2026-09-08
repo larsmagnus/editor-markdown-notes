@@ -2,13 +2,13 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import EditorModeLive from '@/editor/editor-mode-live'
-import { copyToClipboard } from '@/lib/clipboard'
-import { updateNotes } from '@/lib/update-notes'
+import EditorModeLive from '#src/editor/editor-mode-live'
+import { copyToClipboard } from '#src/lib/clipboard'
+import { updateNotes } from '#src/lib/update-notes'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`
 // and the save effect attaches a rejection handler to what it hands back.
-vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
+vi.mock('#src/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 
 // Mermaid draws by measuring text, which happy-dom has no layout engine for.
 // Stubbing it keeps these tests about what the editor does with a diagram -
@@ -20,17 +20,17 @@ vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 // that, so one block would intermittently get the real, un-mocked mermaid
 // instead of the stub.
 const renderMermaid = vi.hoisted(() => vi.fn())
-vi.mock('@/lib/render-mermaid', () => ({ renderMermaid }))
+vi.mock('#src/lib/render-mermaid', () => ({ renderMermaid }))
 
 // The bubble menu positions itself with floating-ui, which measures the DOM
 // and throws in happy-dom the moment anything moves the selection. Nothing
 // here tests the menu, so it is stubbed out.
-vi.mock('@/components/menu-bubble', () => ({ MenuBubble: () => null }))
+vi.mock('#src/components/menu-bubble', () => ({ MenuBubble: () => null }))
 
 // The app's one seam onto the clipboard, mocked here so no test has to replace
 // `navigator` - a stub built from `{ ...navigator, clipboard }` drops the
 // prototype getters ProseMirror reads when it constructs an editor.
-vi.mock('@/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
+vi.mock('#src/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
 
 const MERMAID_NOTE = ['```mermaid', 'graph TD', '  A --> B', '```'].join('\n')
 

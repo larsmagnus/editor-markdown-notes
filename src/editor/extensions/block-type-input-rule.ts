@@ -3,7 +3,7 @@ import type { Range } from '@tiptap/core'
 import type { NodeType, ResolvedPos } from '@tiptap/pm/model'
 import type { Transaction } from '@tiptap/pm/state'
 
-import { canSetBlockType } from '@/editor/extensions/can-set-block-type'
+import { canSetBlockType } from '#src/editor/extensions/can-set-block-type'
 
 /**
  * An input rule that retypes a block and writes its marker text, for the

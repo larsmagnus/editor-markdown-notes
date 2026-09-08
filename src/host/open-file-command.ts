@@ -2,7 +2,7 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import { VIEW_TYPE } from './constants'
+import { VIEW_TYPE } from '#src/host/constants'
 
 /**
  * Opens `uri` — or the active editor's file — with our custom editor.

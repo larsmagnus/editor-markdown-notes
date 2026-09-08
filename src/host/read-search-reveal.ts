@@ -1,12 +1,11 @@
 import * as vscode from 'vscode'
 
-import { splitFrontmatter } from '../lib/host/frontmatter'
-import type { Logger } from '../shared/logger'
-import type { SearchReveal } from '../shared/messages'
-
-import { readSearchResults } from './read-search-match'
-import type { SearchMatch } from './search-match'
-import { buildSearchReveal } from './search-reveal'
+import { readSearchResults } from '#src/host/read-search-match'
+import type { SearchMatch } from '#src/host/search-match'
+import { buildSearchReveal } from '#src/host/search-reveal'
+import { splitFrontmatter } from '#src/lib/host/frontmatter'
+import type { Logger } from '#src/shared/logger'
+import type { SearchReveal } from '#src/shared/messages'
 
 /**
  * Nothing may open a note more slowly than this, reveal or no reveal. The search

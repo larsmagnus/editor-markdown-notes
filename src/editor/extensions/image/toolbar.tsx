@@ -1,10 +1,10 @@
 import { Code, Trash2, Unlink } from 'lucide-react'
 
-import { ButtonAction } from '@/components/button-action'
-import { ButtonCopy } from '@/components/button-copy'
-import { OverlayToolbar } from '@/components/overlay-toolbar'
-import { ImageLinkPopover } from '@/editor/extensions/image/image-link-popover'
-import type { ImageLink } from '@/hooks/use-image-link'
+import { ButtonAction } from '#src/components/button-action'
+import { ButtonCopy } from '#src/components/button-copy'
+import { OverlayToolbar } from '#src/components/overlay-toolbar'
+import { ImageLinkPopover } from '#src/editor/extensions/image/image-link-popover'
+import type { ImageLink } from '#src/hooks/use-image-link'
 
 type ImageCopy = { copied: boolean; onCopy: () => void }
 

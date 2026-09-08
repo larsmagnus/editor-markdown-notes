@@ -1,7 +1,7 @@
 import type { InputRule } from '@tiptap/core'
 import type { NodeType } from '@tiptap/pm/model'
 
-import { createBlockTypeInputRule } from '@/editor/extensions/block-type-input-rule'
+import { createBlockTypeInputRule } from '#src/editor/extensions/block-type-input-rule'
 
 /**
  * Converts a typed `#`x1-6 + space into a heading, superseding the stock

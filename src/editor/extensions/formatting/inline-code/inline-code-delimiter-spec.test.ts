@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import { inlineCodeDelimiterSpec } from '@/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
-import { createEditor } from '@/test-utils/editor'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import { inlineCodeDelimiterSpec } from '#src/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('inlineCodeDelimiterSpec', () => {
 	it('detects a matching single-backtick fence at both ends', () => {

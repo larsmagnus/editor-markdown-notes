@@ -2,8 +2,8 @@ import { renderHook } from '@testing-library/react'
 import { Editor } from '@tiptap/core'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useSearchReveal } from '@/hooks/use-search-reveal'
-import { createEditor } from '@/test-utils/editor'
+import { useSearchReveal } from '#src/hooks/use-search-reveal'
+import { createEditor } from '#src/test-utils/editor'
 
 const NOTE = 'Ask for an email address.'
 

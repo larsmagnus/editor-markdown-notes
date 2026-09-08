@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-import type { HeadingLevel } from '@/lib/heading-levels'
+import type { HeadingLevel } from '#src/lib/heading-levels'
 
 export const HEADING_LEVEL_ICONS: Record<HeadingLevel, LucideIcon> = {
 	1: Heading1,

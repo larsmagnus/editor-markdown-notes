@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type { PropsWithChildren } from 'react'
 
-import { useHostMessage } from '@/hooks/use-host-message'
-import { SettingsContext } from '@/hooks/use-settings'
-import { readInitialSettings } from '@/lib/initial-settings'
-import { configMessageSchema } from '@/lib/schemas'
-import { writeStoredViewOptions } from '@/lib/view-options-storage'
-import { getVSCodeApi, isVSCodeWebview } from '@/lib/vscode-api'
-import type { ExtensionSettings, ViewOptions } from '@/shared/messages'
+import { useHostMessage } from '#src/hooks/use-host-message'
+import { SettingsContext } from '#src/hooks/use-settings'
+import { readInitialSettings } from '#src/lib/initial-settings'
+import { configMessageSchema } from '#src/lib/schemas'
+import { writeStoredViewOptions } from '#src/lib/view-options-storage'
+import { getVSCodeApi, isVSCodeWebview } from '#src/lib/vscode-api'
+import type { ExtensionSettings, ViewOptions } from '#src/shared/messages'
 
 type SettingsProviderProps = PropsWithChildren<{
 	initialViewOptions?: Partial<ViewOptions>

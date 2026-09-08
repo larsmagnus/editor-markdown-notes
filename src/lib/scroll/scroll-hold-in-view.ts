@@ -1,5 +1,8 @@
-import { createSettleLoop, TAKEOVER_EVENTS } from '@/lib/scroll/scroll-settle'
-import type { SettleOptions } from '@/lib/scroll/scroll-settle'
+import {
+	createSettleLoop,
+	TAKEOVER_EVENTS,
+} from '#src/lib/scroll/scroll-settle'
+import type { SettleOptions } from '#src/lib/scroll/scroll-settle'
 
 /**
  * Scrolls an element to the middle of the viewport, and keeps it there while the

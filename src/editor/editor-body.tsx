@@ -1,9 +1,9 @@
 import { cn } from 'cn'
 import type { ReactNode } from 'react'
 
-import { AppErrorBoundary } from '@/components/app-error-boundary'
-import EditorModeLive from '@/editor/editor-mode-live'
-import { EditorModeRaw } from '@/editor/editor-mode-raw'
+import { AppErrorBoundary } from '#src/components/app-error-boundary'
+import EditorModeLive from '#src/editor/editor-mode-live'
+import { EditorModeRaw } from '#src/editor/editor-mode-raw'
 
 interface EditorBodyProps {
 	content: string

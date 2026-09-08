@@ -3,7 +3,7 @@ import { Extension } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { createEditor } from '@/test-utils/editor'
+import { createEditor } from '#src/test-utils/editor'
 
 let leaked: Editor | null = null
 let mountPoint: Element | null = null

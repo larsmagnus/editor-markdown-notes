@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { splitFrontmatter } from '@/lib/host/frontmatter'
-import { getDocumentText } from '@/lib/text-tools/document-text'
-import { markdownProse } from '@/mcp/markdown-text'
-import { createEditor } from '@/test-utils/editor'
+import { splitFrontmatter } from '#src/lib/host/frontmatter'
+import { getDocumentText } from '#src/lib/text-tools/document-text'
+import { markdownProse } from '#src/mcp/markdown-text'
+import { createEditor } from '#src/test-utils/editor'
 
 /**
  * The guard on the one thing the panel and the MCP server implement twice.

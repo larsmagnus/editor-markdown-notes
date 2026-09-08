@@ -2,18 +2,18 @@ import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { moveTableColumn, moveTableRow } from '@tiptap/pm/tables'
 import { Extension } from '@tiptap/react'
 
-import { commandRunner } from '@/editor/extensions/run-command'
-import { alignColumn } from '@/editor/extensions/table/alignment'
-import type { TableAlign } from '@/editor/extensions/table/alignment'
+import { commandRunner } from '#src/editor/extensions/run-command'
+import { alignColumn } from '#src/editor/extensions/table/alignment'
+import type { TableAlign } from '#src/editor/extensions/table/alignment'
 import {
 	moveCaretPastTable,
 	moveCaretToCellBeyond,
-} from '@/editor/extensions/table/caret'
+} from '#src/editor/extensions/table/caret'
 import {
 	removeCellSelection,
 	selectCellBeside,
-} from '@/editor/extensions/table/cell-selection'
-import { keepHeaderInFirstRow } from '@/editor/extensions/table/header'
+} from '#src/editor/extensions/table/cell-selection'
+import { keepHeaderInFirstRow } from '#src/editor/extensions/table/header'
 
 /**
  * Everything the table needs that `@tiptap/extension-table` does not bind:

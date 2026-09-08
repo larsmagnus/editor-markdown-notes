@@ -1,4 +1,4 @@
-import type { SearchReveal } from '@/shared/messages'
+import type { SearchReveal } from '#src/shared/messages'
 
 /** A range of the raw markdown source, as character offsets. */
 export type SourceRange = {

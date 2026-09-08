@@ -1,9 +1,9 @@
 import { Extension } from '@tiptap/core'
 import { PluginKey } from '@tiptap/pm/state'
 
-import { askProposalCommands } from '@/editor/extensions/ask/ask-proposal-commands'
-import { createAskProposalPlugin } from '@/editor/extensions/ask/ask-proposal-plugin'
-import { unmountActiveWidget } from '@/editor/extensions/ask/ask-proposal-widget-mount'
+import { askProposalCommands } from '#src/editor/extensions/ask/ask-proposal-commands'
+import { createAskProposalPlugin } from '#src/editor/extensions/ask/ask-proposal-plugin'
+import { unmountActiveWidget } from '#src/editor/extensions/ask/ask-proposal-widget-mount'
 
 type AskProposalStatus = 'streaming' | 'done' | 'error'
 

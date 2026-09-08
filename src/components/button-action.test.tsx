@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { ButtonAction } from '@/components/button-action'
-import { TooltipProvider } from '@/components/ui/tooltip'
+import { ButtonAction } from '#src/components/button-action'
+import { TooltipProvider } from '#src/components/ui/tooltip'
 
 describe('ButtonAction', () => {
 	it('uses the label as its accessible name and calls onClick', async () => {

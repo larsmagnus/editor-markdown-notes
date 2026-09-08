@@ -1,7 +1,7 @@
 import type { Mark, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
-import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
+import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
 
 type MarkBoundary =
 	| string

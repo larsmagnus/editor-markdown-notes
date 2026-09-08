@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-import type { ShikiThemeKind } from '../../shared/messages'
+import type { ShikiThemeKind } from '#src/shared/messages'
 
 const UI_THEME_KIND: Record<string, ShikiThemeKind> = {
 	vs: 'light',

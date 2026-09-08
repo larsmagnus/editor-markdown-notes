@@ -5,9 +5,9 @@ import type {
 	SuggestionProps,
 } from '@tiptap/suggestion'
 
-import type { SlashCommandItem } from '@/editor/extensions/slash-command/commands'
-import { SlashCommandMenu } from '@/editor/extensions/slash-command/menu'
-import type { SlashCommandMenuHandle } from '@/editor/extensions/slash-command/menu'
+import type { SlashCommandItem } from '#src/editor/extensions/slash-command/commands'
+import { SlashCommandMenu } from '#src/editor/extensions/slash-command/menu'
+import type { SlashCommandMenuHandle } from '#src/editor/extensions/slash-command/menu'
 
 /** What the rendered menu needs, kept separate from `SlashCommandItem` so `run` never leaks into props. */
 interface SlashCommandMenuProps {

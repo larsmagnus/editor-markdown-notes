@@ -3,7 +3,7 @@ import type { Command, EditorState, Selection } from '@tiptap/pm/state'
 import { TextSelection } from '@tiptap/pm/state'
 import { nextCell, TableMap } from '@tiptap/pm/tables'
 
-import { cellAt, outOfText } from '@/editor/extensions/table/cell-selection'
+import { cellAt, outOfText } from '#src/editor/extensions/table/cell-selection'
 
 /** Which way the caret is being asked to go. */
 type Direction = 1 | -1

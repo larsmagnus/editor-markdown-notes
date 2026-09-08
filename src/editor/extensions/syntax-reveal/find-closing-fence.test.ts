@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { findClosingFence } from '@/editor/extensions/syntax-reveal/find-closing-fence'
+import { findClosingFence } from '#src/editor/extensions/syntax-reveal/find-closing-fence'
 
 describe('findClosingFence', () => {
 	it('finds a closing marker on a line of its own', () => {

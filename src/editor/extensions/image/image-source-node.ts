@@ -3,8 +3,8 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { EditorState, Transaction } from '@tiptap/pm/state'
 import { NodeSelection } from '@tiptap/pm/state'
 
-import type { ImageAttrs } from '@/editor/extensions/image/image-markdown-text'
-import { parseImageMarkdown } from '@/editor/extensions/image/image-markdown-text'
+import type { ImageAttrs } from '#src/editor/extensions/image/image-markdown-text'
+import { parseImageMarkdown } from '#src/editor/extensions/image/image-markdown-text'
 
 /**
  * The image's `![alt](src "title")` while it's being edited - real, editable

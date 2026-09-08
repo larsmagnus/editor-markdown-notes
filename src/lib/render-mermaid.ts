@@ -1,4 +1,4 @@
-import { errorMessage } from '@/lib/error-message'
+import { errorMessage } from '#src/lib/error-message'
 
 /** An SVG to show, or the reason there isn't one. */
 export type MermaidResult = { svg: string } | { error: string }

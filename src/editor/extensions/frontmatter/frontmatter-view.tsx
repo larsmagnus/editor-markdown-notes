@@ -2,16 +2,16 @@ import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 import { Code } from 'lucide-react'
 
-import { ButtonAction } from '@/components/button-action'
-import { ButtonCopy } from '@/components/button-copy'
-import { ErrorFallback } from '@/components/error-fallback'
-import { focusBlockContentStart } from '@/editor/extensions/focus-block-content-start'
-import { ButtonDelete } from '@/editor/extensions/frontmatter/button-delete'
+import { ButtonAction } from '#src/components/button-action'
+import { ButtonCopy } from '#src/components/button-copy'
+import { ErrorFallback } from '#src/components/error-fallback'
+import { focusBlockContentStart } from '#src/editor/extensions/focus-block-content-start'
+import { ButtonDelete } from '#src/editor/extensions/frontmatter/button-delete'
 import {
 	frontmatterYaml,
 	parseFrontmatterFence,
-} from '@/editor/extensions/frontmatter/frontmatter-fence'
-import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
+} from '#src/editor/extensions/frontmatter/frontmatter-fence'
+import { useCopyToClipboard } from '#src/hooks/use-copy-to-clipboard'
 
 /**
  * The node view every `frontmatter` block renders through: a bordered box with

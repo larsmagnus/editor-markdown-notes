@@ -1,9 +1,9 @@
 import { useCurrentEditor } from '@tiptap/react'
 
-import { findIssueRange } from '@/editor/extensions/text-tools/text-tools-extension'
-import type { RuleGroup } from '@/lib/text-tools/summarize'
-import type { TextIssue } from '@/lib/text-tools/types'
-import { TextToolsRuleInfo } from '@/text-tools/text-tools-rule-info'
+import { findIssueRange } from '#src/editor/extensions/text-tools/text-tools-extension'
+import type { RuleGroup } from '#src/lib/text-tools/summarize'
+import type { TextIssue } from '#src/lib/text-tools/types'
+import { TextToolsRuleInfo } from '#src/text-tools/text-tools-rule-info'
 
 /** Readability findings quote the whole sentence, which is too long for a list. */
 function truncate(value: string) {

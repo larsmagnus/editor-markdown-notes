@@ -1,6 +1,6 @@
-import { readPanelState, updatePanelState } from '@/lib/panel-state'
-import { searchRevealSchema } from '@/lib/schemas'
-import type { SearchReveal } from '@/shared/messages'
+import { readPanelState, updatePanelState } from '#src/lib/panel-state'
+import { searchRevealSchema } from '#src/lib/schemas'
+import type { SearchReveal } from '#src/shared/messages'
 
 /**
  * The match this note was opened on, if it was opened from a search result.

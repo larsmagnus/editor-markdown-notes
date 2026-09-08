@@ -1,8 +1,8 @@
-import type { PlacedIssue } from '@/editor/extensions/text-tools/text-tools-extension'
-import type { DocumentText } from '@/lib/text-tools/document-text'
-import { offsetToPosition } from '@/lib/text-tools/offset-to-position'
-import type { TextIssue } from '@/lib/text-tools/types'
-import type { TextToolRuleId } from '@/shared/messages'
+import type { PlacedIssue } from '#src/editor/extensions/text-tools/text-tools-extension'
+import type { DocumentText } from '#src/lib/text-tools/document-text'
+import { offsetToPosition } from '#src/lib/text-tools/offset-to-position'
+import type { TextIssue } from '#src/lib/text-tools/types'
+import type { TextToolRuleId } from '#src/shared/messages'
 
 /**
  * Maps issues from text offsets onto document positions, dropping any that no

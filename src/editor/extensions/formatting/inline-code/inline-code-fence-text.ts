@@ -1,5 +1,5 @@
-import type { DelimiterPair } from '@/editor/extensions/formatting/delimiter-spec'
-import { codeFenceLength } from '@/editor/extensions/formatting/inline-code/code-fence-length'
+import type { DelimiterPair } from '#src/editor/extensions/formatting/delimiter-spec'
+import { codeFenceLength } from '#src/editor/extensions/formatting/inline-code/code-fence-length'
 
 /**
  * The literal open/close fence text for wrapping `text` in inline code -

@@ -1,8 +1,8 @@
 import type { Editor, Range } from '@tiptap/core'
 
-import { enterImageEditSource } from '@/editor/extensions/image/edit-source'
-import { pickImage } from '@/lib/pick-image'
-import { isVSCodeWebview } from '@/lib/vscode-api'
+import { enterImageEditSource } from '#src/editor/extensions/image/edit-source'
+import { pickImage } from '#src/lib/pick-image'
+import { isVSCodeWebview } from '#src/lib/vscode-api'
 
 /** Inserts an empty image node and opens its source for editing right away. */
 function insertEmptyImage(editor: Editor, range: Range) {

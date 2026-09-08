@@ -1,4 +1,4 @@
-import type { HunspellDictionary } from '@/lib/text-tools/types'
+import type { HunspellDictionary } from '#src/lib/text-tools/types'
 
 /**
  * One language's Hunspell pair, as text rather than bytes.

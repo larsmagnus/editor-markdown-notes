@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ButtonColor } from '@/components/button-color'
+import { ButtonColor } from '#src/components/button-color'
 
 const meta = {
 	component: ButtonColor,

@@ -8,10 +8,7 @@
 		"strict": true,
 		"noEmit": true,
 		"types": ["@playwright/test", "node"],
-		"paths": {
-			"@/*": ["./src/*"],
-			"@/e2e/*": ["./e2e/*"]
-		}
+		"resolvePackageJsonImports": true
 	},
 	"include": ["e2e/**/*.ts", "src/lib/vscode-api.ts"]
 }

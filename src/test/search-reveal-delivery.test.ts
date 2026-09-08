@@ -2,9 +2,8 @@ import * as assert from 'assert'
 
 import * as vscode from 'vscode'
 
-import { readSearchReveal } from '../host/read-search-reveal'
-
-import { runSearch } from './search-test-support'
+import { readSearchReveal } from '#src/host/read-search-reveal'
+import { runSearch } from '#src/test/search-test-support'
 
 /**
  * What the host hands the webview when a note opens from a search result.

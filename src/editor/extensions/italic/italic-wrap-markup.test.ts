@@ -1,8 +1,8 @@
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { italicWrapMarkup } from '@/editor/extensions/italic/italic-wrap-markup'
-import { createEditor } from '@/test-utils/editor'
+import { italicWrapMarkup } from '#src/editor/extensions/italic/italic-wrap-markup'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('italicWrapMarkup', () => {
 	it('always returns an asterisk when that is the preferred marker', () => {

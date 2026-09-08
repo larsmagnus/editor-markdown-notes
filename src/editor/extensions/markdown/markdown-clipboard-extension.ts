@@ -5,9 +5,9 @@ import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { isInTable } from '@tiptap/pm/tables'
 import { Extension } from '@tiptap/react'
 
-import { looksLikeBlockMarkdown } from '@/editor/extensions/markdown/looks-like-block-markdown'
-import { flattenPastedCells } from '@/editor/extensions/table/flatten-pasted-cells'
-import { closeTableSlice } from '@/editor/extensions/table/slice'
+import { looksLikeBlockMarkdown } from '#src/editor/extensions/markdown/looks-like-block-markdown'
+import { flattenPastedCells } from '#src/editor/extensions/table/flatten-pasted-cells'
+import { closeTableSlice } from '#src/editor/extensions/table/slice'
 
 /**
  * Makes the clipboard speak markdown in both directions.

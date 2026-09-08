@@ -1,12 +1,12 @@
 import type { EditorContentProps } from '@tiptap/react'
 import { EditorContext } from '@tiptap/react'
 
-import { MenuBar } from '@/components/menu-bar'
-import { MenuBubble } from '@/components/menu-bubble'
-import { EditorSurface } from '@/editor/editor-mode-live-surface'
-import { ButtonAdd } from '@/editor/extensions/frontmatter/button-add'
-import { useMarkdownEditor } from '@/hooks/use-markdown-editor'
-import { TextToolsAside } from '@/text-tools/text-tools-aside'
+import { MenuBar } from '#src/components/menu-bar'
+import { MenuBubble } from '#src/components/menu-bubble'
+import { EditorSurface } from '#src/editor/editor-mode-live-surface'
+import { ButtonAdd } from '#src/editor/extensions/frontmatter/button-add'
+import { useMarkdownEditor } from '#src/hooks/use-markdown-editor'
+import { TextToolsAside } from '#src/text-tools/text-tools-aside'
 
 interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 	content: string

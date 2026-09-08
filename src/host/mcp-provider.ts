@@ -1,10 +1,9 @@
 import * as vscode from 'vscode'
 
-import { WORKSPACE_SEPARATOR } from '../shared/constants'
-import type { Logger } from '../shared/logger'
-
-import { CONFIG_SECTION, MCP_PROVIDER_ID } from './constants'
-import type { SettingsStore } from './settings-store'
+import { CONFIG_SECTION, MCP_PROVIDER_ID } from '#src/host/constants'
+import type { SettingsStore } from '#src/host/settings-store'
+import { WORKSPACE_SEPARATOR } from '#src/shared/constants'
+import type { Logger } from '#src/shared/logger'
 
 /**
  * Publishes the writing checks to any MCP client the editor knows about, so an

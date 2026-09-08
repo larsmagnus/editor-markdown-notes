@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createOwnSyncTracker } from '@/lib/own-sync-tracker'
+import { createOwnSyncTracker } from '#src/lib/own-sync-tracker'
 
 describe('createOwnSyncTracker', () => {
 	it('recognises the exact text it was told about', () => {

@@ -1,11 +1,11 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
-import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
+import type { DelimiterSpec } from '#src/editor/extensions/formatting/delimiter-spec'
+import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
 import {
 	detectLinkClose,
 	linkCloseText,
-} from '@/editor/extensions/link/link-close-text'
+} from '#src/editor/extensions/link/link-close-text'
 
 /**
  * Delimiter recognition/reconstruction for links, for `ensure-delimiters-

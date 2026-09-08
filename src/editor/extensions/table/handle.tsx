@@ -1,15 +1,15 @@
 import { useCurrentEditor } from '@tiptap/react'
 import { useState } from 'react'
 
-import { ButtonHandle } from '@/editor/extensions/table/button-handle'
-import { TableDropIndicator } from '@/editor/extensions/table/drop-indicator'
-import type { TableAnchor } from '@/editor/extensions/table/geometry'
-import { TableHandleMenu } from '@/editor/extensions/table/handle-menu'
+import { ButtonHandle } from '#src/editor/extensions/table/button-handle'
+import { TableDropIndicator } from '#src/editor/extensions/table/drop-indicator'
+import type { TableAnchor } from '#src/editor/extensions/table/geometry'
+import { TableHandleMenu } from '#src/editor/extensions/table/handle-menu'
 import type {
 	TableAxis,
 	TableMenuItem,
-} from '@/editor/extensions/table/menu-items'
-import { useTableHandleDrag } from '@/hooks/use-table-handle-drag'
+} from '#src/editor/extensions/table/menu-items'
+import { useTableHandleDrag } from '#src/hooks/use-table-handle-drag'
 
 interface TableHandleProps {
 	axis: TableAxis

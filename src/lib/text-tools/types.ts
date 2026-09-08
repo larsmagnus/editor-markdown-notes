@@ -1,4 +1,4 @@
-import type { SpellingLanguage, TextToolRuleId } from '@/shared/messages'
+import type { SpellingLanguage, TextToolRuleId } from '#src/shared/messages'
 
 /**
  * The contract between the main thread and the analysis worker, and between the

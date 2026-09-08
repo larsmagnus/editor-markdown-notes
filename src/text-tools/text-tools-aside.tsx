@@ -1,7 +1,7 @@
-import { AppErrorBoundary } from '@/components/app-error-boundary'
-import { useSettings } from '@/hooks/use-settings'
-import type { Analysis } from '@/lib/text-tools/types'
-import { TextToolsPanel } from '@/text-tools/text-tools-panel'
+import { AppErrorBoundary } from '#src/components/app-error-boundary'
+import { useSettings } from '#src/hooks/use-settings'
+import type { Analysis } from '#src/lib/text-tools/types'
+import { TextToolsPanel } from '#src/text-tools/text-tools-panel'
 
 type TextToolsAsideProps = {
 	analysis: Analysis

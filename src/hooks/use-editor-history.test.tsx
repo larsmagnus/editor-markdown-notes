@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react'
 import { EditorContext } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { useEditorHistory } from '@/hooks/use-editor-history'
-import { createEditor } from '@/test-utils/editor'
+import { useEditorHistory } from '#src/hooks/use-editor-history'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('history', () => {
 	it('undoes and redoes an edit', () => {

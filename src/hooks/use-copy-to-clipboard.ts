@@ -1,5 +1,5 @@
-import { useCopiedFeedback } from '@/hooks/use-copied-feedback'
-import { copyToClipboard } from '@/lib/clipboard'
+import { useCopiedFeedback } from '#src/hooks/use-copied-feedback'
+import { copyToClipboard } from '#src/lib/clipboard'
 
 /** Copies `text` to the clipboard on demand, alongside `useCopiedFeedback`'s transient acknowledgement. */
 export function useCopyToClipboard(text: string) {

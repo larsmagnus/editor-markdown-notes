@@ -1,5 +1,5 @@
-import type { HunspellDictionary } from '@/lib/text-tools/types'
-import type { SpellingLanguage } from '@/shared/messages'
+import type { HunspellDictionary } from '#src/lib/text-tools/types'
+import type { SpellingLanguage } from '#src/shared/messages'
 
 /**
  * Fetches the Hunspell dictionary behind a spelling language.
@@ -14,9 +14,9 @@ const LOADERS: Record<
 	SpellingLanguage,
 	() => Promise<{ default: HunspellDictionary }>
 > = {
-	'en-US': () => import('@/lib/text-tools/dictionaries/en-us'),
-	'en-GB': () => import('@/lib/text-tools/dictionaries/en-gb'),
-	'en-AU': () => import('@/lib/text-tools/dictionaries/en-au'),
+	'en-US': () => import('#src/lib/text-tools/dictionaries/en-us'),
+	'en-GB': () => import('#src/lib/text-tools/dictionaries/en-gb'),
+	'en-AU': () => import('#src/lib/text-tools/dictionaries/en-au'),
 }
 
 export async function loadDictionary(

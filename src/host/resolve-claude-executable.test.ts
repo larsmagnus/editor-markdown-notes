@@ -14,7 +14,7 @@ describe('resolveClaudeExecutable', () => {
 			callback(null, '/usr/local/bin/claude\n')
 		})
 		const { resolveClaudeExecutable } =
-			await import('./resolve-claude-executable')
+			await import('#src/host/resolve-claude-executable')
 
 		await expect(resolveClaudeExecutable()).resolves.toBe(
 			'/usr/local/bin/claude'
@@ -26,7 +26,7 @@ describe('resolveClaudeExecutable', () => {
 			callback(new Error('not found'), '')
 		})
 		const { resolveClaudeExecutable } =
-			await import('./resolve-claude-executable')
+			await import('#src/host/resolve-claude-executable')
 
 		await expect(resolveClaudeExecutable()).resolves.toBeUndefined()
 	})
@@ -36,7 +36,7 @@ describe('resolveClaudeExecutable', () => {
 			callback(null, '/usr/local/bin/claude\n')
 		})
 		const { resolveClaudeExecutable } =
-			await import('./resolve-claude-executable')
+			await import('#src/host/resolve-claude-executable')
 
 		await resolveClaudeExecutable()
 		await resolveClaudeExecutable()
@@ -49,7 +49,7 @@ describe('resolveClaudeExecutable', () => {
 			callback(new Error('not found'), '')
 		})
 		const { resolveClaudeExecutable } =
-			await import('./resolve-claude-executable')
+			await import('#src/host/resolve-claude-executable')
 
 		await resolveClaudeExecutable()
 		execFile.mockImplementation((_command, _args, callback) => {

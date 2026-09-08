@@ -1,5 +1,5 @@
-import { IDENTITY_DELIMITER_SERIALIZE } from '@/editor/extensions/formatting/delimiter-spec'
-import type { MarkdownIt } from '@/editor/extensions/markdown/markdown-it-types'
+import { IDENTITY_DELIMITER_SERIALIZE } from '#src/editor/extensions/formatting/delimiter-spec'
+import type { MarkdownIt } from '#src/editor/extensions/markdown/markdown-it-types'
 
 /**
  * The `markdown` storage tiptap-markdown reads to serialize/parse italics.

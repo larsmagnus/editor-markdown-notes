@@ -1,17 +1,17 @@
 import type { Mark } from '@tiptap/core'
 
-import { createDelimiterInputRule } from '@/editor/extensions/formatting/delimiter-input-rule'
-import { IDENTITY_DELIMITER_SERIALIZE } from '@/editor/extensions/formatting/delimiter-spec'
+import { createDelimiterInputRule } from '#src/editor/extensions/formatting/delimiter-input-rule'
+import { IDENTITY_DELIMITER_SERIALIZE } from '#src/editor/extensions/formatting/delimiter-spec'
 import type {
 	DelimiterMarkdownSerialize,
 	DelimiterSpec,
-} from '@/editor/extensions/formatting/delimiter-spec'
-import { createEnsureDelimitersPlugin } from '@/editor/extensions/formatting/ensure-delimiters-plugin'
+} from '#src/editor/extensions/formatting/delimiter-spec'
+import { createEnsureDelimitersPlugin } from '#src/editor/extensions/formatting/ensure-delimiters-plugin'
 import {
 	removeDelimiterOnBackspace,
 	removeDelimiterOnDelete,
-} from '@/editor/extensions/formatting/remove-delimiter-at-boundary'
-import { PARSED_BY_MARKDOWN_IT } from '@/editor/extensions/markdown/mark-serializer'
+} from '#src/editor/extensions/formatting/remove-delimiter-at-boundary'
+import { PARSED_BY_MARKDOWN_IT } from '#src/editor/extensions/markdown/mark-serializer'
 
 /**
  * Turns a stock mark extension into one whose delimiters are real, editable,

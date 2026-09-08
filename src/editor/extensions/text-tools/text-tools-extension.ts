@@ -3,9 +3,9 @@ import { PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/react'
 
-import { createDecorationPlugin } from '@/editor/extensions/create-decoration-plugin'
-import { issueClassName } from '@/lib/text-tools/issue-class-name'
-import type { TextIssue } from '@/lib/text-tools/types'
+import { createDecorationPlugin } from '#src/editor/extensions/create-decoration-plugin'
+import { issueClassName } from '#src/lib/text-tools/issue-class-name'
+import type { TextIssue } from '#src/lib/text-tools/types'
 
 /**
  * Draws the writing-tool findings onto the document.

@@ -1,4 +1,4 @@
-import type { DocumentText } from '@/lib/text-tools/document-text'
+import type { DocumentText } from '#src/lib/text-tools/document-text'
 
 /**
  * Converts an offset in the flattened text back to a document position.

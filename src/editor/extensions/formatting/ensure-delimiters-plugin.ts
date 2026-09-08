@@ -2,14 +2,14 @@ import type { MarkType, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 import type { Selection, Transaction } from '@tiptap/pm/state'
 
-import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
-import { uniformOuterMarks } from '@/editor/extensions/formatting/uniform-outer-marks'
-import { unwrapRun } from '@/editor/extensions/formatting/unwrap-run'
-import { createDeletionProbe } from '@/editor/extensions/syntax-repair/authored-deletion'
-import type { DeletionProbe } from '@/editor/extensions/syntax-repair/authored-deletion'
-import { anyDocChanged } from '@/editor/extensions/transaction-filters'
+import type { DelimiterSpec } from '#src/editor/extensions/formatting/delimiter-spec'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
+import { uniformOuterMarks } from '#src/editor/extensions/formatting/uniform-outer-marks'
+import { unwrapRun } from '#src/editor/extensions/formatting/unwrap-run'
+import { createDeletionProbe } from '#src/editor/extensions/syntax-repair/authored-deletion'
+import type { DeletionProbe } from '#src/editor/extensions/syntax-repair/authored-deletion'
+import { anyDocChanged } from '#src/editor/extensions/transaction-filters'
 
 /**
  * Where a run whose delimiter the author just deleted now starts. Same

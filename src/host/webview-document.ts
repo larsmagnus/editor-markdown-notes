@@ -2,18 +2,17 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import { buildContentSecurityPolicy } from '../lib/host/content-security-policy'
-import { createNonce } from '../lib/host/nonce'
-import { WEBVIEW_LOG_BRIDGE } from '../lib/host/webview-diagnostics'
+import { getImageBaseUris } from '#src/host/image-base-uris'
+import { readEntryChunk } from '#src/host/read-vite-manifest'
+import { buildContentSecurityPolicy } from '#src/lib/host/content-security-policy'
+import { createNonce } from '#src/lib/host/nonce'
+import { WEBVIEW_LOG_BRIDGE } from '#src/lib/host/webview-diagnostics'
 import {
 	buildMissingAssetsHtml,
 	buildWebviewHtml,
-} from '../lib/host/webview-html'
-import type { Logger } from '../shared/logger'
-import type { Config, SearchReveal } from '../shared/messages'
-
-import { getImageBaseUris } from './image-base-uris'
-import { readEntryChunk } from './read-vite-manifest'
+} from '#src/lib/host/webview-html'
+import type { Logger } from '#src/shared/logger'
+import type { Config, SearchReveal } from '#src/shared/messages'
 
 type WebviewDocumentOptions = {
 	webview: vscode.Webview

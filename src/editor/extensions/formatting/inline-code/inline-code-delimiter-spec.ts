@@ -1,9 +1,9 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
-import { edgeResolvers } from '@/editor/extensions/formatting/delimiter-spec'
-import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
-import { inlineCodeFenceText } from '@/editor/extensions/formatting/inline-code/inline-code-fence-text'
+import type { DelimiterSpec } from '#src/editor/extensions/formatting/delimiter-spec'
+import { edgeResolvers } from '#src/editor/extensions/formatting/delimiter-spec'
+import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
+import { inlineCodeFenceText } from '#src/editor/extensions/formatting/inline-code/inline-code-fence-text'
 
 /**
  * Delimiter recognition for inline code, whose fence length varies with the

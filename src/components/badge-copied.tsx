@@ -1,7 +1,7 @@
 import { cn } from 'cn'
 import { CircleCheck } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '#src/components/ui/badge'
 
 /** Which edge of its anchor the badge floats off. */
 export type BadgeCopiedSide = 'top' | 'right' | 'bottom' | 'left'

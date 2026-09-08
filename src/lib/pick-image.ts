@@ -1,5 +1,5 @@
-import { imagePickedMessageSchema } from '@/lib/schemas'
-import { getVSCodeApi } from '@/lib/vscode-api'
+import { imagePickedMessageSchema } from '#src/lib/schemas'
+import { getVSCodeApi } from '#src/lib/vscode-api'
 
 /**
  * Opens VS Code's native file dialog and resolves once with whatever `path`

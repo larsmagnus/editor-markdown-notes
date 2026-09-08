@@ -1,4 +1,4 @@
-import { frontmatterLineOffsets } from '@/lib/text-tools/prose-policy'
+import { frontmatterLineOffsets } from '#src/lib/text-tools/prose-policy'
 
 /**
  * One run of prose per frontmatter line, with where each sits in the file.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEditor } from '@/test-utils/editor'
+import { createEditor } from '#src/test-utils/editor'
 
 function documentFrom(markdown: string) {
 	const editor = createEditor(markdown)

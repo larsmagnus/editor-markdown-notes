@@ -1,7 +1,7 @@
 import { Extension } from '@tiptap/core'
 import { Plugin } from '@tiptap/pm/state'
 
-import { focusRelativeToDomPoint } from '@/editor/extensions/focus-navigation/focusable-elements'
+import { focusRelativeToDomPoint } from '#src/editor/extensions/focus-navigation/focusable-elements'
 
 /** Held alone, these must never disarm focus-navigation. */
 const MODIFIER_KEYS = new Set([

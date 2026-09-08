@@ -1,9 +1,9 @@
 import type { CommandProps } from '@tiptap/core'
 import type { MarkType } from '@tiptap/pm/model'
 
-import { inlineCodeDelimiterSpec } from '@/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
-import { inlineCodeFenceText } from '@/editor/extensions/formatting/inline-code/inline-code-fence-text'
-import { toggleDelimitedMark } from '@/editor/extensions/formatting/toggle-delimited-mark'
+import { inlineCodeDelimiterSpec } from '#src/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
+import { inlineCodeFenceText } from '#src/editor/extensions/formatting/inline-code/inline-code-fence-text'
+import { toggleDelimitedMark } from '#src/editor/extensions/formatting/toggle-delimited-mark'
 
 /**
  * `toggleCode`'s body - separate from `create-toggle-mark-command.ts`

@@ -1,7 +1,7 @@
 import type { MarkType } from '@tiptap/pm/model'
 import type { Command, Transaction } from '@tiptap/pm/state'
 
-import type { DelimiterPair } from '@/editor/extensions/formatting/delimiter-spec'
+import type { DelimiterPair } from '#src/editor/extensions/formatting/delimiter-spec'
 
 /**
  * Wraps `from`-`to` in literal delimiter text and marks the whole thing,

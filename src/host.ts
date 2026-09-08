@@ -1,19 +1,19 @@
 import * as vscode from 'vscode'
 
 // Relative imports throughout the host, and `tsconfig.host.json` has no
-// `paths` mapping so an `@/` alias fails typecheck rather than at runtime: `tsc`
+// `paths` mapping so an `#src/` alias fails typecheck rather than at runtime: `tsc`
 // emits aliases verbatim and the extension would die with MODULE_NOT_FOUND.
 //
 // This file must stay `src/host.ts` alongside the `src/host/` folder.
 // `package.json` points `main` at `./out/host.js`; turning this into
 // `src/host/index.ts` would resolve to `out/host/index.js` and break
 // activation.
-import { registerCommands } from './host/commands'
-import { MarkdownEditorProvider } from './host/markdown-editor-provider'
-import { registerMcpProvider } from './host/mcp-provider'
-import { ScrollPositionStore } from './host/scroll-position-store'
-import { SettingsStore } from './host/settings-store'
-import { ShikiThemeStore } from './host/shiki-theme-store'
+import { registerCommands } from '#src/host/commands'
+import { MarkdownEditorProvider } from '#src/host/markdown-editor-provider'
+import { registerMcpProvider } from '#src/host/mcp-provider'
+import { ScrollPositionStore } from '#src/host/scroll-position-store'
+import { SettingsStore } from '#src/host/settings-store'
+import { ShikiThemeStore } from '#src/host/shiki-theme-store'
 
 export function activate(context: vscode.ExtensionContext) {
 	// Surfaced as "Editor Markdown Notes" in the Output panel. `log: true` makes

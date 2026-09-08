@@ -4,12 +4,12 @@ import { join } from 'node:path'
 
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { listChecks } from '@/mcp/checks'
-import { copyDictionaries } from '@/mcp/copy-dictionaries'
-import { suggestDictionaryWords } from '@/mcp/jargon'
-import { checkMarkdown } from '@/mcp/tools'
-import type { CheckDefaults } from '@/mcp/tools'
-import { TEXT_TOOL_RULE_IDS } from '@/shared/messages'
+import { listChecks } from '#src/mcp/checks'
+import { copyDictionaries } from '#src/mcp/copy-dictionaries'
+import { suggestDictionaryWords } from '#src/mcp/jargon'
+import { checkMarkdown } from '#src/mcp/tools'
+import type { CheckDefaults } from '#src/mcp/tools'
+import { TEXT_TOOL_RULE_IDS } from '#src/shared/messages'
 
 /**
  * Runs the real pipeline rather than a stub, because the point of these tools

@@ -1,8 +1,8 @@
 import { NodeViewContent } from '@tiptap/react'
 import { cn } from 'cn'
 
-import { ButtonCopy } from '@/components/button-copy'
-import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
+import { ButtonCopy } from '#src/components/button-copy'
+import { useCopyToClipboard } from '#src/hooks/use-copy-to-clipboard'
 
 type CodeBlockSourceProps = {
 	code: string

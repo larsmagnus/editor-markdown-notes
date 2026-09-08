@@ -1,23 +1,23 @@
 import { lazy, Suspense } from 'react'
 
-import { ButtonCopyPage } from '@/components/button-copy-page'
-import type { DevFileSelectorProps } from '@/components/dev-file-selector'
+import { ButtonCopyPage } from '#src/components/button-copy-page'
+import type { DevFileSelectorProps } from '#src/components/dev-file-selector'
 import {
 	editModeFromViewOptions,
 	EDIT_MODE_OPTIONS,
-} from '@/components/edit-mode-options'
-import ThemeToggle from '@/components/theme-toggle'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+} from '#src/components/edit-mode-options'
+import ThemeToggle from '#src/components/theme-toggle'
+import { ToggleGroup, ToggleGroupItem } from '#src/components/ui/toggle-group'
 import {
 	fromToggleValues,
 	toToggleValues,
 	VIEW_TOGGLES,
-} from '@/components/view-toggle-options'
-import { useSettings } from '@/hooks/use-settings'
-import { getVSCodeApi } from '@/lib/vscode-api'
+} from '#src/components/view-toggle-options'
+import { useSettings } from '#src/hooks/use-settings'
+import { getVSCodeApi } from '#src/lib/vscode-api'
 
 const DevFileSelector = import.meta.env.DEV
-	? lazy(() => import('@/components/dev-file-selector'))
+	? lazy(() => import('#src/components/dev-file-selector'))
 	: null
 
 type ToolbarProps = {

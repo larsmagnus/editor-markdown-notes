@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { blockquoteMarkerLength } from '@/editor/extensions/blockquote/blockquote-marker'
+import { blockquoteMarkerLength } from '#src/editor/extensions/blockquote/blockquote-marker'
 
 describe('blockquoteMarkerLength', () => {
 	it('returns 2 for text starting with "> "', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveImageSrc } from '@/lib/host/resolve-image-src'
+import { resolveImageSrc } from '#src/lib/host/resolve-image-src'
 
 // What `webview.asWebviewUri` hands back for a document in a workspace.
 const baseUris = {

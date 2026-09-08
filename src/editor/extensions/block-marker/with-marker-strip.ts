@@ -1,6 +1,6 @@
 import type { CommandProps } from '@tiptap/core'
 
-import { STRIP_BLOCK_MARKERS } from '@/editor/extensions/block-marker/strip-marker-plugin'
+import { STRIP_BLOCK_MARKERS } from '#src/editor/extensions/block-marker/strip-marker-plugin'
 
 /** Which node the toggle acts on, and which one holds the marker text. */
 type MarkerStripNodes = {

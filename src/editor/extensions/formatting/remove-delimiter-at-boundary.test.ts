@@ -1,12 +1,12 @@
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
+import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
 import {
 	removeDelimiterOnBackspace,
 	removeDelimiterOnDelete,
-} from '@/editor/extensions/formatting/remove-delimiter-at-boundary'
-import { createEditor } from '@/test-utils/editor'
+} from '#src/editor/extensions/formatting/remove-delimiter-at-boundary'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('removeDelimiterOnBackspace', () => {
 	it('unwraps the run from inside its opening delimiter', () => {

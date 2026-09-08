@@ -1,6 +1,6 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
+import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
 
 /** The textblock a construct's marker text actually lives in. */
 type MarkerHost = {

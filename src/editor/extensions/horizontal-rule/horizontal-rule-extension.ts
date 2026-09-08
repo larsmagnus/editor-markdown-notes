@@ -1,12 +1,12 @@
 import { mergeAttributes, Node } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
 
-import { createHorizontalRuleInputRule } from '@/editor/extensions/horizontal-rule/horizontal-rule-input-rule'
+import { createHorizontalRuleInputRule } from '#src/editor/extensions/horizontal-rule/horizontal-rule-input-rule'
 import {
 	HORIZONTAL_RULE_TEXT,
 	insertLiteralRules,
-} from '@/editor/extensions/horizontal-rule/horizontal-rule-marker'
-import { serializeVerbatim } from '@/editor/extensions/markdown/serialize-verbatim'
+} from '#src/editor/extensions/horizontal-rule/horizontal-rule-marker'
+import { serializeVerbatim } from '#src/editor/extensions/markdown/serialize-verbatim'
 
 /**
  * A horizontal rule holding its own `---` as real text, so the caret can reach

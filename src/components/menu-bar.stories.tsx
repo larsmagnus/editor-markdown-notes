@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { MenuBar } from '@/components/menu-bar'
-import { EditorContextDecorator } from '@/storybook/decorator-editor-context'
+import { MenuBar } from '#src/components/menu-bar'
+import { EditorContextDecorator } from '#src/storybook/decorator-editor-context'
 
 const meta = {
 	component: MenuBar,

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { AskPromptInput } from '@/editor/extensions/slash-command/ask-prompt-input'
+import { AskPromptInput } from '#src/editor/extensions/slash-command/ask-prompt-input'
 
 describe('AskPromptInput', () => {
 	it('submits the trimmed prompt on Enter', async () => {

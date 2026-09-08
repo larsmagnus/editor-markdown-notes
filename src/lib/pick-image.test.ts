@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { pickImage } from '@/lib/pick-image'
+import { pickImage } from '#src/lib/pick-image'
 
 function bootInsideVSCode() {
 	const postMessage = vi.fn()

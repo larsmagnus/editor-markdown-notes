@@ -2,8 +2,8 @@ import type { Command } from '@tiptap/pm/state'
 import { Editor } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { setImageLink, unsetImageLink } from '@/editor/extensions/image/link'
-import { createEditor } from '@/test-utils/editor'
+import { setImageLink, unsetImageLink } from '#src/editor/extensions/image/link'
+import { createEditor } from '#src/test-utils/editor'
 
 /** Runs `command` against `editor`'s own state and dispatch. */
 function apply(editor: Editor, command: Command): boolean {

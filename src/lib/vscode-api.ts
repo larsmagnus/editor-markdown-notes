@@ -3,7 +3,7 @@ import type {
 	ImageBaseUris,
 	SearchReveal,
 	WebviewToHost,
-} from '@/shared/messages'
+} from '#src/shared/messages'
 
 interface VSCodeAPI {
 	postMessage: (message: WebviewToHost) => void

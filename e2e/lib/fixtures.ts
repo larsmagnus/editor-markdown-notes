@@ -1,6 +1,6 @@
 import { test as base } from '@playwright/test'
 
-import { createSelectionChangeCounter } from '@/e2e/lib/selection-settle'
+import { createSelectionChangeCounter } from '#e2e/lib/selection-settle'
 
 /**
  * `test`/`expect` with `createSelectionChangeCounter` wired in automatically,

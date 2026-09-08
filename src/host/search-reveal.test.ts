@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildSearchReveal } from './search-reveal'
+import { buildSearchReveal } from '#src/host/search-reveal'
 
 /**
  * Positions mirror `public/other-note.md`, whose frontmatter occupies eight

@@ -1,9 +1,9 @@
 import dictionaryEn from 'dictionary-en'
 import { describe, expect, it } from 'vitest'
 
-import { runPipeline } from '@/lib/text-tools/run-pipeline'
-import type { PipelineOptions } from '@/lib/text-tools/types'
-import { TEXT_TOOL_RULE_IDS } from '@/shared/messages'
+import { runPipeline } from '#src/lib/text-tools/run-pipeline'
+import type { PipelineOptions } from '#src/lib/text-tools/types'
+import { TEXT_TOOL_RULE_IDS } from '#src/shared/messages'
 
 const ALL_RULES = [...TEXT_TOOL_RULE_IDS]
 

@@ -1,6 +1,6 @@
 import MarkdownIt from 'markdown-it'
 
-import { splitFrontmatter } from '@/lib/host/frontmatter'
+import { splitFrontmatter } from '#src/lib/host/frontmatter'
 
 const md = new MarkdownIt({ html: false })
 

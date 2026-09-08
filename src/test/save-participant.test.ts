@@ -11,7 +11,7 @@ import {
 	pause,
 	spyOnPostedMessages,
 	VIEW_TYPE,
-} from './webview-panel-restore-support'
+} from '#src/test/webview-panel-restore-support'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 

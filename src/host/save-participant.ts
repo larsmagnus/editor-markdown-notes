@@ -1,11 +1,10 @@
 import * as vscode from 'vscode'
 
-import type { Logger } from '../shared/logger'
-import type { HostToWebview } from '../shared/messages'
-
-import type { DocumentWriter } from './document-updates'
-import { requestLatestContent } from './latest-content-request'
-import type { SessionsByUri } from './sessions-by-uri'
+import type { DocumentWriter } from '#src/host/document-updates'
+import { requestLatestContent } from '#src/host/latest-content-request'
+import type { SessionsByUri } from '#src/host/sessions-by-uri'
+import type { Logger } from '#src/shared/logger'
+import type { HostToWebview } from '#src/shared/messages'
 
 export type PanelSaveSession = {
 	panel: vscode.WebviewPanel

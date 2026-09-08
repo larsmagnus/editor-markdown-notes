@@ -1,5 +1,5 @@
-import { webviewPanelStateSchema } from '@/lib/schemas'
-import { getVSCodeApi } from '@/lib/vscode-api'
+import { webviewPanelStateSchema } from '#src/lib/schemas'
+import { getVSCodeApi } from '#src/lib/vscode-api'
 
 export type WebviewPanelState = {
 	/** How far down the note was scrolled, or absent if it never was. */

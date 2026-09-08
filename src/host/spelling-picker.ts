@@ -1,12 +1,11 @@
+import type { SettingsStore } from '#src/host/settings-store'
+import type { ViewOptionChoice } from '#src/host/view-option-picker'
+import { pickViewOption } from '#src/host/view-option-picker'
 import {
 	SPELLING_LANGUAGE_LABELS,
 	SPELLING_LANGUAGES,
-} from '../shared/messages'
-import type { SpellingLanguage } from '../shared/messages'
-
-import type { SettingsStore } from './settings-store'
-import type { ViewOptionChoice } from './view-option-picker'
-import { pickViewOption } from './view-option-picker'
+} from '#src/shared/messages'
+import type { SpellingLanguage } from '#src/shared/messages'
 
 const LANGUAGE_CHOICES: ViewOptionChoice<SpellingLanguage>[] =
 	SPELLING_LANGUAGES.map((value) => ({

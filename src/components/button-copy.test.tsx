@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { ButtonCopy } from '@/components/button-copy'
-import { TooltipProvider } from '@/components/ui/tooltip'
+import { ButtonCopy } from '#src/components/button-copy'
+import { TooltipProvider } from '#src/components/ui/tooltip'
 
 describe('ButtonCopy', () => {
 	it('calls onClick when clicked', async () => {

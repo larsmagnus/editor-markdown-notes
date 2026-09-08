@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
-import { AskInlineErrorWidget } from '@/editor/extensions/ask/ask-inline-error-widget'
+import { AskInlineErrorWidget } from '#src/editor/extensions/ask/ask-inline-error-widget'
 
 const meta = {
 	component: AskInlineErrorWidget,

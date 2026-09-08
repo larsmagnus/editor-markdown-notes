@@ -1,7 +1,7 @@
 import { Maximize2, Minimize2, PencilRuler } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-import type { ViewOptions } from '@/shared/messages'
+import type { ViewOptions } from '#src/shared/messages'
 
 type BooleanViewOption = 'fullWidth' | 'textTools'
 

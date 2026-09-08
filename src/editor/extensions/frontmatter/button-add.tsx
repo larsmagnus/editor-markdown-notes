@@ -2,8 +2,8 @@ import type { Editor } from '@tiptap/react'
 import { useEditorState } from '@tiptap/react'
 import { Plus } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
+import { Button } from '#src/components/ui/button'
+import { parseFrontmatterFence } from '#src/editor/extensions/frontmatter/frontmatter-fence'
 
 type ButtonAddProps = { editor: Editor }
 

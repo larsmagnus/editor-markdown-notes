@@ -5,8 +5,8 @@ import { unified } from 'unified'
 import { VFile } from 'vfile'
 import type { VFileMessage } from 'vfile-message'
 
-import type { TextIssue } from '@/lib/text-tools/types'
-import { offsetsOf, toIssue } from '@/lib/text-tools/vfile-message-to-issue'
+import type { TextIssue } from '#src/lib/text-tools/types'
+import { offsetsOf, toIssue } from '#src/lib/text-tools/vfile-message-to-issue'
 
 /**
  * How much older a reader must be for a sentence to count as *very* hard rather

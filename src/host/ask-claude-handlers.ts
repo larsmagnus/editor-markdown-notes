@@ -2,9 +2,8 @@ import * as path from 'node:path'
 
 import * as vscode from 'vscode'
 
-import type { HostToWebview } from '../shared/messages'
-
-import { runClaudeAsk } from './claude-agent'
+import { runClaudeAsk } from '#src/host/claude-agent'
+import type { HostToWebview } from '#src/shared/messages'
 
 type AskClaudeHandlersOptions = {
 	panel: vscode.WebviewPanel

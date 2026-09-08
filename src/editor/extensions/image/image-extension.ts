@@ -1,14 +1,14 @@
 import Image from '@tiptap/extension-image'
 import { mergeAttributes, ReactNodeViewRenderer } from '@tiptap/react'
 
-import { ImageView } from '@/editor/extensions/image/image-view'
+import { ImageView } from '#src/editor/extensions/image/image-view'
 import {
 	createImageStepOverPlugin,
 	moveToAdjacentImage,
-} from '@/editor/extensions/image/keyboard-nav'
-import { createImageSourcePlugin } from '@/editor/extensions/image/sync-image-source-plugin'
-import { commandRunner } from '@/editor/extensions/run-command'
-import { resolveImageSrc } from '@/lib/host/resolve-image-src'
+} from '#src/editor/extensions/image/keyboard-nav'
+import { createImageSourcePlugin } from '#src/editor/extensions/image/sync-image-source-plugin'
+import { commandRunner } from '#src/editor/extensions/run-command'
+import { resolveImageSrc } from '#src/lib/host/resolve-image-src'
 
 /**
  * Inline, so an image can sit mid-paragraph, in a link, or in a table cell -

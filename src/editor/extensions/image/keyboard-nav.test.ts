@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { moveToAdjacentImage } from '@/editor/extensions/image/keyboard-nav'
-import { createEditor } from '@/test-utils/editor'
+import { moveToAdjacentImage } from '#src/editor/extensions/image/keyboard-nav'
+import { createEditor } from '#src/test-utils/editor'
 
 const TWO_IMAGES = [
 	'Before',

@@ -1,10 +1,10 @@
 import dictionaryEn from 'dictionary-en'
 import { describe, expect, it } from 'vitest'
 
-import { RULES } from '@/lib/text-tools/rules'
-import { runPipeline } from '@/lib/text-tools/run-pipeline'
-import type { PipelineOptions } from '@/lib/text-tools/types'
-import { TEXT_TOOL_RULE_IDS } from '@/shared/messages'
+import { RULES } from '#src/lib/text-tools/rules'
+import { runPipeline } from '#src/lib/text-tools/run-pipeline'
+import type { PipelineOptions } from '#src/lib/text-tools/types'
+import { TEXT_TOOL_RULE_IDS } from '#src/shared/messages'
 
 const ALL_RULES = [...TEXT_TOOL_RULE_IDS]
 

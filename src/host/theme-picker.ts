@@ -1,8 +1,7 @@
-import type { Theme } from '../shared/messages'
-
-import type { SettingsStore } from './settings-store'
-import type { ViewOptionChoice } from './view-option-picker'
-import { pickViewOption } from './view-option-picker'
+import type { SettingsStore } from '#src/host/settings-store'
+import type { ViewOptionChoice } from '#src/host/view-option-picker'
+import { pickViewOption } from '#src/host/view-option-picker'
+import type { Theme } from '#src/shared/messages'
 
 const THEME_CHOICES: ViewOptionChoice<Theme>[] = [
 	{ label: 'Light', value: 'light' },

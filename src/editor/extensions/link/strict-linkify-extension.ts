@@ -1,6 +1,6 @@
 import { Extension } from '@tiptap/react'
 
-import type { MarkdownIt } from '@/editor/extensions/markdown/markdown-it-types'
+import type { MarkdownIt } from '#src/editor/extensions/markdown/markdown-it-types'
 
 /**
  * Markdown-it's fuzzy linkify would turn prose that merely looks like a

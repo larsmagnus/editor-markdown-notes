@@ -7,9 +7,9 @@ import type { Plugin } from 'unified'
 import { unified } from 'unified'
 import { VFile } from 'vfile'
 
-import type { TextIssue } from '@/lib/text-tools/types'
-import { toIssue } from '@/lib/text-tools/vfile-message-to-issue'
-import type { TextToolRuleId } from '@/shared/messages'
+import type { TextIssue } from '#src/lib/text-tools/types'
+import { toIssue } from '#src/lib/text-tools/vfile-message-to-issue'
+import type { TextToolRuleId } from '#src/shared/messages'
 
 /**
  * The plugin behind each rule. Keyed by `TextToolRuleId`, so a new rule does not

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { BadgeLoading } from '@/components/badge-loading'
+import { BadgeLoading } from '#src/components/badge-loading'
 
 const meta = {
 	component: BadgeLoading,

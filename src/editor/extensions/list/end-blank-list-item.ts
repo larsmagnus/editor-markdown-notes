@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/core'
 
-import { blankListItemAtCaret } from '@/editor/extensions/list/list-item-caret'
-import { outdentListItem } from '@/editor/extensions/list/outdent-list-item'
+import { blankListItemAtCaret } from '#src/editor/extensions/list/list-item-caret'
+import { outdentListItem } from '#src/editor/extensions/list/outdent-list-item'
 
 /**
  * Ends the list item the caret sits in when that item holds nothing but its

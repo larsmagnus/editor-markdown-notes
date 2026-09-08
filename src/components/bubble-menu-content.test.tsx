@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { EditorContext } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { BubbleMenuContent } from '@/components/bubble-menu-content'
-import { createEditor } from '@/test-utils/editor'
+import { BubbleMenuContent } from '#src/components/bubble-menu-content'
+import { createEditor } from '#src/test-utils/editor'
 
 /**
  * These render `BubbleMenuContent` directly rather than `MenuBubble`. The bubble

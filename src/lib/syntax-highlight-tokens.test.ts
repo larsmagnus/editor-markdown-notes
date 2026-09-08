@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { collectCodeBlocks, placeTokens } from '@/lib/syntax-highlight-tokens'
-import { createEditor } from '@/test-utils/editor'
+import {
+	collectCodeBlocks,
+	placeTokens,
+} from '#src/lib/syntax-highlight-tokens'
+import { createEditor } from '#src/test-utils/editor'
 
 function documentFrom(markdown: string) {
 	const editor = createEditor(markdown)

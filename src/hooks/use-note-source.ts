@@ -1,6 +1,6 @@
-import useContent from '@/hooks/use-content'
-import { useHostDocument } from '@/hooks/use-host-document'
-import { useSettings } from '@/hooks/use-settings'
+import useContent from '#src/hooks/use-content'
+import { useHostDocument } from '#src/hooks/use-host-document'
+import { useSettings } from '#src/hooks/use-settings'
 
 /**
  * The note on screen, from whichever side owns it.

@@ -1,9 +1,9 @@
 import type { CommandProps } from '@tiptap/core'
 import Blockquote from '@tiptap/extension-blockquote'
 
-import { withMarkerStrip } from '@/editor/extensions/block-marker/with-marker-strip'
-import { blockquoteMarkdownSerialize } from '@/editor/extensions/blockquote/blockquote-markdown-spec'
-import { insertLiteralBlockquoteMarker } from '@/editor/extensions/blockquote/insert-literal-blockquote-marker'
+import { withMarkerStrip } from '#src/editor/extensions/block-marker/with-marker-strip'
+import { blockquoteMarkdownSerialize } from '#src/editor/extensions/blockquote/blockquote-markdown-spec'
+import { insertLiteralBlockquoteMarker } from '#src/editor/extensions/blockquote/insert-literal-blockquote-marker'
 
 /**
  * The leading `"> "` on a blockquote's own first line becomes real,

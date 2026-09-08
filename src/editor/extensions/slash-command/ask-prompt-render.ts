@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/core'
 import { ReactRenderer } from '@tiptap/react'
 
-import { AskPromptInputWithBoundary } from '@/editor/extensions/slash-command/ask-prompt-input-with-boundary'
+import { AskPromptInputWithBoundary } from '#src/editor/extensions/slash-command/ask-prompt-input-with-boundary'
 
 /**
  * Mounts the free-text ask box at `pos`, positioned by hand via

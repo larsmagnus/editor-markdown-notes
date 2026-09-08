@@ -1,11 +1,11 @@
 import type { PropsWithChildren } from 'react'
 
-import { AppErrorBoundary } from '@/components/app-error-boundary'
-import { SettingsProvider } from '@/components/settings-provider'
-import { ThemeProvider } from '@/components/theme-provider'
-import { TooltipProvider } from '@/components/ui/tooltip'
-import Layout from '@/layout'
-import type { ExtensionSettings, ViewOptions } from '@/shared/messages'
+import { AppErrorBoundary } from '#src/components/app-error-boundary'
+import { SettingsProvider } from '#src/components/settings-provider'
+import { ThemeProvider } from '#src/components/theme-provider'
+import { TooltipProvider } from '#src/components/ui/tooltip'
+import Layout from '#src/layout'
+import type { ExtensionSettings, ViewOptions } from '#src/shared/messages'
 
 function App({
 	defaultFileName = 'notes.md',

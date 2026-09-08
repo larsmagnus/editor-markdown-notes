@@ -2,8 +2,8 @@ import type { Schema } from '@tiptap/pm/model'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 import type { Transaction } from '@tiptap/pm/state'
 
-import { parseListMarker } from '@/editor/extensions/list/list-marker'
-import { anyDocChanged } from '@/editor/extensions/transaction-filters'
+import { parseListMarker } from '#src/editor/extensions/list/list-marker'
+import { anyDocChanged } from '#src/editor/extensions/transaction-filters'
 
 /**
  * Keeps a task item's `checked` attribute matching whatever its own marker

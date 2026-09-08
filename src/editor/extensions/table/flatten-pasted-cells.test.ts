@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { flattenPastedCells } from '@/editor/extensions/table/flatten-pasted-cells'
+import { flattenPastedCells } from '#src/editor/extensions/table/flatten-pasted-cells'
 
 describe('flattenPastedCells', () => {
 	it('unwraps the single paragraph other editors wrap a cell in', () => {

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-import type { DocumentWriter } from './document-updates'
+import type { DocumentWriter } from '#src/host/document-updates'
 
 /**
  * Calls back when this document changes underneath the editor.

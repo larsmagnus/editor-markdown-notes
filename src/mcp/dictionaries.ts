@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import type { HunspellDictionary } from '@/lib/text-tools/types'
-import type { SpellingLanguage } from '@/shared/messages'
+import type { HunspellDictionary } from '#src/lib/text-tools/types'
+import type { SpellingLanguage } from '#src/shared/messages'
 
 /**
  * Loads a Hunspell dictionary from the copy shipped beside this server.

@@ -6,7 +6,7 @@ import type {
 	PropsWithChildren,
 } from 'react'
 
-import type { HeadingLevel } from '@/lib/heading-levels'
+import type { HeadingLevel } from '#src/lib/heading-levels'
 
 interface HeadingProps extends PropsWithChildren<
 	DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>

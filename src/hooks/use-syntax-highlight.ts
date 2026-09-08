@@ -2,10 +2,10 @@ import type { Editor } from '@tiptap/react'
 import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
 
-import type { PlacedToken } from '@/editor/extensions/syntax-highlight/syntax-highlight-extension'
-import { useDocumentRevision } from '@/hooks/use-document-revision'
-import { useShikiTheme } from '@/hooks/use-shiki-theme'
-import type { RelativeToken } from '@/lib/syntax-highlight-tokens'
+import type { PlacedToken } from '#src/editor/extensions/syntax-highlight/syntax-highlight-extension'
+import { useDocumentRevision } from '#src/hooks/use-document-revision'
+import { useShikiTheme } from '#src/hooks/use-shiki-theme'
+import type { RelativeToken } from '#src/lib/syntax-highlight-tokens'
 
 /** The two custom properties `.ProseMirror pre` reads in `globals.css`. */
 export type CodeBlockStyle = CSSProperties & {
@@ -53,7 +53,7 @@ export function useSyntaxHighlight(editor: Editor | null, active: boolean) {
 
 		const run = async () => {
 			const { collectCodeBlocks, placeTokens, tokenizeBlock } =
-				await import('@/lib/syntax-highlight-tokens')
+				await import('#src/lib/syntax-highlight-tokens')
 			if (cancelled) return
 
 			// The positions below are absolute, and everything here is awaited - a
@@ -72,7 +72,7 @@ export function useSyntaxHighlight(editor: Editor | null, active: boolean) {
 			}
 
 			const { ensureTheme, getHighlighter, themeColors } =
-				await import('@/lib/shiki-highlighter')
+				await import('#src/lib/shiki-highlighter')
 			if (cancelled) return
 
 			const highlighter = await getHighlighter()

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { createToggleHeadingCommand } from '@/editor/extensions/heading/toggle-heading-command'
-import { createEditor } from '@/test-utils/editor'
+import { createToggleHeadingCommand } from '#src/editor/extensions/heading/toggle-heading-command'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('createToggleHeadingCommand', () => {
 	// Regression: a list item's own content spec requires its first child to

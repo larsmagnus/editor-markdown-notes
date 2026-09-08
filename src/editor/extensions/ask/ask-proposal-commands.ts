@@ -1,8 +1,8 @@
 import type { RawCommands } from '@tiptap/core'
 import type { EditorState, Transaction } from '@tiptap/pm/state'
 
-import { askProposalPluginKey } from '@/editor/extensions/ask/ask-suggestion-extension'
-import type { AskProposalState } from '@/editor/extensions/ask/ask-suggestion-extension'
+import { askProposalPluginKey } from '#src/editor/extensions/ask/ask-suggestion-extension'
+import type { AskProposalState } from '#src/editor/extensions/ask/ask-suggestion-extension'
 
 /**
  * Looks up the in-flight proposal, gated to the command's own id (a stale

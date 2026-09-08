@@ -1,8 +1,8 @@
 import type { MarkType } from '@tiptap/pm/model'
 import type { Transaction } from '@tiptap/pm/state'
 
-import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
-import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
+import type { DelimiterSpec } from '#src/editor/extensions/formatting/delimiter-spec'
+import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
 
 /**
  * Strips one run's mark and the delimiter text at its two ends, returning the

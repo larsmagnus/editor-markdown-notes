@@ -5,7 +5,7 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import type {
 	RevealProvider,
 	RevealSpan,
-} from '@/editor/extensions/syntax-reveal/reveal-provider'
+} from '#src/editor/extensions/syntax-reveal/reveal-provider'
 
 /** The class every hidden syntax range gets; see `globals.css` for the technique. */
 export const SYNTAX_HIDDEN_CLASS = 'syntax-hidden'

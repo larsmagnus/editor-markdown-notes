@@ -1,10 +1,13 @@
-import { SpellingLanguagePicker } from '@/components/spelling-language-picker'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Field, FieldLabel } from '@/components/ui/field'
-import { RULES } from '@/lib/text-tools/rules'
-import type { SpellingLanguage, TextToolRuleId } from '@/shared/messages'
-import { SPELLING_LANGUAGE_LABELS, TEXT_TOOL_RULE_IDS } from '@/shared/messages'
-import { TextToolsRuleInfo } from '@/text-tools/text-tools-rule-info'
+import { SpellingLanguagePicker } from '#src/components/spelling-language-picker'
+import { Checkbox } from '#src/components/ui/checkbox'
+import { Field, FieldLabel } from '#src/components/ui/field'
+import { RULES } from '#src/lib/text-tools/rules'
+import type { SpellingLanguage, TextToolRuleId } from '#src/shared/messages'
+import {
+	SPELLING_LANGUAGE_LABELS,
+	TEXT_TOOL_RULE_IDS,
+} from '#src/shared/messages'
+import { TextToolsRuleInfo } from '#src/text-tools/text-tools-rule-info'
 
 type TextToolsRuleCheckboxesProps = {
 	rules: TextToolRuleId[]

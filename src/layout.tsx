@@ -1,15 +1,15 @@
 import { cn } from 'cn'
 import { lazy, Suspense } from 'react'
 
-import { AppErrorBoundary } from '@/components/app-error-boundary'
-import { SkipLinks } from '@/components/skip-links'
-import { EditorBody } from '@/editor/editor-body'
-import { useNoteSource } from '@/hooks/use-note-source'
-import { useScrollPosition } from '@/hooks/use-scroll-position'
-import { useSettings } from '@/hooks/use-settings'
-import { contentWidthClassName } from '@/lib/content-width-class'
+import { AppErrorBoundary } from '#src/components/app-error-boundary'
+import { SkipLinks } from '#src/components/skip-links'
+import { EditorBody } from '#src/editor/editor-body'
+import { useNoteSource } from '#src/hooks/use-note-source'
+import { useScrollPosition } from '#src/hooks/use-scroll-position'
+import { useSettings } from '#src/hooks/use-settings'
+import { contentWidthClassName } from '#src/lib/content-width-class'
 
-const Toolbar = lazy(() => import('@/components/toolbar'))
+const Toolbar = lazy(() => import('#src/components/toolbar'))
 
 type LayoutProps = {
 	defaultFileName: string

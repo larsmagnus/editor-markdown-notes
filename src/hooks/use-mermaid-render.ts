@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
-import { renderMermaid } from '@/lib/render-mermaid'
-import type { MermaidResult } from '@/lib/render-mermaid'
+import { renderMermaid } from '#src/lib/render-mermaid'
+import type { MermaidResult } from '#src/lib/render-mermaid'
 
 /**
  * Renders mermaid source to an SVG, or to the reason it would not parse.

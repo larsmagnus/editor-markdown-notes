@@ -1,21 +1,20 @@
 import * as vscode from 'vscode'
 
-import { recordWebviewLog } from '../lib/host/webview-diagnostics'
-import type { Logger } from '../shared/logger'
+import { createAskClaudeHandlers } from '#src/host/ask-claude-handlers'
+import type { DocumentWriter } from '#src/host/document-updates'
+import { postDocumentUpdate } from '#src/host/document-updates'
+import { openClaudeTerminal } from '#src/host/open-claude-terminal-command'
+import { openInTextEditor } from '#src/host/open-in-text-editor-command'
+import { pickImagePath } from '#src/host/pick-image-command'
+import type { ScrollPositionStore } from '#src/host/scroll-position-store'
+import type { SettingsStore } from '#src/host/settings-store'
+import { recordWebviewLog } from '#src/lib/host/webview-diagnostics'
+import type { Logger } from '#src/shared/logger'
 import type {
 	HostToWebview,
 	ShikiThemePayload,
 	WebviewToHost,
-} from '../shared/messages'
-
-import { createAskClaudeHandlers } from './ask-claude-handlers'
-import type { DocumentWriter } from './document-updates'
-import { postDocumentUpdate } from './document-updates'
-import { openClaudeTerminal } from './open-claude-terminal-command'
-import { openInTextEditor } from './open-in-text-editor-command'
-import { pickImagePath } from './pick-image-command'
-import type { ScrollPositionStore } from './scroll-position-store'
-import type { SettingsStore } from './settings-store'
+} from '#src/shared/messages'
 
 type WebviewMessageHandlers = {
 	[K in WebviewToHost['type']]: (

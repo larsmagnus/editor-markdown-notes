@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { CLAUDE_PROMPT_CONTENT_MAX_LENGTH } from '../shared/messages'
-
-import { buildAskPrompt } from './claude-agent'
+import { buildAskPrompt } from '#src/host/claude-agent'
+import { CLAUDE_PROMPT_CONTENT_MAX_LENGTH } from '#src/shared/messages'
 
 describe('buildAskPrompt', () => {
 	it('references the note by path, states the prompt, and asks for content only', () => {

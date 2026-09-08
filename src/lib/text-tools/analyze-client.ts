@@ -1,11 +1,11 @@
-import AnalyzeWorker from '@/lib/text-tools/analyze.worker.ts?worker&inline'
+import AnalyzeWorker from '#src/lib/text-tools/analyze.worker.ts?worker&inline'
 import type {
 	Analysis,
 	AnalyzeRequest,
 	AnalyzeResponse,
 	PipelineOptions,
-} from '@/lib/text-tools/types'
-import type { SpellingLanguage } from '@/shared/messages'
+} from '#src/lib/text-tools/types'
+import type { SpellingLanguage } from '#src/shared/messages'
 
 /**
  * Owns the analysis worker. Only ever reached through `await import()`, which

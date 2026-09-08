@@ -1,5 +1,5 @@
-import { AppErrorBoundary } from '@/components/app-error-boundary'
-import { AskPromptInput } from '@/editor/extensions/slash-command/ask-prompt-input'
+import { AppErrorBoundary } from '#src/components/app-error-boundary'
+import { AskPromptInput } from '#src/editor/extensions/slash-command/ask-prompt-input'
 
 interface AskPromptInputWithBoundaryProps {
 	onSubmit: (prompt: string) => void

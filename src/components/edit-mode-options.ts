@@ -1,7 +1,7 @@
 import { Code, FileType, PencilSparkles } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-import type { ViewOptions } from '@/shared/messages'
+import type { ViewOptions } from '#src/shared/messages'
 
 export type EditMode = 'text' | 'raw' | 'live'
 

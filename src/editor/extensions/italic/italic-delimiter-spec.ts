@@ -1,9 +1,9 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
-import { edgeResolvers } from '@/editor/extensions/formatting/delimiter-spec'
-import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
-import { italicMarkup } from '@/editor/extensions/italic/italic-markup'
+import type { DelimiterSpec } from '#src/editor/extensions/formatting/delimiter-spec'
+import { edgeResolvers } from '#src/editor/extensions/formatting/delimiter-spec'
+import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
+import { italicMarkup } from '#src/editor/extensions/italic/italic-markup'
 
 /**
  * Delimiter recognition/reconstruction for italic, for `ensure-delimiters-

@@ -4,8 +4,8 @@ import { join } from 'node:path'
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { WORKSPACE_SEPARATOR } from '@/shared/constants'
-import { DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
+import { WORKSPACE_SEPARATOR } from '#src/shared/constants'
+import { DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
 /**
  * The host's configuration reaches this process as environment variables, read
@@ -18,7 +18,7 @@ async function loadWith(environment: Record<string, string>) {
 		vi.stubEnv(key, value)
 	}
 
-	return import('@/mcp/environment')
+	return import('#src/mcp/environment')
 }
 
 /** A workspace folder holding one note, as a real directory on disk. */

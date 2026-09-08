@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-import type { Analyzer } from '@/lib/text-tools/analyze-client'
+import type { Analyzer } from '#src/lib/text-tools/analyze-client'
 
 /**
  * Owns the analysis worker's lifetime, so the hook that runs the checks does
@@ -30,7 +30,8 @@ export function useAnalyzer() {
 		if (analyzerRef.current) return analyzerRef.current
 
 		const generation = generationRef.current
-		const { createAnalyzer } = await import('@/lib/text-tools/analyze-client')
+		const { createAnalyzer } =
+			await import('#src/lib/text-tools/analyze-client')
 		if (isTornDownRef.current || generation !== generationRef.current)
 			return null
 

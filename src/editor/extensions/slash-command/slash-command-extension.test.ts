@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { filterCommands } from '@/editor/extensions/slash-command/slash-command-extension'
+import { filterCommands } from '#src/editor/extensions/slash-command/slash-command-extension'
 
 afterEach(() => {
 	delete window.vscode

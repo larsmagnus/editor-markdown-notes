@@ -1,6 +1,6 @@
-import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import type { RevealProvider } from '@/editor/extensions/syntax-reveal/reveal-provider'
+import type { DelimiterSpec } from '#src/editor/extensions/formatting/delimiter-spec'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import type { RevealProvider } from '#src/editor/extensions/syntax-reveal/reveal-provider'
 
 /**
  * Reveals a delimited mark's delimiter text (`**bold**`, `` `code` ``) only

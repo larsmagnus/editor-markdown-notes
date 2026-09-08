@@ -1,12 +1,12 @@
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 
-import { parseImageMarkdown } from '@/editor/extensions/image/image-markdown-text'
+import { parseImageMarkdown } from '#src/editor/extensions/image/image-markdown-text'
 import {
 	finalizeImageSource,
 	findImageSource,
 	matchesImageAttrs,
-} from '@/editor/extensions/image/image-source-node'
-import { revealsContainer } from '@/editor/extensions/syntax-reveal/compute-reveal-decorations'
+} from '#src/editor/extensions/image/image-source-node'
+import { revealsContainer } from '#src/editor/extensions/syntax-reveal/compute-reveal-decorations'
 
 /**
  * Keeps a revealed image source in sync with the image it belongs to, and

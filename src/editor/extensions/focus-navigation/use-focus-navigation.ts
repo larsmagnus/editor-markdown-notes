@@ -4,8 +4,8 @@ import { useEffect, useRef } from 'react'
 import {
 	focusNearestStopFromElement,
 	focusNearestStopFromPosition,
-} from '@/editor/extensions/focus-navigation/nearest-stop'
-import { skipToEditorRef } from '@/editor/extensions/focus-navigation/skip-target'
+} from '#src/editor/extensions/focus-navigation/nearest-stop'
+import { skipToEditorRef } from '#src/editor/extensions/focus-navigation/skip-target'
 
 /**
  * Handles the two Tab cases ProseMirror's keymap cannot reach, both of which

@@ -1,13 +1,13 @@
 import type { CommandProps } from '@tiptap/core'
 import Link from '@tiptap/extension-link'
 
-import { createDelimitedMarkExtension } from '@/editor/extensions/formatting/delimited-mark-extension'
-import { createApplyLinkCommand } from '@/editor/extensions/link/apply-link-command'
-import type { LinkAttrs } from '@/editor/extensions/link/apply-link-command'
-import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
-import { LINK_MARKDOWN_SERIALIZE } from '@/editor/extensions/link/link-markdown-spec'
-import { createSyncLinkAttrsPlugin } from '@/editor/extensions/link/sync-link-attrs-plugin'
-import { createUnlinkCommand } from '@/editor/extensions/link/unlink-command'
+import { createDelimitedMarkExtension } from '#src/editor/extensions/formatting/delimited-mark-extension'
+import { createApplyLinkCommand } from '#src/editor/extensions/link/apply-link-command'
+import type { LinkAttrs } from '#src/editor/extensions/link/apply-link-command'
+import { linkDelimiterSpec } from '#src/editor/extensions/link/link-delimiter-spec'
+import { LINK_MARKDOWN_SERIALIZE } from '#src/editor/extensions/link/link-markdown-spec'
+import { createSyncLinkAttrsPlugin } from '#src/editor/extensions/link/sync-link-attrs-plugin'
+import { createUnlinkCommand } from '#src/editor/extensions/link/unlink-command'
 
 /**
  * `[text](href "title")` with real, caret-revealed delimiter text. Unlike a

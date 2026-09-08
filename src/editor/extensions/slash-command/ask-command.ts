@@ -1,8 +1,8 @@
 import type { Editor, Range } from '@tiptap/core'
 import type { Transaction } from '@tiptap/pm/state'
 
-import { openAskPromptPopup } from '@/editor/extensions/slash-command/ask-prompt-render'
-import { getAskClient } from '@/lib/ask/ask-client'
+import { openAskPromptPopup } from '#src/editor/extensions/slash-command/ask-prompt-render'
+import { getAskClient } from '#src/lib/ask/ask-client'
 
 /**
  * Opens a free-text prompt box at the cursor rather than running immediately,

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Editor } from '@tiptap/react'
 
-import { TooltipProvider } from '@/components/ui/tooltip'
-import { extensions } from '@/editor/extensions/extensions'
-import { ButtonDelete } from '@/editor/extensions/frontmatter/button-delete'
+import { TooltipProvider } from '#src/components/ui/tooltip'
+import { extensions } from '#src/editor/extensions/extensions'
+import { ButtonDelete } from '#src/editor/extensions/frontmatter/button-delete'
 
 const editor = new Editor({ extensions, content: '' })
 editor.commands.insertContentAt(0, {

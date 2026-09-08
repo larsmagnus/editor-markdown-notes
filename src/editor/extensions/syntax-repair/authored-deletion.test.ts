@@ -1,8 +1,8 @@
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { createDeletionProbe } from '@/editor/extensions/syntax-repair/authored-deletion'
-import { createEditor } from '@/test-utils/editor'
+import { createDeletionProbe } from '#src/editor/extensions/syntax-repair/authored-deletion'
+import { createEditor } from '#src/test-utils/editor'
 
 /** An editor holding `<p>hello world</p>`, whose text spans positions 1-12. */
 function editorWithParagraph() {

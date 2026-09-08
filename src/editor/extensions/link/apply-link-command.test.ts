@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { createApplyLinkCommand } from '@/editor/extensions/link/apply-link-command'
-import { createEditor } from '@/test-utils/editor'
+import { createApplyLinkCommand } from '#src/editor/extensions/link/apply-link-command'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('createApplyLinkCommand', () => {
 	it('wraps a plain selection in a fresh link', () => {

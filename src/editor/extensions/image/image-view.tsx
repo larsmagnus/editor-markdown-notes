@@ -2,13 +2,13 @@ import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewWrapper } from '@tiptap/react'
 import { cn } from 'cn'
 
-import { PanZoom } from '@/components/pan-zoom'
-import { ImageToolbar } from '@/editor/extensions/image/toolbar'
-import { useImageCaretAdjacent } from '@/hooks/use-image-caret-adjacent'
-import { useImageCopy } from '@/hooks/use-image-copy'
-import { useImageEditSource } from '@/hooks/use-image-edit-source'
-import { useImageLink } from '@/hooks/use-image-link'
-import { resolveImageSrc } from '@/lib/host/resolve-image-src'
+import { PanZoom } from '#src/components/pan-zoom'
+import { ImageToolbar } from '#src/editor/extensions/image/toolbar'
+import { useImageCaretAdjacent } from '#src/hooks/use-image-caret-adjacent'
+import { useImageCopy } from '#src/hooks/use-image-copy'
+import { useImageEditSource } from '#src/hooks/use-image-edit-source'
+import { useImageLink } from '#src/hooks/use-image-link'
+import { resolveImageSrc } from '#src/lib/host/resolve-image-src'
 
 type ImageViewProps = Pick<
 	NodeViewProps,

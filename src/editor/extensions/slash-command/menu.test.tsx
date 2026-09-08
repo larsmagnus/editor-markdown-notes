@@ -4,9 +4,9 @@ import { GitBranch, Table2 } from 'lucide-react'
 import { createRef } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { SlashCommandItem } from '@/editor/extensions/slash-command/commands'
-import { SlashCommandMenu } from '@/editor/extensions/slash-command/menu'
-import type { SlashCommandMenuHandle } from '@/editor/extensions/slash-command/menu'
+import type { SlashCommandItem } from '#src/editor/extensions/slash-command/commands'
+import { SlashCommandMenu } from '#src/editor/extensions/slash-command/menu'
+import type { SlashCommandMenuHandle } from '#src/editor/extensions/slash-command/menu'
 
 const ITEMS: SlashCommandItem[] = [
 	{

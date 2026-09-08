@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveEntryChunk } from '@/lib/host/vite-manifest'
+import { resolveEntryChunk } from '#src/lib/host/vite-manifest'
 
 describe('resolveEntryChunk', () => {
 	it('finds the entry and its own stylesheets', () => {

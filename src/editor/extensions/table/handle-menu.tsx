@@ -4,13 +4,13 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { TableMenuAction } from '@/editor/extensions/table/menu-action'
-import { TABLE_MENU_ITEMS } from '@/editor/extensions/table/menu-items'
+} from '#src/components/ui/dropdown-menu'
+import { TableMenuAction } from '#src/editor/extensions/table/menu-action'
+import { TABLE_MENU_ITEMS } from '#src/editor/extensions/table/menu-items'
 import type {
 	TableAxis,
 	TableMenuItem,
-} from '@/editor/extensions/table/menu-items'
+} from '#src/editor/extensions/table/menu-items'
 
 interface TableHandleMenuProps {
 	axis: TableAxis

@@ -1,8 +1,8 @@
 import Bold, { starInputRegex } from '@tiptap/extension-bold'
 
-import { createToggleMarkCommand } from '@/editor/extensions/formatting/create-toggle-mark-command'
-import { createDelimitedMarkExtension } from '@/editor/extensions/formatting/delimited-mark-extension'
-import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
+import { createToggleMarkCommand } from '#src/editor/extensions/formatting/create-toggle-mark-command'
+import { createDelimitedMarkExtension } from '#src/editor/extensions/formatting/delimited-mark-extension'
+import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
 
 const DELIMITER = '**'
 

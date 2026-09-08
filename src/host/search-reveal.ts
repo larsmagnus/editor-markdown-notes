@@ -1,7 +1,6 @@
-import type { SearchReveal } from '../shared/messages'
-
-import type { SearchMatch } from './search-match'
-import { deriveQueryLength } from './search-query'
+import type { SearchMatch } from '#src/host/search-match'
+import { deriveQueryLength } from '#src/host/search-query'
+import type { SearchReveal } from '#src/shared/messages'
 
 type SearchRevealInput = {
 	/** This note's matches, in source coordinates. */

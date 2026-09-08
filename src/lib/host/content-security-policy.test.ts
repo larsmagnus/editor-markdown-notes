@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildContentSecurityPolicy } from '@/lib/host/content-security-policy'
+import { buildContentSecurityPolicy } from '#src/lib/host/content-security-policy'
 
 const CSP_SOURCE = 'https://file+.vscode-resource.vscode-cdn.net'
 

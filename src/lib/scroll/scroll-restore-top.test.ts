@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { scrollRestoreTop } from '@/lib/scroll/scroll-restore-top'
+import { scrollRestoreTop } from '#src/lib/scroll/scroll-restore-top'
 
 /**
  * happy-dom has no layout engine, so `scrollHeight` and `clientHeight` are

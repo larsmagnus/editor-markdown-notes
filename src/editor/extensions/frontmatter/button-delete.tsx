@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/react'
 import { Trash2 } from 'lucide-react'
 
-import { ButtonAction } from '@/components/button-action'
+import { ButtonAction } from '#src/components/button-action'
 
 type ButtonDeleteProps = {
 	editor: Editor

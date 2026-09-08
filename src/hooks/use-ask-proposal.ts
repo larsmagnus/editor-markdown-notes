@@ -2,8 +2,8 @@ import type { Editor } from '@tiptap/react'
 import { useEditorState } from '@tiptap/react'
 import { useEffect } from 'react'
 
-import { askProposalPluginKey } from '@/editor/extensions/ask/ask-suggestion-extension'
-import { getAskClient } from '@/lib/ask/ask-client'
+import { askProposalPluginKey } from '#src/editor/extensions/ask/ask-suggestion-extension'
+import { getAskClient } from '#src/lib/ask/ask-client'
 
 /**
  * Drives the Claude call behind the bubble menu's ask proposal: starts one

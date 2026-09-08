@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react'
 
-import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
-import type { ExtensionSettings, ViewOptions } from '@/shared/messages'
+import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
+import type { ExtensionSettings, ViewOptions } from '#src/shared/messages'
 
 export type SettingsState = {
 	/** User-toggleable view state, persisted and shared across editor tabs. */

@@ -1,6 +1,6 @@
 import type { Mark, Node as ProseMirrorNode } from 'prosemirror-model'
 
-import { isWordChar } from '@/lib/word-boundary'
+import { isWordChar } from '#src/lib/word-boundary'
 
 function charBefore(
 	parent: ProseMirrorNode,

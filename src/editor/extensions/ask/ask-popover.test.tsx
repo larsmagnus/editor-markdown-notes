@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { EditorContext } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { AskPopover } from '@/editor/extensions/ask/ask-popover'
-import { askProposalPluginKey } from '@/editor/extensions/ask/ask-suggestion-extension'
-import { createEditor } from '@/test-utils/editor'
+import { AskPopover } from '#src/editor/extensions/ask/ask-popover'
+import { askProposalPluginKey } from '#src/editor/extensions/ask/ask-suggestion-extension'
+import { createEditor } from '#src/test-utils/editor'
 
 function renderPopover(
 	content: string,

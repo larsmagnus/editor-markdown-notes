@@ -3,10 +3,10 @@ import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 import { VFile } from 'vfile'
 
-import { readabilityIssues } from '@/lib/text-tools/readability-issues'
-import { spellingIssues } from '@/lib/text-tools/spelling-issues'
-import type { Analysis, PipelineOptions } from '@/lib/text-tools/types'
-import { wordIssues } from '@/lib/text-tools/word-issues'
+import { readabilityIssues } from '#src/lib/text-tools/readability-issues'
+import { spellingIssues } from '#src/lib/text-tools/spelling-issues'
+import type { Analysis, PipelineOptions } from '#src/lib/text-tools/types'
+import { wordIssues } from '#src/lib/text-tools/word-issues'
 
 /**
  * The analysis itself, kept free of any worker plumbing so the tests can drive

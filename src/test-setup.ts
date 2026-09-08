@@ -4,7 +4,7 @@ import { cleanup } from '@testing-library/react'
 import { Editor } from '@tiptap/core'
 import { afterEach } from 'vitest'
 
-import { MOUNT_SELECTOR } from '@/test-utils/mount-point'
+import { MOUNT_SELECTOR } from '#src/test-utils/mount-point'
 
 const editors = new Set<Editor>()
 

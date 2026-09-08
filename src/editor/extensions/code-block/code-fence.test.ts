@@ -5,7 +5,7 @@ import {
 	fenceLanguage,
 	fenceText,
 	parseFence,
-} from '@/editor/extensions/code-block/code-fence'
+} from '#src/editor/extensions/code-block/code-fence'
 
 describe('parseFence', () => {
 	it('parses a well-formed fenced block', () => {

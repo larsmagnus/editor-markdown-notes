@@ -4,7 +4,7 @@ import {
 	firstParagraphStart,
 	parseListMarker,
 	taskMarkerText,
-} from '@/editor/extensions/list/list-marker'
+} from '#src/editor/extensions/list/list-marker'
 
 /** Offset of the `[ ]`/`[x]` state character within a task marker (`- [x] `). */
 const CHECKED_CHAR_OFFSET = 3

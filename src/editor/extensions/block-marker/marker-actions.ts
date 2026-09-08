@@ -1,9 +1,9 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-import { forEachMarkerHost } from '@/editor/extensions/block-marker/marker-host'
-import type { MarkerMatch } from '@/editor/extensions/block-marker/marker-host'
-import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
-import type { DeletionProbe } from '@/editor/extensions/syntax-repair/authored-deletion'
+import { forEachMarkerHost } from '#src/editor/extensions/block-marker/marker-host'
+import type { MarkerMatch } from '#src/editor/extensions/block-marker/marker-host'
+import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
+import type { DeletionProbe } from '#src/editor/extensions/syntax-repair/authored-deletion'
 
 /** One marker to write, and where whatever is currently there begins and ends. */
 export type MarkerFix = {

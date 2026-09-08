@@ -1,9 +1,9 @@
 import type { NodeViewProps } from '@tiptap/react'
 
-import { useCaretInside } from '@/hooks/use-caret-inside'
-import { useIsDark } from '@/hooks/use-is-dark'
-import { useMermaidRender } from '@/hooks/use-mermaid-render'
-import type { MermaidResult } from '@/lib/render-mermaid'
+import { useCaretInside } from '#src/hooks/use-caret-inside'
+import { useIsDark } from '#src/hooks/use-is-dark'
+import { useMermaidRender } from '#src/hooks/use-mermaid-render'
+import type { MermaidResult } from '#src/lib/render-mermaid'
 
 type MermaidSourceOptions = Pick<NodeViewProps, 'editor' | 'getPos'> & {
 	code: string

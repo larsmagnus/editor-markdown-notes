@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { useAnalyzer } from '@/hooks/use-analyzer'
+import { useAnalyzer } from '#src/hooks/use-analyzer'
 
 const disposeMock = vi.fn()
 const createAnalyzerMock = vi.fn(() => ({
@@ -9,13 +9,13 @@ const createAnalyzerMock = vi.fn(() => ({
 	dispose: disposeMock,
 }))
 
-vi.mock('@/lib/text-tools/analyze-client', () => ({
+vi.mock('#src/lib/text-tools/analyze-client', () => ({
 	createAnalyzer: () => createAnalyzerMock(),
 }))
 
 describe('useAnalyzer', () => {
 	/**
-	 * Turning text tools off while `import('@/lib/text-tools/analyze-client')`
+	 * Turning text tools off while `import('#src/lib/text-tools/analyze-client')`
 	 * is still in flight used to leak a worker: `disposeAnalyzer()` ran while
 	 * `analyzerRef` was still empty (a no-op), then the import resolved and
 	 * created one anyway - the panel was closed, but nothing tore it down until

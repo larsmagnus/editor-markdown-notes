@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { EditorContext } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { createEditor } from '@/test-utils/editor'
-import { TextToolsStats } from '@/text-tools/text-tools-stats'
+import { createEditor } from '#src/test-utils/editor'
+import { TextToolsStats } from '#src/text-tools/text-tools-stats'
 
 describe('TextToolsStats', () => {
 	it('starts collapsed, with the counts hidden until expanded', () => {

@@ -1,7 +1,7 @@
 import { useCurrentEditor } from '@tiptap/react'
 
-import { parseHeadingLevel } from '@/editor/extensions/heading/heading-marker'
-import type { HeadingLevel } from '@/lib/heading-levels'
+import { parseHeadingLevel } from '#src/editor/extensions/heading/heading-marker'
+import type { HeadingLevel } from '#src/lib/heading-levels'
 
 /**
  * Applying and querying heading levels. `hasHeading` reads the current

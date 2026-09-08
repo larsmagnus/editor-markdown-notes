@@ -1,6 +1,6 @@
 'use client'
 
-import { TextBubbleControls } from '@/components/text-bubble-controls'
+import { TextBubbleControls } from '#src/components/text-bubble-controls'
 
 /**
  * The bubble menu's content, separate from the bubble that positions it.

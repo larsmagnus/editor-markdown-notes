@@ -2,15 +2,15 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { SettingsProvider } from '@/components/settings-provider'
-import EditorModeLive from '@/editor/editor-mode-live'
-import type { Analysis, TextIssue } from '@/lib/text-tools/types'
-import { DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
+import { SettingsProvider } from '#src/components/settings-provider'
+import EditorModeLive from '#src/editor/editor-mode-live'
+import type { Analysis, TextIssue } from '#src/lib/text-tools/types'
+import { DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`
 // and the save effect attaches a rejection handler to what it hands back.
-vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
-vi.mock('@/components/menu-bubble', () => ({ MenuBubble: () => null }))
+vi.mock('#src/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
+vi.mock('#src/components/menu-bubble', () => ({ MenuBubble: () => null }))
 
 /**
  * The real client boots an inline blob worker, which happy-dom cannot run. The
@@ -20,7 +20,7 @@ vi.mock('@/components/menu-bubble', () => ({ MenuBubble: () => null }))
  */
 const analyze = vi.hoisted(() => vi.fn())
 
-vi.mock('@/lib/text-tools/analyze-client', () => ({
+vi.mock('#src/lib/text-tools/analyze-client', () => ({
 	createAnalyzer: () => ({ analyze, dispose: vi.fn() }),
 }))
 
@@ -30,7 +30,7 @@ const loadDictionary = vi.hoisted(() =>
 	vi.fn(async () => ({ aff: '', dic: '' }))
 )
 
-vi.mock('@/lib/text-tools/load-dictionary', () => ({ loadDictionary }))
+vi.mock('#src/lib/text-tools/load-dictionary', () => ({ loadDictionary }))
 
 const STORAGE_KEY = 'editor-markdown-notes:view-options'
 

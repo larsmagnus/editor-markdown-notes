@@ -1,6 +1,6 @@
-import { expect, test } from '@/e2e/lib/fixtures'
-import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
-import { openInVSCode } from '@/e2e/lib/vscode-host'
+import { expect, test } from '#e2e/lib/fixtures'
+import { actionSettled, pressKeySettled } from '#e2e/lib/press-key-settled'
+import { openInVSCode } from '#e2e/lib/vscode-host'
 
 /**
  * Tab means "indent" wherever there is a real text caret, rather than moving

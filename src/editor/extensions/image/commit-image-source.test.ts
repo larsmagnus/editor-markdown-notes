@@ -5,8 +5,8 @@ import { describe, expect, it } from 'vitest'
 import {
 	commitImageSource,
 	enterImageEditSource,
-} from '@/editor/extensions/image/edit-source'
-import { createEditor } from '@/test-utils/editor'
+} from '#src/editor/extensions/image/edit-source'
+import { createEditor } from '#src/test-utils/editor'
 
 /** An editor with `content` and its sole image's source revealed. */
 function editorWithSourceRevealed(content: string): Editor {

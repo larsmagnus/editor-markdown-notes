@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { ButtonCopyPage } from '@/components/button-copy-page'
-import { SettingsProvider } from '@/components/settings-provider'
+import { ButtonCopyPage } from '#src/components/button-copy-page'
+import { SettingsProvider } from '#src/components/settings-provider'
 
 const NOTE = ['# Roadmap', '', 'Ship it.'].join('\n')
 

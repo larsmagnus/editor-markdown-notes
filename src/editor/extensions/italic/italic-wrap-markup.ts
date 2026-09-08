@@ -1,6 +1,6 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-import { isWordChar } from '@/lib/word-boundary'
+import { isWordChar } from '#src/lib/word-boundary'
 
 /**
  * The italic markup character to wrap a fresh (not-yet-marked) selection in

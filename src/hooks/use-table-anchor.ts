@@ -2,8 +2,8 @@ import { useCurrentEditor } from '@tiptap/react'
 import { useEffect, useState } from 'react'
 import type { RefObject } from 'react'
 
-import { measureTableAnchor } from '@/editor/extensions/table/geometry'
-import type { TableAnchor } from '@/editor/extensions/table/geometry'
+import { measureTableAnchor } from '#src/editor/extensions/table/geometry'
+import type { TableAnchor } from '#src/editor/extensions/table/geometry'
 
 /**
  * Everything about an anchor that is a number, as one comparable string.

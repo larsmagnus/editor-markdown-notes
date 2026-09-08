@@ -1,8 +1,8 @@
 import type { NodeViewProps } from '@tiptap/react'
 
-import { firstParagraphStart } from '@/editor/extensions/list/list-marker'
-import { revealsContainer } from '@/editor/extensions/syntax-reveal/compute-reveal-decorations'
-import { useEditorFlag } from '@/hooks/use-editor-flag'
+import { firstParagraphStart } from '#src/editor/extensions/list/list-marker'
+import { revealsContainer } from '#src/editor/extensions/syntax-reveal/compute-reveal-decorations'
+import { useEditorFlag } from '#src/hooks/use-editor-flag'
 
 // Module-level, so the subscription is not torn down and rebuilt every render.
 // `transaction` as well as the selection events: a marker's length can change

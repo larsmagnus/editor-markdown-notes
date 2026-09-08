@@ -1,8 +1,7 @@
 import * as vscode from 'vscode'
 
-import type { ViewOptions } from '../shared/messages'
-
-import type { SettingsStore } from './settings-store'
+import type { SettingsStore } from '#src/host/settings-store'
+import type { ViewOptions } from '#src/shared/messages'
 
 /** One offered value, and what the quick pick calls it. */
 export type ViewOptionChoice<Value> = { label: string; value: Value }

@@ -5,8 +5,8 @@ import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
-} from '@/components/ui/popover'
-import { getPageFocusableElements } from '@/editor/extensions/focus-navigation/focusable-elements'
+} from '#src/components/ui/popover'
+import { getPageFocusableElements } from '#src/editor/extensions/focus-navigation/focusable-elements'
 
 describe('getPageFocusableElements', () => {
 	it('collects the buttons on the page', () => {

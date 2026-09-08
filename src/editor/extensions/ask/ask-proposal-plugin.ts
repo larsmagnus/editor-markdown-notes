@@ -3,9 +3,9 @@ import type { Editor } from '@tiptap/core'
 import {
 	renderWidget,
 	unmountActiveWidget,
-} from '@/editor/extensions/ask/ask-proposal-widget-mount'
-import { askProposalPluginKey } from '@/editor/extensions/ask/ask-suggestion-extension'
-import { createSingleWidgetDecorationPlugin } from '@/editor/extensions/single-widget-decoration-plugin'
+} from '#src/editor/extensions/ask/ask-proposal-widget-mount'
+import { askProposalPluginKey } from '#src/editor/extensions/ask/ask-suggestion-extension'
+import { createSingleWidgetDecorationPlugin } from '#src/editor/extensions/single-widget-decoration-plugin'
 
 /**
  * The `askSuggestion` extension's ProseMirror plugin, pulled out of

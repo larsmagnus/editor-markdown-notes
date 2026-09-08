@@ -5,12 +5,12 @@ import {
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
-} from '@/components/ui/accordion'
+} from '#src/components/ui/accordion'
 import {
 	computeTextStats,
 	countParagraphs,
 	formatCount,
-} from '@/lib/text-tools/document-stats'
+} from '#src/lib/text-tools/document-stats'
 
 type TextToolsStatsProps = {
 	sentenceCount: number

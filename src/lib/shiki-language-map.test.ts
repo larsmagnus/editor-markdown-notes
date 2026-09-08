@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { ensureLanguage, getHighlighter } from '@/lib/shiki-highlighter'
-import { findLanguageImporter, SHIKI_LANGUAGES } from '@/lib/shiki-language-map'
+import { ensureLanguage, getHighlighter } from '#src/lib/shiki-highlighter'
+import {
+	findLanguageImporter,
+	SHIKI_LANGUAGES,
+} from '#src/lib/shiki-language-map'
 
 describe('findLanguageImporter', () => {
 	it('is case-insensitive', () => {

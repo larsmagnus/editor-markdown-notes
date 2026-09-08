@@ -1,7 +1,7 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-import type { FocusDirection } from '@/editor/extensions/focus-navigation/focusable-elements'
-import { headingMarkerLength } from '@/editor/extensions/heading/heading-marker'
+import type { FocusDirection } from '#src/editor/extensions/focus-navigation/focusable-elements'
+import { headingMarkerLength } from '#src/editor/extensions/heading/heading-marker'
 
 /**
  * `pos` landing exactly at a heading's start (entering from outside the

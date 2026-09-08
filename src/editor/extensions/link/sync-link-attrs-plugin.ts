@@ -2,10 +2,10 @@ import type { MarkType } from '@tiptap/pm/model'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 import type { Transaction } from '@tiptap/pm/state'
 
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import { parseLinkClose } from '@/editor/extensions/link/link-close-text'
-import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
-import { anyDocChanged } from '@/editor/extensions/transaction-filters'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import { parseLinkClose } from '#src/editor/extensions/link/link-close-text'
+import { linkDelimiterSpec } from '#src/editor/extensions/link/link-delimiter-spec'
+import { anyDocChanged } from '#src/editor/extensions/transaction-filters'
 
 /**
  * Keeps a link's `href`/`title` matching whatever its closing delimiter text

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { AppErrorBoundary } from '@/components/app-error-boundary'
+import { AppErrorBoundary } from '#src/components/app-error-boundary'
 
 /**
  * A component that throws until it is told to stop, so a boundary reset has

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import App from '@/app'
+import App from '#src/app'
 
 const meta = {
 	component: App,

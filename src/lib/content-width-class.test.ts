@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { contentWidthClassName } from '@/lib/content-width-class'
+import { contentWidthClassName } from '#src/lib/content-width-class'
 
 describe('contentWidthClassName', () => {
 	it('lifts the measure when full width is on', () => {

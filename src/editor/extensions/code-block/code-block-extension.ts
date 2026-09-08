@@ -2,16 +2,16 @@ import { mergeAttributes } from '@tiptap/core'
 import CodeBlock from '@tiptap/extension-code-block'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
-import { unwrapConstructAtCaret } from '@/editor/extensions/block-marker/unwrap-at-caret'
-import { CodeBlockView } from '@/editor/extensions/code-block/code-block-view'
+import { unwrapConstructAtCaret } from '#src/editor/extensions/block-marker/unwrap-at-caret'
+import { CodeBlockView } from '#src/editor/extensions/code-block/code-block-view'
 import {
 	fenceLanguage,
 	insertLiteralFences,
-} from '@/editor/extensions/code-block/code-fence'
-import { createFenceInputRule } from '@/editor/extensions/code-block/fence-input-rule'
-import { createToggleCodeBlockCommand } from '@/editor/extensions/code-block/toggle-code-block-command'
-import type { MarkdownIt } from '@/editor/extensions/markdown/markdown-it-types'
-import { serializeVerbatim } from '@/editor/extensions/markdown/serialize-verbatim'
+} from '#src/editor/extensions/code-block/code-fence'
+import { createFenceInputRule } from '#src/editor/extensions/code-block/fence-input-rule'
+import { createToggleCodeBlockCommand } from '#src/editor/extensions/code-block/toggle-code-block-command'
+import type { MarkdownIt } from '#src/editor/extensions/markdown/markdown-it-types'
+import { serializeVerbatim } from '#src/editor/extensions/markdown/serialize-verbatim'
 
 /** Never reconfigured elsewhere in this project - see the stock extension's own default. */
 const LANGUAGE_CLASS_PREFIX = 'language-'

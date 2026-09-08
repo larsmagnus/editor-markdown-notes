@@ -1,9 +1,9 @@
 import { createElement } from 'react'
 
-import { AppErrorBoundary } from '@/components/app-error-boundary'
-import { BadgeLoading } from '@/components/badge-loading'
-import { AskInlineErrorWidget } from '@/editor/extensions/ask/ask-inline-error-widget'
-import { createWidgetMount } from '@/editor/extensions/decoration-widget-mount'
+import { AppErrorBoundary } from '#src/components/app-error-boundary'
+import { BadgeLoading } from '#src/components/badge-loading'
+import { AskInlineErrorWidget } from '#src/editor/extensions/ask/ask-inline-error-widget'
+import { createWidgetMount } from '#src/editor/extensions/decoration-widget-mount'
 
 // Two mounts, not one: the loading spinner sits mid-paragraph at the cursor
 // and needs an inline `span` container, while the error card is a full block

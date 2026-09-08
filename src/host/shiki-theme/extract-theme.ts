@@ -3,12 +3,11 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import type { Logger } from '../../shared/logger'
-import type { ShikiThemePayload } from '../../shared/messages'
-
-import { findThemeContribution } from './find-theme-contribution'
-import { resolveThemeJson } from './resolve-theme-json'
-import { fallbackKind, kindFromUiTheme } from './theme-kind'
+import { findThemeContribution } from '#src/host/shiki-theme/find-theme-contribution'
+import { resolveThemeJson } from '#src/host/shiki-theme/resolve-theme-json'
+import { fallbackKind, kindFromUiTheme } from '#src/host/shiki-theme/theme-kind'
+import type { Logger } from '#src/shared/logger'
+import type { ShikiThemePayload } from '#src/shared/messages'
 
 /**
  * Extracts one VS Code color theme's JSON, reshaped for Shiki.

@@ -1,5 +1,8 @@
-import { createSettleLoop, TAKEOVER_EVENTS } from '@/lib/scroll/scroll-settle'
-import type { SettleOptions } from '@/lib/scroll/scroll-settle'
+import {
+	createSettleLoop,
+	TAKEOVER_EVENTS,
+} from '#src/lib/scroll/scroll-settle'
+import type { SettleOptions } from '#src/lib/scroll/scroll-settle'
 
 /**
  * Scrolls a container to a remembered offset, and holds it there while the page

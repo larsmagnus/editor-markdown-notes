@@ -1,16 +1,16 @@
 import { ChevronDown, Code, FileCode } from 'lucide-react'
 
-import { ButtonCopy } from '@/components/button-copy'
-import { CopyActionsMenu } from '@/components/copy-actions-menu'
-import { Button } from '@/components/ui/button'
+import { ButtonCopy } from '#src/components/button-copy'
+import { CopyActionsMenu } from '#src/components/copy-actions-menu'
+import { Button } from '#src/components/ui/button'
 import {
 	DropdownMenu,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { openDiagramInClaude } from '@/editor/extensions/mermaid/actions'
-import { useCopiedFeedback } from '@/hooks/use-copied-feedback'
-import { useSettings } from '@/hooks/use-settings'
-import { copyToClipboard } from '@/lib/clipboard'
+} from '#src/components/ui/dropdown-menu'
+import { openDiagramInClaude } from '#src/editor/extensions/mermaid/actions'
+import { useCopiedFeedback } from '#src/hooks/use-copied-feedback'
+import { useSettings } from '#src/hooks/use-settings'
+import { copyToClipboard } from '#src/lib/clipboard'
 
 type ButtonActionsProps = {
 	/** The block's mermaid source. */

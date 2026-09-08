@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { SettingsProvider } from '@/components/settings-provider'
-import Toolbar from '@/components/toolbar'
-import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
+import { SettingsProvider } from '#src/components/settings-provider'
+import Toolbar from '#src/components/toolbar'
+import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
 const STORAGE_KEY = 'editor-markdown-notes:view-options'
 

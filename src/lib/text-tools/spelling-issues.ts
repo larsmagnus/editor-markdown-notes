@@ -4,9 +4,9 @@ import retextSpell from 'retext-spell'
 import { unified } from 'unified'
 import { VFile } from 'vfile'
 
-import type { HunspellDictionary, TextIssue } from '@/lib/text-tools/types'
-import { toIssue } from '@/lib/text-tools/vfile-message-to-issue'
-import type { SpellingLanguage } from '@/shared/messages'
+import type { HunspellDictionary, TextIssue } from '#src/lib/text-tools/types'
+import { toIssue } from '#src/lib/text-tools/vfile-message-to-issue'
+import type { SpellingLanguage } from '#src/shared/messages'
 
 /**
  * Its own pass rather than a plugin in `word-issues.ts`, which rebuilds its

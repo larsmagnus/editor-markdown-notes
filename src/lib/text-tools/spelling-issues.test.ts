@@ -5,7 +5,7 @@ import { unified } from 'unified'
 import { VFile } from 'vfile'
 import { describe, expect, it } from 'vitest'
 
-import { spellingIssues } from '@/lib/text-tools/spelling-issues'
+import { spellingIssues } from '#src/lib/text-tools/spelling-issues'
 
 const decoder = new TextDecoder()
 

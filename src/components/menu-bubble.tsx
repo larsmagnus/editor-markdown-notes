@@ -4,7 +4,7 @@ import { NodeSelection } from '@tiptap/pm/state'
 import { useCurrentEditor } from '@tiptap/react'
 import { BubbleMenu } from '@tiptap/react/menus'
 
-import { BubbleMenuContent } from '@/components/bubble-menu-content'
+import { BubbleMenuContent } from '#src/components/bubble-menu-content'
 
 /**
  * A contextual menu that is only visible when selecting text. A `NodeSelection`

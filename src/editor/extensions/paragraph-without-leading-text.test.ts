@@ -2,7 +2,7 @@ import { getSchema } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { paragraphWithoutLeadingText } from '@/editor/extensions/paragraph-without-leading-text'
+import { paragraphWithoutLeadingText } from '#src/editor/extensions/paragraph-without-leading-text'
 
 const schema = getSchema([StarterKit])
 

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
 
-import { parseSearchResults } from './search-match'
-import type { SearchMatch } from './search-match'
+import { parseSearchResults } from '#src/host/search-match'
+import type { SearchMatch } from '#src/host/search-match'
 
 /**
  * Every current search match, keyed by file, newest search only.

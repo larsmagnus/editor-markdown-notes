@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { markerCaretInMarker } from '@/editor/extensions/block-marker/marker-caret'
-import { createEditor } from '@/test-utils/editor'
+import { markerCaretInMarker } from '#src/editor/extensions/block-marker/marker-caret'
+import { createEditor } from '#src/test-utils/editor'
 
 function documentFrom(markdown: string): Editor {
 	const editor = createEditor(markdown)

@@ -5,14 +5,14 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { Command as ProseMirrorCommand } from '@tiptap/pm/state'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
-import { createHeadingInputRule } from '@/editor/extensions/heading/heading-input-rule'
-import { parseHeadingLevel } from '@/editor/extensions/heading/heading-marker'
-import { createHeadingNodeView } from '@/editor/extensions/heading/heading-node-view'
-import { insertLiteralHeadingMarkers } from '@/editor/extensions/heading/insert-literal-heading-markers'
+import { createHeadingInputRule } from '#src/editor/extensions/heading/heading-input-rule'
+import { parseHeadingLevel } from '#src/editor/extensions/heading/heading-marker'
+import { createHeadingNodeView } from '#src/editor/extensions/heading/heading-node-view'
+import { insertLiteralHeadingMarkers } from '#src/editor/extensions/heading/insert-literal-heading-markers'
 import {
 	createSetHeadingCommand,
 	createToggleHeadingCommand,
-} from '@/editor/extensions/heading/toggle-heading-command'
+} from '#src/editor/extensions/heading/toggle-heading-command'
 
 /** Adapts a plain ProseMirror `Command` into TipTap's `addCommands` shape. */
 function adaptCommand(command: ProseMirrorCommand) {

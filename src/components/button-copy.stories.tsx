@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
-import { ButtonCopy } from '@/components/button-copy'
-import { TooltipProvider } from '@/components/ui/tooltip'
+import { ButtonCopy } from '#src/components/button-copy'
+import { TooltipProvider } from '#src/components/ui/tooltip'
 
 const meta = {
 	component: ButtonCopy,

@@ -1,13 +1,13 @@
 import { Sparkles } from 'lucide-react'
 import { useState } from 'react'
 
-import Header from '@/components/header'
-import { PopoverArrow } from '@/components/popover-arrow'
-import { PopoverIconTrigger } from '@/components/popover-icon-trigger'
-import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent } from '@/components/ui/popover'
-import { Textarea } from '@/components/ui/textarea'
-import { useEditorAsk } from '@/hooks/use-editor-ask'
+import Header from '#src/components/header'
+import { PopoverArrow } from '#src/components/popover-arrow'
+import { PopoverIconTrigger } from '#src/components/popover-icon-trigger'
+import { Button } from '#src/components/ui/button'
+import { Popover, PopoverContent } from '#src/components/ui/popover'
+import { Textarea } from '#src/components/ui/textarea'
+import { useEditorAsk } from '#src/hooks/use-editor-ask'
 
 const ASK_PRESETS = [
 	{ id: 'simplify', label: 'Simplify', prompt: 'Simplify this text.' },

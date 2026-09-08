@@ -1,18 +1,20 @@
 import * as vscode from 'vscode'
 
-import type { Logger } from '../shared/logger'
-import type { HostToWebview } from '../shared/messages'
-
-import { broadcastToPanels } from './broadcast'
-import { CONFIG_SECTION, VIEW_TYPE } from './constants'
-import { attachPanelSession } from './panel-session'
-import { readSearchReveal } from './read-search-reveal'
-import type { PanelSaveSession } from './save-participant'
-import { registerSaveParticipant, trackSaveSession } from './save-participant'
-import type { ScrollPositionStore } from './scroll-position-store'
-import { SessionsByUri } from './sessions-by-uri'
-import type { SettingsStore } from './settings-store'
-import type { ShikiThemeStore } from './shiki-theme-store'
+import { broadcastToPanels } from '#src/host/broadcast'
+import { CONFIG_SECTION, VIEW_TYPE } from '#src/host/constants'
+import { attachPanelSession } from '#src/host/panel-session'
+import { readSearchReveal } from '#src/host/read-search-reveal'
+import type { PanelSaveSession } from '#src/host/save-participant'
+import {
+	registerSaveParticipant,
+	trackSaveSession,
+} from '#src/host/save-participant'
+import type { ScrollPositionStore } from '#src/host/scroll-position-store'
+import { SessionsByUri } from '#src/host/sessions-by-uri'
+import type { SettingsStore } from '#src/host/settings-store'
+import type { ShikiThemeStore } from '#src/host/shiki-theme-store'
+import type { Logger } from '#src/shared/logger'
+import type { HostToWebview } from '#src/shared/messages'
 
 /**
  * The custom editor itself. Owns the set of open panels, which is what lets a

@@ -2,15 +2,15 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { SettingsProvider } from '@/components/settings-provider'
-import { TooltipProvider } from '@/components/ui/tooltip'
-import { ButtonActions } from '@/editor/extensions/mermaid/button-actions'
-import { copyToClipboard } from '@/lib/clipboard'
+import { SettingsProvider } from '#src/components/settings-provider'
+import { TooltipProvider } from '#src/components/ui/tooltip'
+import { ButtonActions } from '#src/editor/extensions/mermaid/button-actions'
+import { copyToClipboard } from '#src/lib/clipboard'
 
 // Mocked at the module rather than at `navigator`, which is the app's one seam
 // onto the clipboard. Tolerating a missing clipboard is that module's job and
 // is tested there.
-vi.mock('@/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
+vi.mock('#src/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
 
 const DIAGRAM_CODE = 'flowchart LR\n  A[Start] --> B[Ship it]'
 const DIAGRAM_SVG = '<svg aria-roledescription="flowchart-v2"></svg>'

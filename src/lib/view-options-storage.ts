@@ -1,7 +1,7 @@
-import { viewOptionsSchema } from '@/lib/schemas'
-import { EXTENSION_ID } from '@/shared/constants'
-import { DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
-import type { ViewOptions } from '@/shared/messages'
+import { viewOptionsSchema } from '#src/lib/schemas'
+import { EXTENSION_ID } from '#src/shared/constants'
+import { DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
+import type { ViewOptions } from '#src/shared/messages'
 
 export const VIEW_OPTIONS_STORAGE_KEY = `${EXTENSION_ID}:view-options`
 

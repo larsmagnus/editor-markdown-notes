@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react'
 import { EditorContext } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { useEditorLink } from '@/hooks/use-editor-link'
-import { createEditor } from '@/test-utils/editor'
+import { useEditorLink } from '#src/hooks/use-editor-link'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('links', () => {
 	it('sets the link, then reads it back off the selection', () => {

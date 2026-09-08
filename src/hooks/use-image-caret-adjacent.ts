@@ -1,7 +1,7 @@
 import { NodeSelection } from '@tiptap/pm/state'
 import type { NodeViewProps } from '@tiptap/react'
 
-import { useEditorFlag } from '@/hooks/use-editor-flag'
+import { useEditorFlag } from '#src/hooks/use-editor-flag'
 
 /**
  * Is the caret (or a click, or arrowing between images) sitting right next to

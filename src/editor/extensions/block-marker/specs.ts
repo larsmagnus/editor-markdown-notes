@@ -1,29 +1,29 @@
 import {
 	codeBlockMarkerSpec,
 	frontmatterMarkerSpec,
-} from '@/editor/extensions/block-marker/fenced-specs'
-import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
+} from '#src/editor/extensions/block-marker/fenced-specs'
+import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
 import {
 	liftOutOfConstruct,
 	unwrapToParagraph,
-} from '@/editor/extensions/block-marker/unwrap'
-import { BLOCKQUOTE_MARKER } from '@/editor/extensions/blockquote/blockquote-marker'
-import { blockquoteMarkerLength } from '@/editor/extensions/blockquote/blockquote-marker'
+} from '#src/editor/extensions/block-marker/unwrap'
+import { BLOCKQUOTE_MARKER } from '#src/editor/extensions/blockquote/blockquote-marker'
+import { blockquoteMarkerLength } from '#src/editor/extensions/blockquote/blockquote-marker'
 import {
 	headingMarkerLength,
 	headingMarkerText,
 	parseHeadingLevel,
-} from '@/editor/extensions/heading/heading-marker'
+} from '#src/editor/extensions/heading/heading-marker'
 import {
 	HORIZONTAL_RULE_TEXT,
 	horizontalRuleLength,
-} from '@/editor/extensions/horizontal-rule/horizontal-rule-marker'
+} from '#src/editor/extensions/horizontal-rule/horizontal-rule-marker'
 import {
 	bulletMarkerText,
 	orderedMarkerText,
 	parseListMarker,
 	taskMarkerText,
-} from '@/editor/extensions/list/list-marker'
+} from '#src/editor/extensions/list/list-marker'
 
 /**
  * A heading's `#`x`level`. `parseHeadingLevel` already answers `1` for text

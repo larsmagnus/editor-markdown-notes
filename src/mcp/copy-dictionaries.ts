@@ -3,7 +3,7 @@ import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-import { DICTIONARIES } from '@/mcp/dictionaries'
+import { DICTIONARIES } from '#src/mcp/dictionaries'
 
 /**
  * Copies the Hunspell dictionaries somewhere the MCP server can read them.

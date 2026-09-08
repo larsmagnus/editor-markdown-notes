@@ -1,9 +1,9 @@
 import { readFileSync } from 'fs'
 
-import { pasteText } from '@/e2e/lib/clipboard'
-import { expect, test } from '@/e2e/lib/fixtures'
-import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
-import { openInVSCode } from '@/e2e/lib/vscode-host'
+import { pasteText } from '#e2e/lib/clipboard'
+import { expect, test } from '#e2e/lib/fixtures'
+import { actionSettled, pressKeySettled } from '#e2e/lib/press-key-settled'
+import { openInVSCode } from '#e2e/lib/vscode-host'
 
 test.describe('Lists in the live editor', () => {
 	test('typing "- " creates a bullet list item', async ({ page }) => {

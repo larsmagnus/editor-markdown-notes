@@ -1,5 +1,5 @@
-import { RULES } from '@/lib/text-tools/rules'
-import { TEXT_TOOL_RULE_IDS } from '@/shared/messages'
+import { RULES } from '#src/lib/text-tools/rules'
+import { TEXT_TOOL_RULE_IDS } from '#src/shared/messages'
 
 /** Every check this server can run, in the wording the extension's panel uses. */
 export function listChecks() {

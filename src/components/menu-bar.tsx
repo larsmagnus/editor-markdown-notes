@@ -1,10 +1,10 @@
 import { useCurrentEditor } from '@tiptap/react'
 
-import { ButtonHeadingGroup } from '@/components/button-heading-group'
-import { ButtonStyle } from '@/components/button-style'
-import { Button } from '@/components/ui/button'
-import { MENU_BAR_COMMANDS } from '@/editor/commands/menu-bar-commands'
-import { useEditorHistory } from '@/hooks/use-editor-history'
+import { ButtonHeadingGroup } from '#src/components/button-heading-group'
+import { ButtonStyle } from '#src/components/button-style'
+import { Button } from '#src/components/ui/button'
+import { MENU_BAR_COMMANDS } from '#src/editor/commands/menu-bar-commands'
+import { useEditorHistory } from '#src/hooks/use-editor-history'
 
 export function MenuBar() {
 	const { editor } = useCurrentEditor()

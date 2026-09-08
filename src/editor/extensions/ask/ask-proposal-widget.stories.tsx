@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
-import { AskProposalWidget } from '@/editor/extensions/ask/ask-proposal-widget'
-import type { AskProposalState } from '@/editor/extensions/ask/ask-suggestion-extension'
+import { AskProposalWidget } from '#src/editor/extensions/ask/ask-proposal-widget'
+import type { AskProposalState } from '#src/editor/extensions/ask/ask-suggestion-extension'
 
 const BASE_PROPOSAL: AskProposalState = {
 	id: 'proposal-1',

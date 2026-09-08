@@ -1,8 +1,8 @@
-import { configSchema } from '@/lib/schemas'
-import { readStoredViewOptions } from '@/lib/view-options-storage'
-import { isVSCodeWebview } from '@/lib/vscode-api'
-import { DEFAULT_SETTINGS } from '@/shared/messages'
-import type { Config } from '@/shared/messages'
+import { configSchema } from '#src/lib/schemas'
+import { readStoredViewOptions } from '#src/lib/view-options-storage'
+import { isVSCodeWebview } from '#src/lib/vscode-api'
+import { DEFAULT_SETTINGS } from '#src/shared/messages'
+import type { Config } from '#src/shared/messages'
 
 /**
  * The settings the app starts with, from whichever side owns them.

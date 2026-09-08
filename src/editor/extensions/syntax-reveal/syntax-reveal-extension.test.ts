@@ -1,9 +1,9 @@
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { SYNTAX_HIDDEN_CLASS } from '@/editor/extensions/syntax-reveal/compute-reveal-decorations'
-import { SyntaxReveal } from '@/editor/extensions/syntax-reveal/syntax-reveal-extension'
-import { createEditor } from '@/test-utils/editor'
+import { SYNTAX_HIDDEN_CLASS } from '#src/editor/extensions/syntax-reveal/compute-reveal-decorations'
+import { SyntaxReveal } from '#src/editor/extensions/syntax-reveal/syntax-reveal-extension'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('SyntaxReveal', () => {
 	it('draws the hidden class on a provider range the caret is outside of', () => {

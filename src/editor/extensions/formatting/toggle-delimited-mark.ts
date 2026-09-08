@@ -5,13 +5,13 @@ import { TextSelection } from '@tiptap/pm/state'
 import type {
 	DelimiterPair,
 	DelimiterSpec,
-} from '@/editor/extensions/formatting/delimiter-spec'
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import { unwrapRun } from '@/editor/extensions/formatting/unwrap-run'
+} from '#src/editor/extensions/formatting/delimiter-spec'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import { unwrapRun } from '#src/editor/extensions/formatting/unwrap-run'
 import {
 	wrapRangeWithDelimiter,
 	wrapSelectionWithDelimiter,
-} from '@/editor/extensions/formatting/wrap-selection-with-delimiter'
+} from '#src/editor/extensions/formatting/wrap-selection-with-delimiter'
 
 /**
  * Toggling with nothing selected, which is how most styled text gets written:

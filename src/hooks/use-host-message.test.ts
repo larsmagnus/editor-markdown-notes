@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
-import { useHostMessage } from '@/hooks/use-host-message'
+import { useHostMessage } from '#src/hooks/use-host-message'
 
 const updateSchema = z.object({
 	type: z.literal('update'),

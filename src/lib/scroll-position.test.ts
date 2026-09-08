@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { readScrollTop, writeScrollTop } from '@/lib/scroll-position'
+import { readScrollTop, writeScrollTop } from '#src/lib/scroll-position'
 
 afterEach(() => {
 	delete window.vscode

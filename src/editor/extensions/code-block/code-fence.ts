@@ -1,4 +1,4 @@
-import { findClosingFence } from '@/editor/extensions/syntax-reveal/find-closing-fence'
+import { findClosingFence } from '#src/editor/extensions/syntax-reveal/find-closing-fence'
 
 /**
  * A fenced code block's own text, split into its fence-open line, code, and

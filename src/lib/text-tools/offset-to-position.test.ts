@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { getDocumentText } from '@/lib/text-tools/document-text'
-import { offsetToPosition } from '@/lib/text-tools/offset-to-position'
-import { createEditor } from '@/test-utils/editor'
+import { getDocumentText } from '#src/lib/text-tools/document-text'
+import { offsetToPosition } from '#src/lib/text-tools/offset-to-position'
+import { createEditor } from '#src/test-utils/editor'
 
 /**
  * Mapping a retext offset back to a ProseMirror position. Each case asserts on

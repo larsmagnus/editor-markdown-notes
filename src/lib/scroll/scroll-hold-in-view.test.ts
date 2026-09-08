@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { scrollHoldInView } from '@/lib/scroll/scroll-hold-in-view'
+import { scrollHoldInView } from '#src/lib/scroll/scroll-hold-in-view'
 
 /**
  * happy-dom has no layout engine and so no real `scrollIntoView`; what matters

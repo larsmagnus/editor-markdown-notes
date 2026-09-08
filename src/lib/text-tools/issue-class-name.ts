@@ -1,4 +1,4 @@
-import type { IssueSeverity } from '@/lib/text-tools/types'
+import type { IssueSeverity } from '#src/lib/text-tools/types'
 
 /**
  * The classes that mark a finding, wherever it is drawn.

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { AskPopover } from '@/editor/extensions/ask/ask-popover'
-import { EditorContextDecorator } from '@/storybook/decorator-editor-context'
+import { AskPopover } from '#src/editor/extensions/ask/ask-popover'
+import { EditorContextDecorator } from '#src/storybook/decorator-editor-context'
 
 const meta = {
 	component: AskPopover,

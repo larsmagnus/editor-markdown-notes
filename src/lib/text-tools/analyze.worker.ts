@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
-import { runPipeline } from '@/lib/text-tools/run-pipeline'
-import type { AnalyzeRequest, AnalyzeResponse } from '@/lib/text-tools/types'
+import { runPipeline } from '#src/lib/text-tools/run-pipeline'
+import type { AnalyzeRequest, AnalyzeResponse } from '#src/lib/text-tools/types'
 
 /**
  * The analysis runs here so a long note does not stall typing - a 8,000-word

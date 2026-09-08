@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { relativeImagePath } from './relative-image-path'
+import { relativeImagePath } from '#src/host/relative-image-path'
 
 describe('relativeImagePath', () => {
 	it('resolves a sibling file with no leading path segment', () => {

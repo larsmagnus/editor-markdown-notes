@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
-import { ButtonAdd } from '@/editor/extensions/frontmatter/button-add'
-import { createEditor } from '@/test-utils/editor'
+import { ButtonAdd } from '#src/editor/extensions/frontmatter/button-add'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('ButtonAdd', () => {
 	it('renders when the document has no frontmatter block', () => {

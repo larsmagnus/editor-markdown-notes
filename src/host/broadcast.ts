@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-import type { HostToWebview } from '../shared/messages'
+import type { HostToWebview } from '#src/shared/messages'
 
 /**
  * Posts one message to every open panel.

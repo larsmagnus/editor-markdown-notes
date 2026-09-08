@@ -3,14 +3,14 @@ import { isAbsolute, resolve } from 'node:path'
 
 import { z } from 'zod'
 
-import type { CheckDefaults } from '@/mcp/tools'
-import { WORKSPACE_SEPARATOR } from '@/shared/constants'
+import type { CheckDefaults } from '#src/mcp/tools'
+import { WORKSPACE_SEPARATOR } from '#src/shared/constants'
 import {
 	DEFAULT_SETTINGS,
 	DEFAULT_VIEW_OPTIONS,
 	SPELLING_LANGUAGES,
 	TEXT_TOOL_RULE_IDS,
-} from '@/shared/messages'
+} from '#src/shared/messages'
 
 /**
  * The host's configuration, handed over as environment variables when VS Code

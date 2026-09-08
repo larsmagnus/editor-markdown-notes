@@ -1,12 +1,12 @@
 import type { Node as ProseMirrorNode, NodeType } from '@tiptap/pm/model'
 import type { Command, EditorState, Transaction } from '@tiptap/pm/state'
 
-import { canSetBlockType } from '@/editor/extensions/can-set-block-type'
+import { canSetBlockType } from '#src/editor/extensions/can-set-block-type'
 import {
 	headingMarkerLength,
 	headingMarkerText,
 	parseHeadingLevel,
-} from '@/editor/extensions/heading/heading-marker'
+} from '#src/editor/extensions/heading/heading-marker'
 
 type HeadingBlock = { pos: number; node: ProseMirrorNode }
 

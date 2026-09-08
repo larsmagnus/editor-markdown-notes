@@ -1,8 +1,8 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
-import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
-import { paragraphWithoutLeadingText } from '@/editor/extensions/paragraph-without-leading-text'
+import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
+import { paragraphWithoutLeadingText } from '#src/editor/extensions/paragraph-without-leading-text'
 
 /**
  * Renders `node`'s content with its own marker text stripped from its first

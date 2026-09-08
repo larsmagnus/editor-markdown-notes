@@ -1,12 +1,12 @@
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 
-import { insertLiteralBlockquoteMarker } from '@/editor/extensions/blockquote/insert-literal-blockquote-marker'
-import { insertLiteralHeadingMarkers } from '@/editor/extensions/heading/insert-literal-heading-markers'
-import { insertLiteralRules } from '@/editor/extensions/horizontal-rule/horizontal-rule-marker'
+import { insertLiteralBlockquoteMarker } from '#src/editor/extensions/blockquote/insert-literal-blockquote-marker'
+import { insertLiteralHeadingMarkers } from '#src/editor/extensions/heading/insert-literal-heading-markers'
+import { insertLiteralRules } from '#src/editor/extensions/horizontal-rule/horizontal-rule-marker'
 import {
 	insertLiteralListMarkers,
 	insertLiteralTaskMarkers,
-} from '@/editor/extensions/list/insert-literal-list-markers'
+} from '#src/editor/extensions/list/insert-literal-list-markers'
 
 const INSERTERS = [
 	insertLiteralHeadingMarkers,

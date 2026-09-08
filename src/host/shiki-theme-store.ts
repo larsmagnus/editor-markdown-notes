@@ -1,10 +1,9 @@
 import * as vscode from 'vscode'
 
-import type { Logger } from '../shared/logger'
-import type { ShikiThemePayload } from '../shared/messages'
-
-import { extractShikiTheme } from './shiki-theme/extract-theme'
-import { resolveActiveThemeSettingsId } from './shiki-theme/resolve-active-theme-id'
+import { extractShikiTheme } from '#src/host/shiki-theme/extract-theme'
+import { resolveActiveThemeSettingsId } from '#src/host/shiki-theme/resolve-active-theme-id'
+import type { Logger } from '#src/shared/logger'
+import type { ShikiThemePayload } from '#src/shared/messages'
 
 /** What `resolveActiveThemeSettingsId` reads, watched for changes below. */
 const COLOR_THEME_SETTING = 'workbench.colorTheme'

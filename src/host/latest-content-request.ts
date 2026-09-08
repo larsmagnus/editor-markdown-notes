@@ -1,8 +1,7 @@
 import * as vscode from 'vscode'
 
-import type { HostToWebview } from '../shared/messages'
-
-import { hasMessageType } from './message-guards'
+import { hasMessageType } from '#src/host/message-guards'
+import type { HostToWebview } from '#src/shared/messages'
 
 /** VS Code aborts a slow save participant on its own; this stays comfortably
  *  under that so a timeout here is always the one that fires. */

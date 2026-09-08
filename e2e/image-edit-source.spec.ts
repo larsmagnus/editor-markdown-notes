@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test'
 
-import { expect, test } from '@/e2e/lib/fixtures'
-import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
-import { openInVSCode } from '@/e2e/lib/vscode-host'
+import { expect, test } from '#e2e/lib/fixtures'
+import { actionSettled, pressKeySettled } from '#e2e/lib/press-key-settled'
+import { openInVSCode } from '#e2e/lib/vscode-host'
 
 /**
  * "Edit image source" reveals text and moves the selection onto it via a

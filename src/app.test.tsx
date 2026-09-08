@@ -2,12 +2,12 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import App from '@/app'
-import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
+import App from '#src/app'
+import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
 // The bubble menu positions itself with floating-ui, which measures the DOM
 // and throws in happy-dom. Nothing here tests the menu.
-vi.mock('@/components/menu-bubble', () => ({ MenuBubble: () => null }))
+vi.mock('#src/components/menu-bubble', () => ({ MenuBubble: () => null }))
 
 const NOTE = '---\ntitle: Roadmap\n---\n\n# Roadmap\n\nShip it.'
 

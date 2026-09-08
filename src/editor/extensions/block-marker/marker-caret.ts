@@ -1,9 +1,9 @@
 import type { Editor } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
 
-import type { MarkerMatch } from '@/editor/extensions/block-marker/marker-host'
-import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
-import { BLOCK_MARKER_SPECS } from '@/editor/extensions/block-marker/specs'
+import type { MarkerMatch } from '#src/editor/extensions/block-marker/marker-host'
+import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
+import { BLOCK_MARKER_SPECS } from '#src/editor/extensions/block-marker/specs'
 
 /** Where the caret sits inside the marker of the construct enclosing it. */
 export type MarkerCaret = {

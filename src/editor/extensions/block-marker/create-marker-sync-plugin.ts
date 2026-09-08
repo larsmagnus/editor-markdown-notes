@@ -2,14 +2,14 @@ import { Fragment } from '@tiptap/pm/model'
 import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state'
 import type { EditorState, Transaction } from '@tiptap/pm/state'
 
-import { findMarkerActions } from '@/editor/extensions/block-marker/marker-actions'
+import { findMarkerActions } from '#src/editor/extensions/block-marker/marker-actions'
 import type {
 	MarkerAction,
 	MarkerFix,
-} from '@/editor/extensions/block-marker/marker-actions'
-import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
-import { createDeletionProbe } from '@/editor/extensions/syntax-repair/authored-deletion'
-import { anyDocChanged } from '@/editor/extensions/transaction-filters'
+} from '#src/editor/extensions/block-marker/marker-actions'
+import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
+import { createDeletionProbe } from '#src/editor/extensions/syntax-repair/authored-deletion'
+import { anyDocChanged } from '#src/editor/extensions/transaction-filters'
 
 /**
  * Writes one marker, replacing whatever wrong-length remnant sits there.

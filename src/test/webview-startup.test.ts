@@ -5,7 +5,7 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import { getWebviewProblems } from '../lib/host/webview-diagnostics'
+import { getWebviewProblems } from '#src/lib/host/webview-diagnostics'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 

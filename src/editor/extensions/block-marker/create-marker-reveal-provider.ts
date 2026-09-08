@@ -1,11 +1,11 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-import { forEachMarkerHost } from '@/editor/extensions/block-marker/marker-host'
-import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
+import { forEachMarkerHost } from '#src/editor/extensions/block-marker/marker-host'
+import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
 import type {
 	RevealProvider,
 	RevealSpan,
-} from '@/editor/extensions/syntax-reveal/reveal-provider'
+} from '#src/editor/extensions/syntax-reveal/reveal-provider'
 
 /**
  * Reveals every block construct's marker text as the caret reaches it, each

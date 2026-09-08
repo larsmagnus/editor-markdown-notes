@@ -1,13 +1,13 @@
 import { CornerDownLeft } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '#src/components/ui/badge'
 import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupButton,
 	InputGroupTextarea,
-} from '@/components/ui/input-group'
+} from '#src/components/ui/input-group'
 
 interface AskPromptInputProps {
 	onSubmit: (prompt: string) => void

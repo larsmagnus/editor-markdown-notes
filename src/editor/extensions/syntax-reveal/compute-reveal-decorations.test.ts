@@ -1,9 +1,9 @@
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { computeRevealDecorations } from '@/editor/extensions/syntax-reveal/compute-reveal-decorations'
-import type { RevealProvider } from '@/editor/extensions/syntax-reveal/reveal-provider'
-import { createEditor } from '@/test-utils/editor'
+import { computeRevealDecorations } from '#src/editor/extensions/syntax-reveal/compute-reveal-decorations'
+import type { RevealProvider } from '#src/editor/extensions/syntax-reveal/reveal-provider'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('computeRevealDecorations', () => {
 	// "hello world" -> "hello" spans doc positions 1-6, "world" spans 7-12.

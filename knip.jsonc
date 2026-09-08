@@ -2,11 +2,16 @@
 	"$schema": "https://unpkg.com/knip@6/schema.json",
 	// Knip's vite/vitest/typescript plugins already find `index.html` →
 	// `src/main.tsx`, `src/test-setup.ts` and — via package.json `main` →
-	// `out/host.js` — the extension host entry. Listing those again is
-	// redundant and knip says so, hence only the one it cannot infer:
+	// `out/host.js` — the extension host entry. The rest it cannot infer:
 	// `.vscode-test.mjs` points at `out/test/**/*.test.js`, compiled output with
-	// no path back to source.
-	"entry": ["src/test/**/*.test.ts"],
+	// no path back to source; `agent-sdk-bundle.ts` and `server.ts` are each a
+	// `vite build -c vite.*.config.ts` entry knip doesn't introspect, where the
+	// old single `esbuild <file>.ts` script invocations were.
+	"entry": [
+		"src/test/**/*.test.ts",
+		"src/host/agent-sdk-bundle.ts",
+		"src/mcp/server.ts",
+	],
 	// `.css` is in here so the Tailwind v4 `@plugin` directive in
 	// `src/globals.css` counts as usage of `tailwindcss-animate`.
 	"project": ["src/**/*.{ts,tsx,css}"],

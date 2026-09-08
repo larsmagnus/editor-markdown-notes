@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { AskProposalWidget } from '@/editor/extensions/ask/ask-proposal-widget'
-import type { AskProposalState } from '@/editor/extensions/ask/ask-suggestion-extension'
+import { AskProposalWidget } from '#src/editor/extensions/ask/ask-proposal-widget'
+import type { AskProposalState } from '#src/editor/extensions/ask/ask-suggestion-extension'
 
 const BASE_PROPOSAL: AskProposalState = {
 	id: 'proposal-1',

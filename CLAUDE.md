@@ -8,7 +8,7 @@ Only add a line here if a future session couldn't cheaply rediscover it by readi
 
 A VSCode extension for editing markdown in a live preview powered by a React web application.
 
-- **VSCode Extension**: `src/host.ts` only activates; everything else lives in `src/host/` and compiles to `out/host.js`, a name `package.json`'s `main` field requires — renaming to `src/host/index.ts` would break activation. `tsconfig.host.json` has no `paths` mapping, so a stray `@/` alias fails typecheck instead of MODULE_NOT_FOUND at activation. Host-only pure utilities shared with the webview (e.g. frontmatter splitting) live in `src/lib/host/**`, the one exception carved out of `src/lib/`, for the same relative-import reason. The root package is ESM for Vite, but the extension host needs CommonJS: `vscode:compile` writes `out/package.json` as `{"type":"commonjs"}`, making everything under `out/` CJS.
+- **VSCode Extension**: `src/host.ts` only activates; everything else lives in `src/host/` and compiles to `out/host.js`, a name `package.json`'s `main` field requires — renaming to `src/host/index.ts` would break activation. Imports resolve via the `#src/*` subpath import (`package.json`'s `imports` field, resolved by Node itself at `require()` time), not `compilerOptions.paths`, which `tsc` only consults for typechecking and never rewrites into the emitted `require()` call. `vscode:sentinel` writes a matching `imports` map into `out/package.json`, since Node resolves `imports` from the nearest `package.json` to the _requiring_ file, not the root one. Host-only pure utilities shared with the webview (e.g. frontmatter splitting) live in `src/lib/host/**`, the one exception carved out of `src/lib/` — kept separate so the CJS host build doesn't drag in the rest of `src/lib/`'s dependencies (zod, React, the retext stack). The root package is ESM for Vite, but the extension host needs CommonJS: `vscode:compile` writes `out/package.json` as `{"type":"commonjs"}`, making everything under `out/` CJS.
 - **Shared contract**: `src/shared/messages.ts` holds host ↔ webview message types and defaults, included in both tsconfig projects; the CJS sentinel above is what makes value imports safe from the extension host.
 
 ## Development Commands
@@ -84,7 +84,7 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 
 ### MCP server (`src/mcp/`)
 
-`src/mcp/README.md` carries the why. The build is the only trap not in it: its own process, so unlike `agent-sdk-bundle.ts` it needs **no** `.cjs` loader shim — that shim exists because the CommonJS host has to reach an ES module, while this is a fresh `node` VSCode starts. Excluded from `tsconfig.host.json` and bundled with `--alias:@=./src`, so it uses `@/` imports like the webview rather than the host's relative ones.
+`src/mcp/README.md` carries the why. The build is the only trap not in it: its own process, so unlike `agent-sdk-bundle.ts` it needs **no** `.cjs` loader shim — that shim exists because the CommonJS host has to reach an ES module, while this is a fresh `node` VSCode starts. Excluded from `tsconfig.host.json` and bundled separately with esbuild, whose native `package.json` `imports`-field support resolves the same `#src/*` specifiers everywhere else uses, with no `--alias` flag needed.
 
 ### Content Management
 

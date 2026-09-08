@@ -1,11 +1,11 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { HighlighterCore } from 'shiki'
 
-import { parseFence } from '@/editor/extensions/code-block/code-fence'
-import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
-import { MERMAID_LANGUAGE } from '@/editor/extensions/mermaid/language'
-import type { PlacedToken } from '@/editor/extensions/syntax-highlight/syntax-highlight-extension'
-import { ensureLanguage } from '@/lib/shiki-highlighter'
+import { parseFence } from '#src/editor/extensions/code-block/code-fence'
+import { parseFrontmatterFence } from '#src/editor/extensions/frontmatter/frontmatter-fence'
+import { MERMAID_LANGUAGE } from '#src/editor/extensions/mermaid/language'
+import type { PlacedToken } from '#src/editor/extensions/syntax-highlight/syntax-highlight-extension'
+import { ensureLanguage } from '#src/lib/shiki-highlighter'
 
 /** One fenced code block's current text, language and document position. */
 export type CodeBlockSnapshot = { text: string; language: string; from: number }

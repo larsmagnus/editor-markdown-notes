@@ -2,11 +2,11 @@ import { cn } from 'cn'
 import { Link } from 'lucide-react'
 import { useState } from 'react'
 
-import { PopoverForm } from '@/components/popover-form'
-import { PopoverIconTrigger } from '@/components/popover-icon-trigger'
-import { PopoverTextField } from '@/components/popover-text-field'
-import { Popover } from '@/components/ui/popover'
-import { useEditorLink } from '@/hooks/use-editor-link'
+import { PopoverForm } from '#src/components/popover-form'
+import { PopoverIconTrigger } from '#src/components/popover-icon-trigger'
+import { PopoverTextField } from '#src/components/popover-text-field'
+import { Popover } from '#src/components/ui/popover'
+import { useEditorLink } from '#src/hooks/use-editor-link'
 
 /** Sets the link on the selection, seeded with whatever link is already there. */
 export function LinkPopover() {

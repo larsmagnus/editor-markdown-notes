@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
 	buildMissingAssetsHtml,
 	buildWebviewHtml,
-} from '@/lib/host/webview-html'
-import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
+} from '#src/lib/host/webview-html'
+import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
 const INPUT = {
 	scriptUri: 'https://cdn.example/assets/index-a1b2c3.js',

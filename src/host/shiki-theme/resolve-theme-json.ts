@@ -1,6 +1,6 @@
 import * as path from 'path'
 
-import { parseJsonc } from '../../lib/host/jsonc'
+import { parseJsonc } from '#src/lib/host/jsonc'
 
 /** A VS Code theme JSON body, loosely - only the fields this feature reads. */
 export type ThemeJson = {

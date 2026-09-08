@@ -2,9 +2,9 @@ import * as nodePath from 'path'
 
 import * as vscode from 'vscode'
 
-import { copyImageIntoWorkspace } from './copy-image-into-workspace'
-import { isInsideFolder } from './image-copy'
-import { relativeImagePath } from './relative-image-path'
+import { copyImageIntoWorkspace } from '#src/host/copy-image-into-workspace'
+import { isInsideFolder } from '#src/host/image-copy'
+import { relativeImagePath } from '#src/host/relative-image-path'
 
 /**
  * The path a picked image gets inserted as. A file already inside the

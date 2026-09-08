@@ -2,13 +2,13 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { SettingsProvider } from '@/components/settings-provider'
-import { LIVE_EDITOR_ID } from '@/editor/editor-mode-live-surface'
-import Layout from '@/layout'
+import { SettingsProvider } from '#src/components/settings-provider'
+import { LIVE_EDITOR_ID } from '#src/editor/editor-mode-live-surface'
+import Layout from '#src/layout'
 
 // The bubble menu positions itself with floating-ui, which measures the DOM and
 // throws in happy-dom the moment anything moves the selection.
-vi.mock('@/components/menu-bubble', () => ({ MenuBubble: () => null }))
+vi.mock('#src/components/menu-bubble', () => ({ MenuBubble: () => null }))
 
 afterEach(() => {
 	delete window.vscode

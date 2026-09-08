@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { frontmatterFenceText } from '@/editor/extensions/frontmatter/frontmatter-fence'
-import { splitFrontmatter } from '@/lib/host/frontmatter'
-import { createEditor } from '@/test-utils/editor'
+import { frontmatterFenceText } from '#src/editor/extensions/frontmatter/frontmatter-fence'
+import { splitFrontmatter } from '#src/lib/host/frontmatter'
+import { createEditor } from '#src/test-utils/editor'
 
 /**
  * Runs markdown through the exact extension set the app ships with, then reads

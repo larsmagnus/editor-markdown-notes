@@ -3,18 +3,18 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { EditorBody } from '@/editor/editor-body'
-import { LIVE_EDITOR_ID } from '@/editor/editor-mode-live-surface'
-import { RAW_MARKDOWN_EDITOR_ID } from '@/editor/editor-mode-raw'
-import { skipToEditor } from '@/editor/extensions/focus-navigation/skip-target'
+import { EditorBody } from '#src/editor/editor-body'
+import { LIVE_EDITOR_ID } from '#src/editor/editor-mode-live-surface'
+import { RAW_MARKDOWN_EDITOR_ID } from '#src/editor/editor-mode-raw'
+import { skipToEditor } from '#src/editor/extensions/focus-navigation/skip-target'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`
 // and the save effect attaches a rejection handler to what it hands back.
-vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
+vi.mock('#src/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 
 // The bubble menu positions itself with floating-ui, which measures the DOM
 // and throws in happy-dom the moment anything moves the selection.
-vi.mock('@/components/menu-bubble', () => ({ MenuBubble: () => null }))
+vi.mock('#src/components/menu-bubble', () => ({ MenuBubble: () => null }))
 
 afterEach(() => {
 	vi.clearAllMocks()

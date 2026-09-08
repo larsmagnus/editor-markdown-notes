@@ -1,8 +1,8 @@
 import type { ComponentProps } from 'react'
 
-import { ButtonToggle } from '@/components/button-toggle'
-import { useEditorHeadings } from '@/hooks/use-editor-headings'
-import type { HeadingLevel } from '@/lib/heading-levels'
+import { ButtonToggle } from '#src/components/button-toggle'
+import { useEditorHeadings } from '#src/hooks/use-editor-headings'
+import type { HeadingLevel } from '#src/lib/heading-levels'
 
 export function ButtonHeading({
 	level,

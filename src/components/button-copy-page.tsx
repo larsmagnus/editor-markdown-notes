@@ -1,18 +1,18 @@
 import { ChevronDown, Code, Copy, FileType } from 'lucide-react'
 
-import { BadgeCopied } from '@/components/badge-copied'
-import { CopyActionsMenu } from '@/components/copy-actions-menu'
-import { Button } from '@/components/ui/button'
-import { ButtonGroup } from '@/components/ui/button-group'
+import { BadgeCopied } from '#src/components/badge-copied'
+import { CopyActionsMenu } from '#src/components/copy-actions-menu'
+import { Button } from '#src/components/ui/button'
+import { ButtonGroup } from '#src/components/ui/button-group'
 import {
 	DropdownMenu,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useCopiedFeedback } from '@/hooks/use-copied-feedback'
-import { useSettings } from '@/hooks/use-settings'
-import { copyToClipboard } from '@/lib/clipboard'
-import { markdownToPlainText } from '@/lib/markdown-to-text'
-import { getVSCodeApi } from '@/lib/vscode-api'
+} from '#src/components/ui/dropdown-menu'
+import { useCopiedFeedback } from '#src/hooks/use-copied-feedback'
+import { useSettings } from '#src/hooks/use-settings'
+import { copyToClipboard } from '#src/lib/clipboard'
+import { markdownToPlainText } from '#src/lib/markdown-to-text'
+import { getVSCodeApi } from '#src/lib/vscode-api'
 
 type ButtonCopyPageProps = { content: string }
 

@@ -1,6 +1,6 @@
-import { createFenceMarkerSpec } from '@/editor/extensions/block-marker/fence-spec'
-import { parseFence } from '@/editor/extensions/code-block/code-fence'
-import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
+import { createFenceMarkerSpec } from '#src/editor/extensions/block-marker/fence-spec'
+import { parseFence } from '#src/editor/extensions/code-block/code-fence'
+import { parseFrontmatterFence } from '#src/editor/extensions/frontmatter/frontmatter-fence'
 
 /**
  * A code block's fence lines. The language tag lives on the opening one, which

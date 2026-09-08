@@ -8,12 +8,17 @@
 		"rootDir": "src",
 		"strict": true,
 		"skipLibCheck": true,
-		"types": ["mocha", "node"]
-		// No `paths` mapping, deliberately. `tsc` does not rewrite path aliases, so
-		// `@/lib/x` would typecheck here and emit `require("@/lib/x")` verbatim,
-		// killing the extension with MODULE_NOT_FOUND on activation - a failure
-		// neither test suite can see. Omitting the mapping turns that into a
-		// typecheck error instead, which is why host code uses relative imports.
+		"types": ["mocha", "node"],
+		// `#src/*` resolves through the root `package.json`'s `imports` field, which
+		// Node itself reads at `require()` time - unlike `compilerOptions.paths`,
+		// which `tsc` only consults for typechecking and never rewrites into the
+		// emitted `require()` call. That's what makes it safe for this project:
+		// no bundler runs between `tsc`'s CommonJS emit and the extension host
+		// loading `out/host.js`. `vscode:sentinel` writes the matching `imports`
+		// map into `out/package.json`, since Node resolves `imports` from the
+		// nearest `package.json` to the *requiring* file, not the root one.
+		"moduleResolution": "bundler",
+		"resolvePackageJsonImports": true
 	},
 	"include": [
 		"src/host.ts",
@@ -30,8 +35,9 @@
 		"out",
 		// esbuild's entry point, never tsc's - see the file's own comment.
 		"src/host/agent-sdk-bundle.ts",
-		// Its own esbuild bundle and its own process, which reaches the retext
-		// stack through `@/` aliases this project deliberately cannot resolve.
+		// Its own esbuild bundle and its own process - pulls in the retext stack
+		// and hunspell dictionaries, which this dependency-free CJS build doesn't
+		// vendor.
 		"src/mcp",
 		// This project has no DOM lib and no vitest types.
 		"src/lib/host/**/*.test.ts"

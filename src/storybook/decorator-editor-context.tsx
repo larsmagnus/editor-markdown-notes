@@ -1,7 +1,7 @@
 import { EditorContent, EditorContext, useEditor } from '@tiptap/react'
 import type { ReactNode } from 'react'
 
-import { extensions } from '@/editor/extensions/extensions'
+import { extensions } from '#src/editor/extensions/extensions'
 
 interface EditorContextDecoratorProps {
 	/** Optional, for stories that only need the mounted content itself. */

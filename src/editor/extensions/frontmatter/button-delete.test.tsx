@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
-import { ButtonDelete } from '@/editor/extensions/frontmatter/button-delete'
-import { createEditor } from '@/test-utils/editor'
+import { ButtonDelete } from '#src/editor/extensions/frontmatter/button-delete'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('ButtonDelete', () => {
 	it('removes the frontmatter node when clicked', async () => {

@@ -2,13 +2,13 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import EditorModeLive from '@/editor/editor-mode-live'
+import EditorModeLive from '#src/editor/editor-mode-live'
 
 // Same two stubs `editor.test.tsx` carries, and for the same reasons: the
 // bubble menu measures the DOM through floating-ui, and the app's one clipboard
 // seam is mocked so no test has to replace `navigator`.
-vi.mock('@/components/menu-bubble', () => ({ MenuBubble: () => null }))
-vi.mock('@/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
+vi.mock('#src/components/menu-bubble', () => ({ MenuBubble: () => null }))
+vi.mock('#src/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
 
 /**
  * happy-dom has no layout engine and no `scrollIntoView`, so the reveal's own

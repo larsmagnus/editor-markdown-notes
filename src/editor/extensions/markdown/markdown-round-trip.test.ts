@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { createEditor } from '@/test-utils/editor'
+import { createEditor } from '#src/test-utils/editor'
 
 /**
  * Runs markdown through the exact extension set the app ships with, then reads

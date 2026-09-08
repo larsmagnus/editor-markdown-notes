@@ -6,7 +6,7 @@ import {
 	DEFAULT_VIEW_OPTIONS,
 	SPELLING_LANGUAGES,
 	TEXT_TOOL_RULE_IDS,
-} from '@/shared/messages'
+} from '#src/shared/messages'
 
 /**
  * Runtime validation for everything the webview receives from outside itself:

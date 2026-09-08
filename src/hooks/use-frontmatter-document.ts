@@ -1,8 +1,8 @@
 import type { Editor } from '@tiptap/react'
 import { useEffect, useRef } from 'react'
 
-import { frontmatterFenceText } from '@/editor/extensions/frontmatter/frontmatter-fence'
-import { splitFrontmatter } from '@/lib/host/frontmatter'
+import { frontmatterFenceText } from '#src/editor/extensions/frontmatter/frontmatter-fence'
+import { splitFrontmatter } from '#src/lib/host/frontmatter'
 
 /** Stable, so the default does not re-run the effect on every render. */
 const neverOwnSync = () => false

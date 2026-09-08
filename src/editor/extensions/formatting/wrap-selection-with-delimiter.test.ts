@@ -1,8 +1,8 @@
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { wrapSelectionWithDelimiter } from '@/editor/extensions/formatting/wrap-selection-with-delimiter'
-import { createEditor } from '@/test-utils/editor'
+import { wrapSelectionWithDelimiter } from '#src/editor/extensions/formatting/wrap-selection-with-delimiter'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('wrapSelectionWithDelimiter', () => {
 	it('wraps the selection in delimiter text and marks the whole thing', () => {

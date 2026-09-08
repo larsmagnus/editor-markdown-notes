@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { userEvent, within } from 'storybook/test'
 
-import { MenuBubble } from '@/components/menu-bubble'
-import { EditorContextDecorator } from '@/storybook/decorator-editor-context'
+import { MenuBubble } from '#src/components/menu-bubble'
+import { EditorContextDecorator } from '#src/storybook/decorator-editor-context'
 
 const meta = {
 	component: MenuBubble,

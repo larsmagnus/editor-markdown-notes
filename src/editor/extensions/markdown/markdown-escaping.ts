@@ -1,15 +1,15 @@
 import { MarkdownSerializerState } from 'prosemirror-markdown'
 
-import type { HeadingSerializerState } from '@/editor/extensions/heading/heading-extension'
-import type { LinkSerializerState } from '@/editor/extensions/link/link-markdown-spec'
+import type { HeadingSerializerState } from '#src/editor/extensions/heading/heading-extension'
+import type { LinkSerializerState } from '#src/editor/extensions/link/link-markdown-spec'
 import {
 	backtickRuns,
 	flankingAsteriskOffsets,
 	hasFlankingAsteriskPartner,
 	hasMatchingBacktickRun,
-} from '@/editor/extensions/markdown/markdown-escape-partners'
-import type { TableSerializerState } from '@/editor/extensions/table/table-extension'
-import { isWordChar } from '@/lib/word-boundary'
+} from '#src/editor/extensions/markdown/markdown-escape-partners'
+import type { TableSerializerState } from '#src/editor/extensions/table/table-extension'
+import { isWordChar } from '#src/lib/word-boundary'
 
 let patched = false
 

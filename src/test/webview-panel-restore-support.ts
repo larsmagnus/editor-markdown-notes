@@ -1,9 +1,9 @@
 import * as vscode from 'vscode'
 
-import { MarkdownEditorProvider } from '../host/markdown-editor-provider'
-import { hasMessageType } from '../host/message-guards'
+import { MarkdownEditorProvider } from '#src/host/markdown-editor-provider'
+import { hasMessageType } from '#src/host/message-guards'
 
-export { pause } from './search-test-support'
+export { pause } from '#src/test/search-test-support'
 
 export const VIEW_TYPE = 'editor-markdown-notes.markdownEditor'
 

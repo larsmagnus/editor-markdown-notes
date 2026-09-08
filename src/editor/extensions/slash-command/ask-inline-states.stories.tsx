@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useCurrentEditor } from '@tiptap/react'
 import { useEffect } from 'react'
 
-import { EditorContextDecorator } from '@/storybook/decorator-editor-context'
+import { EditorContextDecorator } from '#src/storybook/decorator-editor-context'
 
 /**
  * Starts the `/ask` loading widget once the editor mounts, so the story shows

@@ -1,6 +1,6 @@
 import type { Command } from '@tiptap/pm/state'
 
-import { headingMarkerLength } from '@/editor/extensions/heading/heading-marker'
+import { headingMarkerLength } from '#src/editor/extensions/heading/heading-marker'
 
 /**
  * Strips every heading block the selection touches of its marker text,

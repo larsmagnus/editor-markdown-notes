@@ -4,7 +4,7 @@ import {
 	imageMarkdownSource,
 	imageMarkdownText,
 	parseImageMarkdown,
-} from '@/editor/extensions/image/image-markdown-text'
+} from '#src/editor/extensions/image/image-markdown-text'
 
 describe('imageMarkdownText', () => {
 	it('builds markdown with no title', () => {

@@ -1,10 +1,10 @@
 import { Extension } from '@tiptap/core'
 import Suggestion from '@tiptap/suggestion'
 
-import { SLASH_COMMANDS } from '@/editor/extensions/slash-command/commands'
-import type { SlashCommandItem } from '@/editor/extensions/slash-command/commands'
-import { createSlashCommandRender } from '@/editor/extensions/slash-command/render'
-import { isVSCodeWebview } from '@/lib/vscode-api'
+import { SLASH_COMMANDS } from '#src/editor/extensions/slash-command/commands'
+import type { SlashCommandItem } from '#src/editor/extensions/slash-command/commands'
+import { createSlashCommandRender } from '#src/editor/extensions/slash-command/render'
+import { isVSCodeWebview } from '#src/lib/vscode-api'
 
 /**
  * Lower ranks first: a label starting with the query ("Ask Claude" for "ask")

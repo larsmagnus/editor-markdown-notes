@@ -1,9 +1,9 @@
 import type { CommandProps } from '@tiptap/core'
 import ListItem from '@tiptap/extension-list-item'
 
-import { withMarkerStrip } from '@/editor/extensions/block-marker/with-marker-strip'
-import { insertLiteralListMarkers } from '@/editor/extensions/list/insert-literal-list-markers'
-import { listItemMarkdownSerialize } from '@/editor/extensions/list/list-markdown-spec'
+import { withMarkerStrip } from '#src/editor/extensions/block-marker/with-marker-strip'
+import { insertLiteralListMarkers } from '#src/editor/extensions/list/insert-literal-list-markers'
+import { listItemMarkdownSerialize } from '#src/editor/extensions/list/list-markdown-spec'
 
 /**
  * `listItem` stays real ProseMirror structure (nesting, Enter, Tab all

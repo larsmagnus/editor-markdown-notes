@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { createUnlinkCommand } from '@/editor/extensions/link/unlink-command'
-import { createEditor } from '@/test-utils/editor'
+import { createUnlinkCommand } from '#src/editor/extensions/link/unlink-command'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('createUnlinkCommand', () => {
 	it('removes a text link, delimiters included', () => {

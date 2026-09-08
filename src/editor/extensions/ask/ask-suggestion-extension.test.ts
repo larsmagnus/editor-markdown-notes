@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { askProposalPluginKey } from '@/editor/extensions/ask/ask-suggestion-extension'
-import { createEditor } from '@/test-utils/editor'
+import { askProposalPluginKey } from '#src/editor/extensions/ask/ask-suggestion-extension'
+import { createEditor } from '#src/test-utils/editor'
 
 function newEditor(content: string) {
 	const editor = createEditor(content, { parseOnly: true })

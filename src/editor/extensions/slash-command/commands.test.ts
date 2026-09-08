@@ -1,11 +1,11 @@
 import type { JSONContent } from '@tiptap/core'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { SLASH_COMMANDS } from '@/editor/extensions/slash-command/commands'
-import { createEditor } from '@/test-utils/editor'
+import { SLASH_COMMANDS } from '#src/editor/extensions/slash-command/commands'
+import { createEditor } from '#src/test-utils/editor'
 
 const pickImage = vi.hoisted(() => vi.fn())
-vi.mock('@/lib/pick-image', () => ({ pickImage }))
+vi.mock('#src/lib/pick-image', () => ({ pickImage }))
 
 function commandFor(id: string) {
 	const command = SLASH_COMMANDS.find((item) => item.id === id)

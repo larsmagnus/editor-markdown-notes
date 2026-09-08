@@ -1,6 +1,6 @@
-// Relative, not `@/`: this module is also compiled by `tsconfig.host.json`,
+// Relative, not `#src/`: this module is also compiled by `tsconfig.host.json`,
 // which has no `paths` mapping precisely so aliases cannot reach the host build.
-import type { ImageBaseUris } from '../../shared/messages'
+import type { ImageBaseUris } from '#src/shared/messages'
 
 /**
  * Turns an image path from the markdown into something the page can load.

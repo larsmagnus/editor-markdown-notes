@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { errorMessage } from '@/lib/error-message'
+import { errorMessage } from '#src/lib/error-message'
 
 describe('errorMessage', () => {
 	it('takes the message off an Error', () => {

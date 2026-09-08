@@ -5,7 +5,7 @@ import {
 	flankingAsteriskOffsets,
 	hasFlankingAsteriskPartner,
 	hasMatchingBacktickRun,
-} from '@/editor/extensions/markdown/markdown-escape-partners'
+} from '#src/editor/extensions/markdown/markdown-escape-partners'
 
 describe('flankingAsteriskOffsets', () => {
 	it('excludes an asterisk flanked by whitespace on both sides', () => {

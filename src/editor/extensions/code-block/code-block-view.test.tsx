@@ -2,17 +2,17 @@ import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import EditorModeLive from '@/editor/editor-mode-live'
-import { copyToClipboard } from '@/lib/clipboard'
+import EditorModeLive from '#src/editor/editor-mode-live'
+import { copyToClipboard } from '#src/lib/clipboard'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`
 // and the save effect attaches a rejection handler to what it hands back.
-vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
+vi.mock('#src/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 
 // The app's one seam onto the clipboard, mocked here so no test has to replace
 // `navigator` - a stub built from `{ ...navigator, clipboard }` drops the
 // prototype getters ProseMirror reads when it constructs an editor.
-vi.mock('@/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
+vi.mock('#src/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
 
 afterEach(() => {
 	vi.clearAllMocks()

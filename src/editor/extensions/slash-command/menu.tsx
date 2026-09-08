@@ -3,7 +3,7 @@
 import { cn } from 'cn'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 
-import type { SlashCommandItem } from '@/editor/extensions/slash-command/commands'
+import type { SlashCommandItem } from '#src/editor/extensions/slash-command/commands'
 
 /** What `extension.ts` drives keyboard navigation through, outside React's own event system. */
 export type SlashCommandMenuHandle = {

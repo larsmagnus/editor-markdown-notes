@@ -1,6 +1,6 @@
-import { backspaceAtEndOf } from '@/e2e/lib/backspace-positions'
-import { expect, test } from '@/e2e/lib/fixtures'
-import { openInVSCode } from '@/e2e/lib/vscode-host'
+import { backspaceAtEndOf } from '#e2e/lib/backspace-positions'
+import { expect, test } from '#e2e/lib/fixtures'
+import { openInVSCode } from '#e2e/lib/vscode-host'
 
 /**
  * Backspacing at a delimiter is how a writer unformats text without reaching

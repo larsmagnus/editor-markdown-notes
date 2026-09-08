@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import type { SelectionSnapshot } from '@/e2e/lib/selection-snapshot'
+import type { SelectionSnapshot } from '#e2e/lib/selection-snapshot'
 
 /**
  * Counts native `selectionchange` events on `document`, from page load.

@@ -1,16 +1,16 @@
 import type { Command, EditorState } from '@tiptap/pm/state'
 import { TextSelection } from '@tiptap/pm/state'
 
-import { imageMarkdownSource } from '@/editor/extensions/image/image-markdown-text'
-import type { ImageAttrs } from '@/editor/extensions/image/image-markdown-text'
-import type { ImageSourceMatch } from '@/editor/extensions/image/image-source-node'
+import { imageMarkdownSource } from '#src/editor/extensions/image/image-markdown-text'
+import type { ImageAttrs } from '#src/editor/extensions/image/image-markdown-text'
+import type { ImageSourceMatch } from '#src/editor/extensions/image/image-source-node'
 import {
 	caretInsideSource,
 	finalizeImageSource,
 	findImageSource,
 	ImageSource as ImageSourceSchema,
 	removeSourceNode,
-} from '@/editor/extensions/image/image-source-node'
+} from '#src/editor/extensions/image/image-source-node'
 
 /** The attrs the image had when editing began, restored by `cancelImageSource`. */
 let originalAttrs: ImageAttrs | null = null

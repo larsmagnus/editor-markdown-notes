@@ -1,8 +1,8 @@
 import type { Editor, EditorEvents } from '@tiptap/react'
 import { useCallback, useEffect } from 'react'
 
-import { CONTENT_SYNC_META } from '@/hooks/use-frontmatter-document'
-import { useNoteSync } from '@/hooks/use-note-sync'
+import { CONTENT_SYNC_META } from '#src/hooks/use-frontmatter-document'
+import { useNoteSync } from '#src/hooks/use-note-sync'
 
 type UseMarkdownAutosyncOptions = {
 	editor: Editor | null

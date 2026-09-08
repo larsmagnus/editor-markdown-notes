@@ -1,19 +1,19 @@
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
-import { blockquoteMarkerLength } from '@/editor/extensions/blockquote/blockquote-marker'
-import { parseFrontmatterFence } from '@/editor/extensions/frontmatter/frontmatter-fence'
-import { headingMarkerLength } from '@/editor/extensions/heading/heading-marker'
-import { parseListMarker } from '@/editor/extensions/list/list-marker'
+import { blockquoteMarkerLength } from '#src/editor/extensions/blockquote/blockquote-marker'
+import { parseFrontmatterFence } from '#src/editor/extensions/frontmatter/frontmatter-fence'
+import { headingMarkerLength } from '#src/editor/extensions/heading/heading-marker'
+import { parseListMarker } from '#src/editor/extensions/list/list-marker'
 import {
 	appendTextblockChildren,
 	IGNORED_NODES,
-} from '@/lib/text-tools/append-textblock-children'
-import { delimiterRanges } from '@/lib/text-tools/delimiter-ranges'
-import type { TextSlice } from '@/lib/text-tools/delimiter-ranges'
+} from '#src/lib/text-tools/append-textblock-children'
+import { delimiterRanges } from '#src/lib/text-tools/delimiter-ranges'
+import type { TextSlice } from '#src/lib/text-tools/delimiter-ranges'
 import {
 	BLOCK_SEPARATOR,
 	frontmatterLineOffsets,
-} from '@/lib/text-tools/prose-policy'
+} from '#src/lib/text-tools/prose-policy'
 
 /**
  * Flattens a ProseMirror document into the plain text retext analyses, keeping

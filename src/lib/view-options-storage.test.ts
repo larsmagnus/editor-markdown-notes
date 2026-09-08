@@ -4,8 +4,8 @@ import {
 	readStoredViewOptions,
 	VIEW_OPTIONS_STORAGE_KEY,
 	writeStoredViewOptions,
-} from '@/lib/view-options-storage'
-import { DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
+} from '#src/lib/view-options-storage'
+import { DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
 afterEach(() => {
 	localStorage.clear()

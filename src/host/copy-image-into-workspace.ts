@@ -2,8 +2,8 @@ import * as nodePath from 'path'
 
 import * as vscode from 'vscode'
 
-import { resolveCopyFilename } from './image-copy'
-import { relativeImagePath } from './relative-image-path'
+import { resolveCopyFilename } from '#src/host/image-copy'
+import { relativeImagePath } from '#src/host/relative-image-path'
 
 async function fileExists(uri: vscode.Uri): Promise<boolean> {
 	try {

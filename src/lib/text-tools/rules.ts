@@ -1,5 +1,5 @@
-import type { IssueSeverity } from '@/lib/text-tools/types'
-import type { TextToolRuleId } from '@/shared/messages'
+import type { IssueSeverity } from '#src/lib/text-tools/types'
+import type { TextToolRuleId } from '#src/shared/messages'
 
 /**
  * Presentation for each check: what the sidebar calls it and how it explains

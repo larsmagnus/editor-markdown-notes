@@ -1,4 +1,4 @@
-import type { Logger } from '@/shared/logger'
+import type { Logger } from '#src/shared/logger'
 
 /**
  * Logging for a process whose stdout is a wire protocol.

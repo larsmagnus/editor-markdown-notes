@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createNonce } from '@/lib/host/nonce'
+import { createNonce } from '#src/lib/host/nonce'
 
 describe('createNonce', () => {
 	it('is long enough to be unguessable', () => {

@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { useFrontmatterDocument } from '@/hooks/use-frontmatter-document'
-import { createEditor } from '@/test-utils/editor'
+import { useFrontmatterDocument } from '#src/hooks/use-frontmatter-document'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('useFrontmatterDocument', () => {
 	it('rebuilds the document when the file changes underneath it', () => {

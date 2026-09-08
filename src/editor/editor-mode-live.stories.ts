@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import EditorModeLive from '@/editor/editor-mode-live'
+import EditorModeLive from '#src/editor/editor-mode-live'
 
 const meta = {
 	component: EditorModeLive,

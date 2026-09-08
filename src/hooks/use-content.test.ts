@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import useContent from '@/hooks/use-content'
+import useContent from '#src/hooks/use-content'
 
 afterEach(() => {
 	vi.unstubAllGlobals()

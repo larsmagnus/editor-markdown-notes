@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 
-import { TableHandle } from '@/editor/extensions/table/handle'
-import { useTableAnchor } from '@/hooks/use-table-anchor'
+import { TableHandle } from '#src/editor/extensions/table/handle'
+import { useTableAnchor } from '#src/hooks/use-table-anchor'
 
 /**
  * The floating row and column handles for the table the caret is in.

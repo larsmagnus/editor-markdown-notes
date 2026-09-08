@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react'
 
-import { LIVE_EDITOR_ID } from '@/editor/editor-mode-live-surface'
-import { RAW_MARKDOWN_EDITOR_ID } from '@/editor/editor-mode-raw'
+import { LIVE_EDITOR_ID } from '#src/editor/editor-mode-live-surface'
+import { RAW_MARKDOWN_EDITOR_ID } from '#src/editor/editor-mode-raw'
 
 /**
  * Where the "Skip to editor" link jumps to.

@@ -1,5 +1,5 @@
-import { checkMarkdown } from '@/mcp/tools'
-import type { CheckDefaults, CheckOptions } from '@/mcp/tools'
+import { checkMarkdown } from '#src/mcp/tools'
+import type { CheckDefaults, CheckOptions } from '#src/mcp/tools'
 
 /**
  * A word the speller rejected, with how often it occurs.

@@ -1,17 +1,17 @@
-import LinkSkip from '@/components/link-skip'
-import { LIVE_EDITOR_ID } from '@/editor/editor-mode-live-surface'
+import LinkSkip from '#src/components/link-skip'
+import { LIVE_EDITOR_ID } from '#src/editor/editor-mode-live-surface'
 import {
 	asSkipLinkClick,
 	skipToEditor,
-} from '@/editor/extensions/focus-navigation/skip-target'
-import { summarize } from '@/lib/text-tools/summarize'
-import type { Analysis } from '@/lib/text-tools/types'
-import type { SpellingLanguage, TextToolRuleId } from '@/shared/messages'
-import { TextToolsIssueGroup } from '@/text-tools/text-tools-issue-group'
-import { TextToolsReadabilityLines } from '@/text-tools/text-tools-readability-lines'
-import { TextToolsRuleCheckboxes } from '@/text-tools/text-tools-rule-checkboxes'
-import { TextToolsStats } from '@/text-tools/text-tools-stats'
-import { TextToolsStatus } from '@/text-tools/text-tools-status'
+} from '#src/editor/extensions/focus-navigation/skip-target'
+import { summarize } from '#src/lib/text-tools/summarize'
+import type { Analysis } from '#src/lib/text-tools/types'
+import type { SpellingLanguage, TextToolRuleId } from '#src/shared/messages'
+import { TextToolsIssueGroup } from '#src/text-tools/text-tools-issue-group'
+import { TextToolsReadabilityLines } from '#src/text-tools/text-tools-readability-lines'
+import { TextToolsRuleCheckboxes } from '#src/text-tools/text-tools-rule-checkboxes'
+import { TextToolsStats } from '#src/text-tools/text-tools-stats'
+import { TextToolsStatus } from '#src/text-tools/text-tools-status'
 
 /** Where "Skip to text tools" (`layout.tsx`) focuses. */
 export const TEXT_TOOLS_PANEL_ID = 'text-tools-panel'

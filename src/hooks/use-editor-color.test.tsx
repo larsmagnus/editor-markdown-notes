@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react'
 import { EditorContext } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { useEditorColor } from '@/hooks/use-editor-color'
-import { createEditor } from '@/test-utils/editor'
+import { useEditorColor } from '#src/hooks/use-editor-color'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('colour', () => {
 	it('sets and clears the colour of the selection', () => {

@@ -1,10 +1,10 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
-import { copyToClipboard } from '@/lib/clipboard'
+import { useCopyToClipboard } from '#src/hooks/use-copy-to-clipboard'
+import { copyToClipboard } from '#src/lib/clipboard'
 
-vi.mock('@/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
+vi.mock('#src/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
 
 afterEach(() => {
 	vi.clearAllMocks()

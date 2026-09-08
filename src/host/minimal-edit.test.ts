@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { computeMinimalReplacement } from './minimal-edit'
+import { computeMinimalReplacement } from '#src/host/minimal-edit'
 
 describe('computeMinimalReplacement', () => {
 	it('returns null for identical text', () => {

@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
 	appendProseText,
 	delimiterRanges,
-} from '@/lib/text-tools/delimiter-ranges'
-import type { TextSlice } from '@/lib/text-tools/delimiter-ranges'
-import { createEditor } from '@/test-utils/editor'
+} from '#src/lib/text-tools/delimiter-ranges'
+import type { TextSlice } from '#src/lib/text-tools/delimiter-ranges'
+import { createEditor } from '#src/test-utils/editor'
 
 function buildDoc(markType: string, delimited: string) {
 	const editor = createEditor({

@@ -1,15 +1,15 @@
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewWrapper } from '@tiptap/react'
 
-import { CodeBlockSource } from '@/editor/extensions/code-block/code-block-source'
+import { CodeBlockSource } from '#src/editor/extensions/code-block/code-block-source'
 import {
 	fenceCode,
 	fenceLanguage,
-} from '@/editor/extensions/code-block/code-fence'
-import { focusBlockContentStart } from '@/editor/extensions/focus-block-content-start'
-import { MermaidDiagram } from '@/editor/extensions/mermaid/diagram'
-import { MERMAID_LANGUAGE } from '@/editor/extensions/mermaid/language'
-import { useMermaidSource } from '@/hooks/use-mermaid-source'
+} from '#src/editor/extensions/code-block/code-fence'
+import { focusBlockContentStart } from '#src/editor/extensions/focus-block-content-start'
+import { MermaidDiagram } from '#src/editor/extensions/mermaid/diagram'
+import { MERMAID_LANGUAGE } from '#src/editor/extensions/mermaid/language'
+import { useMermaidSource } from '#src/hooks/use-mermaid-source'
 
 /**
  * The node view every code block renders through: its source, and for a

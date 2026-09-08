@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
 
-import { IconClaude } from '@/components/icons/icon-claude'
+import { IconClaude } from '#src/components/icons/icon-claude'
 import {
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
+} from '#src/components/ui/dropdown-menu'
 
 type CopyActionsMenuItem = {
 	icon: ReactNode

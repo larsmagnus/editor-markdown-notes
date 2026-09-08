@@ -1,5 +1,5 @@
-import type { TableAnchor } from '@/editor/extensions/table/geometry'
-import type { TableAxis } from '@/editor/extensions/table/menu-items'
+import type { TableAnchor } from '#src/editor/extensions/table/geometry'
+import type { TableAxis } from '#src/editor/extensions/table/menu-items'
 
 interface TableDropIndicatorProps {
 	axis: TableAxis

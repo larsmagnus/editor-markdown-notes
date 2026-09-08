@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { splitFrontmatter } from '@/lib/host/frontmatter'
+import { splitFrontmatter } from '#src/lib/host/frontmatter'
 
 describe('splitFrontmatter', () => {
 	it('extracts the frontmatter block and leaves the rest as the body', () => {

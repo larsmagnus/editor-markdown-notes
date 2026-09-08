@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { endBlankListItem } from '@/editor/extensions/list/end-blank-list-item'
-import { createEditor } from '@/test-utils/editor'
+import { endBlankListItem } from '#src/editor/extensions/list/end-blank-list-item'
+import { createEditor } from '#src/test-utils/editor'
 
 // `setContent` runs the plugins that seed and renumber marker text;
 // constructing with `content` directly does not (see `marker-sync.test.ts`).

@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/core'
 import { describe, expect, it } from 'vitest'
 
-import { findOccurrences } from '@/editor/extensions/search-reveal/find-occurrences'
-import { createEditor } from '@/test-utils/editor'
+import { findOccurrences } from '#src/editor/extensions/search-reveal/find-occurrences'
+import { createEditor } from '#src/test-utils/editor'
 
 /** The text each found range actually covers, which is what a highlight draws. */
 function textAt(editor: Editor, needle: string): string[] {

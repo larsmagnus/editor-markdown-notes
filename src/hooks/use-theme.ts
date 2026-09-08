@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 
-import type { Theme } from '@/shared/messages'
+import type { Theme } from '#src/shared/messages'
 
 export type ThemeState = {
 	theme: Theme

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
+import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
 
 describe('fixedDelimiter', () => {
 	it('detects the delimiter length at the start of matching text', () => {

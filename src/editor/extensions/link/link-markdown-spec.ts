@@ -1,8 +1,8 @@
 import type { Mark, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
-import type { DelimiterMarkdownSerialize } from '@/editor/extensions/formatting/delimiter-spec'
-import { linkCloseText } from '@/editor/extensions/link/link-close-text'
+import type { DelimiterMarkdownSerialize } from '#src/editor/extensions/formatting/delimiter-spec'
+import { linkCloseText } from '#src/editor/extensions/link/link-close-text'
 
 /**
  * Mirrors `prosemirror-markdown`'s own (unexported) `isPlainURL`: a link

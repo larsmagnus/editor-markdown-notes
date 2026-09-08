@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { codeFenceLength } from '@/editor/extensions/formatting/inline-code/code-fence-length'
+import { codeFenceLength } from '#src/editor/extensions/formatting/inline-code/code-fence-length'
 
 describe('codeFenceLength', () => {
 	it('returns one for text with no backticks at all', () => {

@@ -1,7 +1,7 @@
-import { AppErrorBoundary } from '@/components/app-error-boundary'
-import { PanZoom } from '@/components/pan-zoom'
-import { MermaidToolbar } from '@/editor/extensions/mermaid/toolbar'
-import type { MermaidResult } from '@/lib/render-mermaid'
+import { AppErrorBoundary } from '#src/components/app-error-boundary'
+import { PanZoom } from '#src/components/pan-zoom'
+import { MermaidToolbar } from '#src/editor/extensions/mermaid/toolbar'
+import type { MermaidResult } from '#src/lib/render-mermaid'
 
 type MermaidDiagramProps = {
 	code: string

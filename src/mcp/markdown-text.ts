@@ -3,15 +3,15 @@ import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown } from 'mdast-util-gfm'
 import { gfm } from 'micromark-extension-gfm'
 
-import { splitFrontmatter } from '@/lib/host/frontmatter'
-import type { ProseExclusion } from '@/lib/text-tools/prose-policy'
+import { splitFrontmatter } from '#src/lib/host/frontmatter'
+import type { ProseExclusion } from '#src/lib/text-tools/prose-policy'
 import {
 	BLOCK_SEPARATOR,
 	PROSE_SUBSTITUTE,
-} from '@/lib/text-tools/prose-policy'
-import { frontmatterRuns } from '@/mcp/frontmatter-prose'
-import type { ProseSlice, SourcePosition } from '@/mcp/source-position'
-import { alignedSlices, positionMapper } from '@/mcp/source-position'
+} from '#src/lib/text-tools/prose-policy'
+import { frontmatterRuns } from '#src/mcp/frontmatter-prose'
+import type { ProseSlice, SourcePosition } from '#src/mcp/source-position'
+import { alignedSlices, positionMapper } from '#src/mcp/source-position'
 
 /**
  * Flattens a markdown file into the plain text retext analyses, keeping enough

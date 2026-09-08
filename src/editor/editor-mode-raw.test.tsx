@@ -2,13 +2,13 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { SettingsProvider } from '@/components/settings-provider'
-import { EditorModeRaw } from '@/editor/editor-mode-raw'
-import { updateNotes } from '@/lib/update-notes'
+import { SettingsProvider } from '#src/components/settings-provider'
+import { EditorModeRaw } from '#src/editor/editor-mode-raw'
+import { updateNotes } from '#src/lib/update-notes'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`
 // and the sync effect attaches a rejection handler to what it hands back.
-vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
+vi.mock('#src/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 
 const NOTE_WITH_FRONTMATTER = [
 	'---',

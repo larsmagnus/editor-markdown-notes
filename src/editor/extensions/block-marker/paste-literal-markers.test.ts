@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEditor } from '@/test-utils/editor'
+import { createEditor } from '#src/test-utils/editor'
 
 /**
  * HTML from a browser reaches `parseHTML` without ever passing through

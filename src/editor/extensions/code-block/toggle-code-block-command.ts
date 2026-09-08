@@ -1,6 +1,6 @@
 import type { CommandProps } from '@tiptap/core'
 
-import { unwrapConstructAtCaret } from '@/editor/extensions/block-marker/unwrap-at-caret'
+import { unwrapConstructAtCaret } from '#src/editor/extensions/block-marker/unwrap-at-caret'
 
 /**
  * The stock command's own signature. `language` is no longer an attribute of

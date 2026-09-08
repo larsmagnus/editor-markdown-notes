@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseJsonc } from '@/lib/host/jsonc'
+import { parseJsonc } from '#src/lib/host/jsonc'
 
 describe('parseJsonc', () => {
 	it('parses plain JSON unchanged', () => {

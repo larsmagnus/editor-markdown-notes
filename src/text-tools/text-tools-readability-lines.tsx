@@ -1,7 +1,7 @@
 import { cn } from 'cn'
 
-import type { ReadabilityLine } from '@/lib/text-tools/summarize'
-import type { IssueSeverity } from '@/lib/text-tools/types'
+import type { ReadabilityLine } from '#src/lib/text-tools/summarize'
+import type { IssueSeverity } from '#src/lib/text-tools/types'
 
 /** Red for the harder tier, amber for the softer one. */
 const SEVERITY_CLASS_NAMES: Partial<Record<IssueSeverity, string>> = {

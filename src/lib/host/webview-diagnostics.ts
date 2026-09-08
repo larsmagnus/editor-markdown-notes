@@ -1,7 +1,7 @@
-// Relative, not `@/`: this module is also compiled by `tsconfig.host.json`,
+// Relative, not `#src/`: this module is also compiled by `tsconfig.host.json`,
 // which has no `paths` mapping precisely so aliases cannot reach the host build.
-import type { Logger } from '../../shared/logger'
-import type { LogLevel } from '../../shared/messages'
+import type { Logger } from '#src/shared/logger'
+import type { LogLevel } from '#src/shared/messages'
 
 /**
  * Seeing inside a webview from the extension host. The page has its own console

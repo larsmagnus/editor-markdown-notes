@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 import type { PropsWithChildren } from 'react'
 
-import { useSettings } from '@/hooks/use-settings'
-import { ThemeContext } from '@/hooks/use-theme'
-import type { Theme } from '@/shared/messages'
+import { useSettings } from '#src/hooks/use-settings'
+import { ThemeContext } from '#src/hooks/use-theme'
+import type { Theme } from '#src/shared/messages'
 
 /**
  * Applies the theme to the DOM. The theme itself is stored with the other view

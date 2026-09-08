@@ -1,7 +1,7 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { Transaction } from '@tiptap/pm/state'
 
-import type { MarkerMatch } from '@/editor/extensions/block-marker/marker-host'
+import type { MarkerMatch } from '#src/editor/extensions/block-marker/marker-host'
 
 /**
  * Where a construct's marker text lives: on the matched node itself (a

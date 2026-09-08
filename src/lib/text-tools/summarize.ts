@@ -1,6 +1,6 @@
-import { RULES } from '@/lib/text-tools/rules'
-import type { Analysis, TextIssue } from '@/lib/text-tools/types'
-import type { TextToolRuleId } from '@/shared/messages'
+import { RULES } from '#src/lib/text-tools/rules'
+import type { Analysis, TextIssue } from '#src/lib/text-tools/types'
+import type { TextToolRuleId } from '#src/shared/messages'
 
 /** A "n of N sentences are …" line in the panel's header. */
 export type ReadabilityLine = {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { markdownProse } from '@/mcp/markdown-text'
+import { markdownProse } from '#src/mcp/markdown-text'
 
 /**
  * Positions are the part an agent acts on, and the part that fails silently:

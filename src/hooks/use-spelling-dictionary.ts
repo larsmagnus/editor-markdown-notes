@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import { loadDictionary } from '@/lib/text-tools/load-dictionary'
-import type { HunspellDictionary } from '@/lib/text-tools/types'
-import type { SpellingLanguage } from '@/shared/messages'
+import { loadDictionary } from '#src/lib/text-tools/load-dictionary'
+import type { HunspellDictionary } from '#src/lib/text-tools/types'
+import type { SpellingLanguage } from '#src/shared/messages'
 
 type LoadedDictionary = {
 	language: SpellingLanguage

@@ -2,14 +2,19 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
 
-import { listChecks } from '@/mcp/checks'
-import { defaults, OPTIONS, readSource, SOURCE } from '@/mcp/environment'
-import { suggestDictionaryWords } from '@/mcp/jargon'
-import { describe, keepStdoutForProtocol, log, logFatalErrors } from '@/mcp/log'
-import { runTool } from '@/mcp/run-tool'
-import { checkMarkdown } from '@/mcp/tools'
-import { EXTENSION_ID } from '@/shared/constants'
-import { TEXT_TOOL_RULE_IDS } from '@/shared/messages'
+import { listChecks } from '#src/mcp/checks'
+import { defaults, OPTIONS, readSource, SOURCE } from '#src/mcp/environment'
+import { suggestDictionaryWords } from '#src/mcp/jargon'
+import {
+	describe,
+	keepStdoutForProtocol,
+	log,
+	logFatalErrors,
+} from '#src/mcp/log'
+import { runTool } from '#src/mcp/run-tool'
+import { checkMarkdown } from '#src/mcp/tools'
+import { EXTENSION_ID } from '#src/shared/constants'
+import { TEXT_TOOL_RULE_IDS } from '#src/shared/messages'
 
 /**
  * The MCP server, run as a child process of the extension host.

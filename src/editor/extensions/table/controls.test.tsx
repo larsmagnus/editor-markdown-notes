@@ -4,8 +4,8 @@ import { EditorContext } from '@tiptap/react'
 import { Editor } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { TableControls } from '@/editor/extensions/table/controls'
-import { createEditor, saved } from '@/test-utils/editor'
+import { TableControls } from '#src/editor/extensions/table/controls'
+import { createEditor, saved } from '#src/test-utils/editor'
 
 const TABLE = [
 	'| Quarter | Revenue | Growth |',

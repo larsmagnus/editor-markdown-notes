@@ -3,8 +3,8 @@ import type { EditorView } from '@tiptap/pm/view'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/react'
 
-import { createDecorationPlugin } from '@/editor/extensions/create-decoration-plugin'
-import type { Occurrence } from '@/editor/extensions/search-reveal/find-occurrences'
+import { createDecorationPlugin } from '#src/editor/extensions/create-decoration-plugin'
+import type { Occurrence } from '#src/editor/extensions/search-reveal/find-occurrences'
 
 /**
  * Highlights the matches a note was opened on from the search view.

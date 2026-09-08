@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { useHostMessage } from '@/hooks/use-host-message'
-import { useIsDark } from '@/hooks/use-is-dark'
-import { shikiThemeMessageSchema } from '@/lib/schemas'
-import { getVSCodeApi, isVSCodeWebview } from '@/lib/vscode-api'
-import type { ShikiThemeKind } from '@/shared/messages'
+import { useHostMessage } from '#src/hooks/use-host-message'
+import { useIsDark } from '#src/hooks/use-is-dark'
+import { shikiThemeMessageSchema } from '#src/lib/schemas'
+import { getVSCodeApi, isVSCodeWebview } from '#src/lib/vscode-api'
+import type { ShikiThemeKind } from '#src/shared/messages'
 
 /**
  * Which theme to highlight with - a description, not the theme body.

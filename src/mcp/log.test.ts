@@ -4,7 +4,7 @@ import {
 	describe as describeError,
 	keepStdoutForProtocol,
 	log,
-} from '@/mcp/log'
+} from '#src/mcp/log'
 
 /**
  * The server's stdout is the JSON-RPC transport, so these are protocol tests

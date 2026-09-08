@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { hasSearchReveal, takeSearchReveal } from '@/lib/search-reveal'
+import { hasSearchReveal, takeSearchReveal } from '#src/lib/search-reveal'
 
 const REVEAL = { line: 58, column: 1, text: '<input', lineOffset: 8 }
 

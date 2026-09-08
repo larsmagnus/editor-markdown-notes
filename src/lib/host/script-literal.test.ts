@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { toScriptLiteral } from '@/lib/host/script-literal'
+import { toScriptLiteral } from '#src/lib/host/script-literal'
 
 describe('toScriptLiteral', () => {
 	it('escapes every `<` so a closing tag cannot end the block early', () => {

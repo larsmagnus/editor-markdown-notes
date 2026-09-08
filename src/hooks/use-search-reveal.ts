@@ -1,10 +1,10 @@
 import type { Editor } from '@tiptap/react'
 import { useEffect } from 'react'
 
-import { findOccurrences } from '@/editor/extensions/search-reveal/find-occurrences'
-import { SEARCH_REVEAL_TARGET_CLASS } from '@/editor/extensions/search-reveal/search-reveal-extension'
-import { scrollHoldInView } from '@/lib/scroll/scroll-hold-in-view'
-import { takeSearchReveal } from '@/lib/search-reveal'
+import { findOccurrences } from '#src/editor/extensions/search-reveal/find-occurrences'
+import { SEARCH_REVEAL_TARGET_CLASS } from '#src/editor/extensions/search-reveal/search-reveal-extension'
+import { scrollHoldInView } from '#src/lib/scroll/scroll-hold-in-view'
+import { takeSearchReveal } from '#src/lib/search-reveal'
 
 /**
  * Scrolls a note opened from a search result to its match, and highlights every

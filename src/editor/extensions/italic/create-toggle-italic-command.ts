@@ -1,9 +1,9 @@
 import type { CommandProps } from '@tiptap/core'
 import type { MarkType } from '@tiptap/pm/model'
 
-import { toggleDelimitedMark } from '@/editor/extensions/formatting/toggle-delimited-mark'
-import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
-import { italicWrapMarkup } from '@/editor/extensions/italic/italic-wrap-markup'
+import { toggleDelimitedMark } from '#src/editor/extensions/formatting/toggle-delimited-mark'
+import { italicDelimiterSpec } from '#src/editor/extensions/italic/italic-delimiter-spec'
+import { italicWrapMarkup } from '#src/editor/extensions/italic/italic-wrap-markup'
 
 /**
  * `toggleItalic`'s body - separate from `create-toggle-mark-command.ts`

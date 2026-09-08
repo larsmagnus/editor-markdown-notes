@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { CLAUDE_PROMPT_CONTENT_MAX_LENGTH } from '../shared/messages'
-
 import {
 	buildClaudeCommand,
 	buildPrompt,
@@ -10,7 +8,8 @@ import {
 	isPowerShell,
 	shellFamily,
 	stripForCmd,
-} from './claude-prompt'
+} from '#src/host/claude-prompt'
+import { CLAUDE_PROMPT_CONTENT_MAX_LENGTH } from '#src/shared/messages'
 
 describe('escapeForPosixShell', () => {
 	it('backslash-escapes double quotes, backslashes, backticks and dollar signs', () => {

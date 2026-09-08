@@ -7,7 +7,7 @@
  * (creating the terminal, resolving the document's path) and stays thin.
  */
 
-import { CLAUDE_PROMPT_CONTENT_MAX_LENGTH } from '../shared/messages'
+import { CLAUDE_PROMPT_CONTENT_MAX_LENGTH } from '#src/shared/messages'
 
 /**
  * Escapes a double-quoted argument for POSIX shells (bash/zsh/fish - the

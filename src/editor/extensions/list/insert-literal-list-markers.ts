@@ -2,7 +2,7 @@ import {
 	bulletMarkerText,
 	orderedMarkerText,
 	taskMarkerText,
-} from '@/editor/extensions/list/list-marker'
+} from '#src/editor/extensions/list/list-marker'
 
 /**
  * Reinstates literal bullet/ordered marker text into every plain `<li>`

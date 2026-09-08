@@ -5,7 +5,7 @@ import {
 	orderedMarkerText,
 	parseListMarker,
 	taskMarkerText,
-} from '@/editor/extensions/list/list-marker'
+} from '#src/editor/extensions/list/list-marker'
 
 describe('parseListMarker', () => {
 	it('parses a dash bullet', () => {

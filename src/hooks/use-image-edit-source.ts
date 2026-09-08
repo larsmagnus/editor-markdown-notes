@@ -1,6 +1,6 @@
 import type { NodeViewProps } from '@tiptap/react'
 
-import { enterImageEditSource } from '@/editor/extensions/image/edit-source'
+import { enterImageEditSource } from '#src/editor/extensions/image/edit-source'
 
 /**
  * Opens the "Edit source" flow for this image. Routed through

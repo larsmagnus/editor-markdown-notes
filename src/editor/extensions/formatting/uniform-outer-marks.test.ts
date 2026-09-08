@@ -1,9 +1,9 @@
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import { uniformOuterMarks } from '@/editor/extensions/formatting/uniform-outer-marks'
-import { createEditor } from '@/test-utils/editor'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import { uniformOuterMarks } from '#src/editor/extensions/formatting/uniform-outer-marks'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('uniformOuterMarks', () => {
 	it('returns the outer mark when it covers the whole run', () => {

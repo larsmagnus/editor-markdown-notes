@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { useShikiTheme } from '@/hooks/use-shiki-theme'
-import { ThemeContext } from '@/hooks/use-theme'
+import { useShikiTheme } from '#src/hooks/use-shiki-theme'
+import { ThemeContext } from '#src/hooks/use-theme'
 
 function withTheme(theme: 'dark' | 'light') {
 	return function Wrapper({ children }: PropsWithChildren): ReactNode {

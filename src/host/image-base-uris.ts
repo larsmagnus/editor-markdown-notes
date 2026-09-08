@@ -2,7 +2,7 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import type { ImageBaseUris } from '../shared/messages'
+import type { ImageBaseUris } from '#src/shared/messages'
 
 /**
  * The folders a webview may load this document's images from. Without them the

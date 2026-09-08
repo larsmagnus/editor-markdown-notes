@@ -1,10 +1,10 @@
 import { Extension } from '@tiptap/core'
 
-import { askInlineStatusCommands } from '@/editor/extensions/ask/ask-inline-status-commands'
-import { createAskInlineStatusPlugin } from '@/editor/extensions/ask/ask-inline-status-plugin'
-import { unmountActiveInlineStatusWidget } from '@/editor/extensions/ask/ask-inline-status-widget-mount'
+import { askInlineStatusCommands } from '#src/editor/extensions/ask/ask-inline-status-commands'
+import { createAskInlineStatusPlugin } from '#src/editor/extensions/ask/ask-inline-status-plugin'
+import { unmountActiveInlineStatusWidget } from '#src/editor/extensions/ask/ask-inline-status-widget-mount'
 
-export { askInlineStatusPluginKey } from '@/editor/extensions/ask/ask-inline-status-state'
+export { askInlineStatusPluginKey } from '#src/editor/extensions/ask/ask-inline-status-state'
 
 /**
  * The `/ask` slash command's status at the cursor: a spinner while it waits

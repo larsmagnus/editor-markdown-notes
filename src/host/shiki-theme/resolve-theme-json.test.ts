@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveThemeJson } from './resolve-theme-json'
+import { resolveThemeJson } from '#src/host/shiki-theme/resolve-theme-json'
 
 function readFrom(files: Record<string, string>) {
 	return (filePath: string) => {

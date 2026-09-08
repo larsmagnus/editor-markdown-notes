@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import Layout from '@/layout'
+import Layout from '#src/layout'
 
 const meta = {
 	component: Layout,

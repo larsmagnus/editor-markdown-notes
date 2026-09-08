@@ -2,16 +2,16 @@
 
 import { CircleOff } from 'lucide-react'
 
-import { ButtonColor } from '@/components/button-color'
-import { ButtonStyle } from '@/components/button-style'
-import { ButtonUnlink } from '@/components/button-unlink'
-import { HeadingPopover } from '@/components/heading-popover'
-import { LinkPopover } from '@/components/link-popover'
-import { Button } from '@/components/ui/button'
-import { AskPopover } from '@/editor/extensions/ask/ask-popover'
-import { useEditorColor } from '@/hooks/use-editor-color'
-import { useSettings } from '@/hooks/use-settings'
-import { COLOR_SWATCHES } from '@/lib/color-swatches'
+import { ButtonColor } from '#src/components/button-color'
+import { ButtonStyle } from '#src/components/button-style'
+import { ButtonUnlink } from '#src/components/button-unlink'
+import { HeadingPopover } from '#src/components/heading-popover'
+import { LinkPopover } from '#src/components/link-popover'
+import { Button } from '#src/components/ui/button'
+import { AskPopover } from '#src/editor/extensions/ask/ask-popover'
+import { useEditorColor } from '#src/hooks/use-editor-color'
+import { useSettings } from '#src/hooks/use-settings'
+import { COLOR_SWATCHES } from '#src/lib/color-swatches'
 
 /** The bubble menu's controls for a text selection: heading, styles, link, colour, reset. */
 export function TextBubbleControls() {

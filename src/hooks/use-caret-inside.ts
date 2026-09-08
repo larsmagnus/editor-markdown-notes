@@ -1,6 +1,6 @@
 import type { NodeViewProps } from '@tiptap/react'
 
-import { useEditorFlag } from '@/hooks/use-editor-flag'
+import { useEditorFlag } from '#src/hooks/use-editor-flag'
 
 /**
  * Is the caret inside this node right now?

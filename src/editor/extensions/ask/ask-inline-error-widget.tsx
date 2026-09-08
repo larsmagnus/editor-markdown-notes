@@ -1,4 +1,4 @@
-import { ErrorFallback } from '@/components/error-fallback'
+import { ErrorFallback } from '#src/components/error-fallback'
 
 interface AskInlineErrorWidgetProps {
 	error: string

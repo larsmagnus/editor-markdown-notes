@@ -1,8 +1,8 @@
 import type { Content, Extensions } from '@tiptap/core'
 import { Editor } from '@tiptap/core'
 
-import { extensions as appExtensions } from '@/editor/extensions/extensions'
-import { createMountPoint } from '@/test-utils/mount-point'
+import { extensions as appExtensions } from '#src/editor/extensions/extensions'
+import { createMountPoint } from '#src/test-utils/mount-point'
 
 type EditorOptions = {
 	/** Defaults to the app's own list; `[StarterKit]` for schema-level tests. */

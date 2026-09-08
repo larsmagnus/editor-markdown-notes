@@ -2,10 +2,9 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import type { Logger } from '../shared/logger'
-import type { HostToWebview } from '../shared/messages'
-
-import { computeMinimalReplacement } from './minimal-edit'
+import { computeMinimalReplacement } from '#src/host/minimal-edit'
+import type { Logger } from '#src/shared/logger'
+import type { HostToWebview } from '#src/shared/messages'
 
 /** Pushes the document's current text at one panel. */
 export function postDocumentUpdate(

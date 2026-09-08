@@ -1,5 +1,5 @@
-import type { BlockMarkerSpec } from '@/editor/extensions/block-marker/spec'
-import { unwrapFenced } from '@/editor/extensions/block-marker/unwrap'
+import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
+import { unwrapFenced } from '#src/editor/extensions/block-marker/unwrap'
 
 /** The subset of a fence parse every fenced construct's marker handling needs. */
 export type FenceRange = {

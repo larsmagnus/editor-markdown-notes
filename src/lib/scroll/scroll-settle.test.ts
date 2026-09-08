@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createSettleLoop } from '@/lib/scroll/scroll-settle'
+import { createSettleLoop } from '#src/lib/scroll/scroll-settle'
 
 beforeEach(() => {
 	vi.useFakeTimers()

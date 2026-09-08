@@ -2,10 +2,10 @@ import { InputRule } from '@tiptap/core'
 import TaskItem from '@tiptap/extension-task-item'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
-import { insertLiteralTaskMarkers } from '@/editor/extensions/list/insert-literal-list-markers'
-import { taskItemMarkdownSerialize } from '@/editor/extensions/list/list-markdown-spec'
-import { createSyncTaskCheckedPlugin } from '@/editor/extensions/task-item/sync-task-checked-plugin'
-import { TaskItemView } from '@/editor/extensions/task-item/task-item-view'
+import { insertLiteralTaskMarkers } from '#src/editor/extensions/list/insert-literal-list-markers'
+import { taskItemMarkdownSerialize } from '#src/editor/extensions/list/list-markdown-spec'
+import { createSyncTaskCheckedPlugin } from '#src/editor/extensions/task-item/sync-task-checked-plugin'
+import { TaskItemView } from '#src/editor/extensions/task-item/task-item-view'
 
 // Unlike the stock `inputRegex` this mirrors, the leading bullet is part of
 // the match rather than assumed already consumed.

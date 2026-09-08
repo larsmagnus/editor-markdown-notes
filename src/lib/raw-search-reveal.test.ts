@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { findRawSearchRange } from '@/lib/raw-search-reveal'
+import { findRawSearchRange } from '#src/lib/raw-search-reveal'
 
 /**
  * Raw mode shows the whole file, frontmatter included, so the position search

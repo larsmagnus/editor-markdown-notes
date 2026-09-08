@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { looksLikeBlockMarkdown } from '@/editor/extensions/markdown/looks-like-block-markdown'
+import { looksLikeBlockMarkdown } from '#src/editor/extensions/markdown/looks-like-block-markdown'
 
 describe('text that is worth parsing as markdown', () => {
 	it('recognises a table by its delimiter row', () => {

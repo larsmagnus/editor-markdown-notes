@@ -3,8 +3,8 @@ import { EditorConsumer, EditorContent } from '@tiptap/react'
 import { cn } from 'cn'
 import type { ReactNode } from 'react'
 
-import { TableControls } from '@/editor/extensions/table/controls'
-import type { CodeBlockStyle } from '@/hooks/use-syntax-highlight'
+import { TableControls } from '#src/editor/extensions/table/controls'
+import type { CodeBlockStyle } from '#src/hooks/use-syntax-highlight'
 
 /**
  * Where the "Skip to editor" link focuses in live mode. Applied via

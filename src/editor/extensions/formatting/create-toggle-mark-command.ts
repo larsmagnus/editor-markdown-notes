@@ -1,8 +1,8 @@
 import type { CommandProps } from '@tiptap/core'
 import type { MarkType } from '@tiptap/pm/model'
 
-import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
-import { toggleDelimitedMark } from '@/editor/extensions/formatting/toggle-delimited-mark'
+import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
+import { toggleDelimitedMark } from '#src/editor/extensions/formatting/toggle-delimited-mark'
 
 /**
  * The body every fixed-delimiter mark's `toggleXxx` command shares - only

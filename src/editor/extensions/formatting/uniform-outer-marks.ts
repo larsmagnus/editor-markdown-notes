@@ -1,6 +1,6 @@
 import type { Mark, MarkType, Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
+import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
 
 /**
  * Which of `outerMarkTypeNames` uniformly cover a run's entire interior -

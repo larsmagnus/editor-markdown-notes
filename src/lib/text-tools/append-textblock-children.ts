@@ -3,10 +3,10 @@ import type { Node as ProseMirrorNode } from 'prosemirror-model'
 import {
 	appendProseText,
 	delimiterRanges,
-} from '@/lib/text-tools/delimiter-ranges'
-import type { TextSlice } from '@/lib/text-tools/delimiter-ranges'
-import type { ProseExclusion } from '@/lib/text-tools/prose-policy'
-import { PROSE_SUBSTITUTE } from '@/lib/text-tools/prose-policy'
+} from '#src/lib/text-tools/delimiter-ranges'
+import type { TextSlice } from '#src/lib/text-tools/delimiter-ranges'
+import type { ProseExclusion } from '#src/lib/text-tools/prose-policy'
+import { PROSE_SUBSTITUTE } from '#src/lib/text-tools/prose-policy'
 
 /**
  * `document-text.ts`'s own name for each excluded construct.

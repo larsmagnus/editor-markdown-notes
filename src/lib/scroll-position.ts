@@ -1,7 +1,7 @@
-import { readPanelState, updatePanelState } from '@/lib/panel-state'
-import { scrollTopSchema } from '@/lib/schemas'
-import { getVSCodeApi, isVSCodeWebview } from '@/lib/vscode-api'
-import { EXTENSION_ID } from '@/shared/constants'
+import { readPanelState, updatePanelState } from '#src/lib/panel-state'
+import { scrollTopSchema } from '#src/lib/schemas'
+import { getVSCodeApi, isVSCodeWebview } from '#src/lib/vscode-api'
+import { EXTENSION_ID } from '#src/shared/constants'
 
 const STORAGE_KEY_PREFIX = `${EXTENSION_ID}:scroll-top:`
 

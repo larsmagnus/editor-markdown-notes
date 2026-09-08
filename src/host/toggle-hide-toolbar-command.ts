@@ -1,8 +1,7 @@
 import * as vscode from 'vscode'
 
-import { DEFAULT_SETTINGS } from '../shared/messages'
-
-import { CONFIG_SECTION } from './constants'
+import { CONFIG_SECTION } from '#src/host/constants'
+import { DEFAULT_SETTINGS } from '#src/shared/messages'
 
 /**
  * `hideToolbar` is a workspace/user setting rather than a persisted view option,

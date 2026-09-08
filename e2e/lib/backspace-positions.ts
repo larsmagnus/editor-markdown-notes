@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test'
 import { expect } from '@playwright/test'
 
-import { pressKeySettled } from '@/e2e/lib/press-key-settled'
+import { pressKeySettled } from '#e2e/lib/press-key-settled'
 
 /** Clicks into `text`, then backspaces right at its end. */
 export async function backspaceAtEndOf(page: Page, text: string) {

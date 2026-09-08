@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { askInlineStatusPluginKey } from '@/editor/extensions/ask/ask-inline-status-extension'
-import { createEditor } from '@/test-utils/editor'
+import { askInlineStatusPluginKey } from '#src/editor/extensions/ask/ask-inline-status-extension'
+import { createEditor } from '#src/test-utils/editor'
 
 function newEditor(content: string) {
 	const editor = createEditor(content, { parseOnly: true })

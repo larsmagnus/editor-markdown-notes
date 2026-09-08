@@ -3,9 +3,9 @@ import type { Editor } from '@tiptap/core'
 import {
 	markerCaretAtBoundary,
 	resolveMarkerCaret,
-} from '@/editor/extensions/block-marker/marker-caret'
-import type { MarkerCaret } from '@/editor/extensions/block-marker/marker-caret'
-import { listMarkerSpec } from '@/editor/extensions/block-marker/specs'
+} from '#src/editor/extensions/block-marker/marker-caret'
+import type { MarkerCaret } from '#src/editor/extensions/block-marker/marker-caret'
+import { listMarkerSpec } from '#src/editor/extensions/block-marker/specs'
 
 /**
  * Narrows a resolved marker caret to one sitting on a list item's own marker.

@@ -2,7 +2,7 @@ import { PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/react'
 
-import { createDecorationPlugin } from '@/editor/extensions/create-decoration-plugin'
+import { createDecorationPlugin } from '#src/editor/extensions/create-decoration-plugin'
 
 /**
  * Draws Shiki's token colors onto fenced code blocks.

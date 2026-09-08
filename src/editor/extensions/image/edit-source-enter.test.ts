@@ -2,8 +2,8 @@ import { TextSelection } from '@tiptap/pm/state'
 import { Editor } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { enterImageEditSource } from '@/editor/extensions/image/edit-source'
-import { createEditor } from '@/test-utils/editor'
+import { enterImageEditSource } from '#src/editor/extensions/image/edit-source'
+import { createEditor } from '#src/test-utils/editor'
 
 /** The sole image node's own position in the document. */
 function imagePos(editor: Editor): number {

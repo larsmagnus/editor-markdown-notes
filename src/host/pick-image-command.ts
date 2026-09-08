@@ -1,9 +1,8 @@
 import * as vscode from 'vscode'
 
-import type { Logger } from '../shared/logger'
-
-import { resolvePickedImagePath } from './resolve-picked-image-path'
-import type { SettingsStore } from './settings-store'
+import { resolvePickedImagePath } from '#src/host/resolve-picked-image-path'
+import type { SettingsStore } from '#src/host/settings-store'
+import type { Logger } from '#src/shared/logger'
 
 /**
  * Shows the native file dialog and resolves the path to reply with - `null`

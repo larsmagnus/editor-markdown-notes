@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { readScrollTop, writeScrollTop } from '@/lib/scroll-position'
-import { scrollRestoreTop } from '@/lib/scroll/scroll-restore-top'
-import { hasSearchReveal } from '@/lib/search-reveal'
+import { readScrollTop, writeScrollTop } from '#src/lib/scroll-position'
+import { scrollRestoreTop } from '#src/lib/scroll/scroll-restore-top'
+import { hasSearchReveal } from '#src/lib/search-reveal'
 
 /**
  * Opens a note where it was last left, and remembers where it is left next.

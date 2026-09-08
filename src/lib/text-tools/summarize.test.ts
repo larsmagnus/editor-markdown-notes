@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { summarize } from '@/lib/text-tools/summarize'
-import type { Analysis, TextIssue } from '@/lib/text-tools/types'
-import { TEXT_TOOL_RULE_IDS } from '@/shared/messages'
+import { summarize } from '#src/lib/text-tools/summarize'
+import type { Analysis, TextIssue } from '#src/lib/text-tools/types'
+import { TEXT_TOOL_RULE_IDS } from '#src/shared/messages'
 
 const ALL_RULES = [...TEXT_TOOL_RULE_IDS]
 

@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { askInlineStatusPluginKey } from '@/editor/extensions/ask/ask-inline-status-extension'
+import { askInlineStatusPluginKey } from '#src/editor/extensions/ask/ask-inline-status-extension'
 import {
 	runAskCommand,
 	streamAskInto,
-} from '@/editor/extensions/slash-command/ask-command'
-import { createEditor } from '@/test-utils/editor'
+} from '#src/editor/extensions/slash-command/ask-command'
+import { createEditor } from '#src/test-utils/editor'
 
 const ask = vi.hoisted(() => vi.fn())
 const cancel = vi.hoisted(() => vi.fn())
-vi.mock('@/lib/ask/ask-client', () => ({
+vi.mock('#src/lib/ask/ask-client', () => ({
 	getAskClient: () => ({ ask, cancel }),
 }))
 
@@ -19,7 +19,7 @@ vi.mock('@/lib/ask/ask-client', () => ({
 // wrapper, so a mock exercises everything worth asserting on here: that it
 // runs, with the right arguments.
 const openAskPromptPopup = vi.hoisted(() => vi.fn())
-vi.mock('@/editor/extensions/slash-command/ask-prompt-render', () => ({
+vi.mock('#src/editor/extensions/slash-command/ask-prompt-render', () => ({
 	openAskPromptPopup,
 }))
 

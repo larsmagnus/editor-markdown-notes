@@ -1,8 +1,7 @@
 import * as vscode from 'vscode'
 
-import type { ExtensionSettings } from '../shared/messages'
-
-import { buildClaudeCommand } from './claude-prompt'
+import { buildClaudeCommand } from '#src/host/claude-prompt'
+import type { ExtensionSettings } from '#src/shared/messages'
 
 /**
  * Opens an integrated terminal running `claude`, prompted about `uri` by its

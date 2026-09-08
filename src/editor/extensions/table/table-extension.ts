@@ -3,12 +3,12 @@ import { getHTMLFromFragment } from '@tiptap/react'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
-import { delimiterRow } from '@/editor/extensions/table/alignment'
+import { delimiterRow } from '#src/editor/extensions/table/alignment'
 import {
 	childNodes,
 	hasHeaderRow,
 	isGfmTable,
-} from '@/editor/extensions/table/shape'
+} from '#src/editor/extensions/table/shape'
 
 /** `tiptap-markdown` adds `inTable` to prosemirror-markdown's state. */
 export type TableSerializerState = MarkdownSerializerState & {

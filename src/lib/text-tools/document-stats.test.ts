@@ -4,8 +4,8 @@ import {
 	computeTextStats,
 	countParagraphs,
 	formatCount,
-} from '@/lib/text-tools/document-stats'
-import { createEditor } from '@/test-utils/editor'
+} from '#src/lib/text-tools/document-stats'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('computeTextStats', () => {
 	it('counts words, characters and reading time for a short sentence', () => {

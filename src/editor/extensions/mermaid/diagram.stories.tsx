@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { EditorContent, useEditor } from '@tiptap/react'
 
-import { extensions } from '@/editor/extensions/extensions'
+import { extensions } from '#src/editor/extensions/extensions'
 
 type MermaidDiagramPreviewProps = { content: string }
 

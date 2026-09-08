@@ -2,10 +2,10 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 import type { Transaction } from '@tiptap/pm/state'
 
-import { forEachMarkerHost } from '@/editor/extensions/block-marker/marker-host'
-import { BLOCK_MARKER_SPECS } from '@/editor/extensions/block-marker/specs'
-import { createDeletionProbe } from '@/editor/extensions/syntax-repair/authored-deletion'
-import { metaString } from '@/editor/extensions/transaction-filters'
+import { forEachMarkerHost } from '#src/editor/extensions/block-marker/marker-host'
+import { BLOCK_MARKER_SPECS } from '#src/editor/extensions/block-marker/specs'
+import { createDeletionProbe } from '#src/editor/extensions/syntax-repair/authored-deletion'
+import { metaString } from '#src/editor/extensions/transaction-filters'
 
 /**
  * Set by a construct's own toggle command when it turns the construct *off*,

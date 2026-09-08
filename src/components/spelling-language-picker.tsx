@@ -1,14 +1,17 @@
 import { ChevronDown } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '#src/components/ui/button'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import type { SpellingLanguage } from '@/shared/messages'
-import { SPELLING_LANGUAGE_LABELS, SPELLING_LANGUAGES } from '@/shared/messages'
+} from '#src/components/ui/dropdown-menu'
+import type { SpellingLanguage } from '#src/shared/messages'
+import {
+	SPELLING_LANGUAGE_LABELS,
+	SPELLING_LANGUAGES,
+} from '#src/shared/messages'
 
 type SpellingLanguagePickerProps = {
 	language: SpellingLanguage

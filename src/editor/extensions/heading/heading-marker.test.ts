@@ -4,7 +4,7 @@ import {
 	headingMarkerLength,
 	headingMarkerText,
 	parseHeadingLevel,
-} from '@/editor/extensions/heading/heading-marker'
+} from '#src/editor/extensions/heading/heading-marker'
 
 describe('parseHeadingLevel', () => {
 	it('reads the level from each of the six valid marker lengths', () => {

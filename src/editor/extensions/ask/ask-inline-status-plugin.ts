@@ -1,13 +1,13 @@
 import type { Editor } from '@tiptap/core'
 
-import type { AskInlineStatusState } from '@/editor/extensions/ask/ask-inline-status-state'
-import { askInlineStatusPluginKey } from '@/editor/extensions/ask/ask-inline-status-state'
+import type { AskInlineStatusState } from '#src/editor/extensions/ask/ask-inline-status-state'
+import { askInlineStatusPluginKey } from '#src/editor/extensions/ask/ask-inline-status-state'
 import {
 	renderErrorWidget,
 	renderLoadingWidget,
 	unmountActiveInlineStatusWidget,
-} from '@/editor/extensions/ask/ask-inline-status-widget-mount'
-import { createSingleWidgetDecorationPlugin } from '@/editor/extensions/single-widget-decoration-plugin'
+} from '#src/editor/extensions/ask/ask-inline-status-widget-mount'
+import { createSingleWidgetDecorationPlugin } from '#src/editor/extensions/single-widget-decoration-plugin'
 
 function widgetFor(current: NonNullable<AskInlineStatusState>, editor: Editor) {
 	if (current.status === 'loading') {

@@ -1,9 +1,9 @@
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { createDelimitedMarkRevealProvider } from '@/editor/extensions/formatting/create-delimited-mark-reveal-provider'
-import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
-import { createEditor } from '@/test-utils/editor'
+import { createDelimitedMarkRevealProvider } from '#src/editor/extensions/formatting/create-delimited-mark-reveal-provider'
+import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('createDelimitedMarkRevealProvider', () => {
 	it('spans the whole run, with delimiter ranges at each end', () => {

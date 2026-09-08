@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
-import { TextToolsPanel } from '@/text-tools/text-tools-panel'
+import { TextToolsPanel } from '#src/text-tools/text-tools-panel'
 
 const meta = {
 	component: TextToolsPanel,

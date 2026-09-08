@@ -1,6 +1,6 @@
 import type { Storage } from '@tiptap/core'
 
-import { DEFAULT_SETTINGS } from '@/shared/messages'
+import { DEFAULT_SETTINGS } from '#src/shared/messages'
 
 /**
  * The `markup` attribute's config, factored out of `italic-extension.ts` so

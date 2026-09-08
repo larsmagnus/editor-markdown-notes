@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createAnalyzer } from '@/lib/text-tools/analyze-client'
-import type { AnalyzeRequest, PipelineOptions } from '@/lib/text-tools/types'
+import { createAnalyzer } from '#src/lib/text-tools/analyze-client'
+import type { AnalyzeRequest, PipelineOptions } from '#src/lib/text-tools/types'
 
 /**
  * The real worker is an inlined blob happy-dom cannot start, and the analysis
@@ -14,7 +14,7 @@ const listeners = vi.hoisted(
 	() => new Map<string, (event: MessageEvent) => void>()
 )
 
-vi.mock('@/lib/text-tools/analyze.worker.ts?worker&inline', () => ({
+vi.mock('#src/lib/text-tools/analyze.worker.ts?worker&inline', () => ({
 	default: class {
 		addEventListener(type: string, handler: (event: MessageEvent) => void) {
 			listeners.set(type, handler)

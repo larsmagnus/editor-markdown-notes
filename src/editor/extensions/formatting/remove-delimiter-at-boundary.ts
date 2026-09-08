@@ -2,10 +2,10 @@ import type { MarkType } from '@tiptap/pm/model'
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { Command } from '@tiptap/pm/state'
 
-import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
-import { unwrapRun } from '@/editor/extensions/formatting/unwrap-run'
+import type { DelimiterSpec } from '#src/editor/extensions/formatting/delimiter-spec'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
+import { unwrapRun } from '#src/editor/extensions/formatting/unwrap-run'
 
 /** Backspace deletes to the caret's left, Delete to its right. */
 type Direction = 'backspace' | 'delete'

@@ -1,9 +1,9 @@
 import { Heading } from 'lucide-react'
 
-import { ButtonHeadingGroup } from '@/components/button-heading-group'
-import { PopoverArrow } from '@/components/popover-arrow'
-import { PopoverIconTrigger } from '@/components/popover-icon-trigger'
-import { Popover, PopoverContent } from '@/components/ui/popover'
+import { ButtonHeadingGroup } from '#src/components/button-heading-group'
+import { PopoverArrow } from '#src/components/popover-arrow'
+import { PopoverIconTrigger } from '#src/components/popover-icon-trigger'
+import { Popover, PopoverContent } from '#src/components/ui/popover'
 
 /** The six heading levels, behind one button in the bubble menu. */
 export function HeadingPopover() {

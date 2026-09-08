@@ -4,7 +4,7 @@ import {
 	frontmatterFenceText,
 	frontmatterYaml,
 	parseFrontmatterFence,
-} from '@/editor/extensions/frontmatter/frontmatter-fence'
+} from '#src/editor/extensions/frontmatter/frontmatter-fence'
 
 describe('parseFrontmatterFence', () => {
 	it('parses a well-formed frontmatter block', () => {

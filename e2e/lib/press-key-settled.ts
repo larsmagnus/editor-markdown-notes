@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test'
 
-import { waitForSelectionSettle } from '@/e2e/lib/selection-settle'
-import { takeSelectionSnapshot } from '@/e2e/lib/selection-snapshot'
+import { waitForSelectionSettle } from '#e2e/lib/selection-settle'
+import { takeSelectionSnapshot } from '#e2e/lib/selection-snapshot'
 
 /** Retries an apparent no-op this many times before trusting it as one. */
 const MAX_ATTEMPTS = 3

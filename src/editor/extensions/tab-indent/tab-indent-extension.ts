@@ -2,8 +2,8 @@ import { Extension } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
 import { isInTable } from '@tiptap/pm/tables'
 
-import { listItemAtMarkerBoundary } from '@/editor/extensions/list/list-item-caret'
-import { outdentListItem } from '@/editor/extensions/list/outdent-list-item'
+import { listItemAtMarkerBoundary } from '#src/editor/extensions/list/list-item-caret'
+import { outdentListItem } from '#src/editor/extensions/list/outdent-list-item'
 
 const INDENT = '  '
 

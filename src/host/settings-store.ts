@@ -1,18 +1,17 @@
 import * as vscode from 'vscode'
 
+import { CONFIG_SECTION, VIEW_OPTIONS_KEY } from '#src/host/constants'
 import {
 	CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH,
 	DEFAULT_SETTINGS,
 	DEFAULT_VIEW_OPTIONS,
-} from '../shared/messages'
+} from '#src/shared/messages'
 import type {
 	Config,
 	ExtensionSettings,
 	ItalicMarker,
 	ViewOptions,
-} from '../shared/messages'
-
-import { CONFIG_SECTION, VIEW_OPTIONS_KEY } from './constants'
+} from '#src/shared/messages'
 
 /**
  * The two halves of the editor's configuration, and the only thing that reads

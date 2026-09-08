@@ -1,12 +1,12 @@
 import type { MarkType } from '@tiptap/pm/model'
 import type { Command } from '@tiptap/pm/state'
 
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import type { MarkRun } from '@/editor/extensions/formatting/find-mark-runs'
-import { unwrapRun } from '@/editor/extensions/formatting/unwrap-run'
-import { wrapRangeWithDelimiter } from '@/editor/extensions/formatting/wrap-selection-with-delimiter'
-import { linkCloseText } from '@/editor/extensions/link/link-close-text'
-import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
+import { unwrapRun } from '#src/editor/extensions/formatting/unwrap-run'
+import { wrapRangeWithDelimiter } from '#src/editor/extensions/formatting/wrap-selection-with-delimiter'
+import { linkCloseText } from '#src/editor/extensions/link/link-close-text'
+import { linkDelimiterSpec } from '#src/editor/extensions/link/link-delimiter-spec'
 
 export type LinkAttrs = { href: string; title?: string | null }
 

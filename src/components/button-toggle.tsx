@@ -1,7 +1,7 @@
 import { cn } from 'cn'
 import type { ComponentProps } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '#src/components/ui/button'
 
 type ButtonToggleProps = ComponentProps<'button'> & {
 	active: boolean

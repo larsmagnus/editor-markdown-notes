@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
-import { createEditor } from '@/test-utils/editor'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import { italicDelimiterSpec } from '#src/editor/extensions/italic/italic-delimiter-spec'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('italicDelimiterSpec', () => {
 	it('detects either italic marker at the start of text', () => {

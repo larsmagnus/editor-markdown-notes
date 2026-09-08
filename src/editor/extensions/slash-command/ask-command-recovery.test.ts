@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { askInlineStatusPluginKey } from '@/editor/extensions/ask/ask-inline-status-extension'
-import { streamAskInto } from '@/editor/extensions/slash-command/ask-command'
-import { createEditor } from '@/test-utils/editor'
+import { askInlineStatusPluginKey } from '#src/editor/extensions/ask/ask-inline-status-extension'
+import { streamAskInto } from '#src/editor/extensions/slash-command/ask-command'
+import { createEditor } from '#src/test-utils/editor'
 
 const ask = vi.hoisted(() => vi.fn())
 const cancel = vi.hoisted(() => vi.fn())
-vi.mock('@/lib/ask/ask-client', () => ({
+vi.mock('#src/lib/ask/ask-client', () => ({
 	getAskClient: () => ({ ask, cancel }),
 }))
 

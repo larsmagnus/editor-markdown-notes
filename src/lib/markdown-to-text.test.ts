@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { markdownToPlainText } from '@/lib/markdown-to-text'
+import { markdownToPlainText } from '#src/lib/markdown-to-text'
 
 describe('markdownToPlainText', () => {
 	it('strips heading markers and keeps the heading text', () => {

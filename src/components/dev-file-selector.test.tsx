@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import DevFileSelector from '@/components/dev-file-selector'
+import DevFileSelector from '#src/components/dev-file-selector'
 
 const NOTES = [
 	{ value: 'notes.md', label: 'notes.md' },

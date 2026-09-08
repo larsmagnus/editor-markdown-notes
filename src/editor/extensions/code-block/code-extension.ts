@@ -1,8 +1,8 @@
 import CodeMark from '@tiptap/extension-code'
 
-import { createDelimitedMarkExtension } from '@/editor/extensions/formatting/delimited-mark-extension'
-import { createToggleCodeCommand } from '@/editor/extensions/formatting/inline-code/create-toggle-code-command'
-import { inlineCodeDelimiterSpec } from '@/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
+import { createDelimitedMarkExtension } from '#src/editor/extensions/formatting/delimited-mark-extension'
+import { createToggleCodeCommand } from '#src/editor/extensions/formatting/inline-code/create-toggle-code-command'
+import { inlineCodeDelimiterSpec } from '#src/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
 
 /** A single backtick, with a delimited text span captured as the whole match. */
 const CODE_INPUT_REGEX = /(`[^`]+`)$/

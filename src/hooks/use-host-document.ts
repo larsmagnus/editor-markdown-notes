@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { useHostMessage } from '@/hooks/use-host-message'
-import { documentDirty } from '@/lib/document-dirty-tracker'
-import { documentSavedMessageSchema, updateMessageSchema } from '@/lib/schemas'
-import { getVSCodeApi, isVSCodeWebview } from '@/lib/vscode-api'
+import { useHostMessage } from '#src/hooks/use-host-message'
+import { documentDirty } from '#src/lib/document-dirty-tracker'
+import {
+	documentSavedMessageSchema,
+	updateMessageSchema,
+} from '#src/lib/schemas'
+import { getVSCodeApi, isVSCodeWebview } from '#src/lib/vscode-api'
 
 /**
  * The note the host has open, and the way to write it back.

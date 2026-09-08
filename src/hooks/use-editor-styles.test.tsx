@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react'
 import { EditorContext } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { useEditorStyles } from '@/hooks/use-editor-styles'
-import { createEditor } from '@/test-utils/editor'
+import { useEditorStyles } from '#src/hooks/use-editor-styles'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('toggleStyle', () => {
 	it('toggles bold', () => {

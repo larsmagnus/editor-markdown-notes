@@ -3,10 +3,10 @@ import { useCurrentEditor } from '@tiptap/react'
 import {
 	isListStyle,
 	LIST_STYLE_COMMANDS,
-} from '@/editor/commands/list-style-commands'
-import type { ListStyle } from '@/editor/commands/list-style-commands'
-import { TEXT_STYLE_COMMANDS } from '@/editor/commands/text-style-commands'
-import type { TextStyle } from '@/editor/commands/text-style-commands'
+} from '#src/editor/commands/list-style-commands'
+import type { ListStyle } from '#src/editor/commands/list-style-commands'
+import { TEXT_STYLE_COMMANDS } from '#src/editor/commands/text-style-commands'
+import type { TextStyle } from '#src/editor/commands/text-style-commands'
 
 export type Style = ListStyle | TextStyle
 

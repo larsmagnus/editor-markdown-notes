@@ -1,6 +1,6 @@
 import { Extension } from '@tiptap/core'
 
-import { endBlankListItem } from '@/editor/extensions/list/end-blank-list-item'
+import { endBlankListItem } from '#src/editor/extensions/list/end-blank-list-item'
 
 /**
  * Enter on a list item holding nothing but its marker ends that item instead of

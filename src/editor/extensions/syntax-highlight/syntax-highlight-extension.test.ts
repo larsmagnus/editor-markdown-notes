@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEditor } from '@/test-utils/editor'
+import { createEditor } from '#src/test-utils/editor'
 
 function editorWithCode() {
 	const editor = createEditor(['```ts', 'const total = 1', '```'].join('\n'))

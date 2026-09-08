@@ -1,4 +1,4 @@
-import type { SearchMatch } from './search-match'
+import type { SearchMatch } from '#src/host/search-match'
 
 /**
  * An upper bound on the length of the searched-for text, derived from the

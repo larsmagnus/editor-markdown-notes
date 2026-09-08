@@ -2,8 +2,8 @@ import type { InputRule } from '@tiptap/core'
 import type { NodeType } from '@tiptap/pm/model'
 import { TextSelection } from '@tiptap/pm/state'
 
-import { createBlockTypeInputRule } from '@/editor/extensions/block-type-input-rule'
-import { parseFence } from '@/editor/extensions/code-block/code-fence'
+import { createBlockTypeInputRule } from '#src/editor/extensions/block-type-input-rule'
+import { parseFence } from '#src/editor/extensions/code-block/code-fence'
 
 /**
  * Converts a typed ` ```lang ` (or bare ` ``` `) into a code block whose

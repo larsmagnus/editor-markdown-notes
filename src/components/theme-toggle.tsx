@@ -9,14 +9,14 @@ import type {
 	PropsWithChildren,
 } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '#src/components/ui/button'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useTheme } from '@/hooks/use-theme'
+} from '#src/components/ui/dropdown-menu'
+import { useTheme } from '#src/hooks/use-theme'
 
 type ThemeToggleProps = PropsWithChildren<
 	Omit<

@@ -1,4 +1,4 @@
-import { headingMarkerText } from '@/editor/extensions/heading/heading-marker'
+import { headingMarkerText } from '#src/editor/extensions/heading/heading-marker'
 
 /**
  * Reinstates literal `#`x`level` marker text into every `h1`-`h6` markdown-it

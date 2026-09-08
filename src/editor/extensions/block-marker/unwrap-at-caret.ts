@@ -1,6 +1,6 @@
 import type { Command } from '@tiptap/pm/state'
 
-import { BLOCK_MARKER_SPECS } from '@/editor/extensions/block-marker/specs'
+import { BLOCK_MARKER_SPECS } from '#src/editor/extensions/block-marker/specs'
 
 /**
  * Takes apart the construct the caret is in, marker text and all - what a

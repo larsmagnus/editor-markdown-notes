@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
-import { AskPromptInput } from '@/editor/extensions/slash-command/ask-prompt-input'
+import { AskPromptInput } from '#src/editor/extensions/slash-command/ask-prompt-input'
 
 const meta = {
 	component: AskPromptInput,

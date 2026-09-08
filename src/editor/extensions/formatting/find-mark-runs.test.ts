@@ -1,8 +1,8 @@
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import { createEditor } from '@/test-utils/editor'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('findMarkRuns', () => {
 	it('finds a single run', () => {

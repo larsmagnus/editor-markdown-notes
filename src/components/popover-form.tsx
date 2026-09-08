@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 
-import Header from '@/components/header'
-import { PopoverArrow } from '@/components/popover-arrow'
-import { Button } from '@/components/ui/button'
-import { PopoverContent } from '@/components/ui/popover'
+import Header from '#src/components/header'
+import { PopoverArrow } from '#src/components/popover-arrow'
+import { Button } from '#src/components/ui/button'
+import { PopoverContent } from '#src/components/ui/popover'
 
 interface PopoverFormProps {
 	heading: string

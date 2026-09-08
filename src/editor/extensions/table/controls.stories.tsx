@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { userEvent, within } from 'storybook/test'
 
-import { TableControls } from '@/editor/extensions/table/controls'
-import { EditorContextDecorator } from '@/storybook/decorator-editor-context'
+import { TableControls } from '#src/editor/extensions/table/controls'
+import { EditorContextDecorator } from '#src/storybook/decorator-editor-context'
 
 const TABLE = [
 	'<table>',

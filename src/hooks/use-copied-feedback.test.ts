@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useCopiedFeedback } from '@/hooks/use-copied-feedback'
+import { useCopiedFeedback } from '#src/hooks/use-copied-feedback'
 
 beforeEach(() => {
 	vi.useFakeTimers()

@@ -1,10 +1,10 @@
-import { runPipeline } from '@/lib/text-tools/run-pipeline'
-import { summarize } from '@/lib/text-tools/summarize'
-import type { IssueSeverity, TextIssue } from '@/lib/text-tools/types'
-import { loadDictionary } from '@/mcp/dictionaries'
-import { markdownProse } from '@/mcp/markdown-text'
-import { sentenceFinder } from '@/mcp/sentence-at'
-import type { SpellingLanguage, TextToolRuleId } from '@/shared/messages'
+import { runPipeline } from '#src/lib/text-tools/run-pipeline'
+import { summarize } from '#src/lib/text-tools/summarize'
+import type { IssueSeverity, TextIssue } from '#src/lib/text-tools/types'
+import { loadDictionary } from '#src/mcp/dictionaries'
+import { markdownProse } from '#src/mcp/markdown-text'
+import { sentenceFinder } from '#src/mcp/sentence-at'
+import type { SpellingLanguage, TextToolRuleId } from '#src/shared/messages'
 
 /**
  * The checks themselves, as plain functions over markdown.

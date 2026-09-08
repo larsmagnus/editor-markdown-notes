@@ -2,8 +2,8 @@ import {
 	askChunkMessageSchema,
 	askDoneMessageSchema,
 	askErrorMessageSchema,
-} from '@/lib/schemas'
-import { getVSCodeApi } from '@/lib/vscode-api'
+} from '#src/lib/schemas'
+import { getVSCodeApi } from '#src/lib/vscode-api'
 
 type AskHandlers = {
 	onChunk: (text: string) => void

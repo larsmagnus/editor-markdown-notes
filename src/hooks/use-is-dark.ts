@@ -1,4 +1,4 @@
-import { useTheme } from '@/hooks/use-theme'
+import { useTheme } from '#src/hooks/use-theme'
 
 /** Whether the editor is currently dark, resolving the "system" preference. */
 export function useIsDark(): boolean {

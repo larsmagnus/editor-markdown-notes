@@ -1,6 +1,6 @@
 import type { NodeViewProps } from '@tiptap/react'
 
-import { setImageLink, unsetImageLink } from '@/editor/extensions/image/link'
+import { setImageLink, unsetImageLink } from '#src/editor/extensions/image/link'
 
 export type ImageLink = {
 	linked: boolean

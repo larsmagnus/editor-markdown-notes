@@ -1,13 +1,13 @@
 import type { VariantProps } from 'class-variance-authority'
 import type { ReactNode } from 'react'
 
-import { Button } from '@/components/ui/button'
-import type { buttonVariants } from '@/components/ui/button'
+import { Button } from '#src/components/ui/button'
+import type { buttonVariants } from '#src/components/ui/button'
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from '#src/components/ui/tooltip'
 
 type ButtonActionProps = {
 	icon: ReactNode

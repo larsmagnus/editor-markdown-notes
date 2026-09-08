@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import { createEditor } from '@/test-utils/editor'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import { createEditor } from '#src/test-utils/editor'
 
 function linkRunEnd(editor: Editor): number {
 	const [run] = findMarkRuns(editor.state.doc, editor.schema.marks.link)

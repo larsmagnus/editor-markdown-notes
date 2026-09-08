@@ -1,7 +1,7 @@
 import { Unlink } from 'lucide-react'
 
-import { ButtonToggle } from '@/components/button-toggle'
-import { useEditorLink } from '@/hooks/use-editor-link'
+import { ButtonToggle } from '#src/components/button-toggle'
+import { useEditorLink } from '#src/hooks/use-editor-link'
 
 /** Removes the link mark from the current selection or image. */
 export function ButtonUnlink() {

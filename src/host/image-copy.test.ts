@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isInsideFolder, resolveCopyFilename } from './image-copy'
+import { isInsideFolder, resolveCopyFilename } from '#src/host/image-copy'
 
 describe('isInsideFolder', () => {
 	it('is true for a file directly inside the folder', () => {

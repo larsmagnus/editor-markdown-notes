@@ -3,8 +3,8 @@ import { Fragment } from 'react'
 import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
-import type { TableMenuItem } from '@/editor/extensions/table/menu-items'
+} from '#src/components/ui/dropdown-menu'
+import type { TableMenuItem } from '#src/editor/extensions/table/menu-items'
 
 interface TableMenuActionProps {
 	item: TableMenuItem

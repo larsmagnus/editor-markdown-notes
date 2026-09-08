@@ -2,23 +2,22 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import type { Logger } from '../shared/logger'
+import { onDocumentChanged } from '#src/host/document-change-subscription'
+import { DocumentWriter, postDocumentUpdate } from '#src/host/document-updates'
+import { getDocumentResourceRoots } from '#src/host/image-base-uris'
+import type { ScrollPositionStore } from '#src/host/scroll-position-store'
+import type { SettingsStore } from '#src/host/settings-store'
+import { buildWebviewDocument } from '#src/host/webview-document'
+import {
+	createWebviewMessageHandlers,
+	dispatchWebviewMessage,
+} from '#src/host/webview-message-handlers'
+import type { Logger } from '#src/shared/logger'
 import type {
 	SearchReveal,
 	ShikiThemePayload,
 	WebviewToHost,
-} from '../shared/messages'
-
-import { onDocumentChanged } from './document-change-subscription'
-import { DocumentWriter, postDocumentUpdate } from './document-updates'
-import { getDocumentResourceRoots } from './image-base-uris'
-import type { ScrollPositionStore } from './scroll-position-store'
-import type { SettingsStore } from './settings-store'
-import { buildWebviewDocument } from './webview-document'
-import {
-	createWebviewMessageHandlers,
-	dispatchWebviewMessage,
-} from './webview-message-handlers'
+} from '#src/shared/messages'
 
 type PanelSessionOptions = {
 	panel: vscode.WebviewPanel

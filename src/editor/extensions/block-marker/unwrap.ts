@@ -1,7 +1,7 @@
 import type { Transaction } from '@tiptap/pm/state'
 import { liftTarget } from '@tiptap/pm/transform'
 
-import type { MarkerMatch } from '@/editor/extensions/block-marker/marker-host'
+import type { MarkerMatch } from '#src/editor/extensions/block-marker/marker-host'
 
 /**
  * The construct's own content range, one position inside its opening and

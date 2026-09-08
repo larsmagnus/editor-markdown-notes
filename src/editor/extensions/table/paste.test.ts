@@ -2,7 +2,7 @@ import { CellSelection, TableMap } from '@tiptap/pm/tables'
 import { Editor } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { createEditor } from '@/test-utils/editor'
+import { createEditor } from '#src/test-utils/editor'
 
 const TABLE = [
 	'| Quarter | Revenue | Growth |',

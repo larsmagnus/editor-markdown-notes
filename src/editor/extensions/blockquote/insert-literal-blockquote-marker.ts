@@ -1,4 +1,4 @@
-import { BLOCKQUOTE_MARKER } from '@/editor/extensions/blockquote/blockquote-marker'
+import { BLOCKQUOTE_MARKER } from '#src/editor/extensions/blockquote/blockquote-marker'
 
 /**
  * Reinstates the literal `"> "` marker into every blockquote's own first

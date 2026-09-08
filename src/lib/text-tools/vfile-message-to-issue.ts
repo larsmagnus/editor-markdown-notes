@@ -1,7 +1,7 @@
 import type { VFileMessage } from 'vfile-message'
 
-import type { TextIssue } from '@/lib/text-tools/types'
-import type { TextToolRuleId } from '@/shared/messages'
+import type { TextIssue } from '#src/lib/text-tools/types'
+import type { TextToolRuleId } from '#src/shared/messages'
 
 /**
  * Turning retext's messages into issues the editor can place.

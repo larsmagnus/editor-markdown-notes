@@ -1,10 +1,10 @@
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 
-import { Checkbox } from '@/components/ui/checkbox'
-import { parseListMarker } from '@/editor/extensions/list/list-marker'
-import { createToggleTaskCheckedCommand } from '@/editor/extensions/task-item/toggle-task-checked-command'
-import { useMarkerRevealed } from '@/hooks/use-marker-revealed'
+import { Checkbox } from '#src/components/ui/checkbox'
+import { parseListMarker } from '#src/editor/extensions/list/list-marker'
+import { createToggleTaskCheckedCommand } from '#src/editor/extensions/task-item/toggle-task-checked-command'
+import { useMarkerRevealed } from '#src/hooks/use-marker-revealed'
 
 /**
  * Renders a task list item's checkbox with the shadcn `Checkbox` in place of

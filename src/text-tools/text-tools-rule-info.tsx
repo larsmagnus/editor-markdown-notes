@@ -1,7 +1,7 @@
 import { CheckCircle, Info, TriangleAlert } from 'lucide-react'
 
-import { PopoverArrow } from '@/components/popover-arrow'
-import { Button } from '@/components/ui/button'
+import { PopoverArrow } from '#src/components/popover-arrow'
+import { Button } from '#src/components/ui/button'
 import {
 	Popover,
 	PopoverContent,
@@ -9,10 +9,10 @@ import {
 	PopoverHeader,
 	PopoverTitle,
 	PopoverTrigger,
-} from '@/components/ui/popover'
-import { issueClassName } from '@/lib/text-tools/issue-class-name'
-import { RULES } from '@/lib/text-tools/rules'
-import type { TextToolRuleId } from '@/shared/messages'
+} from '#src/components/ui/popover'
+import { issueClassName } from '#src/lib/text-tools/issue-class-name'
+import { RULES } from '#src/lib/text-tools/rules'
+import type { TextToolRuleId } from '#src/shared/messages'
 
 type TextToolsRuleInfoProps = {
 	ruleId: TextToolRuleId

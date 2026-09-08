@@ -2,10 +2,10 @@ import { mergeAttributes, Node } from '@tiptap/core'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
-import { detectFrontmatter } from '@/editor/extensions/frontmatter/detect'
-import { isAtFrontmatterEdge } from '@/editor/extensions/frontmatter/frontmatter-edge-keymap'
-import { FrontmatterView } from '@/editor/extensions/frontmatter/frontmatter-view'
-import { serializeVerbatim } from '@/editor/extensions/markdown/serialize-verbatim'
+import { detectFrontmatter } from '#src/editor/extensions/frontmatter/detect'
+import { isAtFrontmatterEdge } from '#src/editor/extensions/frontmatter/frontmatter-edge-keymap'
+import { FrontmatterView } from '#src/editor/extensions/frontmatter/frontmatter-view'
+import { serializeVerbatim } from '#src/editor/extensions/markdown/serialize-verbatim'
 
 /**
  * The note's YAML frontmatter, as a real node at the start of the document

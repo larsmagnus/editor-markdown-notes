@@ -4,7 +4,7 @@ import {
 	detectLinkClose,
 	linkCloseText,
 	parseLinkClose,
-} from '@/editor/extensions/link/link-close-text'
+} from '#src/editor/extensions/link/link-close-text'
 
 describe('detectLinkClose', () => {
 	it('detects a close with no title', () => {

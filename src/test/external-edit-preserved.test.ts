@@ -5,7 +5,7 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-import { pause, VIEW_TYPE } from './webview-panel-restore-support'
+import { pause, VIEW_TYPE } from '#src/test/webview-panel-restore-support'
 
 const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
 

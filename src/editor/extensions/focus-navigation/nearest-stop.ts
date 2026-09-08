@@ -4,9 +4,9 @@ import type { Editor } from '@tiptap/react'
 import {
 	compareElementToDomPoint,
 	findFocusableInDirection,
-} from '@/editor/extensions/focus-navigation/focusable-elements'
-import type { FocusDirection } from '@/editor/extensions/focus-navigation/focusable-elements'
-import { skipHeadingMarker } from '@/editor/extensions/focus-navigation/skip-heading-marker'
+} from '#src/editor/extensions/focus-navigation/focusable-elements'
+import type { FocusDirection } from '#src/editor/extensions/focus-navigation/focusable-elements'
+import { skipHeadingMarker } from '#src/editor/extensions/focus-navigation/skip-heading-marker'
 
 /**
  * Places the caret at `pos` (or the nearest real text position) and gives

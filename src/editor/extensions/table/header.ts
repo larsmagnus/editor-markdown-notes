@@ -1,7 +1,7 @@
 import type { Node as ProseMirrorNode, NodeType } from '@tiptap/pm/model'
 import type { EditorState, Transaction } from '@tiptap/pm/state'
 
-import { childNodes, isHeaderCell } from '@/editor/extensions/table/shape'
+import { childNodes, isHeaderCell } from '#src/editor/extensions/table/shape'
 
 /**
  * Keeps a table's header row at the top, where GFM's delimiter line puts it.

@@ -2,9 +2,8 @@ import * as assert from 'assert'
 
 import * as vscode from 'vscode'
 
-import { readSearchMatches } from '../host/read-search-match'
-
-import { runSearch } from './search-test-support'
+import { readSearchMatches } from '#src/host/read-search-match'
+import { runSearch } from '#src/test/search-test-support'
 
 /**
  * The clipboard-free reveal path, which is the one meant to run on every open.

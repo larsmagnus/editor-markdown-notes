@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useDebounceValue } from 'usehooks-ts'
 
-import { useHostMessage } from '@/hooks/use-host-message'
-import { documentDirty } from '@/lib/document-dirty-tracker'
-import { requestLatestMessageSchema } from '@/lib/schemas'
-import { updateNotes } from '@/lib/update-notes'
-import { getVSCodeApi } from '@/lib/vscode-api'
+import { useHostMessage } from '#src/hooks/use-host-message'
+import { documentDirty } from '#src/lib/document-dirty-tracker'
+import { requestLatestMessageSchema } from '#src/lib/schemas'
+import { updateNotes } from '#src/lib/update-notes'
+import { getVSCodeApi } from '#src/lib/vscode-api'
 
 const SYNC_DEBOUNCE_MS = 1000
 

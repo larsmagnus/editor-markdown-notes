@@ -1,6 +1,6 @@
 import type { ChainedCommands } from '@tiptap/react'
 
-import { stripHeadingMarkerCommand } from '@/editor/extensions/heading/strip-heading-marker-command'
+import { stripHeadingMarkerCommand } from '#src/editor/extensions/heading/strip-heading-marker-command'
 
 export type TextStyle =
 	| 'italic'

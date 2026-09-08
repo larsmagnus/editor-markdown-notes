@@ -12,10 +12,10 @@ import type { LucideIcon } from 'lucide-react'
 import {
 	fenceText,
 	parseFence,
-} from '@/editor/extensions/code-block/code-fence'
-import { MERMAID_LANGUAGE } from '@/editor/extensions/mermaid/language'
-import { runAskCommand } from '@/editor/extensions/slash-command/ask-command'
-import { runInsertImageCommand } from '@/editor/extensions/slash-command/insert-image-command'
+} from '#src/editor/extensions/code-block/code-fence'
+import { MERMAID_LANGUAGE } from '#src/editor/extensions/mermaid/language'
+import { runAskCommand } from '#src/editor/extensions/slash-command/ask-command'
+import { runInsertImageCommand } from '#src/editor/extensions/slash-command/insert-image-command'
 
 export type SlashCommandItem = {
 	id: string

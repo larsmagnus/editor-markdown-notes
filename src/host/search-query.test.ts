@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { deriveQueryLength } from './search-query'
+import { deriveQueryLength } from '#src/host/search-query'
 
 /**
  * Fixtures mirror real `search.action.getSearchResults` output from VSCode

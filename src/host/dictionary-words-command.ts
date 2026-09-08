@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-import type { SettingsStore } from './settings-store'
+import type { SettingsStore } from '#src/host/settings-store'
 
 /**
  * Adds words to the spelling check's personal list.

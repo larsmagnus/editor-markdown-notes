@@ -4,14 +4,14 @@ import ItalicMark, {
 	underscoreInputRegex,
 } from '@tiptap/extension-italic'
 
-import { createDelimitedMarkExtension } from '@/editor/extensions/formatting/delimited-mark-extension'
-import { createDelimiterInputRule } from '@/editor/extensions/formatting/delimiter-input-rule'
-import { createToggleItalicCommand } from '@/editor/extensions/italic/create-toggle-italic-command'
-import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
-import { italicMarkdownSpec } from '@/editor/extensions/italic/italic-markdown-spec'
-import { italicMarkupAttribute } from '@/editor/extensions/italic/italic-markup-attribute'
-import { italicPasteRules } from '@/editor/extensions/italic/italic-rules'
-import { DEFAULT_SETTINGS } from '@/shared/messages'
+import { createDelimitedMarkExtension } from '#src/editor/extensions/formatting/delimited-mark-extension'
+import { createDelimiterInputRule } from '#src/editor/extensions/formatting/delimiter-input-rule'
+import { createToggleItalicCommand } from '#src/editor/extensions/italic/create-toggle-italic-command'
+import { italicDelimiterSpec } from '#src/editor/extensions/italic/italic-delimiter-spec'
+import { italicMarkdownSpec } from '#src/editor/extensions/italic/italic-markdown-spec'
+import { italicMarkupAttribute } from '#src/editor/extensions/italic/italic-markup-attribute'
+import { italicPasteRules } from '#src/editor/extensions/italic/italic-rules'
+import { DEFAULT_SETTINGS } from '#src/shared/messages'
 
 // `parseHTML` closes over a storage snapshot taken at schema-build time,
 // before the editor's own storage exists, so `this.storage` there never sees

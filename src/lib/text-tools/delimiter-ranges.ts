@@ -1,10 +1,10 @@
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
-import type { DelimiterSpec } from '@/editor/extensions/formatting/delimiter-spec'
-import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
-import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
+import type { DelimiterSpec } from '#src/editor/extensions/formatting/delimiter-spec'
+import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import { italicDelimiterSpec } from '#src/editor/extensions/italic/italic-delimiter-spec'
+import { linkDelimiterSpec } from '#src/editor/extensions/link/link-delimiter-spec'
 
 /**
  * Marks whose delimiters (see `delimited-mark-extension.ts`) are real,

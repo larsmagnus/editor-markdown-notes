@@ -3,8 +3,8 @@ import { X } from 'lucide-react'
 import type { ComponentProps } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
 
-import { Button } from '@/components/ui/button'
-import { errorMessage } from '@/lib/error-message'
+import { Button } from '#src/components/ui/button'
+import { errorMessage } from '#src/lib/error-message'
 
 interface ErrorFallbackProps extends ComponentProps<'div'> {
 	/** What broke, in the reader's terms - "The editor", "The writing tools". */

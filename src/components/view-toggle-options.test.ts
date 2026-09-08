@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
 	fromToggleValues,
 	toToggleValues,
-} from '@/components/view-toggle-options'
-import { DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
+} from '#src/components/view-toggle-options'
+import { DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
 /**
  * The toggle group rebuilds every option from the values it hands back, so a

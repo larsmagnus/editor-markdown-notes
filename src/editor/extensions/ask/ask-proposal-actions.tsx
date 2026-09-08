@@ -2,8 +2,8 @@ import { cn } from 'cn'
 import { Check, RotateCcw, Trash2 } from 'lucide-react'
 import type { DetailedHTMLProps, HTMLAttributes } from 'react'
 
-import { Button } from '@/components/ui/button'
-import type { AskProposalState } from '@/editor/extensions/ask/ask-suggestion-extension'
+import { Button } from '#src/components/ui/button'
+import type { AskProposalState } from '#src/editor/extensions/ask/ask-suggestion-extension'
 
 interface AskProposalActionsProps extends DetailedHTMLProps<
 	HTMLAttributes<HTMLDivElement>,

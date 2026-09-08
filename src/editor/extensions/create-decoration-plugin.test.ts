@@ -5,9 +5,9 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { createDecorationPlugin } from '@/editor/extensions/create-decoration-plugin'
-import { extensions } from '@/editor/extensions/extensions'
-import { createEditor } from '@/test-utils/editor'
+import { createDecorationPlugin } from '#src/editor/extensions/create-decoration-plugin'
+import { extensions } from '#src/editor/extensions/extensions'
+import { createEditor } from '#src/test-utils/editor'
 
 type TestRange = { from: number; to: number }
 

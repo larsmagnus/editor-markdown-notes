@@ -1,6 +1,6 @@
-import { useSpellingDictionary } from '@/hooks/use-spelling-dictionary'
-import type { PipelineOptions } from '@/lib/text-tools/types'
-import type { SpellingLanguage, TextToolRuleId } from '@/shared/messages'
+import { useSpellingDictionary } from '#src/hooks/use-spelling-dictionary'
+import type { PipelineOptions } from '#src/lib/text-tools/types'
+import type { SpellingLanguage, TextToolRuleId } from '#src/shared/messages'
 
 /** What the writing checks are asked to run, shared with their caller. */
 export type AnalysisRequest = {

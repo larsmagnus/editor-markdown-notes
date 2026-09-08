@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react'
 import { EditorContext } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
-import { useEditorHeadings } from '@/hooks/use-editor-headings'
-import { createEditor } from '@/test-utils/editor'
+import { useEditorHeadings } from '#src/hooks/use-editor-headings'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('headings', () => {
 	it('toggles each heading level', () => {

@@ -1,5 +1,5 @@
-import { expect, test } from '@/e2e/lib/fixtures'
-import { openInVSCode } from '@/e2e/lib/vscode-host'
+import { expect, test } from '#e2e/lib/fixtures'
+import { openInVSCode } from '#e2e/lib/vscode-host'
 
 test.describe('Image toolbar: link and copy', () => {
 	test('wraps an image in a link and saves the markdown', async ({ page }) => {

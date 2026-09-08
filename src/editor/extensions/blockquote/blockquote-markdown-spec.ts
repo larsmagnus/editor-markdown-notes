@@ -1,8 +1,8 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
-import { renderWithoutMarker } from '@/editor/extensions/block-marker/render-without-marker'
-import { blockquoteMarkerSpec } from '@/editor/extensions/block-marker/specs'
+import { renderWithoutMarker } from '#src/editor/extensions/block-marker/render-without-marker'
+import { blockquoteMarkerSpec } from '#src/editor/extensions/block-marker/specs'
 
 /**
  * A blockquote's own serialize: `prosemirror-markdown`'s stock

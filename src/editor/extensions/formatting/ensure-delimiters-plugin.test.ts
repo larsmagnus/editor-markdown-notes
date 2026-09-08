@@ -2,9 +2,9 @@ import { Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
-import { createEnsureDelimitersPlugin } from '@/editor/extensions/formatting/ensure-delimiters-plugin'
-import { createEditor } from '@/test-utils/editor'
+import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
+import { createEnsureDelimitersPlugin } from '#src/editor/extensions/formatting/ensure-delimiters-plugin'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('createEnsureDelimitersPlugin', () => {
 	it('wraps a bold run with no delimiter text at all', () => {

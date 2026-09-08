@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isWordChar } from '@/lib/word-boundary'
+import { isWordChar } from '#src/lib/word-boundary'
 
 describe('isWordChar', () => {
 	it('is true for a letter', () => {

@@ -1,8 +1,8 @@
 import { cn } from 'cn'
 import type { ComponentProps } from 'react'
 
-import { ButtonToggle } from '@/components/button-toggle'
-import { useEditorColor } from '@/hooks/use-editor-color'
+import { ButtonToggle } from '#src/components/button-toggle'
+import { useEditorColor } from '#src/hooks/use-editor-color'
 
 export function ButtonColor({
 	className,

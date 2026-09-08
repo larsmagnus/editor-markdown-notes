@@ -1,7 +1,7 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { NodeView } from '@tiptap/pm/view'
 
-import { parseHeadingLevel } from '@/editor/extensions/heading/heading-marker'
+import { parseHeadingLevel } from '#src/editor/extensions/heading/heading-marker'
 
 /**
  * A hand-rolled `NodeView`, not a React one - all it needs to do is swap its

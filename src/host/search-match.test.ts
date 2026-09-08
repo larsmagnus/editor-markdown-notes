@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseSearchResults } from './search-match'
+import { parseSearchResults } from '#src/host/search-match'
 
 /**
  * Fixtures are copied verbatim out of VSCode 1.133.0, from a `<input` search

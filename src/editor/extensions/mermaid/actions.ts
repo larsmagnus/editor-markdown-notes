@@ -1,5 +1,5 @@
-import { copyToClipboard } from '@/lib/clipboard'
-import { getVSCodeApi } from '@/lib/vscode-api'
+import { copyToClipboard } from '#src/lib/clipboard'
+import { getVSCodeApi } from '#src/lib/vscode-api'
 
 /**
  * Hands one diagram to Claude: inside VS Code by asking the host to open a

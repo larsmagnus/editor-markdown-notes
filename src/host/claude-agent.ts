@@ -1,6 +1,6 @@
-import type { ClaudeQueryFn } from './claude-agent-sdk-types'
-import { toExcerpt } from './claude-prompt'
-import { resolveClaudeExecutable } from './resolve-claude-executable'
+import type { ClaudeQueryFn } from '#src/host/claude-agent-sdk-types'
+import { toExcerpt } from '#src/host/claude-prompt'
+import { resolveClaudeExecutable } from '#src/host/resolve-claude-executable'
 
 export type AskContext = {
 	/** The note's path relative to the workspace root. */

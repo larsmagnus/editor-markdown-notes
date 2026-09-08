@@ -1,13 +1,13 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useNoteSync } from '@/hooks/use-note-sync'
-import { documentDirty } from '@/lib/document-dirty-tracker'
-import { updateNotes } from '@/lib/update-notes'
+import { useNoteSync } from '#src/hooks/use-note-sync'
+import { documentDirty } from '#src/lib/document-dirty-tracker'
+import { updateNotes } from '#src/lib/update-notes'
 
 // Resolves rather than returning `undefined`, because the real `updateNotes` is
 // `async` and the caller attaches a rejection handler to what it hands back.
-vi.mock('@/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
+vi.mock('#src/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 
 const SYNC_DEBOUNCE_MS = 1000
 

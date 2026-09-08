@@ -22,9 +22,7 @@
 		"erasableSyntaxOnly": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true,
-		"paths": {
-			"@/*": ["./src/*"]
-		}
+		"resolvePackageJsonImports": true
 	},
 	"include": ["src"],
 	// src/test holds the extension host's mocha suites (tsconfig.host.json compiles

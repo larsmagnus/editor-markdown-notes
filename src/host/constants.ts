@@ -1,4 +1,4 @@
-import { EXTENSION_ID } from '../shared/constants'
+import { EXTENSION_ID } from '#src/shared/constants'
 
 /**
  * Host-only identifiers, built from the shared `EXTENSION_ID`.

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { openInVSCode } from '@/e2e/lib/vscode-host'
+import { openInVSCode } from '#e2e/lib/vscode-host'
 
 test.describe('Formatting delimiters in the live editor', () => {
 	test('typing "**bold**" creates real bold text and saves it back out unchanged', async ({

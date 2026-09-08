@@ -1,7 +1,7 @@
-import { backspaceIntoStartOf } from '@/e2e/lib/backspace-positions'
-import { expect, test } from '@/e2e/lib/fixtures'
-import { actionSettled, pressKeySettled } from '@/e2e/lib/press-key-settled'
-import { openInVSCode } from '@/e2e/lib/vscode-host'
+import { backspaceIntoStartOf } from '#e2e/lib/backspace-positions'
+import { expect, test } from '#e2e/lib/fixtures'
+import { actionSettled, pressKeySettled } from '#e2e/lib/press-key-settled'
+import { openInVSCode } from '#e2e/lib/vscode-host'
 
 test.describe('Headings in the live editor', () => {
 	test('typing "# " creates a real heading and saves it back out unchanged', async ({

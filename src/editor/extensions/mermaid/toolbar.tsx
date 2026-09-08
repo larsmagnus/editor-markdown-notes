@@ -2,9 +2,9 @@ import { Code, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
 import type { ReactZoomPanPinchContextState } from 'react-zoom-pan-pinch'
 import { useControls, useTransformComponent } from 'react-zoom-pan-pinch'
 
-import { ButtonAction } from '@/components/button-action'
-import { OverlayToolbar } from '@/components/overlay-toolbar'
-import { ButtonActions } from '@/editor/extensions/mermaid/button-actions'
+import { ButtonAction } from '#src/components/button-action'
+import { OverlayToolbar } from '#src/components/overlay-toolbar'
+import { ButtonActions } from '#src/editor/extensions/mermaid/button-actions'
 
 /** `useTransformComponent` keeps its callback in a dependency array, so this
  *  has to be one stable function rather than a closure built per render. */

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ThemeExtensionLike } from './find-theme-contribution'
-import { findThemeContribution } from './find-theme-contribution'
+import type { ThemeExtensionLike } from '#src/host/shiki-theme/find-theme-contribution'
+import { findThemeContribution } from '#src/host/shiki-theme/find-theme-contribution'
 
 describe('findThemeContribution', () => {
 	it('matches a theme by its declared id', () => {

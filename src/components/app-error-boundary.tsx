@@ -3,8 +3,8 @@ import type { PropsWithChildren } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import type { FallbackProps } from 'react-error-boundary'
 
-import { ErrorFallback } from '@/components/error-fallback'
-import { reportError } from '@/lib/report-error'
+import { ErrorFallback } from '#src/components/error-fallback'
+import { reportError } from '#src/lib/report-error'
 
 type AppErrorBoundaryProps = PropsWithChildren<{
 	/** What breaks if this subtree throws - "The editor", "The toolbar". */

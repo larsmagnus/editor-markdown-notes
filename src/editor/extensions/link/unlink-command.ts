@@ -1,9 +1,9 @@
 import type { MarkType } from '@tiptap/pm/model'
 import type { Command } from '@tiptap/pm/state'
 
-import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-import { unwrapRun } from '@/editor/extensions/formatting/unwrap-run'
-import { linkDelimiterSpec } from '@/editor/extensions/link/link-delimiter-spec'
+import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
+import { unwrapRun } from '#src/editor/extensions/formatting/unwrap-run'
+import { linkDelimiterSpec } from '#src/editor/extensions/link/link-delimiter-spec'
 
 /**
  * Removes a link, delimiter text included - a text run's `[`/`](href

@@ -3,7 +3,7 @@ import { Fragment } from '@tiptap/pm/model'
 import { Selection } from '@tiptap/pm/state'
 import type { EditorState, Transaction } from '@tiptap/pm/state'
 
-import { frontmatterFenceText } from '@/editor/extensions/frontmatter/frontmatter-fence'
+import { frontmatterFenceText } from '#src/editor/extensions/frontmatter/frontmatter-fence'
 
 /**
  * A paragraph made only of text (and marks) - the shape a line of typed YAML

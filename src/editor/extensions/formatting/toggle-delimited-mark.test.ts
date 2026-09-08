@@ -1,9 +1,9 @@
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
-import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
-import { toggleDelimitedMark } from '@/editor/extensions/formatting/toggle-delimited-mark'
-import { createEditor } from '@/test-utils/editor'
+import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
+import { toggleDelimitedMark } from '#src/editor/extensions/formatting/toggle-delimited-mark'
+import { createEditor } from '#src/test-utils/editor'
 
 describe('toggleDelimitedMark', () => {
 	it('wraps an unmarked selection', () => {

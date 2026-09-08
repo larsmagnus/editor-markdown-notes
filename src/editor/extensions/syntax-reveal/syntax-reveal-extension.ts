@@ -6,8 +6,8 @@ import { Extension } from '@tiptap/react'
 import {
 	computeRevealDecorations,
 	revealKey,
-} from '@/editor/extensions/syntax-reveal/compute-reveal-decorations'
-import type { RevealProvider } from '@/editor/extensions/syntax-reveal/reveal-provider'
+} from '#src/editor/extensions/syntax-reveal/compute-reveal-decorations'
+import type { RevealProvider } from '#src/editor/extensions/syntax-reveal/reveal-provider'
 
 /** The decorations in force, and the state they were derived from. */
 type RevealState = { set: DecorationSet; key: string }

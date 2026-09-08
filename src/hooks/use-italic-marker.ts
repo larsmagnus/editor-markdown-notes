@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/react'
 import { useEffect } from 'react'
 
-import type { ItalicMarker } from '@/shared/messages'
+import type { ItalicMarker } from '#src/shared/messages'
 
 /**
  * Mirrors the configured italic marker into the editor's storage.

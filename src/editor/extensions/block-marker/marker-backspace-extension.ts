@@ -1,12 +1,12 @@
 import { Extension } from '@tiptap/core'
 import type { Transaction } from '@tiptap/pm/state'
 
-import { caretToContentStart } from '@/editor/extensions/block-marker/caret-to-content-start'
+import { caretToContentStart } from '#src/editor/extensions/block-marker/caret-to-content-start'
 import {
 	markerCaretAtFirstContentChar,
 	markerCaretInMarker,
-} from '@/editor/extensions/block-marker/marker-caret'
-import type { MarkerCaret } from '@/editor/extensions/block-marker/marker-caret'
+} from '#src/editor/extensions/block-marker/marker-caret'
+import type { MarkerCaret } from '#src/editor/extensions/block-marker/marker-caret'
 
 /**
  * Steps a marker down, or removes it and the construct with it. One

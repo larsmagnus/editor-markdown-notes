@@ -1,12 +1,12 @@
 import { render, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { SettingsProvider } from '@/components/settings-provider'
-import Layout from '@/layout'
+import { SettingsProvider } from '#src/components/settings-provider'
+import Layout from '#src/layout'
 
 // The bubble menu positions itself with floating-ui, which measures the DOM and
 // throws in happy-dom the moment anything moves the selection.
-vi.mock('@/components/menu-bubble', () => ({ MenuBubble: () => null }))
+vi.mock('#src/components/menu-bubble', () => ({ MenuBubble: () => null }))
 
 // happy-dom has no layout engine and so no `scrollIntoView`; the reveal calls it
 // on the element it centres.
