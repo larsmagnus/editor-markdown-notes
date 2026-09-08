@@ -1,17 +1,9 @@
-import { Editor } from '@tiptap/core'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { splitFrontmatter } from '@/lib/host/frontmatter'
 import { getDocumentText } from '@/lib/text-tools/document-text'
 import { markdownProse } from '@/mcp/markdown-text'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 /**
  * The guard on the one thing the panel and the MCP server implement twice.
@@ -31,8 +23,7 @@ function proseFromEditor(markdown: string) {
 	// node. A harness that skipped that step would compare against a document
 	// shape the editor never actually holds.
 	const { frontmatter, body } = splitFrontmatter(markdown)
-	const editor = new Editor({ extensions, content: body })
-	currentEditor = editor
+	const editor = createEditor(body, { parseOnly: true })
 
 	if (frontmatter !== null) {
 		editor

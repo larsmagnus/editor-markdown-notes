@@ -1,21 +1,11 @@
-import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
-
-const editors: Editor[] = []
+import { createEditor } from '@/test-utils/editor'
 
 function documentFrom(markdown: string) {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(markdown)
+	const editor = createEditor(markdown)
 	return editor
 }
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
 
 describe('detectFrontmatter', () => {
 	it('promotes a --- / content / --- block at the top of the document', () => {
@@ -125,8 +115,7 @@ describe('detectFrontmatter', () => {
 	// thing this plugin actually controls: it never opts the promotion out of
 	// history.
 	it('does not opt the promotion out of the undo history', () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
+		const editor = createEditor()
 		const historyEligible: boolean[] = []
 		editor.on('transaction', ({ transaction }) => {
 			historyEligible.push(transaction.getMeta('addToHistory') !== false)

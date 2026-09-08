@@ -1,22 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { ButtonDelete } from '@/editor/extensions/frontmatter/button-delete'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
+import { createEditor } from '@/test-utils/editor'
 
 describe('ButtonDelete', () => {
 	it('removes the frontmatter node when clicked', async () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
+		const editor = createEditor()
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
 			content: [{ type: 'text', text: 'title: Roadmap' }],
@@ -36,8 +27,7 @@ describe('ButtonDelete', () => {
 	// here is the one thing the button actually controls: its delete doesn't
 	// opt out of history.
 	it('deletes with a transaction eligible for undo', async () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
+		const editor = createEditor()
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
 			content: [{ type: 'text', text: 'title: Roadmap' }],

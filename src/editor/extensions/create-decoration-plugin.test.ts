@@ -2,11 +2,12 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { Transaction } from '@tiptap/pm/state'
 import { PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
-import { Editor, Extension } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { Extension } from '@tiptap/react'
+import { describe, expect, it } from 'vitest'
 
 import { createDecorationPlugin } from '@/editor/extensions/create-decoration-plugin'
 import { extensions } from '@/editor/extensions/extensions'
+import { createEditor } from '@/test-utils/editor'
 
 type TestRange = { from: number; to: number }
 
@@ -69,21 +70,13 @@ const StickyTestDecoration = Extension.create({
 	},
 })
 
-const editors: Editor[] = []
-
 function editorWith(extension: typeof ClearableTestDecoration) {
-	const editor = new Editor({
+	const editor = createEditor('<p>hello world</p>', {
 		extensions: [...extensions, extension],
-		content: '<p>hello world</p>',
+		parseOnly: true,
 	})
-	editors.push(editor)
 	return editor
 }
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
 
 describe('createDecorationPlugin', () => {
 	it('renders the decorations its toDecorations is handed', () => {

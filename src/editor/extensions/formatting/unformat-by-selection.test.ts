@@ -1,23 +1,14 @@
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
+import { createEditor } from '@/test-utils/editor'
 
 /**
  * `setContent` then an edit, so every delimiter is real text by the time the
  * case starts - which is the only state in which one can be backspaced at.
  */
 function documentFrom(markdown: string): Editor {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(markdown)
+	const editor = createEditor(markdown)
 	editor.commands.insertContentAt(1, 'x')
 	editor.commands.deleteRange({ from: 1, to: 2 })
 	return editor

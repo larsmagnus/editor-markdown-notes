@@ -1,15 +1,8 @@
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
+import { createEditor } from '@/test-utils/editor'
 
 function linkRunEnd(editor: Editor): number {
 	const [run] = findMarkRuns(editor.state.doc, editor.schema.marks.link)
@@ -18,8 +11,7 @@ function linkRunEnd(editor: Editor): number {
 
 describe('createSyncLinkAttrsPlugin', () => {
 	it('updates href/title attrs to match a directly-edited closing delimiter', () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
+		const editor = createEditor()
 		// `setContent` runs the plugins that build the run's real delimiter
 		// text; constructing with `content` directly does not (see
 		// `inline-code-delimiter-spec.test.ts`'s own regression on the same
@@ -39,11 +31,9 @@ describe('createSyncLinkAttrsPlugin', () => {
 	})
 
 	it('leaves attrs untouched when the text already matches them, even after an unrelated edit', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'Read [the notes](https://example.com) now',
+		const editor = createEditor('Read [the notes](https://example.com) now', {
+			parseOnly: true,
 		})
-		editors.push(editor)
 
 		editor.commands.insertContentAt(editor.state.doc.content.size, '!')
 

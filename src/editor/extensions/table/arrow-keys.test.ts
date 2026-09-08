@@ -1,8 +1,8 @@
 import { CellSelection, TableMap } from '@tiptap/pm/tables'
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
+import { createEditor, press } from '@/test-utils/editor'
 
 const TABLE = [
 	'| Quarter | Revenue | Growth |',
@@ -11,19 +11,12 @@ const TABLE = [
 	'| Q2 2025 | 1.4M | 17% |',
 ].join('\n')
 
-const editors: Editor[] = []
-
 /**
  * A mounted editor: these are keyboard behaviours, and the keymap only runs on
  * events the view's own DOM node receives.
  */
 function editorWith(markdown: string): Editor {
-	const element = document.body.appendChild(document.createElement('div'))
-	const editor = new Editor({ element, extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(markdown)
-
-	return editor
+	return createEditor(markdown, { mount: true })
 }
 
 /**
@@ -36,23 +29,10 @@ function caretInCell(editor: Editor, cell: number, offset = 0): void {
 	editor.commands.setTextSelection(map.map[cell] + 2 + offset)
 }
 
-/** Presses a key the way the browser does, so the keymap plugins see it. */
-function press(editor: Editor, key: string, shiftKey = false): void {
-	editor.view.dom.dispatchEvent(
-		new KeyboardEvent('keydown', { key, shiftKey, bubbles: true })
-	)
-}
-
 /** The text of whatever block the caret is in. */
 function caretIn(editor: Editor): string {
 	return editor.state.selection.$head.parent.textContent
 }
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-	document.body.innerHTML = ''
-})
 
 describe('moving the caret', () => {
 	// Cells hold inline content, which makes them textblocks - and that is what
@@ -144,7 +124,7 @@ describe('shift and an arrow', () => {
 		const editor = editorWith(TABLE)
 		caretInCell(editor, 3, 7)
 
-		press(editor, 'ArrowRight', true)
+		press(editor, 'ArrowRight', { shift: true })
 
 		expect(editor.state.selection).toBeInstanceOf(CellSelection)
 		expect(editor.view.dom.querySelectorAll('.selectedCell')).toHaveLength(2)
@@ -154,7 +134,7 @@ describe('shift and an arrow', () => {
 		const editor = editorWith(TABLE)
 		caretInCell(editor, 3)
 
-		press(editor, 'ArrowRight', true)
+		press(editor, 'ArrowRight', { shift: true })
 
 		expect(editor.state.selection).not.toBeInstanceOf(CellSelection)
 	})
@@ -166,7 +146,7 @@ describe('shift and an arrow', () => {
 		const editor = editorWith(TABLE)
 		caretInCell(editor, 3, 7)
 
-		press(editor, 'ArrowDown', true)
+		press(editor, 'ArrowDown', { shift: true })
 
 		expect(editor.state.selection).toBeInstanceOf(CellSelection)
 		expect(
@@ -180,7 +160,7 @@ describe('shift and an arrow', () => {
 		const editor = editorWith(TABLE)
 		caretInCell(editor, 6)
 
-		press(editor, 'ArrowUp', true)
+		press(editor, 'ArrowUp', { shift: true })
 
 		expect(
 			Array.from(editor.view.dom.querySelectorAll('.selectedCell')).map(
@@ -193,7 +173,7 @@ describe('shift and an arrow', () => {
 		const editor = editorWith(TABLE)
 		caretInCell(editor, 4)
 
-		press(editor, 'ArrowLeft', true)
+		press(editor, 'ArrowLeft', { shift: true })
 
 		expect(editor.state.selection).toBeInstanceOf(CellSelection)
 		expect(editor.view.dom.querySelectorAll('.selectedCell')).toHaveLength(2)

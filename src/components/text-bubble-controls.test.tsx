@@ -1,22 +1,14 @@
 import { render, screen } from '@testing-library/react'
-import { Editor, EditorContext } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { EditorContext } from '@tiptap/react'
+import { describe, expect, it } from 'vitest'
 
 import { TextBubbleControls } from '@/components/text-bubble-controls'
-import { extensions } from '@/editor/extensions/extensions'
 import { SettingsContext } from '@/hooks/use-settings'
 import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '@/shared/messages'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 function renderControls(isVSCodeContext: boolean) {
-	const editor = new Editor({ extensions, content: '<p>Hello world</p>' })
-	currentEditor = editor
+	const editor = createEditor('<p>Hello world</p>', { parseOnly: true })
 
 	render(
 		<SettingsContext.Provider

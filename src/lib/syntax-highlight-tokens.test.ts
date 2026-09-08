@@ -1,22 +1,12 @@
-import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { collectCodeBlocks, placeTokens } from '@/lib/syntax-highlight-tokens'
-
-const editors: Editor[] = []
+import { createEditor } from '@/test-utils/editor'
 
 function documentFrom(markdown: string) {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(markdown)
+	const editor = createEditor(markdown)
 	return editor
 }
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
 
 describe('collectCodeBlocks', () => {
 	it('reports a position the block text actually starts at', () => {

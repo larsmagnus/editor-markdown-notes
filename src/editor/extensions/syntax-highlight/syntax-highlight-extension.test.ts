@@ -1,21 +1,11 @@
-import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
-
-const editors: Editor[] = []
+import { createEditor } from '@/test-utils/editor'
 
 function editorWithCode() {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(['```ts', 'const total = 1', '```'].join('\n'))
+	const editor = createEditor(['```ts', 'const total = 1', '```'].join('\n'))
 	return editor
 }
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
 
 describe('SyntaxHighlight', () => {
 	it('colors the range it is given', () => {

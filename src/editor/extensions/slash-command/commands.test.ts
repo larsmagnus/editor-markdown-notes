@@ -1,9 +1,8 @@
-import { Editor } from '@tiptap/core'
 import type { JSONContent } from '@tiptap/core'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { SLASH_COMMANDS } from '@/editor/extensions/slash-command/commands'
+import { createEditor } from '@/test-utils/editor'
 
 const pickImage = vi.hoisted(() => vi.fn())
 vi.mock('@/lib/pick-image', () => ({ pickImage }))
@@ -14,23 +13,18 @@ function commandFor(id: string) {
 	return command
 }
 
-let currentEditor: Editor | undefined
-
 function bootInsideVSCode() {
 	window.vscode = { postMessage: vi.fn(), getState: vi.fn(), setState: vi.fn() }
 }
 
 afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
 	delete window.vscode
 	vi.clearAllMocks()
 })
 
 describe('mermaid', () => {
 	it('inserts a starter diagram into a mermaid code block', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 
 		commandFor('mermaid').run(editor, { from: 1, to: 1 })
 
@@ -43,8 +37,7 @@ describe('mermaid', () => {
 
 describe('code', () => {
 	it('turns the current block into an empty, fenced code block', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 
 		commandFor('code').run(editor, { from: 1, to: 1 })
 
@@ -65,8 +58,7 @@ describe('code', () => {
 
 describe('task-list', () => {
 	it('turns the current block into a task list item', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 
 		commandFor('task-list').run(editor, { from: 1, to: 1 })
 
@@ -76,8 +68,7 @@ describe('task-list', () => {
 
 describe('table', () => {
 	it('inserts a 2x2 table with a header row', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 
 		commandFor('table').run(editor, { from: 1, to: 1 })
 
@@ -95,8 +86,7 @@ describe('image', () => {
 		it('inserts the picked image at the caret', async () => {
 			bootInsideVSCode()
 			pickImage.mockResolvedValue('./diagram.png')
-			const editor = new Editor({ extensions, content: '' })
-			currentEditor = editor
+			const editor = createEditor()
 
 			commandFor('image').run(editor, { from: 1, to: 1 })
 			await vi.waitFor(() => expect(pickImage).toHaveBeenCalled())
@@ -108,8 +98,7 @@ describe('image', () => {
 		it('inserts nothing when the picker is cancelled', async () => {
 			bootInsideVSCode()
 			pickImage.mockResolvedValue(null)
-			const editor = new Editor({ extensions, content: '# Notes' })
-			currentEditor = editor
+			const editor = createEditor('# Notes', { parseOnly: true })
 
 			commandFor('image').run(editor, { from: 1, to: 1 })
 			await vi.waitFor(() => expect(pickImage).toHaveBeenCalled())
@@ -120,8 +109,7 @@ describe('image', () => {
 
 	describe('outside VS Code', () => {
 		it('inserts an empty image node and reveals its source for editing', () => {
-			const editor = new Editor({ extensions, content: '' })
-			currentEditor = editor
+			const editor = createEditor()
 
 			commandFor('image').run(editor, { from: 1, to: 1 })
 

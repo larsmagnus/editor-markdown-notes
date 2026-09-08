@@ -1,9 +1,6 @@
-import { Editor } from '@tiptap/react'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
-
-const editors: Editor[] = []
+import { createEditor } from '@/test-utils/editor'
 
 /**
  * Runs markdown through the exact extension set the app ships with, then reads
@@ -11,8 +8,7 @@ const editors: Editor[] = []
  * way in is silently lost on the way out, so this is the guarantee that matters.
  */
 function roundTrip(markdown: string): string {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
+	const editor = createEditor()
 	// `setContent` is how editor.tsx loads content, and it runs plugins that
 	// constructing with `content` does not. Testing the other path hides bugs.
 	editor.commands.setContent(markdown)
@@ -21,8 +17,6 @@ function roundTrip(markdown: string): string {
 }
 
 afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
 	delete window.imageBaseUris
 })
 
@@ -438,9 +432,7 @@ describe('escaping', () => {
 	})
 
 	it('escapes a plain-text line shaped like a link reference definition', () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
-		editor.commands.setContent({
+		const editor = createEditor({
 			type: 'doc',
 			content: [
 				{
@@ -457,16 +449,12 @@ describe('escaping', () => {
 
 		// The escaped bracket keeps this a visible paragraph on reload rather
 		// than a vanished reference definition.
-		const reloaded = new Editor({ extensions, content: '' })
-		editors.push(reloaded)
-		reloaded.commands.setContent(markdown)
+		const reloaded = createEditor(markdown)
 		expect(reloaded.getText()).toContain('MDN')
 	})
 
 	it('escapes asterisks that would otherwise re-parse as emphasis', () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
-		editor.commands.setContent({
+		const editor = createEditor({
 			type: 'doc',
 			content: [
 				{ type: 'paragraph', content: [{ type: 'text', text: 'a*b*c' }] },
@@ -479,9 +467,7 @@ describe('escaping', () => {
 	})
 
 	it('escapes backtick runs that share a length with another run in the text', () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
-		editor.commands.setContent({
+		const editor = createEditor({
 			type: 'doc',
 			content: [
 				{ type: 'paragraph', content: [{ type: 'text', text: 'x`y``z`w' }] },
@@ -508,9 +494,7 @@ describe('italic markup', () => {
 	})
 
 	it('uses the configured default marker for a fresh italic with no source markup', () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
-		editor.commands.setContent('hello world')
+		const editor = createEditor('hello world')
 		editor.commands.setTextSelection({ from: 1, to: 6 })
 		editor.commands.toggleItalic()
 
@@ -520,9 +504,7 @@ describe('italic markup', () => {
 	})
 
 	it('respects a configured asterisk default for a fresh italic', () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
-		editor.commands.setContent('hello world')
+		const editor = createEditor('hello world')
 		editor.storage.italic.preferredMarkup = '*'
 		editor.commands.setTextSelection({ from: 1, to: 6 })
 		editor.commands.toggleItalic()
@@ -533,9 +515,7 @@ describe('italic markup', () => {
 	})
 
 	it('falls back to an asterisk when the default marker would land mid-word', () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
-		editor.commands.setContent('helloworld')
+		const editor = createEditor('helloworld')
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		editor.commands.toggleItalic()
 
@@ -545,9 +525,7 @@ describe('italic markup', () => {
 	})
 
 	it('removes italics even when the selection markup differs from the configured default', () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
-		editor.commands.setContent('_italic text_')
+		const editor = createEditor('_italic text_')
 		editor.storage.italic.preferredMarkup = '*'
 		editor.commands.setTextSelection({ from: 1, to: 13 })
 		editor.commands.toggleItalic()
@@ -558,8 +536,7 @@ describe('italic markup', () => {
 	})
 
 	it('uses the configured default marker for pasted HTML italics without a source markup', () => {
-		const editor = new Editor({ extensions, content: '' })
-		editors.push(editor)
+		const editor = createEditor()
 		editor.storage.italic.preferredMarkup = '*'
 		editor.commands.insertContent('<p><em>foo</em></p>')
 

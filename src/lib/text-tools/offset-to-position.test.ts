@@ -1,16 +1,8 @@
-import { Editor } from '@tiptap/core'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { getDocumentText } from '@/lib/text-tools/document-text'
 import { offsetToPosition } from '@/lib/text-tools/offset-to-position'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 /**
  * Mapping a retext offset back to a ProseMirror position. Each case asserts on
@@ -19,11 +11,7 @@ afterEach(() => {
  */
 describe('offsetToPosition', () => {
 	it('maps an offset back to the text it came from', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'The report was written.',
-		})
-		currentEditor = editor
+		const editor = createEditor('The report was written.', { parseOnly: true })
 		const documentText = getDocumentText(editor.state.doc)
 		const start = documentText.text.indexOf('written')
 
@@ -34,11 +22,7 @@ describe('offsetToPosition', () => {
 	})
 
 	it('stays correct in the block after a separator', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'First one\n\nSecond one',
-		})
-		currentEditor = editor
+		const editor = createEditor('First one\n\nSecond one', { parseOnly: true })
 		const documentText = getDocumentText(editor.state.doc)
 		const start = documentText.text.indexOf('Second')
 
@@ -49,11 +33,9 @@ describe('offsetToPosition', () => {
 	})
 
 	it('stays correct across a mark boundary', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'The **report** was written.',
+		const editor = createEditor('The **report** was written.', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 		const documentText = getDocumentText(editor.state.doc)
 		const start = documentText.text.indexOf('report was')
 
@@ -64,11 +46,10 @@ describe('offsetToPosition', () => {
 	})
 
 	it('skips over a code block when mapping the prose after it', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'Before.\n\n```js\nconst x = 1\n```\n\nAfter the code.',
-		})
-		currentEditor = editor
+		const editor = createEditor(
+			'Before.\n\n```js\nconst x = 1\n```\n\nAfter the code.',
+			{ parseOnly: true }
+		)
 		const documentText = getDocumentText(editor.state.doc)
 		const start = documentText.text.indexOf('After')
 
@@ -79,8 +60,7 @@ describe('offsetToPosition', () => {
 	})
 
 	it('has nothing to map in an empty document', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 
 		expect(offsetToPosition(getDocumentText(editor.state.doc), 0)).toBeNull()
 	})

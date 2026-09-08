@@ -2,19 +2,10 @@ import { renderHook } from '@testing-library/react'
 import { Editor } from '@tiptap/core'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { useSearchReveal } from '@/hooks/use-search-reveal'
+import { createEditor } from '@/test-utils/editor'
 
 const NOTE = 'Ask for an email address.'
-
-const editors: Editor[] = []
-
-function createEditor() {
-	const editor = new Editor({ extensions, content: NOTE })
-	editors.push(editor)
-
-	return editor
-}
 
 /** The decorated text, which is the only outward sign the reveal ran. */
 function highlighted(editor: Editor): string {
@@ -35,13 +26,12 @@ beforeEach(() => {
 
 afterEach(() => {
 	delete window.searchReveal
-	for (const editor of editors.splice(0)) editor.destroy()
 	vi.clearAllMocks()
 })
 
 describe('useSearchReveal', () => {
 	it('highlights the match on the editor it is given', () => {
-		const editor = createEditor()
+		const editor = createEditor(NOTE, { parseOnly: true })
 
 		renderHook(() => useSearchReveal(editor))
 
@@ -56,13 +46,13 @@ describe('useSearchReveal', () => {
 	 * what no test caught, because happy-dom's editor never rebuilds on its own.
 	 */
 	it('reveals again when the editor is rebuilt underneath it', () => {
-		const first = createEditor()
+		const first = createEditor(NOTE, { parseOnly: true })
 		const { rerender } = renderHook(({ editor }) => useSearchReveal(editor), {
 			initialProps: { editor: first },
 		})
 		expect(highlighted(first)).toBe('email')
 
-		const second = createEditor()
+		const second = createEditor(NOTE, { parseOnly: true })
 		rerender({ editor: second })
 
 		expect(highlighted(second)).toBe('email')
@@ -70,7 +60,7 @@ describe('useSearchReveal', () => {
 
 	it('does nothing on an ordinary open', () => {
 		delete window.searchReveal
-		const editor = createEditor()
+		const editor = createEditor(NOTE, { parseOnly: true })
 
 		renderHook(() => useSearchReveal(editor))
 

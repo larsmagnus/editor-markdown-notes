@@ -1,15 +1,15 @@
-import { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
 import { uniformOuterMarks } from '@/editor/extensions/formatting/uniform-outer-marks'
+import { createEditor } from '@/test-utils/editor'
 
 describe('uniformOuterMarks', () => {
 	it('returns the outer mark when it covers the whole run', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent(
-			'<p><strong><em>bold and italic</em></strong></p>'
+		const editor = createEditor(
+			'<p><strong><em>bold and italic</em></strong></p>',
+			{ extensions: [StarterKit] }
 		)
 
 		const [run] = findMarkRuns(editor.state.doc, editor.schema.marks.italic)
@@ -20,8 +20,9 @@ describe('uniformOuterMarks', () => {
 	})
 
 	it('returns nothing when the outer mark is absent', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p><em>just italic</em></p>')
+		const editor = createEditor('<p><em>just italic</em></p>', {
+			extensions: [StarterKit],
+		})
 
 		const [run] = findMarkRuns(editor.state.doc, editor.schema.marks.italic)
 		const outer = uniformOuterMarks(editor.state.doc, run, ['bold'])
@@ -30,8 +31,10 @@ describe('uniformOuterMarks', () => {
 	})
 
 	it('returns nothing when the outer mark only covers part of the run', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p><em><strong>bold</strong> not bold</em></p>')
+		const editor = createEditor(
+			'<p><em><strong>bold</strong> not bold</em></p>',
+			{ extensions: [StarterKit] }
+		)
 
 		const [run] = findMarkRuns(editor.state.doc, editor.schema.marks.italic)
 		const outer = uniformOuterMarks(editor.state.doc, run, ['bold'])
@@ -40,8 +43,9 @@ describe('uniformOuterMarks', () => {
 	})
 
 	it('ignores an outer mark name absent from the schema', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p><em>just italic</em></p>')
+		const editor = createEditor('<p><em>just italic</em></p>', {
+			extensions: [StarterKit],
+		})
 
 		const [run] = findMarkRuns(editor.state.doc, editor.schema.marks.italic)
 		const outer = uniformOuterMarks(editor.state.doc, run, ['notAMark'])

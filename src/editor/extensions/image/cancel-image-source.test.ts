@@ -1,24 +1,16 @@
 import { NodeSelection } from '@tiptap/pm/state'
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import {
 	cancelImageSource,
 	enterImageEditSource,
 } from '@/editor/extensions/image/edit-source'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
+import { createEditor } from '@/test-utils/editor'
 
 /** An editor with `content` and its sole image's source revealed. */
 function editorWithSourceRevealed(content: string): Editor {
-	const editor = new Editor({ extensions, content })
-	editors.push(editor)
+	const editor = createEditor(content, { parseOnly: true })
 
 	let imagePos: number | null = null
 	editor.state.doc.descendants((node, pos) => {

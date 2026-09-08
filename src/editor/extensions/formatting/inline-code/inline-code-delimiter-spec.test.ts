@@ -1,16 +1,8 @@
-import { Editor } from '@tiptap/core'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
 import { inlineCodeDelimiterSpec } from '@/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 describe('inlineCodeDelimiterSpec', () => {
 	it('detects a matching single-backtick fence at both ends', () => {
@@ -79,14 +71,13 @@ describe('inlineCodeDelimiterSpec', () => {
 	})
 
 	it('resolves a fresh pair of backticks for a run with no fence yet', () => {
-		// `new Editor({ content })`'s initial parse never runs `ensure-
+		// `createEditor(content, { parseOnly: true })`'s initial parse never runs `ensure-
 		// delimiters-plugin.ts` (only a later real transaction does - see
 		// `delimiter-ranges.test.ts`'s regression on the same asymmetry), so
 		// this run is still bare, unlike the same doc built via
 		// `editor.commands.setContent(...)`.
-		const editor = new Editor({
-			extensions,
-			content: {
+		const editor = createEditor(
+			{
 				type: 'doc',
 				content: [
 					{
@@ -97,8 +88,8 @@ describe('inlineCodeDelimiterSpec', () => {
 					},
 				],
 			},
-		})
-		currentEditor = editor
+			{ parseOnly: true }
+		)
 
 		const runs = findMarkRuns(editor.state.doc, editor.schema.marks.code)
 		expect(runs).toHaveLength(1)
@@ -109,9 +100,8 @@ describe('inlineCodeDelimiterSpec', () => {
 	})
 
 	it('resolves a padded fence when the run itself contains a backtick', () => {
-		const editor = new Editor({
-			extensions,
-			content: {
+		const editor = createEditor(
+			{
 				type: 'doc',
 				content: [
 					{
@@ -122,8 +112,8 @@ describe('inlineCodeDelimiterSpec', () => {
 					},
 				],
 			},
-		})
-		currentEditor = editor
+			{ parseOnly: true }
+		)
 
 		const runs = findMarkRuns(editor.state.doc, editor.schema.marks.code)
 		expect(runs).toHaveLength(1)

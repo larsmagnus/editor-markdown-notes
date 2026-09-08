@@ -1,16 +1,8 @@
-import { Editor } from '@tiptap/core'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
 import { italicDelimiterSpec } from '@/editor/extensions/italic/italic-delimiter-spec'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 describe('italicDelimiterSpec', () => {
 	it('detects either italic marker at the start of text', () => {
@@ -30,9 +22,7 @@ describe('italicDelimiterSpec', () => {
 	})
 
 	it('resolves to the underscore marker for an isolated run', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent({
+		const editor = createEditor({
 			type: 'doc',
 			content: [
 				{
@@ -57,9 +47,7 @@ describe('italicDelimiterSpec', () => {
 	})
 
 	it('falls back to an asterisk when the run sits mid-word', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent({
+		const editor = createEditor({
 			type: 'doc',
 			content: [
 				{

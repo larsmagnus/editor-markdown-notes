@@ -1,22 +1,9 @@
 import { TextSelection } from '@tiptap/pm/state'
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { enterImageEditSource } from '@/editor/extensions/image/edit-source'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
-
-function makeEditor(content: string): Editor {
-	const editor = new Editor({ extensions, content })
-	editors.push(editor)
-	return editor
-}
+import { createEditor } from '@/test-utils/editor'
 
 /** The sole image node's own position in the document. */
 function imagePos(editor: Editor): number {
@@ -50,7 +37,9 @@ function sourceRange(editor: Editor): { from: number; to: number } {
 
 describe('enterImageEditSource', () => {
 	it('declines when the position is not an image', () => {
-		const editor = makeEditor('![Diagram](./diagram.png)')
+		const editor = createEditor('![Diagram](./diagram.png)', {
+			parseOnly: true,
+		})
 
 		const applied = enterImageEditSource(0)(editor.state, editor.view.dispatch)
 
@@ -58,7 +47,9 @@ describe('enterImageEditSource', () => {
 	})
 
 	it('reveals the markdown as real text immediately before the image', () => {
-		const editor = makeEditor('![Diagram](./diagram.png)')
+		const editor = createEditor('![Diagram](./diagram.png)', {
+			parseOnly: true,
+		})
 
 		enterImageEditSource(imagePos(editor))(editor.state, editor.view.dispatch)
 
@@ -69,7 +60,9 @@ describe('enterImageEditSource', () => {
 	})
 
 	it('selects the path - src and title, excluding the parens - with the caret at its end', () => {
-		const editor = makeEditor('![Diagram](./diagram.png "A diagram")')
+		const editor = createEditor('![Diagram](./diagram.png "A diagram")', {
+			parseOnly: true,
+		})
 
 		enterImageEditSource(imagePos(editor))(editor.state, editor.view.dispatch)
 
@@ -83,8 +76,9 @@ describe('enterImageEditSource', () => {
 	})
 
 	it('finalizes a still-open source on another image before revealing a new one', () => {
-		const editor = makeEditor(
-			'![First](./first.png)\n\n![Second](./second.png)'
+		const editor = createEditor(
+			'![First](./first.png)\n\n![Second](./second.png)',
+			{ parseOnly: true }
 		)
 		const [firstPos] = imagePositions(editor)
 

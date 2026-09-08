@@ -1,8 +1,8 @@
 import { CellSelection, TableMap } from '@tiptap/pm/tables'
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
+import { createEditor } from '@/test-utils/editor'
 
 const TABLE = [
 	'| Quarter | Revenue | Growth |',
@@ -11,13 +11,9 @@ const TABLE = [
 	'| Q2 2025 | 1.4M | 17% |',
 ].join('\n')
 
-const editors: Editor[] = []
-
 /** A live editor on the app's own extensions, loaded the way a note is. */
 function editorWith(markdown: string): Editor {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(markdown)
+	const editor = createEditor(markdown)
 
 	return editor
 }
@@ -56,11 +52,6 @@ function pasteText(editor: Editor, text: string): void {
 function saved(editor: Editor): string {
 	return String(editor.storage.markdown.getMarkdown()).trimEnd()
 }
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
 
 describe('pasting a table', () => {
 	it('turns markdown pasted from another application into a real table', () => {

@@ -1,13 +1,14 @@
-import { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
 import { createDeletionProbe } from '@/editor/extensions/syntax-repair/authored-deletion'
+import { createEditor } from '@/test-utils/editor'
 
 /** An editor holding `<p>hello world</p>`, whose text spans positions 1-12. */
 function editorWithParagraph() {
-	const editor = new Editor({ extensions: [StarterKit], content: '' })
-	editor.commands.setContent('<p>hello world</p>')
+	const editor = createEditor('<p>hello world</p>', {
+		extensions: [StarterKit],
+	})
 	return editor
 }
 

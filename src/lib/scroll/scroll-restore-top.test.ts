@@ -29,7 +29,6 @@ beforeEach(() => {
 
 afterEach(() => {
 	vi.useRealTimers()
-	document.body.innerHTML = ''
 })
 
 describe('scrollRestoreTop', () => {

@@ -1,17 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Editor, EditorContext } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { EditorContext } from '@tiptap/react'
+import { describe, expect, it } from 'vitest'
 
 import { BubbleMenuContent } from '@/components/bubble-menu-content'
-import { extensions } from '@/editor/extensions/extensions'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 /**
  * These render `BubbleMenuContent` directly rather than `MenuBubble`. The bubble
@@ -25,8 +18,7 @@ afterEach(() => {
 
 describe('headings', () => {
 	it('turns the selected paragraph into a heading', async () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -45,8 +37,7 @@ describe('headings', () => {
 
 describe('text styles', () => {
 	it('bolds the selection', async () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -62,8 +53,7 @@ describe('text styles', () => {
 	})
 
 	it('italicises the selection', async () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -79,8 +69,7 @@ describe('text styles', () => {
 	})
 
 	it('strikes through the selection', async () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -98,8 +87,7 @@ describe('text styles', () => {
 
 describe('links', () => {
 	it('applies the typed URL to the selection', async () => {
-		const editor = new Editor({ extensions, content: 'Read the notes' })
-		currentEditor = editor
+		const editor = createEditor('Read the notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 10, to: 15 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -119,11 +107,9 @@ describe('links', () => {
 	})
 
 	it('removes an existing link', async () => {
-		const editor = new Editor({
-			extensions,
-			content: 'Read the [notes](https://example.com)',
+		const editor = createEditor('Read the [notes](https://example.com)', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 		editor.commands.setTextSelection({ from: 10, to: 15 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -138,11 +124,9 @@ describe('links', () => {
 	})
 
 	it('seeds the URL field with the link already on the selection', async () => {
-		const editor = new Editor({
-			extensions,
-			content: 'Read the [notes](https://example.com)',
+		const editor = createEditor('Read the [notes](https://example.com)', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 		editor.commands.setTextSelection({ from: 10, to: 15 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -159,9 +143,7 @@ describe('links', () => {
 	// the mark's attrs, leaving the old URL's literal text - now the visible
 	// source of truth - sitting stale right beside it.
 	it('replaces the literal URL text when editing an existing link', async () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent('Read the [notes](https://old.example.com)')
+		const editor = createEditor('Read the [notes](https://old.example.com)')
 		editor.commands.setTextSelection({ from: 10, to: 15 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -185,8 +167,7 @@ describe('links', () => {
 
 describe('colours', () => {
 	it('sets the colour of the selection', async () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -202,8 +183,7 @@ describe('colours', () => {
 	})
 
 	it('clears the colour when the same swatch is picked again', async () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -220,8 +200,7 @@ describe('colours', () => {
 	})
 
 	it('clears only the colour, leaving other formatting intact', async () => {
-		const editor = new Editor({ extensions, content: '## Some notes' })
-		currentEditor = editor
+		const editor = createEditor('## Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		editor.commands.setMark('bold')
 		render(

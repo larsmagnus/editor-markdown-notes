@@ -1,15 +1,16 @@
-import { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
 import { computeRevealDecorations } from '@/editor/extensions/syntax-reveal/compute-reveal-decorations'
 import type { RevealProvider } from '@/editor/extensions/syntax-reveal/reveal-provider'
+import { createEditor } from '@/test-utils/editor'
 
 describe('computeRevealDecorations', () => {
 	// "hello world" -> "hello" spans doc positions 1-6, "world" spans 7-12.
 	it('hides a syntax range when the selection is outside its container', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello world</p>')
+		const editor = createEditor('<p>hello world</p>', {
+			extensions: [StarterKit],
+		})
 		editor.commands.setTextSelection(9) // inside "world"
 
 		const provider: RevealProvider = {
@@ -28,8 +29,9 @@ describe('computeRevealDecorations', () => {
 	})
 
 	it('reveals (no decoration) once the selection overlaps the container', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello world</p>')
+		const editor = createEditor('<p>hello world</p>', {
+			extensions: [StarterKit],
+		})
 		editor.commands.setTextSelection(3) // inside "hello"
 
 		const provider: RevealProvider = {
@@ -48,8 +50,9 @@ describe('computeRevealDecorations', () => {
 	})
 
 	it('reveals when the selection only partially overlaps the container', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello world</p>')
+		const editor = createEditor('<p>hello world</p>', {
+			extensions: [StarterKit],
+		})
 		// Starts inside the container ("hello"), ends outside it ("world").
 		editor.commands.setTextSelection({ from: 3, to: 9 })
 
@@ -69,8 +72,7 @@ describe('computeRevealDecorations', () => {
 	})
 
 	it('drops a syntax range that has collapsed or runs past the document end', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hi</p>')
+		const editor = createEditor('<p>hi</p>', { extensions: [StarterKit] })
 		editor.commands.setTextSelection(1)
 
 		const provider: RevealProvider = {
@@ -94,8 +96,9 @@ describe('computeRevealDecorations', () => {
 	})
 
 	it('merges spans from multiple providers', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello world</p>')
+		const editor = createEditor('<p>hello world</p>', {
+			extensions: [StarterKit],
+		})
 		editor.commands.setTextSelection(9)
 
 		const first: RevealProvider = {

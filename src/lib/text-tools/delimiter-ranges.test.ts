@@ -1,24 +1,14 @@
-import { Editor } from '@tiptap/core'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import {
 	appendProseText,
 	delimiterRanges,
 } from '@/lib/text-tools/delimiter-ranges'
 import type { TextSlice } from '@/lib/text-tools/delimiter-ranges'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 function buildDoc(markType: string, delimited: string) {
-	const editor = new Editor({ extensions, content: '' })
-	currentEditor = editor
-	editor.commands.setContent({
+	const editor = createEditor({
 		type: 'doc',
 		content: [
 			{
@@ -54,16 +44,14 @@ describe('delimiterRanges', () => {
 		])
 	})
 
-	// Regression: `new Editor({ content })` parses a mark straight onto its
+	// Regression: `createEditor(content, { parseOnly: true })` parses a mark straight onto its
 	// bare interior, with no delimiter text - `ensure-delimiters-plugin.ts`
 	// only adds it on the next real transaction. Stripping the run's first/
 	// last two characters unconditionally used to eat real interior text.
 	it('leaves a run with no literal delimiter text alone', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'The **report** was written.',
+		const editor = createEditor('The **report** was written.', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		expect(delimiterRanges(editor.state.doc)).toEqual([])
 	})
@@ -87,9 +75,7 @@ describe('delimiterRanges', () => {
 	})
 
 	it('ignores a run too short to hold both delimiters', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent({
+		const editor = createEditor({
 			type: 'doc',
 			content: [
 				{

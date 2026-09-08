@@ -1,22 +1,13 @@
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { endBlankListItem } from '@/editor/extensions/list/end-blank-list-item'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
+import { createEditor } from '@/test-utils/editor'
 
 // `setContent` runs the plugins that seed and renumber marker text;
 // constructing with `content` directly does not (see `marker-sync.test.ts`).
 function makeEditor(markdown: string): Editor {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(markdown)
+	const editor = createEditor(markdown)
 	return editor
 }
 

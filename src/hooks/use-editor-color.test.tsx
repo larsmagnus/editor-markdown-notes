@@ -1,21 +1,13 @@
 import { act, renderHook } from '@testing-library/react'
-import { Editor, EditorContext } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { EditorContext } from '@tiptap/react'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { useEditorColor } from '@/hooks/use-editor-color'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 describe('colour', () => {
 	it('sets and clears the colour of the selection', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorColor(), {
 			wrapper: ({ children }) => (

@@ -1,9 +1,8 @@
-import { Editor } from '@tiptap/core'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { askInlineStatusPluginKey } from '@/editor/extensions/ask/ask-inline-status-extension'
-import { extensions } from '@/editor/extensions/extensions'
 import { streamAskInto } from '@/editor/extensions/slash-command/ask-command'
+import { createEditor } from '@/test-utils/editor'
 
 const ask = vi.hoisted(() => vi.fn())
 const cancel = vi.hoisted(() => vi.fn())
@@ -11,18 +10,13 @@ vi.mock('@/lib/ask/ask-client', () => ({
 	getAskClient: () => ({ ask, cancel }),
 }))
 
-let currentEditor: Editor | undefined
-
 afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
 	vi.clearAllMocks()
 })
 
 describe('the error card', () => {
 	it('re-runs the same prompt from the same position on retry', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 
 		streamAskInto(editor, 1, 'Summarise this note')
 		ask.mock.calls[0]?.[2].onError('Claude CLI not found')
@@ -40,8 +34,7 @@ describe('the error card', () => {
 	})
 
 	it('leaves nothing behind when dismissed', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 
 		streamAskInto(editor, 1, 'Summarise this note')
 		ask.mock.calls[0]?.[2].onError('Claude CLI not found')
@@ -55,8 +48,7 @@ describe('the error card', () => {
 
 describe('the loading widget', () => {
 	it('cancels the in-flight request when removed', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 		ask.mockReturnValueOnce('request-1')
 
 		streamAskInto(editor, 1, 'Summarise this note')

@@ -1,20 +1,6 @@
-import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
-
-function emptyEditor(): Editor {
-	const editor = new Editor({ extensions, content: '<p></p>' })
-	editors.push(editor)
-	return editor
-}
+import { createEditor } from '@/test-utils/editor'
 
 /**
  * HTML from a browser reaches `parseHTML` without ever passing through
@@ -24,7 +10,7 @@ function emptyEditor(): Editor {
  */
 describe('pasting HTML from outside the editor', () => {
 	it('keeps each heading at its own level', () => {
-		const editor = emptyEditor()
+		const editor = createEditor('<p></p>', { parseOnly: true })
 
 		editor.view.pasteHTML('<h3>Pasted heading</h3><h5>Deeper</h5>')
 
@@ -35,7 +21,7 @@ describe('pasting HTML from outside the editor', () => {
 	})
 
 	it('gives a pasted list its bullets', () => {
-		const editor = emptyEditor()
+		const editor = createEditor('<p></p>', { parseOnly: true })
 
 		editor.view.pasteHTML('<ul><li>one</li><li>two</li></ul>')
 
@@ -43,7 +29,7 @@ describe('pasting HTML from outside the editor', () => {
 	})
 
 	it('gives a pasted blockquote its marker', () => {
-		const editor = emptyEditor()
+		const editor = createEditor('<p></p>', { parseOnly: true })
 
 		editor.view.pasteHTML('<blockquote><p>quoted</p></blockquote>')
 
@@ -54,7 +40,7 @@ describe('pasting HTML from outside the editor', () => {
 	// text at all - and a rule is nothing but its own text, so it used to be
 	// read as unparseable and unwrapped into an empty paragraph on arrival.
 	it('keeps a pasted horizontal rule', () => {
-		const editor = emptyEditor()
+		const editor = createEditor('<p></p>', { parseOnly: true })
 
 		editor.view.pasteHTML('<p>Above</p><hr><p>Below</p>')
 
@@ -62,7 +48,7 @@ describe('pasting HTML from outside the editor', () => {
 	})
 
 	it('leaves markdown arriving through markdown-it alone', () => {
-		const editor = emptyEditor()
+		const editor = createEditor('<p></p>', { parseOnly: true })
 
 		editor.commands.setContent('### From markdown\n\n- item\n\n> quote')
 

@@ -1,12 +1,11 @@
-import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import {
 	computeTextStats,
 	countParagraphs,
 	formatCount,
 } from '@/lib/text-tools/document-stats'
+import { createEditor } from '@/test-utils/editor'
 
 describe('computeTextStats', () => {
 	it('counts words, characters and reading time for a short sentence', () => {
@@ -80,47 +79,32 @@ describe('formatCount', () => {
 	})
 })
 
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
-
 describe('countParagraphs', () => {
 	it('counts paragraph nodes in a single-paragraph document', () => {
-		const editor = new Editor({ extensions, content: 'Just one paragraph.' })
-		currentEditor = editor
+		const editor = createEditor('Just one paragraph.', { parseOnly: true })
 
 		expect(countParagraphs(editor.state.doc)).toBe(1)
 	})
 
 	it('counts paragraph nodes across multiple paragraphs', () => {
-		const editor = new Editor({
-			extensions,
-			content: '<p>First paragraph.</p><p>Second paragraph.</p><p>Third.</p>',
-		})
-		currentEditor = editor
+		const editor = createEditor(
+			'<p>First paragraph.</p><p>Second paragraph.</p><p>Third.</p>',
+			{ parseOnly: true }
+		)
 
 		expect(countParagraphs(editor.state.doc)).toBe(3)
 	})
 
 	it('does not count headings as paragraphs', () => {
-		const editor = new Editor({
-			extensions,
-			content: '<h1>A heading</h1><p>One paragraph.</p>',
+		const editor = createEditor('<h1>A heading</h1><p>One paragraph.</p>', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		expect(countParagraphs(editor.state.doc)).toBe(1)
 	})
 
 	it('returns zero for a document with no paragraphs', () => {
-		const editor = new Editor({
-			extensions,
-			content: '<h1>Only a heading</h1>',
-		})
-		currentEditor = editor
+		const editor = createEditor('<h1>Only a heading</h1>', { parseOnly: true })
 
 		expect(countParagraphs(editor.state.doc)).toBe(0)
 	})

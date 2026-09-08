@@ -1,8 +1,8 @@
 import { CellSelection, TableMap } from '@tiptap/pm/tables'
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
+import { createEditor, press, saved } from '@/test-utils/editor'
 
 const TABLE = [
 	'| Quarter | Revenue | Growth |',
@@ -11,17 +11,12 @@ const TABLE = [
 	'| Q2 2025 | 1.4M | 17% |',
 ].join('\n')
 
-const editors: Editor[] = []
-
 /**
  * A mounted editor with a rectangle of its table's cells selected, numbered in
  * reading order - 0 is the first header cell, 3 the first body cell.
  */
 function editorSelecting(anchor: number, head: number): Editor {
-	const element = document.body.appendChild(document.createElement('div'))
-	const editor = new Editor({ element, extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(TABLE)
+	const editor = createEditor(TABLE, { mount: true })
 
 	const { doc, tr } = editor.state
 	const map = TableMap.get(doc.firstChild!)
@@ -32,24 +27,6 @@ function editorSelecting(anchor: number, head: number): Editor {
 
 	return editor
 }
-
-/** Presses a key the way the browser does, so the keymap plugins see it. */
-function press(editor: Editor, key: string): void {
-	editor.view.dom.dispatchEvent(
-		new KeyboardEvent('keydown', { key, bubbles: true })
-	)
-}
-
-/** What the note would be saved as right now. */
-function saved(editor: Editor): string {
-	return String(editor.storage.markdown.getMarkdown()).trimEnd()
-}
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-	document.body.innerHTML = ''
-})
 
 describe('backspace over selected cells', () => {
 	it('empties the cells when only part of a row is selected', () => {

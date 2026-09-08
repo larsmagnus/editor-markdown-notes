@@ -1,13 +1,14 @@
-import { Editor, Extension } from '@tiptap/react'
+import { Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
 import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
 import { createEnsureDelimitersPlugin } from '@/editor/extensions/formatting/ensure-delimiters-plugin'
+import { createEditor } from '@/test-utils/editor'
 
 describe('createEnsureDelimitersPlugin', () => {
 	it('wraps a bold run with no delimiter text at all', () => {
-		const editor = new Editor({
+		const editor = createEditor('<p>hello <strong>world</strong></p>', {
 			extensions: [
 				StarterKit,
 				Extension.create({
@@ -22,10 +23,7 @@ describe('createEnsureDelimitersPlugin', () => {
 					},
 				}),
 			],
-			content: '',
 		})
-
-		editor.commands.setContent('<p>hello <strong>world</strong></p>')
 
 		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
 			'hello **world**'
@@ -33,7 +31,7 @@ describe('createEnsureDelimitersPlugin', () => {
 	})
 
 	it('leaves an already-delimited run alone', () => {
-		const editor = new Editor({
+		const editor = createEditor('<p>hello <strong>**world**</strong></p>', {
 			extensions: [
 				StarterKit,
 				Extension.create({
@@ -48,10 +46,7 @@ describe('createEnsureDelimitersPlugin', () => {
 					},
 				}),
 			],
-			content: '',
 		})
-
-		editor.commands.setContent('<p>hello <strong>**world**</strong></p>')
 
 		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
 			'hello **world**'
@@ -59,26 +54,24 @@ describe('createEnsureDelimitersPlugin', () => {
 	})
 
 	it('fixes multiple broken runs in one transaction without corrupting later ones', () => {
-		const editor = new Editor({
-			extensions: [
-				StarterKit,
-				Extension.create({
-					name: 'ensureBoldDelimiters',
-					addProseMirrorPlugins() {
-						return [
-							createEnsureDelimitersPlugin(
-								this.editor.schema.marks.bold,
-								fixedDelimiter('**')
-							),
-						]
-					},
-				}),
-			],
-			content: '',
-		})
-
-		editor.commands.setContent(
-			'<p><strong>one</strong> plain <strong>two</strong></p>'
+		const editor = createEditor(
+			'<p><strong>one</strong> plain <strong>two</strong></p>',
+			{
+				extensions: [
+					StarterKit,
+					Extension.create({
+						name: 'ensureBoldDelimiters',
+						addProseMirrorPlugins() {
+							return [
+								createEnsureDelimitersPlugin(
+									this.editor.schema.marks.bold,
+									fixedDelimiter('**')
+								),
+							]
+						},
+					}),
+				],
+			}
 		)
 
 		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
@@ -87,7 +80,7 @@ describe('createEnsureDelimitersPlugin', () => {
 	})
 
 	it('only adds the missing side when one delimiter is already present', () => {
-		const editor = new Editor({
+		const editor = createEditor('<p><strong>**world</strong></p>', {
 			extensions: [
 				StarterKit,
 				Extension.create({
@@ -102,10 +95,7 @@ describe('createEnsureDelimitersPlugin', () => {
 					},
 				}),
 			],
-			content: '',
 		})
-
-		editor.commands.setContent('<p><strong>**world</strong></p>')
 
 		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(
 			'**world**'
@@ -118,7 +108,7 @@ describe('createEnsureDelimitersPlugin', () => {
 	// mark explicitly) is exactly what let the round-trip escaping bug and the
 	// unmarked-delimiter design both slip through undetected earlier.
 	it("marks the delimiters it inserts with the run's own mark", () => {
-		const editor = new Editor({
+		const editor = createEditor('<p>hello <strong>world</strong></p>', {
 			extensions: [
 				StarterKit,
 				Extension.create({
@@ -133,10 +123,7 @@ describe('createEnsureDelimitersPlugin', () => {
 					},
 				}),
 			],
-			content: '',
 		})
-
-		editor.commands.setContent('<p>hello <strong>world</strong></p>')
 
 		const bold = editor.schema.marks.bold
 		const size = editor.state.doc.content.size
@@ -151,27 +138,25 @@ describe('createEnsureDelimitersPlugin', () => {
 	// so neither plugin ever saw a fully-delimited run - each kept re-wrapping
 	// the other's fresh delimiter one layer deeper, forever.
 	it('converges instead of endlessly re-wrapping a run carrying two delimited marks', () => {
-		const editor = new Editor({
-			extensions: [
-				StarterKit,
-				Extension.create({
-					name: 'ensureNestedDelimiters',
-					addProseMirrorPlugins() {
-						const { bold, italic } = this.editor.schema.marks
-						return [
-							createEnsureDelimitersPlugin(bold, fixedDelimiter('**')),
-							createEnsureDelimitersPlugin(italic, fixedDelimiter('_'), [
-								'bold',
-							]),
-						]
-					},
-				}),
-			],
-			content: '',
-		})
-
-		editor.commands.setContent(
-			'<p><strong><em>bold and italic</em></strong></p>'
+		const editor = createEditor(
+			'<p><strong><em>bold and italic</em></strong></p>',
+			{
+				extensions: [
+					StarterKit,
+					Extension.create({
+						name: 'ensureNestedDelimiters',
+						addProseMirrorPlugins() {
+							const { bold, italic } = this.editor.schema.marks
+							return [
+								createEnsureDelimitersPlugin(bold, fixedDelimiter('**')),
+								createEnsureDelimitersPlugin(italic, fixedDelimiter('_'), [
+									'bold',
+								]),
+							]
+						},
+					}),
+				],
+			}
 		)
 
 		expect(editor.state.doc.textBetween(1, editor.state.doc.content.size)).toBe(

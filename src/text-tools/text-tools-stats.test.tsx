@@ -1,25 +1,16 @@
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Editor, EditorContext } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { EditorContext } from '@tiptap/react'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
+import { createEditor } from '@/test-utils/editor'
 import { TextToolsStats } from '@/text-tools/text-tools-stats'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
 
 describe('TextToolsStats', () => {
 	it('starts collapsed, with the counts hidden until expanded', () => {
-		const editor = new Editor({
-			extensions,
-			content: '<p>One two three four.</p>',
+		const editor = createEditor('<p>One two three four.</p>', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -33,11 +24,9 @@ describe('TextToolsStats', () => {
 
 	it('shows word, character, sentence and paragraph counts once expanded', async () => {
 		const user = userEvent.setup()
-		const editor = new Editor({
-			extensions,
-			content: '<p>One two three four.</p><p>Five six.</p>',
+		const editor = createEditor('<p>One two three four.</p><p>Five six.</p>', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -60,8 +49,7 @@ describe('TextToolsStats', () => {
 
 	it('updates counts after the document changes', async () => {
 		const user = userEvent.setup()
-		const editor = new Editor({ extensions, content: '<p>One two.</p>' })
-		currentEditor = editor
+		const editor = createEditor('<p>One two.</p>', { parseOnly: true })
 
 		render(
 			<EditorContext.Provider value={{ editor }}>
@@ -81,8 +69,7 @@ describe('TextToolsStats', () => {
 
 	it('shows a placeholder for the sentence average when there are no sentences', async () => {
 		const user = userEvent.setup()
-		const editor = new Editor({ extensions, content: '<p></p>' })
-		currentEditor = editor
+		const editor = createEditor('<p></p>', { parseOnly: true })
 
 		render(
 			<EditorContext.Provider value={{ editor }}>

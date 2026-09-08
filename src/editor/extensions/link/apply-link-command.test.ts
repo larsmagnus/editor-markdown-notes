@@ -1,25 +1,11 @@
-import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { createApplyLinkCommand } from '@/editor/extensions/link/apply-link-command'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
-
-function makeEditor(content: string): Editor {
-	const editor = new Editor({ extensions, content })
-	editors.push(editor)
-	return editor
-}
+import { createEditor } from '@/test-utils/editor'
 
 describe('createApplyLinkCommand', () => {
 	it('wraps a plain selection in a fresh link', () => {
-		const editor = makeEditor('Read the notes')
+		const editor = createEditor('Read the notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 10, to: 15 })
 
 		createApplyLinkCommand(editor.schema.marks.link, {
@@ -30,7 +16,7 @@ describe('createApplyLinkCommand', () => {
 	})
 
 	it('declines on an empty selection with no existing link', () => {
-		const editor = makeEditor('Read the notes')
+		const editor = createEditor('Read the notes', { parseOnly: true })
 		editor.commands.setTextSelection(10)
 
 		const applied = createApplyLinkCommand(editor.schema.marks.link, {
@@ -41,7 +27,10 @@ describe('createApplyLinkCommand', () => {
 	})
 
 	it('replaces an existing link’s URL, not just its attrs, when the caret sits inside it', () => {
-		const editor = makeEditor('Read [the notes](https://old.example.com) now')
+		const editor = createEditor(
+			'Read [the notes](https://old.example.com) now',
+			{ parseOnly: true }
+		)
 		editor.commands.setTextSelection(10)
 
 		createApplyLinkCommand(editor.schema.marks.link, {
@@ -57,7 +46,7 @@ describe('createApplyLinkCommand', () => {
 	})
 
 	it('sets a title alongside the href', () => {
-		const editor = makeEditor('Read the notes')
+		const editor = createEditor('Read the notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 10, to: 15 })
 
 		createApplyLinkCommand(editor.schema.marks.link, {

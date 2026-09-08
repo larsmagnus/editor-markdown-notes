@@ -1,25 +1,13 @@
-import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { createUnlinkCommand } from '@/editor/extensions/link/unlink-command'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
-
-function makeEditor(content: string): Editor {
-	const editor = new Editor({ extensions, content })
-	editors.push(editor)
-	return editor
-}
+import { createEditor } from '@/test-utils/editor'
 
 describe('createUnlinkCommand', () => {
 	it('removes a text link, delimiters included', () => {
-		const editor = makeEditor('Read [the notes](https://example.com) now')
+		const editor = createEditor('Read [the notes](https://example.com) now', {
+			parseOnly: true,
+		})
 		editor.commands.setTextSelection(10)
 
 		createUnlinkCommand(editor.schema.marks.link)(
@@ -31,8 +19,9 @@ describe('createUnlinkCommand', () => {
 	})
 
 	it('removes the mark from an image with no text run to strip delimiters from', () => {
-		const editor = makeEditor(
-			'[![alt](/icon-editor-markdown-notes.png)](https://example.com)'
+		const editor = createEditor(
+			'[![alt](/icon-editor-markdown-notes.png)](https://example.com)',
+			{ parseOnly: true }
 		)
 		editor.commands.setNodeSelection(0)
 
@@ -47,7 +36,9 @@ describe('createUnlinkCommand', () => {
 	})
 
 	it('declines where there is no link, so the toolbar button can disable', () => {
-		const editor = makeEditor('Just some prose with no link in it')
+		const editor = createEditor('Just some prose with no link in it', {
+			parseOnly: true,
+		})
 		editor.commands.setTextSelection({ from: 1, to: 10 })
 
 		const applied = createUnlinkCommand(editor.schema.marks.link)(

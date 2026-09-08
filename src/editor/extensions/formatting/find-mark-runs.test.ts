@@ -1,13 +1,14 @@
-import { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
 import { findMarkRuns } from '@/editor/extensions/formatting/find-mark-runs'
+import { createEditor } from '@/test-utils/editor'
 
 describe('findMarkRuns', () => {
 	it('finds a single run', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello <strong>world</strong> there</p>')
+		const editor = createEditor('<p>hello <strong>world</strong> there</p>', {
+			extensions: [StarterKit],
+		})
 
 		const runs = findMarkRuns(editor.state.doc, editor.schema.marks.bold)
 
@@ -16,9 +17,9 @@ describe('findMarkRuns', () => {
 	})
 
 	it('finds multiple separate runs', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent(
-			'<p><strong>one</strong> plain <strong>two</strong></p>'
+		const editor = createEditor(
+			'<p><strong>one</strong> plain <strong>two</strong></p>',
+			{ extensions: [StarterKit] }
 		)
 
 		const runs = findMarkRuns(editor.state.doc, editor.schema.marks.bold)
@@ -29,7 +30,7 @@ describe('findMarkRuns', () => {
 	})
 
 	it('merges adjacent text nodes carrying the same mark into one run', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
+		const editor = createEditor('', { extensions: [StarterKit] })
 		// Two adjacent bold text nodes, e.g. from an italic mark starting
 		// mid-run: still one contiguous bold run.
 		editor.commands.setContent('<p><strong>bo<em>ld</em>text</strong></p>')
@@ -43,16 +44,17 @@ describe('findMarkRuns', () => {
 	})
 
 	it('returns nothing when the mark is not used', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>plain text</p>')
+		const editor = createEditor('<p>plain text</p>', {
+			extensions: [StarterKit],
+		})
 
 		expect(findMarkRuns(editor.state.doc, editor.schema.marks.bold)).toEqual([])
 	})
 
 	it('does not merge runs across a block boundary', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent(
-			'<p><strong>one</strong></p><p><strong>two</strong></p>'
+		const editor = createEditor(
+			'<p><strong>one</strong></p><p><strong>two</strong></p>',
+			{ extensions: [StarterKit] }
 		)
 
 		const runs = findMarkRuns(editor.state.doc, editor.schema.marks.bold)

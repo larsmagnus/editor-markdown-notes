@@ -1,21 +1,13 @@
 import { act, renderHook } from '@testing-library/react'
-import { Editor, EditorContext } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { EditorContext } from '@tiptap/react'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { useEditorStyles } from '@/hooks/use-editor-styles'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 describe('toggleStyle', () => {
 	it('toggles bold', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -33,8 +25,7 @@ describe('toggleStyle', () => {
 	})
 
 	it('toggles italic', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -52,8 +43,7 @@ describe('toggleStyle', () => {
 	})
 
 	it('toggles strike', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -71,8 +61,7 @@ describe('toggleStyle', () => {
 	})
 
 	it('toggles code', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -90,8 +79,7 @@ describe('toggleStyle', () => {
 	})
 
 	it('toggles codeBlock', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -107,8 +95,7 @@ describe('toggleStyle', () => {
 	})
 
 	it('toggles blockquote', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -124,8 +111,7 @@ describe('toggleStyle', () => {
 	})
 
 	it('turns a heading back into a paragraph', () => {
-		const editor = new Editor({ extensions, content: '## Some notes' })
-		currentEditor = editor
+		const editor = createEditor('## Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -144,9 +130,7 @@ describe('toggleStyle', () => {
 	// marker stripped, leaving every heading after the first still reading
 	// as literal marker text inside a `<p>`.
 	it('turns every heading a multi-block selection spans back into a paragraph', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent('# One\n\n## Two')
+		const editor = createEditor('# One\n\n## Two')
 		editor.commands.setTextSelection({
 			from: 0,
 			to: editor.state.doc.content.size,
@@ -166,8 +150,7 @@ describe('toggleStyle', () => {
 	})
 
 	it('toggles an ordered list', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -183,8 +166,7 @@ describe('toggleStyle', () => {
 	})
 
 	it('toggles an unordered list', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -202,11 +184,9 @@ describe('toggleStyle', () => {
 
 describe('hasStyle', () => {
 	it('reports the marks and nodes active on the selection', () => {
-		const editor = new Editor({
-			extensions,
-			content: '> **Some** _notes_ and `code`',
+		const editor = createEditor('> **Some** _notes_ and `code`', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 		// Positions shifted +2 from a bare "Some": the blockquote's own "> " is
 		// now real leading text ahead of it (see `blockquote-marker.ts`).
 		editor.commands.setTextSelection({ from: 4, to: 8 })
@@ -234,8 +214,7 @@ describe('canToggleStyle', () => {
 	 * that disables its buttons wrapped the document in a blockquote.
 	 */
 	it('leaves the document untouched when asked about blockquote', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -254,8 +233,7 @@ describe('canToggleStyle', () => {
 	})
 
 	it('leaves the document untouched when asked about the other styles', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -282,8 +260,7 @@ describe('canToggleStyle', () => {
 	 * so both buttons sat permanently disabled in the menu bar.
 	 */
 	it('allows the styles that cannot be queried', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		editor.commands.setTextSelection({ from: 6, to: 11 })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
@@ -298,8 +275,7 @@ describe('canToggleStyle', () => {
 	})
 
 	it('allows the list styles unconditionally', () => {
-		const editor = new Editor({ extensions, content: 'Some notes' })
-		currentEditor = editor
+		const editor = createEditor('Some notes', { parseOnly: true })
 		const { result } = renderHook(() => useEditorStyles(), {
 			wrapper: ({ children }) => (
 				<EditorContext.Provider value={{ editor }}>

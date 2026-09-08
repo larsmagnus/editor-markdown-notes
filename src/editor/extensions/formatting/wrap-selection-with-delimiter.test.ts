@@ -1,13 +1,14 @@
-import { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
 import { wrapSelectionWithDelimiter } from '@/editor/extensions/formatting/wrap-selection-with-delimiter'
+import { createEditor } from '@/test-utils/editor'
 
 describe('wrapSelectionWithDelimiter', () => {
 	it('wraps the selection in delimiter text and marks the whole thing', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello world</p>')
+		const editor = createEditor('<p>hello world</p>', {
+			extensions: [StarterKit],
+		})
 		// "world" is at positions 7-12.
 		editor.commands.setTextSelection({ from: 7, to: 12 })
 
@@ -23,8 +24,9 @@ describe('wrapSelectionWithDelimiter', () => {
 	})
 
 	it('marks the delimiter text along with the interior', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello world</p>')
+		const editor = createEditor('<p>hello world</p>', {
+			extensions: [StarterKit],
+		})
 		editor.commands.setTextSelection({ from: 7, to: 12 })
 
 		wrapSelectionWithDelimiter(editor.schema.marks.bold, {
@@ -39,8 +41,9 @@ describe('wrapSelectionWithDelimiter', () => {
 	})
 
 	it('does not extend the mark past the delimiters', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello world there</p>')
+		const editor = createEditor('<p>hello world there</p>', {
+			extensions: [StarterKit],
+		})
 		editor.commands.setTextSelection({ from: 7, to: 12 })
 
 		wrapSelectionWithDelimiter(editor.schema.marks.bold, {
@@ -61,8 +64,9 @@ describe('wrapSelectionWithDelimiter', () => {
 	})
 
 	it('declines on an empty selection', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello world</p>')
+		const editor = createEditor('<p>hello world</p>', {
+			extensions: [StarterKit],
+		})
 		editor.commands.setTextSelection(7)
 
 		const applied = wrapSelectionWithDelimiter(editor.schema.marks.bold, {
@@ -74,8 +78,9 @@ describe('wrapSelectionWithDelimiter', () => {
 	})
 
 	it('supports asymmetric open/close delimiter text', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello world</p>')
+		const editor = createEditor('<p>hello world</p>', {
+			extensions: [StarterKit],
+		})
 		editor.commands.setTextSelection({ from: 7, to: 12 })
 
 		wrapSelectionWithDelimiter(editor.schema.marks.code, {

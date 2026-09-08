@@ -1,24 +1,15 @@
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
+import { createEditor } from '@/test-utils/editor'
 
 /**
- * `setContent` rather than `new Editor({ content })`, so the plugins that turn
+ * `setContent` rather than `createEditor(content, { parseOnly: true })`, so the plugins that turn
  * markdown syntax into real marker text have actually run - the constructed
  * document alone has none.
  */
 function documentFrom(markdown: string): Editor {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(markdown)
+	const editor = createEditor(markdown)
 	return editor
 }
 

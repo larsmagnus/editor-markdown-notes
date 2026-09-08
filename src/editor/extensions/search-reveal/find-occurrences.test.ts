@@ -1,15 +1,8 @@
 import { Editor } from '@tiptap/core'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { findOccurrences } from '@/editor/extensions/search-reveal/find-occurrences'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 /** The text each found range actually covers, which is what a highlight draws. */
 function textAt(editor: Editor, needle: string): string[] {
@@ -24,11 +17,10 @@ function textAt(editor: Editor, needle: string): string[] {
  */
 describe('findOccurrences', () => {
 	it('finds the searched-for text in prose', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'The email field is required.\n\nAnother email here.',
-		})
-		currentEditor = editor
+		const editor = createEditor(
+			'The email field is required.\n\nAnother email here.',
+			{ parseOnly: true }
+		)
 
 		expect(textAt(editor, 'email')).toEqual(['email', 'email'])
 	})
@@ -39,32 +31,27 @@ describe('findOccurrences', () => {
 	 * this.
 	 */
 	it('finds text inside a code block', () => {
-		const editor = new Editor({
-			extensions,
-			content:
-				'Prose first.\n\n```html\n<input id="email" required />\n```\n\nProse after.',
-		})
-		currentEditor = editor
+		const editor = createEditor(
+			'Prose first.\n\n```html\n<input id="email" required />\n```\n\nProse after.',
+			{ parseOnly: true }
+		)
 
 		expect(textAt(editor, '<input')).toEqual(['<input'])
 	})
 
 	it('ignores case, so a case-insensitive search still lands', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'Email addresses, and the email field.',
+		const editor = createEditor('Email addresses, and the email field.', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		expect(textAt(editor, 'email')).toEqual(['Email', 'email'])
 	})
 
 	it('finds several matches on one line separately', () => {
-		const editor = new Editor({
-			extensions,
-			content: '```html\n<input id="first" /><input id="second" />\n```',
-		})
-		currentEditor = editor
+		const editor = createEditor(
+			'```html\n<input id="first" /><input id="second" />\n```',
+			{ parseOnly: true }
+		)
 
 		expect(textAt(editor, '<input')).toEqual(['<input', '<input'])
 	})
@@ -76,11 +63,9 @@ describe('findOccurrences', () => {
 	 * highlighting a place the user did not search for.
 	 */
 	it('finds nothing when the text is not in the document', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'The email field is required.',
+		const editor = createEditor('The email field is required.', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		expect(findOccurrences(editor.state.doc, 'email field is req**')).toEqual(
 			[]
@@ -88,8 +73,7 @@ describe('findOccurrences', () => {
 	})
 
 	it('finds nothing for empty text', () => {
-		const editor = new Editor({ extensions, content: 'Anything at all.' })
-		currentEditor = editor
+		const editor = createEditor('Anything at all.', { parseOnly: true })
 
 		expect(findOccurrences(editor.state.doc, '')).toEqual([])
 	})
@@ -100,11 +84,7 @@ describe('findOccurrences', () => {
 	 * them, and there is no single honest range to highlight.
 	 */
 	it('declines a match split across a mark boundary', () => {
-		const editor = new Editor({
-			extensions,
-			content: '**bold** text follows',
-		})
-		currentEditor = editor
+		const editor = createEditor('**bold** text follows', { parseOnly: true })
 
 		expect(findOccurrences(editor.state.doc, 'bold text')).toEqual([])
 		expect(textAt(editor, 'bold')).toEqual(['bold'])

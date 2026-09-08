@@ -1,16 +1,8 @@
-import { Editor } from '@tiptap/core'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { getDocumentText } from '@/lib/text-tools/document-text'
 import { offsetToPosition } from '@/lib/text-tools/offset-to-position'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 /**
  * The flat text retext analyses, built from the same schema the editor runs on
@@ -18,11 +10,7 @@ afterEach(() => {
  */
 describe('getDocumentText', () => {
 	it('separates blocks so retext sees distinct sentences', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'First one\n\nSecond one',
-		})
-		currentEditor = editor
+		const editor = createEditor('First one\n\nSecond one', { parseOnly: true })
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'First one\n\nSecond one'
@@ -30,12 +18,10 @@ describe('getDocumentText', () => {
 	})
 
 	it('leaves code blocks out entirely', () => {
-		const editor = new Editor({
-			extensions,
-			content:
-				'Real prose here.\n\n```js\nconst utilize = 1\n```\n\nMore prose.',
-		})
-		currentEditor = editor
+		const editor = createEditor(
+			'Real prose here.\n\n```js\nconst utilize = 1\n```\n\nMore prose.',
+			{ parseOnly: true }
+		)
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'Real prose here.\n\nMore prose.'
@@ -43,11 +29,9 @@ describe('getDocumentText', () => {
 	})
 
 	it('stands a space in for an inline code span', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'Run `pnpm build`, then `pnpm test`.',
+		const editor = createEditor('Run `pnpm build`, then `pnpm test`.', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		// A space rather than nothing, so the words on either side of a span with
 		// no whitespace around it are not welded into one.
@@ -55,11 +39,9 @@ describe('getDocumentText', () => {
 	})
 
 	it('places text after an inline code span at its real position', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'Call the `useEffect` hook.',
+		const editor = createEditor('Call the `useEffect` hook.', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		const documentText = getDocumentText(editor.state.doc)
 		const from = offsetToPosition(
@@ -77,9 +59,7 @@ describe('getDocumentText', () => {
 	})
 
 	it('reads each frontmatter line as its own block rather than one run-on line', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent('Real prose here.')
+		const editor = createEditor('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
 			content: [
@@ -101,9 +81,7 @@ describe('getDocumentText', () => {
 	// now, not markup added only at save time - fed to `getDocumentText`
 	// unstripped, they used to reach retext as if they were YAML prose lines.
 	it('excludes the --- fence lines from the analyzed text', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent('Real prose here.')
+		const editor = createEditor('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
 			content: [{ type: 'text', text: '---\ntitle: Roadmap\n---' }],
@@ -115,9 +93,7 @@ describe('getDocumentText', () => {
 	})
 
 	it('drops a blank line inside frontmatter rather than emitting an empty block', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent('Real prose here.')
+		const editor = createEditor('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
 			content: [
@@ -131,9 +107,7 @@ describe('getDocumentText', () => {
 	})
 
 	it('keeps a frontmatter line that is not a key/value pair whole', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent('Real prose here.')
+		const editor = createEditor('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
 			content: [
@@ -149,9 +123,7 @@ describe('getDocumentText', () => {
 	})
 
 	it('reads nothing out of an empty frontmatter block', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent('Real prose here.')
+		const editor = createEditor('Real prose here.')
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
 			content: [{ type: 'text', text: '---\n---' }],
@@ -161,11 +133,9 @@ describe('getDocumentText', () => {
 	})
 
 	it('joins the text nodes a mark splits a paragraph into', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'The **report** was written.',
+		const editor = createEditor('The **report** was written.', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'The report was written.'
@@ -174,11 +144,9 @@ describe('getDocumentText', () => {
 
 	it('breaks a line rather than welding the words either side of a hard break', () => {
 		// Two trailing spaces is markdown's hard break.
-		const editor = new Editor({
-			extensions,
-			content: 'first line  \nsecond line',
+		const editor = createEditor('first line  \nsecond line', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'first line\nsecond line'
@@ -186,11 +154,7 @@ describe('getDocumentText', () => {
 	})
 
 	it('keeps an inline image from joining the words around it', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'see![shot](/a.png)here',
-		})
-		currentEditor = editor
+		const editor = createEditor('see![shot](/a.png)here', { parseOnly: true })
 
 		expect(getDocumentText(editor.state.doc).text).toBe('see here')
 	})
@@ -202,9 +166,7 @@ describe('getDocumentText', () => {
 	// its `**`/`~~` intact, which can hide a phrase-level issue the delimiter
 	// breaks apart.
 	it('strips bold and strike delimiters but keeps the marked text as prose', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent({
+		const editor = createEditor({
 			type: 'doc',
 			content: [
 				{
@@ -234,9 +196,7 @@ describe('getDocumentText', () => {
 	})
 
 	it('strips italic delimiters but keeps the marked text as prose', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
-		editor.commands.setContent({
+		const editor = createEditor({
 			type: 'doc',
 			content: [
 				{
@@ -258,11 +218,9 @@ describe('getDocumentText', () => {
 	})
 
 	it('reads headings and list items as prose too', () => {
-		const editor = new Editor({
-			extensions,
-			content: '# A heading\n\n- One item\n- Another',
+		const editor = createEditor('# A heading\n\n- One item\n- Another', {
+			parseOnly: true,
 		})
-		currentEditor = editor
 
 		expect(getDocumentText(editor.state.doc).text).toBe(
 			'A heading\n\nOne item\n\nAnother'
@@ -270,11 +228,7 @@ describe('getDocumentText', () => {
 	})
 
 	it('reads a blockquote as prose too, without its own leading "> "', () => {
-		const editor = new Editor({
-			extensions,
-			content: '> A quoted sentence.',
-		})
-		currentEditor = editor
+		const editor = createEditor('> A quoted sentence.', { parseOnly: true })
 
 		expect(getDocumentText(editor.state.doc).text).toBe('A quoted sentence.')
 	})
@@ -288,10 +242,10 @@ describe('getDocumentText', () => {
  */
 describe('getDocumentText once delimiters are real text', () => {
 	it('keeps a link out of the prose it hands retext', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'Read [the guide](https://example.com/guide) first.',
-		})
+		const editor = createEditor(
+			'Read [the guide](https://example.com/guide) first.',
+			{ parseOnly: true }
+		)
 		editor.commands.insertContentAt(1, 'x')
 		editor.commands.deleteRange({ from: 1, to: 2 })
 
@@ -304,10 +258,7 @@ describe('getDocumentText once delimiters are real text', () => {
 	})
 
 	it('keeps bold delimiters out of it too', () => {
-		const editor = new Editor({
-			extensions,
-			content: 'This is **truly** fine.',
-		})
+		const editor = createEditor('This is **truly** fine.', { parseOnly: true })
 		editor.commands.insertContentAt(1, 'x')
 		editor.commands.deleteRange({ from: 1, to: 2 })
 

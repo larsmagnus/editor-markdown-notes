@@ -1,8 +1,8 @@
 import { TableMap } from '@tiptap/pm/tables'
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
+import { createEditor } from '@/test-utils/editor'
 
 const TABLE = [
 	'| Quarter | Revenue | Growth |',
@@ -11,16 +11,12 @@ const TABLE = [
 	'| Q2 2025 | 1.4M | 17% |',
 ].join('\n')
 
-const editors: Editor[] = []
-
 /**
  * A live editor with the caret in one cell of the note's only table, numbered
  * in reading order - 0 is the first header cell, 3 the first body cell.
  */
 function editorInCell(markdown: string, cell: number): Editor {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(markdown)
+	const editor = createEditor(markdown)
 
 	const map = TableMap.get(editor.state.doc.firstChild!)
 	editor.commands.setTextSelection(map.map[cell] + 2)
@@ -32,11 +28,6 @@ function editorInCell(markdown: string, cell: number): Editor {
 function saved(editor: Editor): string {
 	return String(editor.storage.markdown.getMarkdown()).trimEnd()
 }
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
 
 describe('moveColumn', () => {
 	it('moves a column and everything under it', () => {

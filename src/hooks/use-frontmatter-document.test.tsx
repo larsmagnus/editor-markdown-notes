@@ -1,21 +1,12 @@
 import { renderHook } from '@testing-library/react'
-import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { useFrontmatterDocument } from '@/hooks/use-frontmatter-document'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 describe('useFrontmatterDocument', () => {
 	it('rebuilds the document when the file changes underneath it', () => {
-		const editor = new Editor({ extensions, content: 'Ship it.' })
-		currentEditor = editor
+		const editor = createEditor('Ship it.', { parseOnly: true })
 
 		const { rerender } = renderHook(
 			({ content }) => useFrontmatterDocument(editor, content),
@@ -34,8 +25,7 @@ describe('useFrontmatterDocument', () => {
 	 * throw away everything typed since, and the caret with it.
 	 */
 	it('leaves the document alone when the change is its own sync coming back', () => {
-		const editor = new Editor({ extensions, content: 'Ship it.' })
-		currentEditor = editor
+		const editor = createEditor('Ship it.', { parseOnly: true })
 
 		const { rerender } = renderHook(
 			({ content }) =>
@@ -65,8 +55,7 @@ describe('useFrontmatterDocument', () => {
 	 */
 	describe('undo across a rebuild', () => {
 		it('is not itself undoable on the very first rebuild', () => {
-			const editor = new Editor({ extensions, content: 'Ship it.' })
-			currentEditor = editor
+			const editor = createEditor('Ship it.', { parseOnly: true })
 
 			renderHook(({ content }) => useFrontmatterDocument(editor, content), {
 				initialProps: { content: '---\ntitle: Roadmap\n---\n\nShip it.' },
@@ -77,8 +66,7 @@ describe('useFrontmatterDocument', () => {
 		})
 
 		it('undoes a later rebuild as one step, then the edit before it', async () => {
-			const editor = new Editor({ extensions, content: 'Ship it.' })
-			currentEditor = editor
+			const editor = createEditor('Ship it.', { parseOnly: true })
 
 			const { rerender } = renderHook(
 				({ content }) => useFrontmatterDocument(editor, content),

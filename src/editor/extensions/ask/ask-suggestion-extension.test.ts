@@ -1,19 +1,10 @@
-import { Editor } from '@tiptap/core'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { askProposalPluginKey } from '@/editor/extensions/ask/ask-suggestion-extension'
-import { extensions } from '@/editor/extensions/extensions'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 function newEditor(content: string) {
-	const editor = new Editor({ extensions, content })
-	currentEditor = editor
+	const editor = createEditor(content, { parseOnly: true })
 	return editor
 }
 

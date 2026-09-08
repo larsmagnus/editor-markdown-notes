@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { moveToAdjacentImage } from '@/editor/extensions/image/keyboard-nav'
+import { createEditor } from '@/test-utils/editor'
 
 const TWO_IMAGES = [
 	'Before',
@@ -16,12 +16,8 @@ const TWO_IMAGES = [
 	'After',
 ].join('\n')
 
-const editors: Editor[] = []
-
 function editorWith(markdown: string): Editor {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(markdown)
+	const editor = createEditor(markdown)
 	return editor
 }
 
@@ -36,11 +32,6 @@ function run(editor: Editor, dir: 1 | -1): boolean {
 function selectedImageAlt(editor: Editor): string | undefined {
 	return editor.getAttributes('image').alt
 }
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
 
 describe('moveToAdjacentImage', () => {
 	it('walks forward through every image, then declines', () => {

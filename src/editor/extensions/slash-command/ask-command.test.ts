@@ -1,12 +1,11 @@
-import { Editor } from '@tiptap/core'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { askInlineStatusPluginKey } from '@/editor/extensions/ask/ask-inline-status-extension'
-import { extensions } from '@/editor/extensions/extensions'
 import {
 	runAskCommand,
 	streamAskInto,
 } from '@/editor/extensions/slash-command/ask-command'
+import { createEditor } from '@/test-utils/editor'
 
 const ask = vi.hoisted(() => vi.fn())
 const cancel = vi.hoisted(() => vi.fn())
@@ -24,19 +23,13 @@ vi.mock('@/editor/extensions/slash-command/ask-prompt-render', () => ({
 	openAskPromptPopup,
 }))
 
-let currentEditor: Editor | undefined
-
 afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-	document.body.innerHTML = ''
 	vi.clearAllMocks()
 })
 
 describe('runAskCommand', () => {
 	it('deletes the /ask range and opens a free-text prompt box at the caret', async () => {
-		const editor = new Editor({ extensions, content: '<p>/ask summarise</p>' })
-		currentEditor = editor
+		const editor = createEditor('<p>/ask summarise</p>', { parseOnly: true })
 		const range = { from: 1, to: editor.state.doc.content.size - 1 }
 
 		runAskCommand(editor, range)
@@ -56,8 +49,7 @@ describe('runAskCommand', () => {
 
 describe('streamAskInto', () => {
 	it('shows the loading widget immediately, before any reply arrives', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 
 		streamAskInto(editor, 1, 'Summarise this note')
 
@@ -69,8 +61,7 @@ describe('streamAskInto', () => {
 	})
 
 	it('clears the loading widget and inserts each streamed chunk, cumulatively', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 
 		streamAskInto(editor, 1, 'Summarise this note')
 		const handlers = ask.mock.calls[0]?.[2]
@@ -84,8 +75,7 @@ describe('streamAskInto', () => {
 	})
 
 	it('keeps inserting streamed chunks in the right place after an edit earlier in the doc', () => {
-		const editor = new Editor({ extensions, content: '<p>Hello world</p>' })
-		currentEditor = editor
+		const editor = createEditor('<p>Hello world</p>', { parseOnly: true })
 
 		// Position 12, right after "world" - the end of the paragraph.
 		streamAskInto(editor, 12, 'Summarise this note')
@@ -101,8 +91,7 @@ describe('streamAskInto', () => {
 	})
 
 	it('discards any partial reply and shows the error card on failure', () => {
-		const editor = new Editor({ extensions, content: '' })
-		currentEditor = editor
+		const editor = createEditor()
 
 		streamAskInto(editor, 1, 'Summarise this note')
 		const handlers = ask.mock.calls[0]?.[2]

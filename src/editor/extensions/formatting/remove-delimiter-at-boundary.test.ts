@@ -1,4 +1,3 @@
-import { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
@@ -7,11 +6,14 @@ import {
 	removeDelimiterOnBackspace,
 	removeDelimiterOnDelete,
 } from '@/editor/extensions/formatting/remove-delimiter-at-boundary'
+import { createEditor } from '@/test-utils/editor'
 
 describe('removeDelimiterOnBackspace', () => {
 	it('unwraps the run from inside its opening delimiter', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
+		const editor = createEditor(
+			'<p>hello <strong>**world**</strong> there</p>',
+			{ extensions: [StarterKit] }
+		)
 		// The run ("**world**") spans 7-16; right after its opening "**" is 9.
 		editor.commands.setTextSelection(9)
 
@@ -39,8 +41,10 @@ describe('removeDelimiterOnBackspace', () => {
 	// to the opening delimiter alone, this fell through to native deletion, which
 	// half-ate the closing "**" - and repair then put it straight back.
 	it('unwraps the run from inside its closing delimiter', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
+		const editor = createEditor(
+			'<p>hello <strong>**world**</strong> there</p>',
+			{ extensions: [StarterKit] }
+		)
 		editor.commands.setTextSelection(16)
 
 		const applied = removeDelimiterOnBackspace(
@@ -63,8 +67,10 @@ describe('removeDelimiterOnBackspace', () => {
 	})
 
 	it('declines in the middle of a run', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
+		const editor = createEditor(
+			'<p>hello <strong>**world**</strong> there</p>',
+			{ extensions: [StarterKit] }
+		)
 		editor.commands.setTextSelection(11)
 
 		const applied = removeDelimiterOnBackspace(
@@ -77,8 +83,10 @@ describe('removeDelimiterOnBackspace', () => {
 	})
 
 	it('declines with a non-empty selection', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
+		const editor = createEditor(
+			'<p>hello <strong>**world**</strong> there</p>',
+			{ extensions: [StarterKit] }
+		)
 		editor.commands.setTextSelection({ from: 9, to: 11 })
 
 		const applied = removeDelimiterOnBackspace(
@@ -93,8 +101,10 @@ describe('removeDelimiterOnBackspace', () => {
 
 describe('removeDelimiterOnDelete', () => {
 	it('unwraps the run from inside its closing delimiter', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
+		const editor = createEditor(
+			'<p>hello <strong>**world**</strong> there</p>',
+			{ extensions: [StarterKit] }
+		)
 		// The run ("**world**") ends at 16; right before its closing "**" is 14.
 		editor.commands.setTextSelection(14)
 
@@ -111,8 +121,10 @@ describe('removeDelimiterOnDelete', () => {
 	})
 
 	it('unwraps the run from inside its opening delimiter', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
+		const editor = createEditor(
+			'<p>hello <strong>**world**</strong> there</p>',
+			{ extensions: [StarterKit] }
+		)
 		editor.commands.setTextSelection(7)
 
 		const applied = removeDelimiterOnDelete(
@@ -128,8 +140,10 @@ describe('removeDelimiterOnDelete', () => {
 	})
 
 	it('declines in the middle of a run', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
+		const editor = createEditor(
+			'<p>hello <strong>**world**</strong> there</p>',
+			{ extensions: [StarterKit] }
+		)
 		editor.commands.setTextSelection(11)
 
 		const applied = removeDelimiterOnDelete(

@@ -1,18 +1,10 @@
 import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
-
-const editors: Editor[] = []
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
+import { createEditor } from '@/test-utils/editor'
 
 function documentFrom(markdown: string): Editor {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
+	const editor = createEditor()
 	// `setContent` runs the plugins that seed/renumber marker text;
 	// constructing with `content` directly does not (see
 	// `inline-code-delimiter-spec.test.ts`'s own regression on the same

@@ -1,13 +1,13 @@
-import { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
 import { createDelimitedMarkRevealProvider } from '@/editor/extensions/formatting/create-delimited-mark-reveal-provider'
 import { fixedDelimiter } from '@/editor/extensions/formatting/delimiter-spec'
+import { createEditor } from '@/test-utils/editor'
 
 describe('createDelimitedMarkRevealProvider', () => {
 	it('spans the whole run, with delimiter ranges at each end', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
+		const editor = createEditor('', { extensions: [StarterKit] })
 		// "hello " is 6 chars (positions 1-7); "**world**" (bold) runs 7-16.
 		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
 
@@ -25,9 +25,9 @@ describe('createDelimitedMarkRevealProvider', () => {
 	})
 
 	it('returns one span per separate run', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent(
-			'<p><strong>**one**</strong> plain <strong>**two**</strong></p>'
+		const editor = createEditor(
+			'<p><strong>**one**</strong> plain <strong>**two**</strong></p>',
+			{ extensions: [StarterKit] }
 		)
 
 		const spans = createDelimitedMarkRevealProvider(
@@ -39,8 +39,9 @@ describe('createDelimitedMarkRevealProvider', () => {
 	})
 
 	it('skips a run too short to contain both delimiters', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p><strong>*</strong></p>')
+		const editor = createEditor('<p><strong>*</strong></p>', {
+			extensions: [StarterKit],
+		})
 
 		expect(
 			createDelimitedMarkRevealProvider('bold', fixedDelimiter('**')).collect(
@@ -50,8 +51,7 @@ describe('createDelimitedMarkRevealProvider', () => {
 	})
 
 	it('returns nothing when the mark type does not exist in the schema', () => {
-		const editor = new Editor({ extensions: [StarterKit], content: '' })
-		editor.commands.setContent('<p>hello</p>')
+		const editor = createEditor('<p>hello</p>', { extensions: [StarterKit] })
 
 		expect(
 			createDelimitedMarkRevealProvider(

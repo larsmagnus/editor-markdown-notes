@@ -1,25 +1,17 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Editor, EditorContext } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { EditorContext } from '@tiptap/react'
+import { describe, expect, it } from 'vitest'
 
 import { AskPopover } from '@/editor/extensions/ask/ask-popover'
 import { askProposalPluginKey } from '@/editor/extensions/ask/ask-suggestion-extension'
-import { extensions } from '@/editor/extensions/extensions'
-
-let currentEditor: Editor | undefined
-
-afterEach(() => {
-	currentEditor?.destroy()
-	currentEditor = undefined
-})
+import { createEditor } from '@/test-utils/editor'
 
 function renderPopover(
 	content: string,
 	selection: { from: number; to: number }
 ) {
-	const editor = new Editor({ extensions, content })
-	currentEditor = editor
+	const editor = createEditor(content, { parseOnly: true })
 	editor.commands.setTextSelection(selection)
 
 	render(

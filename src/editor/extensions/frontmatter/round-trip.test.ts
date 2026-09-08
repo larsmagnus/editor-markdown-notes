@@ -1,20 +1,15 @@
-import { Editor } from '@tiptap/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { extensions } from '@/editor/extensions/extensions'
 import { frontmatterFenceText } from '@/editor/extensions/frontmatter/frontmatter-fence'
 import { splitFrontmatter } from '@/lib/host/frontmatter'
-
-const editors: Editor[] = []
+import { createEditor } from '@/test-utils/editor'
 
 /**
  * Runs markdown through the exact extension set the app ships with, then reads
  * it back out the same way the auto-save does.
  */
 function roundTrip(markdown: string): string {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
-	editor.commands.setContent(markdown)
+	const editor = createEditor(markdown)
 	return String(editor.storage.markdown.getMarkdown()).trimEnd()
 }
 
@@ -26,8 +21,7 @@ function roundTrip(markdown: string): string {
  * content - a real risk this test would otherwise hide.
  */
 function roundTripWithFrontmatter(markdown: string): string {
-	const editor = new Editor({ extensions, content: '' })
-	editors.push(editor)
+	const editor = createEditor()
 	const { frontmatter, body } = splitFrontmatter(markdown)
 	editor.commands.setContent(body)
 	if (frontmatter !== null) {
@@ -38,11 +32,6 @@ function roundTripWithFrontmatter(markdown: string): string {
 	}
 	return String(editor.storage.markdown.getMarkdown()).trimEnd()
 }
-
-afterEach(() => {
-	editors.forEach((editor) => editor.destroy())
-	editors.length = 0
-})
 
 describe('frontmatter', () => {
 	it('keeps frontmatter attached to its note', () => {
