@@ -1,9 +1,9 @@
 'use client'
 
+import { cn } from 'cn'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 
 import type { SlashCommandItem } from '@/editor/extensions/slash-command/commands'
-import { cn } from '@/lib/utils'
 
 /** What `extension.ts` drives keyboard navigation through, outside React's own event system. */
 export type SlashCommandMenuHandle = {

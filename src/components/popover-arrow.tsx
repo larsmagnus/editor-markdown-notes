@@ -1,7 +1,6 @@
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover'
+import { cn } from 'cn'
 import type { ComponentProps } from 'react'
-
-import { cn } from '@/lib/utils'
 
 /**
  * A small triangle pointing from the popover content to its anchor. Not part

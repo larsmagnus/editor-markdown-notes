@@ -1,10 +1,10 @@
+import { cn } from 'cn'
 import { X } from 'lucide-react'
 import type { ComponentProps } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
 
 import { Button } from '@/components/ui/button'
 import { errorMessage } from '@/lib/error-message'
-import { cn } from '@/lib/utils'
 
 interface ErrorFallbackProps extends ComponentProps<'div'> {
 	/** What broke, in the reader's terms - "The editor", "The writing tools". */

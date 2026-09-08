@@ -1,9 +1,9 @@
+import { cn } from 'cn'
 import type { ComponentProps } from 'react'
 
 import { ButtonToggle } from '@/components/button-toggle'
 import { useEditorStyles } from '@/hooks/use-editor-styles'
 import type { Style } from '@/hooks/use-editor-styles'
-import { cn } from '@/lib/utils'
 
 export function ButtonStyle({
 	className,

@@ -1,3 +1,4 @@
+import { cn } from 'cn'
 import { Link } from 'lucide-react'
 import { useId, useState } from 'react'
 
@@ -5,7 +6,6 @@ import { PopoverForm } from '@/components/popover-form'
 import { PopoverIconTrigger } from '@/components/popover-icon-trigger'
 import { PopoverTextField } from '@/components/popover-text-field'
 import { Popover } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
 
 type ImageLinkPopoverProps = {
 	linked: boolean

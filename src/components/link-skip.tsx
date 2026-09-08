@@ -1,10 +1,9 @@
+import { cn } from 'cn'
 import type {
 	AnchorHTMLAttributes,
 	DetailedHTMLProps,
 	PropsWithChildren,
 } from 'react'
-
-import { cn } from '@/lib/utils'
 
 type LinkSkipProps = PropsWithChildren &
 	DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>

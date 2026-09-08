@@ -1,3 +1,4 @@
+import { cn } from 'cn'
 import { lazy, Suspense } from 'react'
 
 import { AppErrorBoundary } from '@/components/app-error-boundary'
@@ -7,7 +8,6 @@ import { useNoteSource } from '@/hooks/use-note-source'
 import { useScrollPosition } from '@/hooks/use-scroll-position'
 import { useSettings } from '@/hooks/use-settings'
 import { contentWidthClassName } from '@/lib/content-width-class'
-import { cn } from '@/lib/utils'
 
 const Toolbar = lazy(() => import('@/components/toolbar'))
 

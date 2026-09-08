@@ -1,5 +1,6 @@
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewWrapper } from '@tiptap/react'
+import { cn } from 'cn'
 
 import { PanZoom } from '@/components/pan-zoom'
 import { ImageToolbar } from '@/editor/extensions/image/toolbar'
@@ -8,7 +9,6 @@ import { useImageCopy } from '@/hooks/use-image-copy'
 import { useImageEditSource } from '@/hooks/use-image-edit-source'
 import { useImageLink } from '@/hooks/use-image-link'
 import { resolveImageSrc } from '@/lib/host/resolve-image-src'
-import { cn } from '@/lib/utils'
 
 type ImageViewProps = Pick<
 	NodeViewProps,

@@ -1,3 +1,4 @@
+import { cn } from 'cn'
 import { createElement } from 'react'
 import type {
 	DetailedHTMLProps,
@@ -6,7 +7,6 @@ import type {
 } from 'react'
 
 import type { HeadingLevel } from '@/lib/heading-levels'
-import { cn } from '@/lib/utils'
 
 interface HeadingProps extends PropsWithChildren<
 	DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>

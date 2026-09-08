@@ -1,8 +1,8 @@
+import { cn } from 'cn'
 import type { LucideIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
 
 interface PopoverIconTriggerProps {
 	icon: LucideIcon

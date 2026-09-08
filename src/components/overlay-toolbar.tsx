@@ -1,6 +1,5 @@
+import { cn } from 'cn'
 import type { MouseEvent, ReactNode } from 'react'
-
-import { cn } from '@/lib/utils'
 
 type OverlayToolbarProps = {
 	children: ReactNode

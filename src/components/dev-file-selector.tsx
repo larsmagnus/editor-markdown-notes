@@ -1,3 +1,4 @@
+import { cn } from 'cn'
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -11,7 +12,6 @@ import {
 	ComboboxTrigger,
 	ComboboxValue,
 } from '@/components/ui/combobox'
-import { cn } from '@/lib/utils'
 
 export type DevFileSelectorProps = {
 	value: string

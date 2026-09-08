@@ -1,10 +1,10 @@
 import type { EditorContentProps } from '@tiptap/react'
 import { EditorConsumer, EditorContent } from '@tiptap/react'
+import { cn } from 'cn'
 import type { ReactNode } from 'react'
 
 import { TableControls } from '@/editor/extensions/table/controls'
 import type { CodeBlockStyle } from '@/hooks/use-syntax-highlight'
-import { cn } from '@/lib/utils'
 
 /**
  * Where the "Skip to editor" link focuses in live mode. Applied via

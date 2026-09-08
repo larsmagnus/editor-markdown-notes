@@ -1,7 +1,6 @@
+import { cn } from 'cn'
 import type { ReactNode } from 'react'
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
-
-import { cn } from '@/lib/utils'
 
 type PanZoomProps = {
 	children: ReactNode

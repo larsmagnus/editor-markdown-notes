@@ -1,9 +1,9 @@
+import { cn } from 'cn'
 import type { ComponentProps, PropsWithChildren } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Marker } from '@/components/ui/marker'
 import { Spinner } from '@/components/ui/spinner'
-import { cn } from '@/lib/utils'
 
 /**
  * Badge for inline loading or status badges

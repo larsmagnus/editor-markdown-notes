@@ -1,3 +1,4 @@
+import { cn } from 'cn'
 import { X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -5,7 +6,6 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { AskProposalActions } from '@/editor/extensions/ask/ask-proposal-actions'
 import type { AskProposalState } from '@/editor/extensions/ask/ask-suggestion-extension'
-import { cn } from '@/lib/utils'
 
 interface AskProposalWidgetProps {
 	proposal: AskProposalState

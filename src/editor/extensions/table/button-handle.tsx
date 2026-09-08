@@ -1,9 +1,9 @@
+import { cn } from 'cn'
 import type { ComponentProps } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { TABLE_AXES } from '@/editor/extensions/table/menu-items'
 import type { TableAxis } from '@/editor/extensions/table/menu-items'
-import { cn } from '@/lib/utils'
 
 interface ButtonHandleProps extends ComponentProps<'button'> {
 	axis: TableAxis

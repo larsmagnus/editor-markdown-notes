@@ -1,3 +1,4 @@
+import { cn } from 'cn'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
@@ -6,7 +7,6 @@ import { useNoteSync } from '@/hooks/use-note-sync'
 import { useSettings } from '@/hooks/use-settings'
 import { findRawSearchRange } from '@/lib/raw-search-reveal'
 import { takeSearchReveal } from '@/lib/search-reveal'
-import { cn } from '@/lib/utils'
 
 interface RawMarkdownEditorProps {
 	content: string

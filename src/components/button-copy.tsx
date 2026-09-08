@@ -1,11 +1,11 @@
 import type { VariantProps } from 'class-variance-authority'
+import { cn } from 'cn'
 import { Copy } from 'lucide-react'
 
 import { BadgeCopied } from '@/components/badge-copied'
 import type { BadgeCopiedSide } from '@/components/badge-copied'
 import { ButtonAction } from '@/components/button-action'
 import type { buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 
 type ButtonCopyProps = {
 	/** Whether the copy just happened - see `useCopiedFeedback`. */

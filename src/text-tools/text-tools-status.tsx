@@ -1,6 +1,7 @@
+import { cn } from 'cn'
+
 import { BadgeLoading } from '@/components/badge-loading'
 import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
 
 type TextToolsStatusProps = {
 	isAnalyzing: boolean

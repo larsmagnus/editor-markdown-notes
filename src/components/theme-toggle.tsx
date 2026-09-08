@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from 'cn'
 import { Moon, Sun } from 'lucide-react'
 import type {
 	ComponentProps,
@@ -16,7 +17,6 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useTheme } from '@/hooks/use-theme'
-import { cn } from '@/lib/utils'
 
 type ThemeToggleProps = PropsWithChildren<
 	Omit<
