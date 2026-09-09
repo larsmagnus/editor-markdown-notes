@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Changed the extension package to be about 16% smaller
+
 ## [0.23.1] - 2026-09-07
 
 - Fixed pressing Enter on an empty bullet, numbered or task list item adding another empty item instead of ending the list
