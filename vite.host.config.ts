@@ -56,6 +56,11 @@ function hostEntries(): Record<string, string> {
 	return entries
 }
 
+/**
+ * Bundles and minifies the VS Code extension host.
+ * `tsconfig.host.json --noEmit` still typechecks separately; this config
+ * only emits.
+ */
 export default defineConfig({
 	// Not a webview build - don't copy `public/`'s assets into the output.
 	publicDir: false,

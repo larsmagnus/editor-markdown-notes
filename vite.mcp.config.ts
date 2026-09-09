@@ -4,12 +4,17 @@ import { defineConfig } from 'vite'
 
 const srcRoot = join(import.meta.dirname, 'src')
 
-// `server.ts` and `copy-dictionaries.ts` are unrelated entries (the latter
-// never imports the former) that both need to ship as standalone Node ESM -
-// this MCP server is its own process, run outside VS Code's `--no-dependencies`
-// `.vsix`, so unlike the webview it has to carry its own dependency graph
-// (the retext stack, hunspell dictionaries) rather than assume anything is
-// already installed.
+/**
+ * Bundles the MCP server as a standalone Node process. It runs outside the
+ * `--no-dependencies` `.vsix` (its own `node` process, not VS Code's
+ * extension host), so unlike the webview or the host it has to carry its own
+ * full dependency graph (the retext stack, hunspell dictionaries) rather
+ * than assume anything is already installed.
+ *
+ * `server.ts` and `copy-dictionaries.ts` are unrelated entries here (the
+ * latter never imports the former) that both need to ship as standalone
+ * Node ESM.
+ */
 export default defineConfig({
 	// Not a webview build - don't copy `public/`'s assets into the output.
 	publicDir: false,
