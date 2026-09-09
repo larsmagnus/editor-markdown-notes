@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import type { PropsWithChildren } from 'react'
+import type { ComponentProps, PropsWithChildren } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import type { FallbackProps } from 'react-error-boundary'
 
@@ -14,7 +14,8 @@ type AppErrorBoundaryProps = PropsWithChildren<{
 	/** See `ErrorFallback`'s prop of the same name. */
 	onRemove?: () => void
 	removeLabel?: string
-}>
+}> &
+	ComponentProps<'div'>
 
 /**
  * One failable subtree, contained and reported.
@@ -28,6 +29,7 @@ export function AppErrorBoundary({
 	onRemove,
 	removeLabel,
 	children,
+	className,
 }: AppErrorBoundaryProps) {
 	const renderFallback = useCallback(
 		(props: FallbackProps) => (
@@ -35,10 +37,11 @@ export function AppErrorBoundary({
 				title={title}
 				onRemove={onRemove}
 				removeLabel={removeLabel}
+				className={className}
 				{...props}
 			/>
 		),
-		[title, onRemove, removeLabel]
+		[title, onRemove, removeLabel, className]
 	)
 
 	return (
