@@ -3,6 +3,7 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/react'
 
 import { createDecorationPlugin } from '#src/editor/extensions/create-decoration-plugin'
+import { styleFor } from '#src/lib/shiki-token-style'
 
 /**
  * Draws Shiki's token colors onto fenced code blocks.
@@ -30,18 +31,6 @@ export type PlacedToken = {
 }
 
 const syntaxHighlightPluginKey = new PluginKey<DecorationSet>('syntaxHighlight')
-
-function styleFor(token: PlacedToken): string {
-	let style = `color:${token.color}`
-	if (!token.fontStyle || token.fontStyle < 0) return style
-
-	if (token.fontStyle & 1) style += ';font-style:italic'
-	if (token.fontStyle & 2) style += ';font-weight:bold'
-	if (token.fontStyle & 4) style += ';text-decoration:underline'
-	if (token.fontStyle & 8) style += ';text-decoration:line-through'
-
-	return style
-}
 
 function toDecorations(
 	doc: Parameters<typeof DecorationSet.create>[0],

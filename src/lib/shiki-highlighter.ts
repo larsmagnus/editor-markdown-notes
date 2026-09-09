@@ -17,10 +17,11 @@ import { findLanguageImporter } from '#src/lib/shiki-language-map'
  * sidesteps that question entirely instead of requiring it be verified, and it
  * avoids shipping a ~1MB WASM binary for a feature most notes never use.
  *
- * Reached only through `await import()`, from `use-syntax-highlight.ts` and
- * after it has found a code block - the core and the regex engine together are
- * a ~160kB chunk a note without code must not pay for. Nothing may import this
- * module statically.
+ * Reached only through `await import()` - from `use-syntax-highlight.ts` once
+ * it has found a code block, and from `use-raw-syntax-highlight.ts` once raw
+ * mode has any text at all - the core and the regex engine together are a
+ * ~160kB chunk a note without code, or a note never opened in raw mode, must
+ * not pay for. Nothing may import this module statically.
  */
 let highlighterPromise: Promise<HighlighterCore> | undefined
 
@@ -74,7 +75,7 @@ const loadedThemeIds = new Set<string>()
  * that drives its foreground/background fallback for a theme that names
  * neither.
  */
-export async function ensureTheme(
+async function ensureTheme(
 	highlighter: HighlighterCore,
 	theme: ShikiTheme
 ): Promise<string> {
@@ -92,6 +93,20 @@ export async function ensureTheme(
 	}
 
 	return theme.themeId
+}
+
+/**
+ * Resolves the singleton highlighter with `theme` loaded and ready to
+ * tokenize - the "get a highlighter" step every caller of `tokenizeBlock`
+ * needs before it, shared so `use-syntax-highlight.ts` and
+ * `use-raw-syntax-highlight.ts` don't each re-sequence it themselves.
+ */
+export async function getThemedHighlighter(
+	theme: ShikiTheme
+): Promise<{ highlighter: HighlighterCore; themeId: string }> {
+	const highlighter = await getHighlighter()
+	const themeId = await ensureTheme(highlighter, theme)
+	return { highlighter, themeId }
 }
 
 /**

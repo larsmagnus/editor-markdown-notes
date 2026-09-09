@@ -71,14 +71,11 @@ export function useSyntaxHighlight(editor: Editor | null, active: boolean) {
 				return
 			}
 
-			const { ensureTheme, getHighlighter, themeColors } =
+			const { getThemedHighlighter, themeColors } =
 				await import('#src/lib/shiki-highlighter')
 			if (cancelled) return
 
-			const highlighter = await getHighlighter()
-			if (cancelled) return
-
-			const themeId = await ensureTheme(highlighter, theme)
+			const { highlighter, themeId } = await getThemedHighlighter(theme)
 			if (cancelled) return
 
 			const { bg, fg } = themeColors(highlighter, themeId)

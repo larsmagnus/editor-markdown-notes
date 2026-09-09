@@ -1,12 +1,11 @@
 import { cn } from 'cn'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ChangeEvent } from 'react'
+import { useRef } from 'react'
 
-import { useFlushOnDeactivate } from '#src/hooks/use-flush-on-deactivate'
-import { useNoteSync } from '#src/hooks/use-note-sync'
+import { RawMarkdownHighlight } from '#src/editor/raw-markdown-highlight'
+import { useRawDraftSync } from '#src/hooks/use-raw-draft-sync'
+import { useRawSearchReveal } from '#src/hooks/use-raw-search-reveal'
+import { useRawSyntaxHighlight } from '#src/hooks/use-raw-syntax-highlight'
 import { useSettings } from '#src/hooks/use-settings'
-import { findRawSearchRange } from '#src/lib/raw-search-reveal'
-import { takeSearchReveal } from '#src/lib/search-reveal'
 
 interface RawMarkdownEditorProps {
 	content: string
@@ -36,109 +35,43 @@ export function EditorModeRaw({
 	className,
 }: RawMarkdownEditorProps) {
 	const { isVSCodeContext } = useSettings()
-	const [draft, setDraft] = useState(content)
-
-	const draftRef = useRef(draft)
-	draftRef.current = draft
-
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-	// The text this view last agreed with the host about, from either direction:
-	// what it took from `content`, or what it wrote back. A draft that still
-	// matches it has nothing of the author's to lose.
-	//
-	// Both directions matter because `useHostDocument` applies each sync locally,
-	// so `content` follows this view's own writes as well as outside edits -
-	// tracking only what arrived would read an author who undid their way back
-	// to the earlier text as having nothing pending.
-	const adoptedRef = useRef(content)
-
-	const currentFile = useCallback(() => draftRef.current, [])
-	// This view's own echo check, parallel to `use-markdown-editor.ts`'s
-	// `own-sync-tracker` rather than sharing it: `adoptedRef` already tells the
-	// echo of this view's own write apart from an outside edit, and unlike the
-	// live editor a stale match would only cost a redundant `setDraft` here,
-	// not a document rebuild that drops keystrokes.
-	const rememberSync = useCallback(
-		(next: string) => {
-			adoptedRef.current = next
-			syncContent(next)
-		},
-		[syncContent]
-	)
-	const recordOwnSync = useCallback((next: string) => {
-		adoptedRef.current = next
-	}, [])
-	const { queueSync, flushQueuedSync } = useNoteSync({
-		isVSCodeContext,
-		syncContent: rememberSync,
-		currentFile,
+	const { draft, draftRef, handleChange, handleBlur } = useRawDraftSync({
+		content,
+		syncContent,
 		active,
-		recordOwnSync,
+		isVSCodeContext,
+		textareaRef,
 	})
-	useFlushOnDeactivate(active, flushQueuedSync)
-
-	// Only while the caret is elsewhere. The host echoes every sync back as an
-	// `update`, and that echo is a debounce behind the keystrokes still arriving
-	// - adopting it mid-edit would reset both the text and the caret.
-	useEffect(() => {
-		if (document.activeElement === textareaRef.current) return
-
-		adoptedRef.current = content
-		setDraft(content)
-	}, [content])
-
-	// `content` will not change a second time, so the effect above never gets
-	// another chance at a change that landed while the caret was here. Without
-	// this the note shows text nobody wrote until it is closed and reopened.
-	const handleBlur = () => {
-		if (draftRef.current !== adoptedRef.current) return
-
-		adoptedRef.current = content
-		setDraft(content)
-	}
-
-	// A textarea can highlight nothing but its own selection, so selecting the
-	// match *is* the highlight here - and focusing is what scrolls the container
-	// to it. The usual "nothing may autofocus" rule is about not fighting the
-	// remembered scroll position, which a reveal deliberately overrides anyway.
-	const revealed = useRef(false)
-	useEffect(() => {
-		const textarea = textareaRef.current
-		if (!textarea || revealed.current) return
-
-		const reveal = takeSearchReveal()
-		if (!reveal) return
-
-		const range = findRawSearchRange(draftRef.current, reveal)
-		if (!range) return
-
-		revealed.current = true
-		textarea.focus()
-		textarea.setSelectionRange(range.start, range.end)
-	}, [])
-
-	const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-		setDraft(event.target.value)
-		queueSync(event.target.value)
-	}
+	useRawSearchReveal(textareaRef, draftRef)
+	const tokens = useRawSyntaxHighlight(draft, active)
 
 	return (
-		<textarea
-			id={RAW_MARKDOWN_EDITOR_ID}
-			ref={textareaRef}
-			value={draft}
-			onChange={handleChange}
-			onBlur={handleBlur}
-			spellCheck={false}
-			aria-label="Raw markdown"
-			className={cn(
+		// The measure/centering classes (`className`) live on this wrapper, not
+		// the textarea - `RawMarkdownHighlight` shares this same box via
+		// `absolute inset-0`, and the two must wrap at the identical width or a
+		// click lands on whatever character the textarea's own, differently
+		// wrapped layout puts underneath it, not the one the mirror shows there.
+		<div className={cn('relative', className)}>
+			<RawMarkdownHighlight text={draft} tokens={tokens} />
+			<textarea
+				id={RAW_MARKDOWN_EDITOR_ID}
+				ref={textareaRef}
+				value={draft}
+				onChange={handleChange}
+				onBlur={handleBlur}
+				spellCheck={false}
+				aria-label="Raw markdown"
 				// `pre-wrap` rather than `pre`: the source shares the rendered
 				// document's measure, so a line longer than it has to wrap rather
 				// than run off the side of a column it cannot scroll.
-				'w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre-wrap outline-none field-sizing-content',
-				className
-			)}
-		/>
+				//
+				// Text itself is transparent - `RawMarkdownHighlight` behind it
+				// carries the actual colored glyphs - but the caret stays the
+				// theme's foreground color so it doesn't vanish along with it.
+				className="relative w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre-wrap text-transparent caret-foreground outline-none field-sizing-content"
+			/>
+		</div>
 	)
 }
