@@ -4,6 +4,7 @@ import { configDefaults, defineConfig } from 'vitest/config'
 
 import { dictionaryAliases } from './vite/dictionary-aliases.ts'
 import { fixPluralizeUmd } from './vite/fix-pluralize-umd.ts'
+import { subpathAlias } from './vite/subpath-alias.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -25,12 +26,7 @@ export default defineConfig({
 		manifest: 'manifest.json',
 	},
 	resolve: {
-		// Rolldown doesn't resolve the root `package.json`'s `imports` field on its
-		// own, unlike Node and `tsc` - `#src/*` still needs a manual alias here.
-		alias: [
-			{ find: /^#src\//, replacement: `${import.meta.dirname}/src/` },
-			...dictionaryAliases(),
-		],
+		alias: [...subpathAlias(), ...dictionaryAliases()],
 	},
 	test: {
 		environment: 'happy-dom',

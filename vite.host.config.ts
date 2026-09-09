@@ -5,7 +5,7 @@ import { defineConfig } from 'vite'
 
 import { parseJsonc } from '#src/lib/host/jsonc'
 
-import { subpathAlias } from './vite/subpath-alias'
+import { subpathAlias } from './vite/subpath-alias.ts'
 
 const repoRoot = import.meta.dirname
 const srcRoot = `${repoRoot}/src`

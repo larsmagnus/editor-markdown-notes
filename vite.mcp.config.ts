@@ -2,7 +2,7 @@ import { join } from 'node:path'
 
 import { defineConfig } from 'vite'
 
-import { subpathAlias } from './vite/subpath-alias'
+import { subpathAlias } from './vite/subpath-alias.ts'
 
 const srcRoot = join(import.meta.dirname, 'src')
 
