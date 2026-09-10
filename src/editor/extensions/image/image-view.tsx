@@ -54,7 +54,7 @@ export function ImageView({
 					// `min-w`/`min-h`: floors the frame to the toolbar's own size, so a
 					// small image doesn't spill it off the page edge.
 					'max-h-[32rem] min-w-40 min-h-14 rounded-md border border-border/50 p-2 hover:border-border',
-					softFocused && 'border-ring ring-3 ring-ring/50'
+					softFocused && 'border-ring ring-2 ring-ring/50'
 				)}
 				controls={
 					<ImageToolbar
