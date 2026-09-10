@@ -50,7 +50,7 @@ function Toolbar({ files, fileName, setFileName, content }: ToolbarProps) {
 	return (
 		<div
 			role="toolbar"
-			className="sticky top-0 left-0 bg-background/20 backdrop-blur-md p-3 flex gap-2 items-center z-10 scroll-fade overflow-x-auto"
+			className="sticky top-0 left-0 bg-background/20 backdrop-blur-md p-3 flex gap-2 items-center z-20 scroll-fade overflow-x-auto"
 		>
 			{DevFileSelector && !isVSCodeContext && (
 				<Suspense fallback={null}>
