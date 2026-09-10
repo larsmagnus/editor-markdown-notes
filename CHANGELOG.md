@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added support for opening relative links to other files in the workspace, from both the live and raw markdown views
+- Added support for clicking a link to a heading, scrolling to it in the same or another note
 - Added syntax highlighting to the raw markdown view
 - Changed the extension package to be about 16% smaller
 

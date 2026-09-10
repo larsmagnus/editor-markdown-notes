@@ -6,6 +6,8 @@ export type WebviewPanelState = {
 	scrollTop?: number
 	/** Whether the injected search reveal has already been acted on. */
 	searchRevealConsumed?: boolean
+	/** Whether the injected heading reveal has already been acted on. */
+	headingRevealConsumed?: boolean
 }
 
 /**

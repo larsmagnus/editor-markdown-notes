@@ -3,6 +3,9 @@ import { useRef } from 'react'
 
 import { RawMarkdownHighlight } from '#src/editor/raw-markdown-highlight'
 import { useRawDraftSync } from '#src/hooks/use-raw-draft-sync'
+import { useRawHeadingReveal } from '#src/hooks/use-raw-heading-reveal'
+import { useRawLinkClick } from '#src/hooks/use-raw-link-click'
+import { useRawLinkHover } from '#src/hooks/use-raw-link-hover'
 import { useRawSearchReveal } from '#src/hooks/use-raw-search-reveal'
 import { useRawSyntaxHighlight } from '#src/hooks/use-raw-syntax-highlight'
 import { useSettings } from '#src/hooks/use-settings'
@@ -36,6 +39,7 @@ export function EditorModeRaw({
 }: RawMarkdownEditorProps) {
 	const { isVSCodeContext } = useSettings()
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
+	const overlayRef = useRef<HTMLPreElement>(null)
 
 	const { draft, draftRef, handleChange, handleBlur } = useRawDraftSync({
 		content,
@@ -45,6 +49,9 @@ export function EditorModeRaw({
 		textareaRef,
 	})
 	useRawSearchReveal(textareaRef, draftRef)
+	useRawHeadingReveal(textareaRef, draftRef, active)
+	useRawLinkClick(textareaRef, draftRef)
+	const activeLinkRangeIndex = useRawLinkHover(textareaRef, overlayRef)
 	const tokens = useRawSyntaxHighlight(draft, active)
 
 	return (
@@ -54,7 +61,12 @@ export function EditorModeRaw({
 		// click lands on whatever character the textarea's own, differently
 		// wrapped layout puts underneath it, not the one the mirror shows there.
 		<div className={cn('relative', className)}>
-			<RawMarkdownHighlight text={draft} tokens={tokens} />
+			<RawMarkdownHighlight
+				ref={overlayRef}
+				text={draft}
+				tokens={tokens}
+				activeLinkRangeIndex={activeLinkRangeIndex}
+			/>
 			<textarea
 				id={RAW_MARKDOWN_EDITOR_ID}
 				ref={textareaRef}
@@ -70,7 +82,14 @@ export function EditorModeRaw({
 				// Text itself is transparent - `RawMarkdownHighlight` behind it
 				// carries the actual colored glyphs - but the caret stays the
 				// theme's foreground color so it doesn't vanish along with it.
-				className="relative w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre-wrap text-transparent caret-foreground outline-none field-sizing-content"
+				//
+				// `cursor-pointer` while `useRawLinkHover` reports the mouse over a
+				// link's href with the modifier held - the textarea is what actually
+				// receives the pointer, so it is the one CSS can style a cursor on.
+				className={cn(
+					'relative w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre-wrap text-transparent caret-foreground outline-none field-sizing-content',
+					activeLinkRangeIndex !== null && 'cursor-pointer'
+				)}
 			/>
 		</div>
 	)

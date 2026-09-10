@@ -5,8 +5,11 @@ import type { DocumentWriter } from '#src/host/document-updates'
 import { postDocumentUpdate } from '#src/host/document-updates'
 import { openClaudeTerminal } from '#src/host/open-claude-terminal-command'
 import { openInTextEditor } from '#src/host/open-in-text-editor-command'
+import { openLinkTarget } from '#src/host/open-link-command'
+import type { PendingHeadingRevealStore } from '#src/host/pending-heading-reveal-store'
 import { pickImagePath } from '#src/host/pick-image-command'
 import type { ScrollPositionStore } from '#src/host/scroll-position-store'
+import type { SessionsByUri } from '#src/host/sessions-by-uri'
 import type { SettingsStore } from '#src/host/settings-store'
 import { recordWebviewLog } from '#src/lib/host/webview-diagnostics'
 import type { Logger } from '#src/shared/logger'
@@ -31,6 +34,8 @@ type HandlerDependencies = {
 	log: Logger
 	broadcastConfig: () => void
 	readShikiTheme: () => ShikiThemePayload
+	panelsByUri: SessionsByUri<vscode.WebviewPanel>
+	pendingReveals: PendingHeadingRevealStore
 }
 
 /**
@@ -59,6 +64,8 @@ export function createWebviewMessageHandlers({
 	log,
 	broadcastConfig,
 	readShikiTheme,
+	panelsByUri,
+	pendingReveals,
 }: HandlerDependencies): WebviewMessageHandlerSession {
 	const { askClaude, cancelAsk, disposable } = createAskClaudeHandlers({
 		panel,
@@ -85,6 +92,15 @@ export function createWebviewMessageHandlers({
 		log: (message) => recordWebviewLog(log, message.level, message.message),
 		openInTextEditor: () => {
 			void openInTextEditor(document.uri)
+		},
+		openLink: async (message) => {
+			await openLinkTarget(
+				message.href,
+				document,
+				panelsByUri,
+				pendingReveals,
+				log
+			)
 		},
 		// Claude reads the file, not our buffer - VS Code no longer saves on
 		// every sync, so without this the terminal command it types can point

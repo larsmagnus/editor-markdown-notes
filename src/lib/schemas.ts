@@ -197,17 +197,44 @@ export const searchRevealSchema = z
 			'Injected as `window.searchReveal` when a note opens from a search result, naming the match to scroll to in *body* coordinates - the host has already subtracted the frontmatter, and `lineOffset` says how much, for raw mode to add back. Absent on an ordinary open. `text` is the matched source text, which the live editor looks for in the rendered document to place this match and highlight every other occurrence.',
 	})
 
+export const headingRevealSchema = z
+	.object({
+		hash: z.string().catch(''),
+	})
+	.catch({ hash: '' })
+	.meta({
+		id: 'HeadingReveal',
+		title: 'Heading reveal',
+		description:
+			"Injected as `window.headingReveal` when a note opens as a link's target with a `#hash`, naming the heading to scroll to. Absent on an ordinary open.",
+	})
+
+/**
+ * Sent live to an already-open panel whose document a link just targeted -
+ * `window.headingReveal` only reaches a panel at the moment its own page
+ * script runs, so an existing one needs this instead. `type` is not wrapped
+ * in `.catch()`, unlike its payload: a mismatched literal is what lets
+ * `useHostMessage` tell this message apart from any other traffic sharing the
+ * page's `message` channel, and defaulting it would make foreign traffic
+ * parse as a bogus reveal.
+ */
+export const revealHeadingMessageSchema = z.object({
+	type: z.literal('revealHeading'),
+	hash: z.string().catch(''),
+})
+
 export const webviewPanelStateSchema = z
 	.object({
 		scrollTop: z.number().nonnegative().optional().catch(undefined),
 		searchRevealConsumed: z.boolean().optional().catch(undefined),
+		headingRevealConsumed: z.boolean().optional().catch(undefined),
 	})
 	.catch({})
 	.meta({
 		id: 'WebviewPanelState',
 		title: 'Webview panel state',
 		description:
-			'What this panel last recorded through `vscode.setState`, which is the only thing VS Code preserves when it tears the webview down for a backgrounded tab and rebuilds it from the HTML it already holds. Both fields are optional because their absence is meaningful and must not degrade to a default: no `scrollTop` says to fall back to the offset the host injected, where a `0` would be a panel restored at the top, and no `searchRevealConsumed` says the injected reveal has not been acted on yet.',
+			'What this panel last recorded through `vscode.setState`, which is the only thing VS Code preserves when it tears the webview down for a backgrounded tab and rebuilds it from the HTML it already holds. Every field is optional because its absence is meaningful and must not degrade to a default: no `scrollTop` says to fall back to the offset the host injected, where a `0` would be a panel restored at the top, and no `searchRevealConsumed`/`headingRevealConsumed` says the injected reveal has not been acted on yet.',
 	})
 
 export const updateMessageSchema = z

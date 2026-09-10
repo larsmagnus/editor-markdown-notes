@@ -4,6 +4,7 @@ import Link from '@tiptap/extension-link'
 import { createDelimitedMarkExtension } from '#src/editor/extensions/formatting/delimited-mark-extension'
 import { createApplyLinkCommand } from '#src/editor/extensions/link/apply-link-command'
 import type { LinkAttrs } from '#src/editor/extensions/link/apply-link-command'
+import { createLinkClickHandler } from '#src/editor/extensions/link/link-click-handler'
 import { linkDelimiterSpec } from '#src/editor/extensions/link/link-delimiter-spec'
 import { LINK_MARKDOWN_SERIALIZE } from '#src/editor/extensions/link/link-markdown-spec'
 import { createSyncLinkAttrsPlugin } from '#src/editor/extensions/link/sync-link-attrs-plugin'
@@ -21,23 +22,23 @@ import { createUnlinkCommand } from '#src/editor/extensions/link/unlink-command'
  * revealed `(url)` is the primary way of editing a link, and without it the
  * rendered `<a href>` and the popover's field stay frozen at creation time.
  */
-// TODO: relative links (`[notes](./notes.md)`) currently fall through to
-// @tiptap/extension-link's default openOnClick, which calls
-// window.open(href, '_blank') - a no-op for a relative path inside the
-// VS Code webview. Should instead open through the host, mirroring VS
-// Code's own file-link convention: a plain click reuses the existing
-// preview tab (italic tab title), a stronger trigger (double-click/
-// cmd-click) opens a new permanent tab. src/host/open-file-command.ts
-// (openFile, via vscode.openWith) and src/host/open-in-text-editor-
-// command.ts are the closest existing precedent, but neither takes a
-// ViewColumn/preview-mode argument yet, and webview-message-handlers.ts
-// has no link-related message type - both would need to be added.
 export const LinkExtension = createDelimitedMarkExtension(Link, {
 	ensureSpec: linkDelimiterSpec(),
 	serialize: LINK_MARKDOWN_SERIALIZE,
 }).extend({
+	// Stock `openOnClick` has no hook to bail only for a relative href, so it's
+	// off here and reimplemented, absolute URL included, by
+	// `link-click-handler.ts` - the plugin below.
+	addOptions() {
+		return { ...this.parent?.(), openOnClick: false }
+	},
+
 	addProseMirrorPlugins() {
-		return [...(this.parent?.() ?? []), createSyncLinkAttrsPlugin(this.type)]
+		return [
+			...(this.parent?.() ?? []),
+			createSyncLinkAttrsPlugin(this.type),
+			createLinkClickHandler(),
+		]
 	},
 
 	addCommands() {

@@ -199,6 +199,21 @@ export type SearchReveal = {
 	lineOffset: number
 }
 
+/**
+ * Where a link's `#hash` should scroll to, once its target document is open.
+ *
+ * Delivered two ways depending on whether the target already has a panel
+ * open (see `heading-reveal-delivery.ts`): injected as `window.headingReveal`
+ * for a freshly built one, exactly like `SearchReveal`, or posted live as a
+ * `revealHeading` message to one that already exists - which a bare
+ * injected global can't reach, since nothing re-runs the script that reads it.
+ */
+export type HeadingReveal = {
+	/** The link's #fragment, already what `slugify-heading.ts` expects to
+	 *  match against a document's own heading slugs. */
+	hash: string
+}
+
 export type LogLevel = 'error' | 'warn' | 'info'
 
 export type ShikiThemeKind =
@@ -295,6 +310,18 @@ export type WebviewToHost =
 	 * overwrite it.
 	 */
 	| { type: 'latestContent'; requestId: string; content: string | null }
+	/**
+	 * Asks the host to open a relative link's target - a workspace file, or a
+	 * URL with no recognized scheme. Only sent for an href that is not an
+	 * absolute URL with an external scheme (those still `window.open`
+	 * directly) and not a same-document hash-only link (`#title` resolves
+	 * entirely client-side). `href` is the literal delimiter text between the
+	 * parens, unmodified - the host does all path resolution, mirroring how
+	 * `image-base-uris.ts` resolves a relative image src. Still carries its
+	 * own `#hash`, if any, so the host can forward it for cross-document
+	 * reveal once the target is open.
+	 */
+	| { type: 'openLink'; href: string }
 
 export type HostToWebview =
 	| { type: 'update'; content: string; fileName: string }
@@ -325,3 +352,7 @@ export type HostToWebview =
 	 * `TextDocument.isDirty` directly.
 	 */
 	| { type: 'documentSaved' }
+	/** Posted to an already-open panel whose document a link just targeted -
+	 *  see `HeadingReveal`. A freshly opened panel gets the same information
+	 *  injected as `window.headingReveal` instead. */
+	| ({ type: 'revealHeading' } & HeadingReveal)

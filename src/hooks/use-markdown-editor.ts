@@ -10,6 +10,7 @@ import { useFocusNavigation } from '#src/editor/extensions/focus-navigation/use-
 import { useAskProposal } from '#src/hooks/use-ask-proposal'
 import { useFlushOnDeactivate } from '#src/hooks/use-flush-on-deactivate'
 import { useFrontmatterDocument } from '#src/hooks/use-frontmatter-document'
+import { useHeadingReveal } from '#src/hooks/use-heading-reveal'
 import { useItalicMarker } from '#src/hooks/use-italic-marker'
 import { useMarkdownAutosync } from '#src/hooks/use-markdown-autosync'
 import { useSearchReveal } from '#src/hooks/use-search-reveal'
@@ -110,6 +111,7 @@ export function useMarkdownEditor(
 	// document - searching the doc it was constructed with would miss the
 	// frontmatter and race the only content sync this note ever gets for free.
 	useSearchReveal(editor)
+	useHeadingReveal(editor, active)
 
 	const { flushQueuedSync } = useMarkdownAutosync({
 		editor,

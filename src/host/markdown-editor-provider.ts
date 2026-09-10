@@ -2,7 +2,9 @@ import * as vscode from 'vscode'
 
 import { broadcastToPanels } from '#src/host/broadcast'
 import { CONFIG_SECTION, VIEW_TYPE } from '#src/host/constants'
+import { PanelRegistry } from '#src/host/panel-registry'
 import { attachPanelSession } from '#src/host/panel-session'
+import { PendingHeadingRevealStore } from '#src/host/pending-heading-reveal-store'
 import { readSearchReveal } from '#src/host/read-search-reveal'
 import type { PanelSaveSession } from '#src/host/save-participant'
 import {
@@ -26,9 +28,11 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 	private readonly shikiThemeStore: ShikiThemeStore
 	private readonly scrollPositions: ScrollPositionStore
 	private readonly log: Logger
-	private readonly panels = new Set<vscode.WebviewPanel>()
+	private readonly panelRegistry = new PanelRegistry()
 	/** For `registerSaveParticipant`. */
 	private readonly saveSessions = new SessionsByUri<PanelSaveSession>()
+	/** A link's heading reveal, queued until its not-yet-open target exists. */
+	private readonly pendingReveals = new PendingHeadingRevealStore()
 
 	constructor(
 		context: vscode.ExtensionContext,
@@ -84,7 +88,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			...this.store.getConfig(),
 		}
 
-		broadcastToPanels(this.panels, message)
+		broadcastToPanels(this.panelRegistry.panels, message)
 	}
 
 	/** Keeps every open editor tab's syntax highlighting in sync with the
@@ -95,7 +99,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			...this.shikiThemeStore.getTheme(),
 		}
 
-		broadcastToPanels(this.panels, message)
+		broadcastToPanels(this.panelRegistry.panels, message)
 	}
 
 	public async resolveCustomTextEditor(
@@ -118,9 +122,15 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 			broadcastConfig: this.broadcastConfig,
 			readShikiTheme: () => this.shikiThemeStore.getTheme(),
 			token,
+			panelsByUri: this.panelRegistry.panelsByUri,
+			pendingReveals: this.pendingReveals,
 		})
 
-		this.panels.add(webviewPanel)
+		this.panelRegistry.track(
+			document.uri.toString(),
+			webviewPanel,
+			session.writer !== null
+		)
 
 		const untrackSaveSession = trackSaveSession(
 			this.saveSessions,
@@ -130,7 +140,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 		)
 
 		webviewPanel.onDidDispose(() => {
-			this.panels.delete(webviewPanel)
+			this.panelRegistry.untrack(document.uri.toString(), webviewPanel)
 			session.disposable.dispose()
 			untrackSaveSession()
 		})

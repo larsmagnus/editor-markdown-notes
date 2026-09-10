@@ -150,6 +150,20 @@ describe('buildWebviewHtml', () => {
 		expect(buildWebviewHtml(INPUT)).not.toContain('window.searchReveal')
 	})
 
+	it('injects the heading reveal when the note opens as a link target', () => {
+		const html = buildWebviewHtml({
+			...INPUT,
+			globals: { ...INPUT.globals, headingReveal: { hash: 'title' } },
+		})
+
+		expect(html).toContain('window.headingReveal = {"hash":"title"};')
+	})
+
+	/** Its absence is what the webview reads as "an ordinary open". */
+	it('leaves the heading reveal out entirely when there is none', () => {
+		expect(buildWebviewHtml(INPUT)).not.toContain('window.headingReveal')
+	})
+
 	it('gives the app its mount point', () => {
 		expect(buildWebviewHtml(INPUT)).toContain('<div id="root"></div>')
 	})

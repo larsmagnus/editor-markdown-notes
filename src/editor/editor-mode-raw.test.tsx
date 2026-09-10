@@ -279,4 +279,128 @@ describe('EditorModeRaw', () => {
 
 		expect(textarea.selectionStart).toBe(textarea.selectionEnd)
 	})
+
+	describe('Cmd/Ctrl+click on a link', () => {
+		it('routes a relative link through the host when the offset is on its href, and does not move the caret via typing', async () => {
+			window.vscode = {
+				postMessage: vi.fn(),
+				getState: vi.fn(),
+				setState: vi.fn(),
+			}
+			const content = 'See [notes](./notes.md) for details.'
+
+			render(
+				<SettingsProvider>
+					<EditorModeRaw content={content} syncContent={vi.fn()} />
+				</SettingsProvider>
+			)
+
+			const textarea =
+				screen.getByLabelText<HTMLTextAreaElement>('Raw markdown')
+			const offset = content.indexOf('./notes.md') + 2
+			textarea.setSelectionRange(offset, offset)
+
+			fireEvent.mouseDown(textarea, { button: 0, metaKey: true })
+
+			expect(window.vscode.postMessage).toHaveBeenCalledWith({
+				type: 'openLink',
+				href: './notes.md',
+			})
+		})
+
+		it('does nothing on a plain click on the href, leaving caret placement to the browser', async () => {
+			window.vscode = {
+				postMessage: vi.fn(),
+				getState: vi.fn(),
+				setState: vi.fn(),
+			}
+			const content = 'See [notes](./notes.md) for details.'
+
+			render(
+				<SettingsProvider>
+					<EditorModeRaw content={content} syncContent={vi.fn()} />
+				</SettingsProvider>
+			)
+
+			const textarea =
+				screen.getByLabelText<HTMLTextAreaElement>('Raw markdown')
+			const offset = content.indexOf('./notes.md') + 2
+			textarea.setSelectionRange(offset, offset)
+
+			vi.mocked(window.vscode.postMessage).mockClear()
+			fireEvent.mouseDown(textarea, { button: 0 })
+
+			expect(window.vscode.postMessage).not.toHaveBeenCalled()
+		})
+
+		it('does nothing when Cmd/Ctrl+clicking the link text, only the parens content is clickable', async () => {
+			window.vscode = {
+				postMessage: vi.fn(),
+				getState: vi.fn(),
+				setState: vi.fn(),
+			}
+			const content = 'See [notes](./notes.md) for details.'
+
+			render(
+				<SettingsProvider>
+					<EditorModeRaw content={content} syncContent={vi.fn()} />
+				</SettingsProvider>
+			)
+
+			const textarea =
+				screen.getByLabelText<HTMLTextAreaElement>('Raw markdown')
+			const offset = content.indexOf('notes]')
+			textarea.setSelectionRange(offset, offset)
+
+			vi.mocked(window.vscode.postMessage).mockClear()
+			fireEvent.mouseDown(textarea, { button: 0, metaKey: true })
+
+			expect(window.vscode.postMessage).not.toHaveBeenCalled()
+		})
+
+		it('does nothing when Cmd/Ctrl+clicking outside any link', async () => {
+			window.vscode = {
+				postMessage: vi.fn(),
+				getState: vi.fn(),
+				setState: vi.fn(),
+			}
+			const content = 'See [notes](./notes.md) for details.'
+
+			render(
+				<SettingsProvider>
+					<EditorModeRaw content={content} syncContent={vi.fn()} />
+				</SettingsProvider>
+			)
+
+			const textarea =
+				screen.getByLabelText<HTMLTextAreaElement>('Raw markdown')
+			const offset = content.indexOf('for details')
+			textarea.setSelectionRange(offset, offset)
+
+			vi.mocked(window.vscode.postMessage).mockClear()
+			fireEvent.mouseDown(textarea, { button: 0, metaKey: true })
+
+			expect(window.vscode.postMessage).not.toHaveBeenCalled()
+		})
+
+		it('selects the matching heading for a Cmd/Ctrl+click on a same-document hash link', async () => {
+			const content = '# Title\n\nSee [jump](#title) above.\n'
+
+			render(
+				<SettingsProvider>
+					<EditorModeRaw content={content} syncContent={vi.fn()} />
+				</SettingsProvider>
+			)
+
+			const textarea =
+				screen.getByLabelText<HTMLTextAreaElement>('Raw markdown')
+			const offset = content.indexOf('#title') + 2
+			textarea.setSelectionRange(offset, offset)
+
+			fireEvent.mouseDown(textarea, { button: 0, ctrlKey: true })
+
+			expect(textarea.selectionStart).toBe(0)
+			expect(textarea.selectionEnd).toBe(0)
+		})
+	})
 })

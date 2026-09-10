@@ -2,7 +2,12 @@
 import { toScriptLiteral } from '#src/lib/host/script-literal'
 // Relative, not `#src/`: this module is also compiled by `tsconfig.host.json`,
 // which has no `paths` mapping precisely so aliases cannot reach the host build.
-import type { Config, ImageBaseUris, SearchReveal } from '#src/shared/messages'
+import type {
+	Config,
+	HeadingReveal,
+	ImageBaseUris,
+	SearchReveal,
+} from '#src/shared/messages'
 
 export type WebviewHtmlInput = {
 	/** Webview URI of the built entry chunk. */
@@ -24,6 +29,8 @@ export type WebviewHtmlInput = {
 		imageBaseUris: ImageBaseUris
 		/** Only when this note is opening from a search result, which is rare. */
 		searchReveal?: SearchReveal
+		/** Only when this note is opening as a link's target with a `#hash`. */
+		headingReveal?: HeadingReveal
 	}
 }
 
@@ -64,7 +71,8 @@ export function buildWebviewHtml({
             window.initialConfig = ${toScriptLiteral(globals.initialConfig)};
             window.initialScrollTop = ${toScriptLiteral(globals.initialScrollTop)};
             window.imageBaseUris = ${toScriptLiteral(globals.imageBaseUris)};
-            ${searchRevealAssignment(globals.searchReveal)}
+            ${optionalGlobalAssignment('searchReveal', globals.searchReveal)}
+            ${optionalGlobalAssignment('headingReveal', globals.headingReveal)}
         </script>
         <script type="module" crossorigin src="${scriptUri}" nonce="${nonce}"></script>
     </body>
@@ -72,13 +80,14 @@ export function buildWebviewHtml({
 }
 
 /**
- * Assigned only when there is a reveal, so the page an ordinary open produces is
- * unchanged and `'searchReveal' in window` reads as the answer on its own.
+ * Assigned only when `value` is given, so the page an ordinary open produces
+ * is unchanged and `'searchReveal' in window` (or `'headingReveal'`) reads as
+ * the answer on its own.
  */
-function searchRevealAssignment(reveal: SearchReveal | undefined): string {
-	if (!reveal) return ''
+function optionalGlobalAssignment(name: string, value: unknown): string {
+	if (value === undefined) return ''
 
-	return `window.searchReveal = ${toScriptLiteral(reveal)};`
+	return `window.${name} = ${toScriptLiteral(value)};`
 }
 
 /**
