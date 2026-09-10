@@ -45,7 +45,7 @@ export function MermaidDiagram({
 						// hover affordances: a diagram taller than the cap is clipped,
 						// and an edge is what says so rather than leaving it looking
 						// like the diagram simply ends there.
-						className="max-h-[32rem] rounded-md border border-border/50 p-2 hover:border-border"
+						className="min-h-20 rounded-md border border-border/50 p-2 hover:border-border"
 						controls={
 							<MermaidToolbar code={code} svg={result.svg} onEdit={onEdit} />
 						}
