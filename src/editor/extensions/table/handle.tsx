@@ -45,7 +45,7 @@ export function TableHandle({ axis, anchor }: TableHandleProps) {
 				<TableDropIndicator axis={axis} anchor={anchor} index={targetIndex} />
 			)}
 			<div
-				className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2"
+				className="pointer-events-auto absolute z-10 -translate-x-1/2 -translate-y-1/2"
 				style={{ left: handle.left, top: handle.top }}
 			>
 				<TableHandleMenu
