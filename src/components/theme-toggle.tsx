@@ -1,5 +1,3 @@
-'use client'
-
 import { cn } from 'cn'
 import { Moon, Sun } from 'lucide-react'
 import type {

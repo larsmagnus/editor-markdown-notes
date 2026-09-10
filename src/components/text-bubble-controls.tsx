@@ -1,5 +1,3 @@
-'use client'
-
 import { CircleOff } from 'lucide-react'
 
 import { ButtonColor } from '#src/components/button-color'

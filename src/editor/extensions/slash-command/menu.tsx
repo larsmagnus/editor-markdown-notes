@@ -1,5 +1,3 @@
-'use client'
-
 import { cn } from 'cn'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 

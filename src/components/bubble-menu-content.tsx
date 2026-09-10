@@ -1,5 +1,3 @@
-'use client'
-
 import { TextBubbleControls } from '#src/components/text-bubble-controls'
 
 /**
