@@ -1,5 +1,3 @@
-'use client'
-
 import { NodeSelection } from '@tiptap/pm/state'
 import { useCurrentEditor } from '@tiptap/react'
 import { BubbleMenu } from '@tiptap/react/menus'
@@ -22,6 +20,7 @@ export function MenuBubble() {
 
 	return (
 		<BubbleMenu
+			className="z-20"
 			editor={editor}
 			shouldShow={({ view, state }) =>
 				view.hasFocus() &&
