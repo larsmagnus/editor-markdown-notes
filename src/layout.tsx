@@ -8,6 +8,7 @@ import { useNoteSource } from '#src/hooks/use-note-source'
 import { useScrollPosition } from '#src/hooks/use-scroll-position'
 import { useSettings } from '#src/hooks/use-settings'
 import { contentWidthClassName } from '#src/lib/content-width-class'
+import { toolbarHeightStyle } from '#src/lib/toolbar-height-style'
 
 const Toolbar = lazy(() => import('#src/components/toolbar'))
 
@@ -33,7 +34,11 @@ function Layout({ defaultFileName }: LayoutProps) {
 	)
 
 	return (
-		<div ref={scrollRef} className="h-screen overflow-auto">
+		<div
+			ref={scrollRef}
+			className="h-screen overflow-auto"
+			style={toolbarHeightStyle(settings.hideToolbar)}
+		>
 			<SkipLinks raw={viewOptions.raw} textToolsOpen={viewOptions.textTools} />
 
 			{!settings.hideToolbar && (

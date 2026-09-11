@@ -159,15 +159,25 @@
 	 * so the table's margin never reaches the elements around it.
 	 */
 	.tableWrapper {
-		@apply rounded-md overflow-hidden border border-border mb-[1.25em];
+		@apply rounded-md border border-border mb-[1.25em];
 	}
 
 	/*
 	 * ProseMirror table plumbing. Typeset styles the table itself, but the
 	 * fixed layout, cell borders and cell-selection overlay are ours to provide.
+	 *
+	 * Neither this nor `.tableWrapper` clips overflow - each corner cell carries
+	 * its own radius below instead, because `position: sticky` on the header
+	 * row stops working the moment any ancestor between it and the note's
+	 * scroll container clips overflow.
+	 *
+	 * `border-separate`/`border-spacing-0`, not `border-collapse`: browsers
+	 * silently ignore `position: sticky` on a cell of a collapsed-border table.
+	 * Every cell below draws only its own right/bottom border, so separating
+	 * them doesn't double any edge up.
 	 */
 	.ProseMirror table {
-		@apply w-full table-fixed border-collapse overflow-hidden m-0;
+		@apply w-full table-fixed border-separate border-spacing-0 m-0;
 	}
 
 	.ProseMirror {
@@ -213,8 +223,28 @@
 		}
 	}
 
+	/*
+	 * `--toolbar-height` (set on the scroll container in `layout.tsx`) is `0px`
+	 * when `hideToolbar` is on, so the header sticks to the true top instead of
+	 * leaving a gap where a hidden toolbar would have been.
+	 *
+	 * `border-l`/`border-r` on the end cells: with the wrapper no longer
+	 * clipping overflow, its own left/right border scrolls away under the
+	 * sticky header like everything else, leaving the header's rounded top
+	 * corners with no vertical edge to meet. Drawing that edge on the header
+	 * cells too coincides exactly with the wrapper's at rest, and keeps the
+	 * frame intact once the wrapper's has scrolled out of view.
+	 */
 	.ProseMirror th {
-		@apply bg-muted text-left font-bold;
+		@apply sticky top-[var(--toolbar-height,0px)] z-10 bg-muted text-left
+    font-bold;
+
+		&:first-child {
+			@apply border-l border-border;
+		}
+		&:last-child {
+			@apply border-r border-border;
+		}
 	}
 
 	/*
