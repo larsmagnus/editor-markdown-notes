@@ -9,7 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added support for opening relative links to other files in the workspace, from both the live and raw markdown views
 - Added support for clicking a link to a heading, scrolling to it in the same or another note
 - Added syntax highlighting to the raw markdown view
+- Added sticky table headers, staying visible while a tall table scrolls
+- Added a faint stripe to alternating table rows
 - Changed the extension package to be about 16% smaller
+- Changed Mermaid diagrams to no longer cap their height
+- Changed Mermaid diagrams to zoom out further, for an overview of a large one
+- Fixed consecutive blank lines being collapsed to one when the live editor saved
+- Fixed typing right after a horizontal rule merging the new text into it instead of starting a new line
+- Fixed Cmd/Ctrl+B and +I sometimes triggering a VS Code shortcut instead of formatting the selected text
+- Fixed tables sitting flush against the content that follows them
+- Fixed an image's hover border looking different from a Mermaid diagram's
 
 ## [0.23.1] - 2026-09-07
 
