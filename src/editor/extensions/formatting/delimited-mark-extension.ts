@@ -7,6 +7,7 @@ import type {
 	DelimiterSpec,
 } from '#src/editor/extensions/formatting/delimiter-spec'
 import { createEnsureDelimitersPlugin } from '#src/editor/extensions/formatting/ensure-delimiters-plugin'
+import { interceptShortcutsWhileSelected } from '#src/editor/extensions/formatting/intercept-shortcuts-while-selected'
 import {
 	removeDelimiterOnBackspace,
 	removeDelimiterOnDelete,
@@ -61,7 +62,7 @@ export function createDelimitedMarkExtension(
 
 		addKeyboardShortcuts() {
 			return {
-				...this.parent?.(),
+				...interceptShortcutsWhileSelected(this.editor, this.parent?.() ?? {}),
 				Backspace: () =>
 					removeDelimiterOnBackspace(this.type, ensureSpec)(
 						this.editor.state,
