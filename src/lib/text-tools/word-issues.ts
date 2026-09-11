@@ -2,30 +2,27 @@ import type { Root } from 'nlcst'
 import retextEnglish from 'retext-english'
 import retextIntensify from 'retext-intensify'
 import retextPassive from 'retext-passive'
+import retextRepeatedWords from 'retext-repeated-words'
 import retextSimplify from 'retext-simplify'
 import type { Plugin } from 'unified'
 import { unified } from 'unified'
 import { VFile } from 'vfile'
 
+import type { PluginRuleId } from '#src/lib/text-tools/rule-kinds'
 import type { TextIssue } from '#src/lib/text-tools/types'
 import { toIssue } from '#src/lib/text-tools/vfile-message-to-issue'
 import type { TextToolRuleId } from '#src/shared/messages'
 
 /**
  * The plugin behind each rule. Keyed by `TextToolRuleId`, so a new rule does not
- * compile until it is listed here.
- *
- * Readability and spelling are excluded because each needs a processor of its
- * own - readability is run twice with different options, and the speller's is
- * cached across runs.
+ * compile until it is listed here - see `rule-kinds.ts` for why `readability`,
+ * `spelling`, `polarity` and `dashOveruse` are excluded from `PluginRuleId`.
  */
-const RULE_PLUGINS: Record<
-	Exclude<TextToolRuleId, 'readability' | 'spelling'>,
-	Plugin<[], Root>
-> = {
+const RULE_PLUGINS: Record<PluginRuleId, Plugin<[], Root>> = {
 	passive: retextPassive,
 	simplify: retextSimplify,
 	intensify: retextIntensify,
+	repeatedWords: retextRepeatedWords,
 }
 
 /** The word-level rules, run together over one shared parse. */

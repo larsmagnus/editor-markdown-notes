@@ -1,5 +1,6 @@
 import type { VFileMessage } from 'vfile-message'
 
+import type { CustomPassRuleId } from '#src/lib/text-tools/rule-kinds'
 import type { TextIssue } from '#src/lib/text-tools/types'
 import type { TextToolRuleId } from '#src/shared/messages'
 
@@ -19,11 +20,20 @@ import type { TextToolRuleId } from '#src/shared/messages'
  *
  * Matched on `source` rather than `ruleId` because retext-passive sets `ruleId`
  * to the offending word rather than a category.
+ *
+ * Rules in `CustomPassRuleId` (`rule-kinds.ts`) have no entry: neither is a
+ * retext plugin, so neither ever emits a `VFileMessage` - both build
+ * `TextIssue`s directly in their own pass file instead of going through
+ * `toIssue()`.
  */
-const RULE_SOURCES: Record<TextToolRuleId, string> = {
+const RULE_SOURCES: Record<
+	Exclude<TextToolRuleId, CustomPassRuleId>,
+	string
+> = {
 	passive: 'retext-passive',
 	simplify: 'retext-simplify',
 	intensify: 'retext-intensify',
+	repeatedWords: 'retext-repeated-words',
 	readability: 'retext-readability',
 	spelling: 'retext-spell',
 }

@@ -21,8 +21,11 @@ export const TEXT_TOOL_RULE_IDS = [
 	'passive',
 	'simplify',
 	'intensify',
+	'repeatedWords',
 	'readability',
 	'spelling',
+	'polarity',
+	'dashOveruse',
 ] as const
 
 export type TextToolRuleId = (typeof TEXT_TOOL_RULE_IDS)[number]
@@ -124,9 +127,17 @@ export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
 	textTools: false,
 	// Listed rather than spread from `TEXT_TOOL_RULE_IDS`: spelling is the one
 	// check that has to load a dictionary, and is the noisiest on a technical
-	// note, so it is opt-in. A spread would quietly enable every rule added
+	// note, so it is opt-in - as are polarity and dash overuse, the most
+	// subjective/novel of the checks and both prone to false-flagging
+	// legitimate writing. A spread would quietly enable every rule added
 	// after it too.
-	textToolRules: ['passive', 'simplify', 'intensify', 'readability'],
+	textToolRules: [
+		'passive',
+		'simplify',
+		'intensify',
+		'repeatedWords',
+		'readability',
+	],
 	spellingLanguage: 'en-US',
 	spellingIgnoreWords: [],
 }

@@ -19,9 +19,16 @@ function issue(overrides: Partial<TextIssue> = {}): TextIssue {
 	}
 }
 
-const analysis = (issues: TextIssue[], sentenceCount: number): Analysis => ({
+const analysis = (
+	issues: TextIssue[],
+	sentenceCount: number,
+	overrides: Partial<Pick<Analysis, 'polarity' | 'dashOveruse'>> = {}
+): Analysis => ({
 	issues,
 	sentenceCount,
+	polarity: null,
+	dashOveruse: null,
+	...overrides,
 })
 
 describe('summarize', () => {
@@ -113,5 +120,48 @@ describe('summarize', () => {
 		const result = summarize(analysis([], 6), ALL_RULES)
 
 		expect(result).toMatchObject({ readability: [], groups: [], total: 0 })
+	})
+
+	it('carries the polarity temperature through when the rule is on', () => {
+		const result = summarize(
+			analysis([], 3, {
+				polarity: {
+					score: 0.5,
+					label: 'positive',
+					text: 'Document temperature: positive',
+				},
+			}),
+			ALL_RULES
+		)
+
+		expect(result.polarity).toEqual({
+			score: 0.5,
+			label: 'positive',
+			text: 'Document temperature: positive',
+		})
+	})
+
+	it('hides the polarity temperature when the rule is switched off', () => {
+		const result = summarize(
+			analysis([], 3, {
+				polarity: {
+					score: 0.5,
+					label: 'positive',
+					text: 'Document temperature: positive',
+				},
+			}),
+			ALL_RULES.filter((id) => id !== 'polarity')
+		)
+
+		expect(result.polarity).toBeNull()
+	})
+
+	it('hides the dash-overuse rate when the rule is switched off', () => {
+		const result = summarize(
+			analysis([], 3, { dashOveruse: { rate: 0.8, text: 'dash-heavy' } }),
+			ALL_RULES.filter((id) => id !== 'dashOveruse')
+		)
+
+		expect(result.dashOveruse).toBeNull()
 	})
 })

@@ -1,3 +1,5 @@
+import type { DashOveruseSummary } from '#src/lib/text-tools/dash-rate-summary'
+import type { PolarityTemperature } from '#src/lib/text-tools/polarity-temperature'
 import type { SpellingLanguage, TextToolRuleId } from '#src/shared/messages'
 
 /**
@@ -44,6 +46,18 @@ export type Analysis = {
 	issues: TextIssue[]
 	/** Denominator for the panel's "n of N sentences" summary. */
 	sentenceCount: number
+	/**
+	 * The document's overall sentiment. `null` when the rule is off or the
+	 * document has no words to score - distinct from a `polarity` rule with no
+	 * per-word issues, which still has a temperature.
+	 */
+	polarity: PolarityTemperature | null
+	/**
+	 * The document-wide dash rate. `null` when the rule is off or the rate is
+	 * under its threshold - the per-sentence and per-cluster tiers of that same
+	 * rule surface as ordinary `issues` instead.
+	 */
+	dashOveruse: DashOveruseSummary | null
 }
 
 /**

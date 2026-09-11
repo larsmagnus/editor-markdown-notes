@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added a text tools check that flags the same word typed twice in a row
+- Added a text tools check that flags emotionally loaded words and shows the document's overall sentiment
+- Added a text tools check that flags sentences and runs of sentences overusing em/en dashes, and shows the document's overall dash rate
+- Added common software and web terms to the spelling dictionary, so they are no longer flagged as misspellings
 - Added support for opening relative links to other files in the workspace, from both the live and raw markdown views
 - Added support for clicking a link to a heading, scrolling to it in the same or another note
 - Added syntax highlighting to the raw markdown view
@@ -18,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed typing right after a horizontal rule merging the new text into it instead of starting a new line
 - Fixed Cmd/Ctrl+B and +I sometimes triggering a VS Code shortcut instead of formatting the selected text
 - Fixed tables sitting flush against the content that follows them
+- Fixed URLs being flagged by spelling and other text-tools checks
 - Fixed an image's hover border looking different from a Mermaid diagram's
 
 ## [0.23.1] - 2026-09-07

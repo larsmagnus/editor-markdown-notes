@@ -9,7 +9,12 @@ import { getDocumentText } from '#src/lib/text-tools/document-text'
 import { placeIssues } from '#src/lib/text-tools/place-issues'
 import type { Analysis } from '#src/lib/text-tools/types'
 
-const EMPTY_ANALYSIS: Analysis = { issues: [], sentenceCount: 0 }
+const EMPTY_ANALYSIS: Analysis = {
+	issues: [],
+	sentenceCount: 0,
+	polarity: null,
+	dashOveruse: null,
+}
 
 type UseTextToolsOptions = AnalysisRequest & {
 	editor: Editor | null

@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { mergeTechnicalTerms } from '#src/lib/text-tools/dictionaries/technical-terms'
+import { TECHNICAL_TERMS } from '#src/lib/text-tools/dictionaries/technical-terms.generated'
 import type { HunspellDictionary } from '#src/lib/text-tools/types'
 import type { SpellingLanguage } from '#src/shared/messages'
 
@@ -51,10 +53,13 @@ export function loadDictionary(language: SpellingLanguage): HunspellDictionary {
 
 	let dictionary: HunspellDictionary
 	try {
-		dictionary = {
-			aff: readFileSync(`${base}.aff`, 'utf8'),
-			dic: readFileSync(`${base}.dic`, 'utf8'),
-		}
+		dictionary = mergeTechnicalTerms(
+			{
+				aff: readFileSync(`${base}.aff`, 'utf8'),
+				dic: readFileSync(`${base}.dic`, 'utf8'),
+			},
+			TECHNICAL_TERMS
+		)
 	} catch (error) {
 		// Almost always a build that did not run `copy-dictionaries`, which reads
 		// as an unrelated `ENOENT` on a file nobody wrote by hand.

@@ -77,8 +77,18 @@ const SPELLING_ISSUE: TextIssue = {
 	end: NOTE.indexOf('committee') + 'committee'.length,
 }
 
-function analysisOf(issues: TextIssue[], sentenceCount = 1): Analysis {
-	return { issues, sentenceCount }
+function analysisOf(
+	issues: TextIssue[],
+	sentenceCount = 1,
+	overrides: Partial<Pick<Analysis, 'polarity' | 'dashOveruse'>> = {}
+): Analysis {
+	return {
+		issues,
+		sentenceCount,
+		polarity: null,
+		dashOveruse: null,
+		...overrides,
+	}
 }
 
 function renderWithTextTools(open = true, viewOptions = {}) {
@@ -223,6 +233,43 @@ describe('text tools', () => {
 
 		expect(
 			await screen.findByText('1 of 4 sentences are very hard to read')
+		).toBeInTheDocument()
+	})
+
+	it('shows the document temperature when polarity is enabled', async () => {
+		analyze.mockResolvedValue(
+			analysisOf([], 4, {
+				polarity: {
+					score: 0.8,
+					label: 'very positive',
+					text: 'Document temperature: very positive',
+				},
+			})
+		)
+		renderWithTextTools(true, {
+			textToolRules: [...DEFAULT_VIEW_OPTIONS.textToolRules, 'polarity'],
+		})
+
+		expect(
+			await screen.findByText('Document temperature: very positive')
+		).toBeInTheDocument()
+	})
+
+	it('shows the dash-overuse rate line when the rule is enabled', async () => {
+		analyze.mockResolvedValue(
+			analysisOf([], 4, {
+				dashOveruse: {
+					rate: 0.8,
+					text: '10 em/en dashes across 4 sentences - dash-heavy',
+				},
+			})
+		)
+		renderWithTextTools(true, {
+			textToolRules: [...DEFAULT_VIEW_OPTIONS.textToolRules, 'dashOveruse'],
+		})
+
+		expect(
+			await screen.findByText('10 em/en dashes across 4 sentences - dash-heavy')
 		).toBeInTheDocument()
 	})
 

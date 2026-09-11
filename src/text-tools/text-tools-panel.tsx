@@ -7,7 +7,9 @@ import {
 import { summarize } from '#src/lib/text-tools/summarize'
 import type { Analysis } from '#src/lib/text-tools/types'
 import type { SpellingLanguage, TextToolRuleId } from '#src/shared/messages'
+import { TextToolsDashOveruseLine } from '#src/text-tools/text-tools-dash-overuse-line'
 import { TextToolsIssueGroup } from '#src/text-tools/text-tools-issue-group'
+import { TextToolsPolarityLine } from '#src/text-tools/text-tools-polarity-line'
 import { TextToolsReadabilityLines } from '#src/text-tools/text-tools-readability-lines'
 import { TextToolsRuleCheckboxes } from '#src/text-tools/text-tools-rule-checkboxes'
 import { TextToolsStats } from '#src/text-tools/text-tools-stats'
@@ -64,6 +66,8 @@ export function TextToolsPanel({
 				<TextToolsStats sentenceCount={analysis.sentenceCount} />
 
 				<TextToolsReadabilityLines lines={summary.readability} />
+				<TextToolsPolarityLine temperature={summary.polarity} />
+				<TextToolsDashOveruseLine summary={summary.dashOveruse} />
 
 				<TextToolsRuleCheckboxes
 					rules={rules}

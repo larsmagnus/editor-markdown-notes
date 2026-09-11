@@ -94,6 +94,38 @@ export const RULES: Record<TextToolRuleId, TextToolRule> = {
 			severity: 'misspelling',
 		},
 	},
+	repeatedWords: {
+		label: 'Repeated words',
+		description: 'The same word typed twice in a row.',
+		explanation:
+			'A word slips in twice when a sentence gets rewritten mid-thought. Remove one occurrence. A short list of words that legitimately double up - "had had", "that that" - is already let through.',
+		example: {
+			after: 'This is a good idea.',
+			before: [
+				{ text: 'This ' },
+				{ text: 'is is', flagged: true },
+				{ text: ' a good idea.' },
+			],
+			severity: 'warning',
+		},
+	},
+	polarity: {
+		label: 'Charged language',
+		description: 'Words with strong positive or negative sentiment.',
+		explanation:
+			"Emotionally loaded words color a reader's reaction before the argument does. This flags each one; the panel also shows the document's overall temperature. Charged language is not automatically wrong - it just deserves to be a choice.",
+		example: {
+			after: 'This is a change we should discuss.',
+			before: [
+				{ text: 'This is a ' },
+				{ text: 'wonderful', flagged: true },
+				{ text: ' change, but also somewhat ' },
+				{ text: 'terrible', flagged: true },
+				{ text: ' for the schedule.' },
+			],
+			severity: 'warning',
+		},
+	},
 	readability: {
 		label: 'Hard to read',
 		description: 'Sentences above the target reading age.',
@@ -110,6 +142,22 @@ export const RULES: Record<TextToolRuleId, TextToolRule> = {
 				},
 			],
 			severity: 'very-hard',
+		},
+	},
+	dashOveruse: {
+		label: 'Dash overuse',
+		description: "Sentences leaning on em or en dashes to do a comma's job.",
+		explanation:
+			"One dash-marked clause reads as a deliberate aside. Several in one sentence, or several sentences in a row, read as a tic - the panel also totals the document's overall dash rate. Try a comma, a period, or a parenthesis instead.",
+		example: {
+			after: 'The report was late. The client noticed immediately.',
+			before: [
+				{
+					text: 'The report was late—again—and the client noticed—immediately.',
+					flagged: true,
+				},
+			],
+			severity: 'warning',
 		},
 	},
 }

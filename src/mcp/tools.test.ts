@@ -97,6 +97,31 @@ describe('checkMarkdown', () => {
 		expect(summary).toContain('1 of 1 sentence is hard to read')
 	})
 
+	it('summarizes the document temperature when polarity runs', async () => {
+		const note = 'This is a wonderful and amazing idea.\n'
+
+		const { summary } = await checkMarkdown(
+			note,
+			{ rules: ['polarity'] },
+			defaults
+		)
+
+		expect(summary).toContain('Document temperature: very positive')
+	})
+
+	it('summarizes the document-wide dash rate when dash overuse runs', async () => {
+		const note =
+			'One fish. Two fish. Three—fish. Four fish. Five fish. Six—fish. Seven fish. Eight fish. Nine—fish.\n'
+
+		const { summary } = await checkMarkdown(
+			note,
+			{ rules: ['dashOveruse'] },
+			defaults
+		)
+
+		expect(summary).toEqual(['3 em/en dashes across 9 sentences - dash-heavy'])
+	})
+
 	it('offers a correction for a misspelling', async () => {
 		const note = 'This sentence has a typpo in it.\n'
 

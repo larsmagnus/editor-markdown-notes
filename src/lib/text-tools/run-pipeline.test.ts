@@ -186,4 +186,105 @@ describe('runPipeline', () => {
 		const starts = issues.map((issue) => issue.start)
 		expect(starts).toEqual([...starts].sort((a, b) => a - b))
 	})
+
+	describe('polarity', () => {
+		it('scores the document temperature from its charged words', async () => {
+			const text = 'This is a wonderful and amazing idea.'
+
+			const { polarity } = await runPipeline(text, {
+				rules: ['polarity'],
+				...BASE_OPTIONS,
+			})
+
+			expect(polarity).not.toBeNull()
+			expect(polarity?.score).toBeGreaterThan(0)
+			expect(polarity?.label).toBe('very positive')
+			expect(polarity?.text).toBe('Document temperature: very positive')
+		})
+
+		it('reports a neutral temperature for unremarkable prose', async () => {
+			const text = 'The committee reviewed the report on Tuesday.'
+
+			const { polarity } = await runPipeline(text, {
+				rules: ['polarity'],
+				...BASE_OPTIONS,
+			})
+
+			expect(polarity?.label).toBe('neutral')
+		})
+
+		it('reports no temperature when the rule is off', async () => {
+			const text = 'This is a wonderful and amazing idea.'
+
+			const { polarity } = await runPipeline(text, {
+				rules: ['passive'],
+				...BASE_OPTIONS,
+			})
+
+			expect(polarity).toBeNull()
+		})
+	})
+
+	describe('dashOveruse', () => {
+		it('flags a single sentence dense with dashes', async () => {
+			const text = 'The report—already late—was rejected—again.'
+
+			const { issues } = await runPipeline(text, {
+				rules: ['dashOveruse'],
+				...BASE_OPTIONS,
+			})
+
+			expect(issues).toHaveLength(1)
+			expect(issues[0]).toMatchObject({
+				ruleId: 'dashOveruse',
+				severity: 'warning',
+				actual: text,
+			})
+		})
+
+		it('flags a run of consecutive sentences that each use one dash', async () => {
+			// Five short sentences, four of which carry exactly one dash - a
+			// pattern no single sentence's own count would catch.
+			const text =
+				'We shipped it—finally. The team cheered. Bugs appeared—quickly. We triaged—carefully. Calm returned—eventually.'
+
+			const { issues } = await runPipeline(text, {
+				rules: ['dashOveruse'],
+				...BASE_OPTIONS,
+			})
+
+			expect(issues).toHaveLength(1)
+			expect(issues[0].message).toBe('4 of these 5 sentences use a dash.')
+		})
+
+		it('reports a document-wide rate line without flagging any one sentence', async () => {
+			// Nine short sentences, one dash every third one - spaced too thin for
+			// any 5-sentence window to ever see 3 dashed sentences, but still a
+			// third of the document, so only the rate tier should catch it.
+			const text =
+				'One fish. Two fish. Three—fish. Four fish. Five fish. Six—fish. Seven fish. Eight fish. Nine—fish.'
+
+			const { issues, dashOveruse } = await runPipeline(text, {
+				rules: ['dashOveruse'],
+				...BASE_OPTIONS,
+			})
+
+			expect(issues).toEqual([])
+			expect(dashOveruse).not.toBeNull()
+			expect(dashOveruse?.rate).toBeCloseTo(1 / 3)
+		})
+
+		it('reports nothing for a document with only occasional dashes', async () => {
+			const text =
+				'One fish. Two fish. Red fish—blue fish. Three fish. Four fish.'
+
+			const { issues, dashOveruse } = await runPipeline(text, {
+				rules: ['dashOveruse'],
+				...BASE_OPTIONS,
+			})
+
+			expect(issues).toEqual([])
+			expect(dashOveruse).toBeNull()
+		})
+	})
 })

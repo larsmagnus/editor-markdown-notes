@@ -1,3 +1,5 @@
+import { mergeTechnicalTerms } from '#src/lib/text-tools/dictionaries/technical-terms'
+import { TECHNICAL_TERMS } from '#src/lib/text-tools/dictionaries/technical-terms.generated'
 import type { HunspellDictionary } from '#src/lib/text-tools/types'
 
 /**
@@ -9,7 +11,11 @@ import type { HunspellDictionary } from '#src/lib/text-tools/types'
  * gives strings, which is what nspell's constructor wants: handed a
  * `Uint8Array` it falls through to stringifying the byte array, and every word
  * then reads as a misspelling.
+ *
+ * The technical-terms wordlist is spliced in here rather than per-language,
+ * since all three languages this ships (`en-US`/`en-GB`/`en-AU`) are English
+ * variants it applies to unconditionally.
  */
 export function defineDictionary(aff: string, dic: string): HunspellDictionary {
-	return { aff, dic }
+	return mergeTechnicalTerms({ aff, dic }, TECHNICAL_TERMS)
 }

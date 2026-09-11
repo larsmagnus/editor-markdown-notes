@@ -4,6 +4,7 @@ import type { IssueSeverity, TextIssue } from '#src/lib/text-tools/types'
 import { loadDictionary } from '#src/mcp/dictionaries'
 import { markdownProse } from '#src/mcp/markdown-text'
 import { sentenceFinder } from '#src/mcp/sentence-at'
+import { summaryLines } from '#src/mcp/summary-lines'
 import type { SpellingLanguage, TextToolRuleId } from '#src/shared/messages'
 
 /**
@@ -36,7 +37,12 @@ type ReportedIssue = {
 }
 
 export type CheckReport = {
-	/** The panel's "n of N sentences are …" lines, when readability ran. */
+	/**
+	 * The panel's document-level lines: readability's "n of N sentences are …"
+	 * per tier, the polarity rule's overall temperature, and the dash-overuse
+	 * rule's document-wide rate - each only when its rule ran and found
+	 * something. Per-instance findings for all three still land in `issues`.
+	 */
 	summary: string[]
 	issues: ReportedIssue[]
 }
@@ -71,7 +77,7 @@ export async function checkMarkdown(
 	const sentenceOf = sentenceFinder(prose.text)
 
 	return {
-		summary: summarize(analysis, rules).readability.map((line) => line.text),
+		summary: summaryLines(summarize(analysis, rules)),
 		issues: analysis.issues.map((issue) => report(issue, prose, sentenceOf)),
 	}
 }

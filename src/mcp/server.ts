@@ -44,7 +44,7 @@ server.registerTool(
 	{
 		title: 'Check markdown writing quality',
 		description:
-			"Runs the Editor Markdown Notes writing checks over a note and reports what they found: passive voice, wordy phrasing, weak intensifiers, hard-to-read sentences and (when enabled) spelling. Results match what the extension's sidebar shows for the same file, and use the user's own configured reading age and English variant. Each issue carries the line and column in the markdown file plus the sentence containing it - use that sentence as the exact-match anchor when editing. Prose only: code blocks, inline code and link URLs are excluded.",
+			"Runs the Editor Markdown Notes writing checks over a note and reports what they found: passive voice, wordy phrasing, weak intensifiers, repeated words, hard-to-read sentences, emotionally charged language, em/en dash overuse, and (when enabled) spelling. Results match what the extension's sidebar shows for the same file, and use the user's own configured reading age and English variant. Each issue carries the line and column in the markdown file plus the sentence containing it - use that sentence as the exact-match anchor when editing. `summary` also carries document-level lines: readability's per-tier fraction, the polarity rule's overall temperature, and the dash-overuse rule's document-wide rate. Prose only: code blocks, inline code and link URLs are excluded.",
 		inputSchema: {
 			...SOURCE,
 			...OPTIONS,
