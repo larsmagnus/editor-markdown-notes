@@ -1,5 +1,8 @@
+import { cn } from 'cn'
+
 import { AppErrorBoundary } from '#src/components/app-error-boundary'
 import { PAN_ZOOM_MIN_SCALE, PanZoom } from '#src/components/pan-zoom'
+import { PAN_ZOOM_FRAME_CLASSNAME } from '#src/components/pan-zoom-frame'
 import { MermaidToolbar } from '#src/editor/extensions/mermaid/toolbar'
 import type { MermaidResult } from '#src/lib/render-mermaid'
 
@@ -42,7 +45,7 @@ export function MermaidDiagram({
 				<div contentEditable={false} className="not-typeset my-4">
 					<PanZoom
 						minScale={PAN_ZOOM_MIN_SCALE}
-						className="min-h-20 rounded-md border border-border/50 p-2 hover:border-border"
+						className={cn(PAN_ZOOM_FRAME_CLASSNAME, 'min-h-20')}
 						controls={
 							<MermaidToolbar code={code} svg={result.svg} onEdit={onEdit} />
 						}

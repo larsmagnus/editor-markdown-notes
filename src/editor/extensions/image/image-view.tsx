@@ -1,8 +1,8 @@
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewWrapper } from '@tiptap/react'
-import { cn } from 'cn'
 
 import { PanZoom } from '#src/components/pan-zoom'
+import { imageFrameClassName } from '#src/editor/extensions/image/image-frame-class-name'
 import { ImageToolbar } from '#src/editor/extensions/image/toolbar'
 import { useImageCaretAdjacent } from '#src/hooks/use-image-caret-adjacent'
 import { useImageCopy } from '#src/hooks/use-image-copy'
@@ -50,12 +50,7 @@ export function ImageView({
 			className="group relative not-typeset inline-block align-bottom"
 		>
 			<PanZoom
-				className={cn(
-					// `min-w`/`min-h`: floors the frame to the toolbar's own size, so a
-					// small image doesn't spill it off the page edge.
-					'max-h-[32rem] min-w-40 min-h-14 rounded-md border border-border/50 p-2 hover:border-border',
-					softFocused && 'border-ring ring-2 ring-ring/50'
-				)}
+				className={imageFrameClassName(softFocused)}
 				controls={
 					<ImageToolbar
 						onEditSource={handleEditSource}

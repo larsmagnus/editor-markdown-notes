@@ -138,19 +138,26 @@
 		@apply static! min-h-full;
 	}
 
+	/*
+	 * No hover border of its own: `PAN_ZOOM_FRAME_CLASSNAME`'s frame already
+	 * gives the image a hover border on its outer edge, and a second one here,
+	 * nested inside that frame's own padding, doubled up as a visibly different
+	 * ring the diagram frame never has.
+	 */
 	.ProseMirror img {
-		@apply cursor-grab rounded-md border border-transparent outline-none
-    hover:border-neutral-300 active:cursor-grabbing dark:hover:border-neutral-700;
+		@apply cursor-grab rounded-md outline-none active:cursor-grabbing;
 	}
 
 	/*
 	 * A `NodeSelection` never moves real DOM focus onto the `<img>` itself -
 	 * doing so would fail the bubble menu's `hasFocus()` check - so this reads
 	 * ProseMirror's own selection decoration instead of `:focus-visible`. Fires
-	 * for a mouse click and `Tab`-driven selection alike.
+	 * for a mouse click and `Tab`-driven selection alike. `ring-2`, matching
+	 * `PAN_ZOOM_FRAME_CLASSNAME`'s own ring width, so a selected image whose
+	 * caret is also adjacent doesn't stack two different ring widths.
 	 */
 	.ProseMirror img.ProseMirror-selectednode {
-		@apply border-ring ring-3 ring-ring/50;
+		@apply border-ring ring-2 ring-ring/50;
 	}
 
 	/*
