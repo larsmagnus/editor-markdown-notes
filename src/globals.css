@@ -199,6 +199,15 @@
 			@apply relative px-3 py-2 align-top border-r border-border last:border-r-0;
 		}
 
+		/*
+		 * A faint wash on every other row, common enough that a reader expects
+		 * it on any wide table - `:nth-child` alone, since a tight table has no
+		 * separate `tbody` to scope it against the header.
+		 */
+		tr:nth-child(even) td {
+			@apply bg-muted/40;
+		}
+
 		blockquote {
 			@apply bg-muted;
 		}
