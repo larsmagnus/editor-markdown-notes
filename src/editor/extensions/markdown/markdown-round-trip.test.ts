@@ -545,3 +545,70 @@ describe('italic markup', () => {
 		)
 	})
 })
+
+describe('consecutive blank lines', () => {
+	// Setting JSON content skips markdown-it entirely, which is the point:
+	// three separate empty paragraphs are how the live editor represents three
+	// blank lines typed in a row - a `setContent('A\n\n\n\nB')` round trip can't
+	// reproduce them, since CommonMark collapses any run of blank lines into a
+	// single paragraph break on parse.
+	it('keeps one blank line per empty paragraph between two blocks', () => {
+		const editor = createEditor()
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{ type: 'paragraph', content: [{ type: 'text', text: 'A' }] },
+				{ type: 'paragraph' },
+				{ type: 'paragraph' },
+				{ type: 'paragraph' },
+				{ type: 'paragraph', content: [{ type: 'text', text: 'B' }] },
+			],
+		})
+
+		expect(String(editor.storage.markdown.getMarkdown())).toBe('A\n\n\n\n\nB')
+	})
+
+	it('keeps a single blank line when there is only one empty paragraph', () => {
+		const editor = createEditor()
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{ type: 'paragraph', content: [{ type: 'text', text: 'A' }] },
+				{ type: 'paragraph' },
+				{ type: 'paragraph', content: [{ type: 'text', text: 'B' }] },
+			],
+		})
+
+		expect(String(editor.storage.markdown.getMarkdown())).toBe('A\n\n\nB')
+	})
+
+	it('does not add a blank line when paragraphs are directly adjacent', () => {
+		const editor = createEditor()
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{ type: 'paragraph', content: [{ type: 'text', text: 'A' }] },
+				{ type: 'paragraph', content: [{ type: 'text', text: 'B' }] },
+			],
+		})
+
+		expect(String(editor.storage.markdown.getMarkdown())).toBe('A\n\nB')
+	})
+
+	// Pressing Enter twice at the end of a document leaves two trailing empty
+	// paragraphs, not one - both are the same "cursor rests here" artifact, and
+	// neither should gain a blank line nothing asked for.
+	it('stays silent for every trailing empty paragraph, not just the last', () => {
+		const editor = createEditor()
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{ type: 'paragraph', content: [{ type: 'text', text: 'A' }] },
+				{ type: 'paragraph' },
+				{ type: 'paragraph' },
+			],
+		})
+
+		expect(String(editor.storage.markdown.getMarkdown())).toBe('A')
+	})
+})

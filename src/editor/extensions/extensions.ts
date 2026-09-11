@@ -41,6 +41,7 @@ import { ListEnter } from '#src/editor/extensions/list/list-enter-extension'
 import { ListItemExtension } from '#src/editor/extensions/list/list-item-extension'
 import { MarkdownClipboard } from '#src/editor/extensions/markdown/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '#src/editor/extensions/markdown/markdown-escaping'
+import { ParagraphExtension } from '#src/editor/extensions/paragraph-extension'
 import { SearchRevealHighlight } from '#src/editor/extensions/search-reveal/search-reveal-extension'
 import { SlashCommand } from '#src/editor/extensions/slash-command/slash-command-extension'
 import { SyntaxHighlight } from '#src/editor/extensions/syntax-highlight/syntax-highlight-extension'
@@ -93,11 +94,14 @@ export const extensions = [
 		// Replaced below: a rule holds its own `---` as text, which a leaf atom
 		// cannot do.
 		horizontalRule: false,
+		// Replaced below so consecutive blank lines survive serialization.
+		paragraph: false,
 	}),
 	// `frontmatter?` first, so the schema itself enforces "at most one, always
 	// the document's first child" - no `appendTransaction` policing needed.
 	Document.extend({ content: 'frontmatter? block+' }),
 	Frontmatter,
+	ParagraphExtension,
 	CodeBlockExtension,
 	HorizontalRuleExtension,
 	HeadingExtension,
