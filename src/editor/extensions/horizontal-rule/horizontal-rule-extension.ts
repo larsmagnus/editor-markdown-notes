@@ -1,11 +1,11 @@
 import { mergeAttributes, Node } from '@tiptap/core'
-import { TextSelection } from '@tiptap/pm/state'
 
 import { createHorizontalRuleInputRule } from '#src/editor/extensions/horizontal-rule/horizontal-rule-input-rule'
 import {
 	HORIZONTAL_RULE_TEXT,
 	insertLiteralRules,
 } from '#src/editor/extensions/horizontal-rule/horizontal-rule-marker'
+import { stepOutOfRule } from '#src/editor/extensions/horizontal-rule/step-out-of-rule'
 import { serializeVerbatim } from '#src/editor/extensions/markdown/serialize-verbatim'
 
 /**
@@ -54,11 +54,10 @@ export const HorizontalRuleExtension = Node.create({
 
 	/**
 	 * Enter leaves the rule rather than splitting it or, `code` being set,
-	 * adding a newline inside it. A rule is one line by definition, and having
-	 * just typed `---` the caret is still in it - as a leaf atom it never was,
-	 * so there was nothing to step out of. Moving the caret into the new
-	 * paragraph is the whole point: left behind, the next thing typed lands in
-	 * the rule and stops it being one.
+	 * adding a newline inside it. A rule is one line by definition - as a leaf
+	 * atom it never had a caret to press Enter from at all, so this is the
+	 * general escape hatch for whenever the caret is back inside one, the same
+	 * `stepOutOfRule` the input rule itself uses right after typing `---`.
 	 */
 	addKeyboardShortcuts() {
 		return {
@@ -70,14 +69,10 @@ export const HorizontalRuleExtension = Node.create({
 				this.editor.commands.command(({ tr, state, dispatch }) => {
 					const { $from } = state.selection
 					if ($from.parent.type.name !== this.name) return false
-
-					const paragraph = state.schema.nodes.paragraph
-					if (!paragraph) return false
+					if (!state.schema.nodes.paragraph) return false
 					if (!dispatch) return true
 
-					const after = $from.after()
-					tr.insert(after, paragraph.create())
-					tr.setSelection(TextSelection.near(tr.doc.resolve(after + 1)))
+					stepOutOfRule(tr, $from.after())
 					tr.scrollIntoView()
 					return true
 				}),

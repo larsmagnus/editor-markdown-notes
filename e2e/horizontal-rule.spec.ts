@@ -74,4 +74,25 @@ test.describe('A horizontal rule in the live editor', () => {
 
 		await expect(content.locator('[data-type="horizontalRule"]')).toHaveCount(0)
 	})
+
+	// The rule is one line by definition, so whatever the author types right
+	// after finishing it needs somewhere else to land - left in the rule's own
+	// text, the next thing typed corrupts it instead of becoming a new block.
+	test('typing straight through into a heading keeps both intact', async ({
+		page,
+	}) => {
+		await openInVSCode(page, '')
+		const content = page.getByRole('textbox').first()
+
+		await actionSettled(page, () => content.click())
+		await page.keyboard.type('---')
+		await page.keyboard.type('# Heading')
+
+		await expect(content.locator('[data-type="horizontalRule"]')).toHaveText(
+			'---'
+		)
+		await expect(content.getByRole('heading', { level: 1 })).toHaveText(
+			'# Heading'
+		)
+	})
 })
