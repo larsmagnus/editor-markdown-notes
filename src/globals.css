@@ -153,8 +153,13 @@
 		@apply border-ring ring-3 ring-ring/50;
 	}
 
+	/*
+	 * Typeset's own flow margin lands on `table`, but ProseMirror wraps every
+	 * table in this div - the sibling that actually sits in document flow -
+	 * so the table's margin never reaches the elements around it.
+	 */
 	.tableWrapper {
-		@apply rounded-md overflow-hidden border border-border;
+		@apply rounded-md overflow-hidden border border-border mb-[1.25em];
 	}
 
 	/*
