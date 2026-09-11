@@ -13,7 +13,15 @@ type PanZoomProps = {
 	/** Applied to the viewport - give it the bounds to clip against, e.g. a
 	 *  `max-h-*`. */
 	className?: string
+	/** How far a reader can zoom out, 1 (its own size) by default - an image
+	 *  has no toolbar control to zoom back in from further out, unlike a
+	 *  mermaid diagram's `PAN_ZOOM_MIN_SCALE`. */
+	minScale?: number
 }
+
+/** Mermaid's own floor, lower than the default so an overview of a large
+ *  diagram is reachable - `MermaidToolbar`'s zoom-out button disables here. */
+export const PAN_ZOOM_MIN_SCALE = 0.5
 
 /**
  * Ctrl or Cmd, whichever the platform puts under the reader's thumb - and a
@@ -34,10 +42,15 @@ function isZoomModifierPressed(pressedKeys: string[]): boolean {
  * Deliberately media-agnostic: it knows nothing about what it frames beyond
  * that it may be larger than the space available for it.
  */
-export function PanZoom({ children, controls, className }: PanZoomProps) {
+export function PanZoom({
+	children,
+	controls,
+	className,
+	minScale = 1,
+}: PanZoomProps) {
 	return (
 		<TransformWrapper
-			minScale={1}
+			minScale={minScale}
 			maxScale={4}
 			limitToBounds
 			// A bare wheel over the viewport has to keep scrolling the document -

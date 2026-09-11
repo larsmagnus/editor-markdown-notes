@@ -4,6 +4,7 @@ import { useControls, useTransformComponent } from 'react-zoom-pan-pinch'
 
 import { ButtonAction } from '#src/components/button-action'
 import { OverlayToolbar } from '#src/components/overlay-toolbar'
+import { PAN_ZOOM_MIN_SCALE } from '#src/components/pan-zoom'
 import { ButtonActions } from '#src/editor/extensions/mermaid/button-actions'
 
 /** `useTransformComponent` keeps its callback in a dependency array, so this
@@ -30,9 +31,11 @@ type MermaidToolbarProps = {
  */
 export function MermaidToolbar({ code, svg, onEdit }: MermaidToolbarProps) {
 	const { zoomIn, zoomOut, resetTransform } = useControls()
-	// At the starting scale there is nothing to zoom out of or reset to, and a
-	// toolbar that says otherwise reads as broken.
-	const isZoomed = useTransformComponent(selectScale) > 1
+	const scale = useTransformComponent(selectScale)
+	// Nothing to reset to at the starting scale, and nothing further to zoom
+	// out of once the floor is reached - either reads as broken if left enabled.
+	const canReset = scale !== 1
+	const canZoomOut = scale > PAN_ZOOM_MIN_SCALE
 
 	// Each handler drops its click event: these all take a step size first.
 	function handleZoomIn() {
@@ -52,14 +55,14 @@ export function MermaidToolbar({ code, svg, onEdit }: MermaidToolbarProps) {
 			<ButtonAction
 				icon={<ZoomOut />}
 				label="Zoom out"
-				disabled={!isZoomed}
+				disabled={!canZoomOut}
 				onClick={handleZoomOut}
 			/>
 			<ButtonAction icon={<ZoomIn />} label="Zoom in" onClick={handleZoomIn} />
 			<ButtonAction
 				icon={<RotateCcw />}
 				label="Reset zoom"
-				disabled={!isZoomed}
+				disabled={!canReset}
 				onClick={handleReset}
 			/>
 			<ButtonAction

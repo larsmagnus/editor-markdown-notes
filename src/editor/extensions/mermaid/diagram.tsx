@@ -1,5 +1,5 @@
 import { AppErrorBoundary } from '#src/components/app-error-boundary'
-import { PanZoom } from '#src/components/pan-zoom'
+import { PAN_ZOOM_MIN_SCALE, PanZoom } from '#src/components/pan-zoom'
 import { MermaidToolbar } from '#src/editor/extensions/mermaid/toolbar'
 import type { MermaidResult } from '#src/lib/render-mermaid'
 
@@ -41,10 +41,7 @@ export function MermaidDiagram({
 				// outside the typography the authored source takes.
 				<div contentEditable={false} className="not-typeset my-4">
 					<PanZoom
-						// The border is always drawn, unlike the rest of the editor's
-						// hover affordances: a diagram taller than the cap is clipped,
-						// and an edge is what says so rather than leaving it looking
-						// like the diagram simply ends there.
+						minScale={PAN_ZOOM_MIN_SCALE}
 						className="min-h-20 rounded-md border border-border/50 p-2 hover:border-border"
 						controls={
 							<MermaidToolbar code={code} svg={result.svg} onEdit={onEdit} />
