@@ -110,10 +110,10 @@ export const RULES: Record<TextToolRuleId, TextToolRule> = {
 		},
 	},
 	polarity: {
-		label: 'Charged language',
-		description: 'Words with strong positive or negative sentiment.',
+		label: 'Sentiment',
+		description: 'Words with positive or negative emotional affect.',
 		explanation:
-			"Emotionally loaded words color a reader's reaction before the argument does. This flags each one; the panel also shows the document's overall temperature. Charged language is not automatically wrong - it just deserves to be a choice.",
+			"Emotionally charged words influence a reader's reaction before the argument does. Each word is listed, along with the document's overall temperature. Emotionally charged language is not automatically wrong, it just deserves to be a choice.",
 		example: {
 			after: 'This is a change we should discuss.',
 			before: [

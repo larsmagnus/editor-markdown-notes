@@ -1,6 +1,6 @@
 /**
  * `text` is the one already-worded line both the panel and the MCP server
- * display, so "Document temperature: …" is written once here rather than
+ * display, so "Sentiment: …" is written once here rather than
  * separately in `text-tools-polarity-line.tsx` and `mcp/summary-lines.ts` -
  * `label` still rides along on its own for the panel's colour lookup.
  */
@@ -25,5 +25,5 @@ export function polarityTemperature(score: number): PolarityTemperature {
 	const label =
 		POLARITY_TIERS.find((tier) => score <= tier.max)?.label ?? 'neutral'
 
-	return { score, label, text: `Document temperature: ${label}` }
+	return { score, label, text: `Sentiment: ${label}` }
 }

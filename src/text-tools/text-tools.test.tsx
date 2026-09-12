@@ -236,13 +236,13 @@ describe('text tools', () => {
 		).toBeInTheDocument()
 	})
 
-	it('shows the document temperature when polarity is enabled', async () => {
+	it('shows the Sentiment when polarity is enabled', async () => {
 		analyze.mockResolvedValue(
 			analysisOf([], 4, {
 				polarity: {
 					score: 0.8,
 					label: 'very positive',
-					text: 'Document temperature: very positive',
+					text: 'Sentiment: very positive',
 				},
 			})
 		)
@@ -251,7 +251,7 @@ describe('text tools', () => {
 		})
 
 		expect(
-			await screen.findByText('Document temperature: very positive')
+			await screen.findByText('Sentiment: very positive')
 		).toBeInTheDocument()
 	})
 

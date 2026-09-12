@@ -97,7 +97,7 @@ describe('checkMarkdown', () => {
 		expect(summary).toContain('1 of 1 sentence is hard to read')
 	})
 
-	it('summarizes the document temperature when polarity runs', async () => {
+	it('summarizes the Sentiment when polarity runs', async () => {
 		const note = 'This is a wonderful and amazing idea.\n'
 
 		const { summary } = await checkMarkdown(
@@ -106,7 +106,7 @@ describe('checkMarkdown', () => {
 			defaults
 		)
 
-		expect(summary).toContain('Document temperature: very positive')
+		expect(summary).toContain('Sentiment: very positive')
 	})
 
 	it('summarizes the document-wide dash rate when dash overuse runs', async () => {

@@ -188,7 +188,7 @@ describe('runPipeline', () => {
 	})
 
 	describe('polarity', () => {
-		it('scores the document temperature from its charged words', async () => {
+		it('scores the Sentiment from its charged words', async () => {
 			const text = 'This is a wonderful and amazing idea.'
 
 			const { polarity } = await runPipeline(text, {
@@ -199,7 +199,7 @@ describe('runPipeline', () => {
 			expect(polarity).not.toBeNull()
 			expect(polarity?.score).toBeGreaterThan(0)
 			expect(polarity?.label).toBe('very positive')
-			expect(polarity?.text).toBe('Document temperature: very positive')
+			expect(polarity?.text).toBe('Sentiment: very positive')
 		})
 
 		it('reports a neutral temperature for unremarkable prose', async () => {

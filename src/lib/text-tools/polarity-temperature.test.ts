@@ -13,7 +13,7 @@ describe('polarityTemperature', () => {
 		expect(polarityTemperature(score)).toEqual({
 			score,
 			label,
-			text: `Document temperature: ${label}`,
+			text: `Sentiment: ${label}`,
 		})
 	})
 })

@@ -128,7 +128,7 @@ describe('summarize', () => {
 				polarity: {
 					score: 0.5,
 					label: 'positive',
-					text: 'Document temperature: positive',
+					text: 'Sentiment: positive',
 				},
 			}),
 			ALL_RULES
@@ -137,7 +137,7 @@ describe('summarize', () => {
 		expect(result.polarity).toEqual({
 			score: 0.5,
 			label: 'positive',
-			text: 'Document temperature: positive',
+			text: 'Sentiment: positive',
 		})
 	})
 
@@ -147,7 +147,7 @@ describe('summarize', () => {
 				polarity: {
 					score: 0.5,
 					label: 'positive',
-					text: 'Document temperature: positive',
+					text: 'Sentiment: positive',
 				},
 			}),
 			ALL_RULES.filter((id) => id !== 'polarity')

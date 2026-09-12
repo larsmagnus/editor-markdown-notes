@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 - Added a text tools check that flags the same word typed twice in a row
-- Added a text tools check that flags emotionally loaded words and shows the document's overall sentiment
+- Added a text tools check that flags emotionally charged words and shows the document's overall sentiment
 - Added a text tools check that flags sentences and runs of sentences overusing em/en dashes, and shows the document's overall dash rate
 - Added common software and web terms to the spelling dictionary, so they are no longer flagged as misspellings
 - Added support for opening relative links to other files in the workspace, from both the live and raw markdown views
