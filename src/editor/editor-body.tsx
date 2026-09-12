@@ -7,7 +7,10 @@ import { useState } from 'react'
 import { AppErrorBoundary } from '#src/components/app-error-boundary'
 import EditorModeLive from '#src/editor/editor-mode-live'
 import { EditorModeRaw } from '#src/editor/editor-mode-raw'
+import { useAnalyzer } from '#src/hooks/use-analyzer'
+import { RawTextToolsContext } from '#src/hooks/use-raw-text-tools-location'
 import { EMPTY_TEXT_TOOLS_STATE } from '#src/hooks/use-report-live-editor'
+import type { SourcePlacedIssue } from '#src/lib/text-tools/place-source-issues'
 import { TextToolsAside } from '#src/text-tools/text-tools-aside'
 
 interface EditorBodyProps {
@@ -61,6 +64,10 @@ export function EditorBody({
 	// before the editor mounts and again should `EditorModeLive`'s boundary
 	// catch a bad document, so this never outlives the editor it points to.
 	const [liveEditor, setLiveEditor] = useState<Editor | null>(null)
+	// One worker for both modes - each spinning up its own would double the
+	// ~575kB spelling dictionary and the worker itself for the same note.
+	const analyzer = useAnalyzer()
+	const [rawIssues, setRawIssues] = useState<SourcePlacedIssue[]>([])
 
 	return (
 		<EditorContext.Provider value={{ editor: liveEditor }}>
@@ -85,6 +92,7 @@ export function EditorBody({
 								className={className}
 								onAnalysisChange={setTextTools}
 								onEditorChange={setLiveEditor}
+								analyzer={analyzer}
 							/>
 						</AppErrorBoundary>
 					</EditorModeSlot>
@@ -94,14 +102,20 @@ export function EditorBody({
 							syncContent={syncContent}
 							active={raw}
 							className={className}
+							analyzer={analyzer}
+							onIssuesChange={setRawIssues}
 						/>
 					</EditorModeSlot>
 				</div>
-				<TextToolsAside
-					analysis={textTools.analysis}
-					isAnalyzing={textTools.isAnalyzing}
-					hasSpellingFailed={textTools.hasSpellingFailed}
-				/>
+				<RawTextToolsContext.Provider
+					value={{ active: raw, issues: rawIssues }}
+				>
+					<TextToolsAside
+						analysis={textTools.analysis}
+						isAnalyzing={textTools.isAnalyzing}
+						hasSpellingFailed={textTools.hasSpellingFailed}
+					/>
+				</RawTextToolsContext.Provider>
 			</div>
 		</EditorContext.Provider>
 	)

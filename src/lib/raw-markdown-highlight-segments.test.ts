@@ -99,6 +99,89 @@ describe('buildHighlightSegments', () => {
 		])
 	})
 
+	it('underlines an issue range with its severity class and tooltip', () => {
+		const source = 'We recieved the report.'
+		expect(
+			buildHighlightSegments(
+				source,
+				[],
+				[],
+				[
+					{
+						ruleId: 'spelling',
+						severity: 'misspelling',
+						message: 'Misspelled',
+						actual: 'recieved',
+						expected: ['received'],
+						start: 0,
+						end: 0,
+						from: 3,
+						to: 11,
+					},
+				]
+			)
+		).toEqual([
+			{ text: 'We ' },
+			{
+				text: 'recieved',
+				className: 'text-tools-issue text-tools-issue--misspelling',
+				title: 'Misspelled (try: received)',
+			},
+			{ text: ' the report.' },
+		])
+	})
+
+	it('picks the narrowest issue when two overlap', () => {
+		const source = 'The report was written by the committee.'
+		expect(
+			buildHighlightSegments(
+				source,
+				[],
+				[],
+				[
+					{
+						ruleId: 'readability',
+						severity: 'hard',
+						message: 'Hard to read',
+						actual: source,
+						expected: [],
+						start: 0,
+						end: 0,
+						from: 0,
+						to: source.length,
+					},
+					{
+						ruleId: 'passive',
+						severity: 'warning',
+						message: 'Passive voice',
+						actual: 'written',
+						expected: [],
+						start: 0,
+						end: 0,
+						from: 15,
+						to: 22,
+					},
+				]
+			)
+		).toEqual([
+			{
+				text: 'The report was ',
+				className: 'text-tools-issue text-tools-issue--hard',
+				title: 'Hard to read',
+			},
+			{
+				text: 'written',
+				className: 'text-tools-issue text-tools-issue--warning',
+				title: 'Passive voice',
+			},
+			{
+				text: ' by the committee.',
+				className: 'text-tools-issue text-tools-issue--hard',
+				title: 'Hard to read',
+			},
+		])
+	})
+
 	it('marks more than one link range with its own index', () => {
 		const source = '[a](./a.md) and [b](./b.md)'
 		expect(

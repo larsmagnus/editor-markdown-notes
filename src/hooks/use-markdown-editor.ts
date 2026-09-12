@@ -7,6 +7,8 @@ import {
 } from '#src/editor/editor-mode-live-surface'
 import { extensions } from '#src/editor/extensions/extensions'
 import { useFocusNavigation } from '#src/editor/extensions/focus-navigation/use-focus-navigation'
+import type { AnalyzerHandle } from '#src/hooks/use-analyzer'
+import { useSharedAnalyzer } from '#src/hooks/use-analyzer'
 import { useAskProposal } from '#src/hooks/use-ask-proposal'
 import { useFlushOnDeactivate } from '#src/hooks/use-flush-on-deactivate'
 import { useFrontmatterDocument } from '#src/hooks/use-frontmatter-document'
@@ -41,13 +43,22 @@ const noSyncTarget = () => {}
  * absorb incoming content while hidden, so only the expensive or
  * visibility-only parts (autosync, the writing checks, syntax highlighting,
  * "Skip to editor") gate on it.
+ *
+ * `analyzer` comes from `EditorBody` when it renders inside the full app - one
+ * `useAnalyzer()` shared with the raw editor's own writing checks, since each
+ * spinning up its own would mean two workers and two copies of the ~575kB
+ * spelling dictionary for the same note. Falls back to an analyzer owned here
+ * for every standalone mount (stories, component tests) that has no
+ * `EditorBody` to share one with.
  */
 export function useMarkdownEditor(
 	content: string,
 	syncContent: (content: string) => void = noSyncTarget,
-	active = true
+	active = true,
+	analyzer?: AnalyzerHandle
 ) {
 	const { viewOptions, settings, isVSCodeContext } = useSettings()
+	const { getAnalyzer, disposeAnalyzer } = useSharedAnalyzer(analyzer)
 
 	// What this editor recently wrote back, so the `content` that returns
 	// through the host is recognizable as its own echo rather than an outside
@@ -133,6 +144,8 @@ export function useMarkdownEditor(
 		targetAge: settings.textToolsTargetAge,
 		spellingLanguage: viewOptions.spellingLanguage,
 		spellingIgnoreWords: viewOptions.spellingIgnoreWords,
+		getAnalyzer,
+		disposeAnalyzer,
 	})
 
 	useItalicMarker(editor, settings.italicMarker)

@@ -7,6 +7,8 @@ import {
 	AccordionTrigger,
 } from '#src/components/ui/accordion'
 import { findIssueRange } from '#src/editor/extensions/text-tools/text-tools-extension'
+import { selectRawRange } from '#src/editor/select-raw-range'
+import { useRawTextToolsLocation } from '#src/hooks/use-raw-text-tools-location'
 import type { RuleGroup } from '#src/lib/text-tools/summarize'
 import type { TextIssue } from '#src/lib/text-tools/types'
 import { TextToolsRuleInfo } from '#src/text-tools/text-tools-rule-info'
@@ -23,8 +25,22 @@ type TextToolsIssueGroupProps = {
 /** One rule's findings, each a button that selects the text it flagged. */
 export function TextToolsIssueGroup({ group }: TextToolsIssueGroupProps) {
 	const { editor } = useCurrentEditor()
+	const raw = useRawTextToolsLocation()
 
 	const goToIssue = (issue: TextIssue) => {
+		if (raw.active) {
+			// Placed fresh on every analysis rather than decoration-tracked, so the
+			// match by identity below is exact as of the latest pass - there is no
+			// stale range to reconcile against the way the live editor's decorations
+			// are read back below.
+			const match = raw.issues.find(
+				(candidate) =>
+					candidate.start === issue.start && candidate.ruleId === issue.ruleId
+			)
+			if (match) selectRawRange(match.from, match.to)
+			return
+		}
+
 		if (!editor) return
 
 		// Asks the decoration where the issue is now. Its own `start`/`end` are

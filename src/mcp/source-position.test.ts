@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { alignedSlices, positionMapper } from '#src/mcp/source-position'
+import { alignedSlices } from '#src/lib/text-tools/source-offset'
+import { positionMapper } from '#src/mcp/source-position'
 
 describe('alignedSlices', () => {
 	it('keeps mapping text after a named character reference', () => {

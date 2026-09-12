@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { findRawLinkRanges } from '#src/editor/extensions/link/find-raw-link-ranges'
 import { buildHighlightSegments } from '#src/lib/raw-markdown-highlight-segments'
 import type { RelativeToken } from '#src/lib/syntax-highlight-tokens'
+import type { SourcePlacedIssue } from '#src/lib/text-tools/place-source-issues'
 
 interface RawMarkdownHighlightProps {
 	text: string
@@ -12,6 +13,10 @@ interface RawMarkdownHighlightProps {
 	 *  Cmd/Ctrl held (`use-raw-link-hover.ts`), or `null` for none - the one
 	 *  segment this underlines. */
 	activeLinkRangeIndex: number | null
+	/** Text-tools findings, already placed at their raw-source ranges
+	 *  (`use-raw-text-tools.ts`) - the same underline/tooltip the live editor
+	 *  draws as ProseMirror decorations. */
+	issues: SourcePlacedIssue[]
 	ref?: Ref<HTMLPreElement>
 }
 
@@ -31,12 +36,13 @@ export function RawMarkdownHighlight({
 	text,
 	tokens,
 	activeLinkRangeIndex,
+	issues,
 	ref,
 }: RawMarkdownHighlightProps) {
 	const linkRanges = useMemo(() => findRawLinkRanges(text), [text])
 	const segments = useMemo(
-		() => buildHighlightSegments(text, tokens, linkRanges),
-		[text, tokens, linkRanges]
+		() => buildHighlightSegments(text, tokens, linkRanges, issues),
+		[text, tokens, linkRanges, issues]
 	)
 
 	return (
@@ -51,6 +57,8 @@ export function RawMarkdownHighlight({
 					// recomputed wholesale each pass, so index is a stable-enough key.
 					key={index}
 					data-link-range={segment.linkRangeIndex}
+					className={segment.className}
+					title={segment.title}
 					style={
 						segment.linkRangeIndex === activeLinkRangeIndex
 							? { ...segment.style, textDecoration: 'underline' }

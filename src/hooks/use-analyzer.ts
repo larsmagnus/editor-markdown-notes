@@ -2,6 +2,14 @@ import { useCallback, useEffect, useRef } from 'react'
 
 import type { Analyzer } from '#src/lib/text-tools/analyze-client'
 
+/** What `useAnalysis` needs to run a worker it does not own the lifetime of -
+ *  shared by every caller so the live and raw editors can be handed the same
+ *  analyzer instance rather than each spinning up their own. */
+export type AnalyzerHandle = {
+	getAnalyzer: () => Promise<Analyzer | null>
+	disposeAnalyzer: () => void
+}
+
 /**
  * Owns the analysis worker's lifetime, so the hook that runs the checks does
  * not also have to.
@@ -50,4 +58,15 @@ export function useAnalyzer() {
 	}, [disposeAnalyzer])
 
 	return { getAnalyzer, disposeAnalyzer }
+}
+
+/**
+ * `analyzer` when the caller was handed one to share (`EditorBody`, splitting
+ * it between the live and raw editors), otherwise one owned right here - for
+ * every standalone mount (stories, component tests) with no `EditorBody`
+ * around it to share one with.
+ */
+export function useSharedAnalyzer(analyzer?: AnalyzerHandle): AnalyzerHandle {
+	const ownAnalyzer = useAnalyzer()
+	return analyzer ?? ownAnalyzer
 }

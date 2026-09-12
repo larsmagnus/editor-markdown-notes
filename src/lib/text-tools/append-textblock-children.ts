@@ -28,7 +28,20 @@ const PROSE_MIRROR_NAMES: Record<ProseExclusion, readonly string[]> = {
 	atomInline: [],
 }
 
-export const IGNORED_NODES = new Set(PROSE_MIRROR_NAMES.codeBlock)
+/**
+ * `horizontalRule` isn't part of the `ProseExclusion`-keyed table above: it
+ * holds its own `---` as real text the same way `codeBlock` does (see
+ * `horizontal-rule-extension.ts`), but needs no matching entry on the mdast
+ * side - a `thematicBreak` node has no children and isn't one of
+ * `markdown-source-text.ts`'s `TEXT_BLOCKS`, so that walk already skips it
+ * for free. Left out of this set, its "---" reached retext as three
+ * characters of prose the raw editor's flattening never produced -
+ * `analysis-parity.test.ts` is what would have caught it.
+ */
+export const IGNORED_NODES = new Set([
+	...PROSE_MIRROR_NAMES.codeBlock,
+	'horizontalRule',
+])
 const IGNORED_MARKS = new Set(PROSE_MIRROR_NAMES.inlineCode)
 
 /** What an inline node that carries no text of its own stands in as. */

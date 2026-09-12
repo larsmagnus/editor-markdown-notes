@@ -1,14 +1,17 @@
 import { cn } from 'cn'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { RawMarkdownHighlight } from '#src/editor/raw-markdown-highlight'
+import type { AnalyzerHandle } from '#src/hooks/use-analyzer'
 import { useRawDraftSync } from '#src/hooks/use-raw-draft-sync'
 import { useRawHeadingReveal } from '#src/hooks/use-raw-heading-reveal'
 import { useRawLinkClick } from '#src/hooks/use-raw-link-click'
 import { useRawLinkHover } from '#src/hooks/use-raw-link-hover'
 import { useRawSearchReveal } from '#src/hooks/use-raw-search-reveal'
 import { useRawSyntaxHighlight } from '#src/hooks/use-raw-syntax-highlight'
+import { useRawTextTools } from '#src/hooks/use-raw-text-tools'
 import { useSettings } from '#src/hooks/use-settings'
+import type { SourcePlacedIssue } from '#src/lib/text-tools/place-source-issues'
 
 interface RawMarkdownEditorProps {
 	content: string
@@ -18,6 +21,14 @@ interface RawMarkdownEditorProps {
 	 *  the live editor once it is revealed again. */
 	active?: boolean
 	className?: string
+	/** One analyzer shared with the live editor, owned by `EditorBody`. Falls
+	 *  back to one owned here when absent, for a standalone mount with no
+	 *  `EditorBody` around it. */
+	analyzer?: AnalyzerHandle
+	/** Reports the current placed issues to `EditorBody`, which hands them to
+	 *  the sidebar (`RawTextToolsContext`) so a click can select inside this
+	 *  textarea while it is the visible mode. */
+	onIssuesChange?: (issues: SourcePlacedIssue[]) => void
 }
 
 /** Where the "Skip to editor" link (`skip-target.ts`) focuses in raw mode. */
@@ -36,6 +47,8 @@ export function EditorModeRaw({
 	syncContent,
 	active = true,
 	className,
+	analyzer,
+	onIssuesChange,
 }: RawMarkdownEditorProps) {
 	const { isVSCodeContext } = useSettings()
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -53,6 +66,11 @@ export function EditorModeRaw({
 	useRawLinkClick(textareaRef, draftRef)
 	const activeLinkRangeIndex = useRawLinkHover(textareaRef, overlayRef)
 	const tokens = useRawSyntaxHighlight(draft, active)
+	const issues = useRawTextTools(draft, active, analyzer)
+
+	useEffect(() => {
+		onIssuesChange?.(issues)
+	}, [issues, onIssuesChange])
 
 	return (
 		// The measure/centering classes (`className`) live on this wrapper, not
@@ -66,6 +84,7 @@ export function EditorModeRaw({
 				text={draft}
 				tokens={tokens}
 				activeLinkRangeIndex={activeLinkRangeIndex}
+				issues={issues}
 			/>
 			<textarea
 				id={RAW_MARKDOWN_EDITOR_ID}

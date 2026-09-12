@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/react'
 import { useEffect } from 'react'
 
-import { EMPTY_ANALYSIS } from '#src/hooks/use-text-tools'
+import { EMPTY_ANALYSIS } from '#src/hooks/use-analysis'
 import type { Analysis } from '#src/lib/text-tools/types'
 
 export interface TextToolsState {

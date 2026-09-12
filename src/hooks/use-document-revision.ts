@@ -5,8 +5,11 @@ import { useDebounceValue } from 'usehooks-ts'
 /**
  * Long enough that the analysis lands in a typing pause rather than between two
  * keystrokes, short enough that it feels immediate once you stop.
+ *
+ * Exported for `use-raw-text-tools.ts`, which debounces the raw draft string
+ * directly rather than a revision counter, but on the same cadence.
  */
-const ANALYSIS_DEBOUNCE_MS = 500
+export const ANALYSIS_DEBOUNCE_MS = 500
 
 /**
  * A number that changes when the document does, settling after typing stops.

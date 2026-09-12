@@ -1,31 +1,21 @@
 import type { Editor } from '@tiptap/react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
-import { useAnalysisOptions } from '#src/hooks/use-analysis-options'
+import { useAnalysis } from '#src/hooks/use-analysis'
 import type { AnalysisRequest } from '#src/hooks/use-analysis-options'
-import { useAnalyzer } from '#src/hooks/use-analyzer'
+import type { AnalyzerHandle } from '#src/hooks/use-analyzer'
 import { useDocumentRevision } from '#src/hooks/use-document-revision'
 import { getDocumentText } from '#src/lib/text-tools/document-text'
 import { placeIssues } from '#src/lib/text-tools/place-issues'
-import type { Analysis } from '#src/lib/text-tools/types'
 
-export const EMPTY_ANALYSIS: Analysis = {
-	issues: [],
-	sentenceCount: 0,
-	polarity: null,
-	dashOveruse: null,
-}
-
-type UseTextToolsOptions = AnalysisRequest & {
-	editor: Editor | null
-}
+type UseTextToolsOptions = AnalysisRequest &
+	AnalyzerHandle & {
+		editor: Editor | null
+	}
 
 /**
- * Runs the writing checks over the document and pushes the results into both
- * the decoration plugin and the sidebar.
- *
- * The worker and the whole retext stack behind it are only imported once the
- * tools are switched on, and are torn down when they are switched off again.
+ * Runs the writing checks over the live editor's document and pushes the
+ * results into the decoration plugin, via the shared `useAnalysis`.
  */
 export function useTextTools({
 	editor,
@@ -34,73 +24,44 @@ export function useTextTools({
 	targetAge,
 	spellingLanguage,
 	spellingIgnoreWords,
+	getAnalyzer,
+	disposeAnalyzer,
 }: UseTextToolsOptions) {
-	const [analysis, setAnalysis] = useState<Analysis>(EMPTY_ANALYSIS)
-	const [isAnalyzing, setIsAnalyzing] = useState(false)
-	const { getAnalyzer, disposeAnalyzer } = useAnalyzer()
-
 	const debouncedRevision = useDocumentRevision(editor)
 
-	const { options, key, hasSpellingFailed } = useAnalysisOptions({
-		enabled,
-		rules,
-		targetAge,
-		spellingLanguage,
-		spellingIgnoreWords,
-	})
-	const optionsRef = useRef(options)
-	optionsRef.current = options
+	// `viewOptions.textToolRules` is rebuilt by its zod `.transform` on every
+	// config broadcast (see `use-analysis-options.ts`), so a ref keeps the
+	// placement effect below from re-dispatching on an unrelated settings
+	// change - it only needs to react once `analysis`/`analyzedText` land.
+	const rulesRef = useRef(rules)
+	rulesRef.current = rules
 
-	// Split from the analysis effect below so it runs on the transition only.
-	// Sharing that effect's dependencies would dispatch a no-op transaction
-	// every debounce tick while the tools are off, for the whole session.
-	useEffect(() => {
-		if (enabled || !editor) return
-
-		disposeAnalyzer()
-		setAnalysis(EMPTY_ANALYSIS)
-		setIsAnalyzing(false)
-		editor.commands.setTextToolIssues([])
-	}, [editor, enabled, disposeAnalyzer])
-
-	useEffect(() => {
-		if (!editor || !enabled) return
-
-		const options = optionsRef.current
-		let cancelled = false
-		setIsAnalyzing(true)
-
-		const run = async () => {
-			const analyzer = await getAnalyzer()
-			if (!analyzer || cancelled) return
-
-			const documentText = getDocumentText(editor.state.doc)
-			const result = await analyzer.analyze(documentText.text, options)
-
-			// The document may have moved on while the worker was busy. Positions
-			// derived from the old snapshot would land in the wrong place, and the
-			// debounce already has the next run queued.
-			if (cancelled || editor.isDestroyed) return
-
-			setAnalysis(result)
-			setIsAnalyzing(false)
-			editor.commands.setTextToolIssues(
-				placeIssues(result.issues, documentText, new Set(options.rules))
-			)
-		}
-
-		run().catch((error) => {
-			if (cancelled) return
-			// The error object, not `errorMessage(error)` - devtools renders a stack
-			// from it, and nothing here needs a string.
-			console.error('Text tools analysis failed:', error)
-			setIsAnalyzing(false)
+	const { analysis, analyzedText, isAnalyzing, hasSpellingFailed } =
+		useAnalysis({
+			getFlattenedText: () =>
+				editor ? getDocumentText(editor.state.doc) : null,
+			revisionKey: debouncedRevision,
+			enabled: enabled && editor !== null,
+			rules,
+			targetAge,
+			spellingLanguage,
+			spellingIgnoreWords,
+			getAnalyzer,
+			disposeAnalyzer,
 		})
 
-		return () => {
-			cancelled = true
+	useEffect(() => {
+		if (!editor || editor.isDestroyed) return
+
+		if (!analyzedText) {
+			editor.commands.setTextToolIssues([])
+			return
 		}
-	}, [editor, enabled, key, debouncedRevision, getAnalyzer])
+
+		editor.commands.setTextToolIssues(
+			placeIssues(analysis.issues, analyzedText, new Set(rulesRef.current))
+		)
+	}, [editor, analysis, analyzedText])
 
 	return { analysis, isAnalyzing, hasSpellingFailed }
 }
