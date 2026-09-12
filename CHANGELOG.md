@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-09-12
+
 - Added writing tools highlights to the raw markdown view, matching the live editor
 - Added a text tools check that flags the same word typed twice in a row
 - Added a text tools check that flags emotionally charged words and shows the document's overall sentiment
