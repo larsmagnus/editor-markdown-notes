@@ -1,3 +1,4 @@
+import type { Root } from 'nlcst'
 import retextEnglish from 'retext-english'
 import retextSyntaxUrls from 'retext-syntax-urls'
 import { unified } from 'unified'
@@ -5,11 +6,22 @@ import { visit } from 'unist-util-visit'
 import { VFile } from 'vfile'
 
 import { dashOveruseIssues } from '#src/lib/text-tools/dash-overuse-issues'
+import { overallReadability } from '#src/lib/text-tools/overall-readability'
 import { polarityIssues } from '#src/lib/text-tools/polarity-issues'
 import { readabilityIssues } from '#src/lib/text-tools/readability-issues'
 import { spellingIssues } from '#src/lib/text-tools/spelling-issues'
+import { textRangesOf } from '#src/lib/text-tools/text-ranges-of'
 import type { Analysis, PipelineOptions } from '#src/lib/text-tools/types'
 import { wordIssues } from '#src/lib/text-tools/word-issues'
+
+function wordCharacterCounts(tree: Root): { word: number; character: number } {
+	const words = textRangesOf(tree, 'WordNode')
+
+	return {
+		word: words.length,
+		character: words.reduce((total, word) => total + word.text.length, 0),
+	}
+}
 
 /**
  * The analysis itself, kept free of any worker plumbing so the tests can drive
@@ -42,6 +54,15 @@ export async function runPipeline(
 	const readability = enabled.has('readability')
 		? await readabilityIssues(tree, text, options.targetAge)
 		: []
+	const overall = enabled.has('readability')
+		? overallReadability(
+				{
+					sentence: sentenceCount,
+					...wordCharacterCounts(tree),
+				},
+				options.targetAge
+			)
+		: null
 
 	const spelling = enabled.has('spelling')
 		? await spellingIssues(tree, text, {
@@ -70,5 +91,6 @@ export async function runPipeline(
 		sentenceCount,
 		polarity: polarity?.temperature ?? null,
 		dashOveruse: dashOveruse?.summary ?? null,
+		overallReadability: overall,
 	}
 }

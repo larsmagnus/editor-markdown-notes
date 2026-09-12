@@ -1,4 +1,6 @@
-import { CheckCircle, Info, TriangleAlert } from 'lucide-react'
+import { cn } from 'cn'
+import { Info } from 'lucide-react'
+import type { ComponentProps } from 'react'
 
 import { PopoverArrow } from '#src/components/popover-arrow'
 import { Button } from '#src/components/ui/button'
@@ -10,18 +12,15 @@ import {
 	PopoverTitle,
 	PopoverTrigger,
 } from '#src/components/ui/popover'
-import { issueClassName } from '#src/lib/text-tools/issue-class-name'
-import { RULES } from '#src/lib/text-tools/rules'
-import type { TextToolRuleId } from '#src/shared/messages'
+import type { TextToolRule } from '#src/lib/text-tools/rules'
+import { TextToolsRuleExample } from '#src/text-tools/text-tools-rule-example'
 
 type TextToolsRuleInfoProps = {
-	ruleId: TextToolRuleId
-}
+	rule: TextToolRule
+} & ComponentProps<'button'>
 
 /** What one check looks for and why, behind an info button. */
-export function TextToolsRuleInfo({ ruleId }: TextToolsRuleInfoProps) {
-	const rule = RULES[ruleId]
-
+export function TextToolsRuleInfo({ className, rule }: TextToolsRuleInfoProps) {
 	return (
 		<Popover>
 			<PopoverTrigger
@@ -30,7 +29,7 @@ export function TextToolsRuleInfo({ ruleId }: TextToolsRuleInfoProps) {
 						type="button"
 						variant="ghost"
 						size="icon-xs"
-						className="text-muted-foreground"
+						className={cn('text-muted-foreground', className)}
 						aria-label={`About ${rule.label}`}
 					>
 						<Info />
@@ -45,37 +44,7 @@ export function TextToolsRuleInfo({ ruleId }: TextToolsRuleInfoProps) {
 					</PopoverDescription>
 				</PopoverHeader>
 				<p className="text-sm leading-relaxed">{rule.explanation}</p>
-				<dl className="flex flex-col gap-2">
-					<div className="flex flex-col gap-1 bg-green-300/15 dark:bg-green-300/10 p-2 rounded-md">
-						<dt className="text-xs flex items-center gap-1 text-muted-foreground">
-							<CheckCircle className="size-3 text-green-700 dark:text-green-300" />{' '}
-							Try
-						</dt>
-						<dd>{rule.example.after}</dd>
-					</div>
-					<div className="flex flex-col gap-1 bg-amber-300/15 dark:bg-amber-300/10 p-2 rounded-md">
-						<dt className="text-xs flex items-center gap-1 text-muted-foreground">
-							<TriangleAlert className="size-3 text-amber-700 dark:text-amber-300" />{' '}
-							Instead of
-						</dt>
-						<dd>
-							{rule.example.before.map((segment, index) => (
-								<span
-									// Freeform prose: the same run can appear twice in one
-									// example, so only its position is unique.
-									key={index}
-									className={
-										segment.flagged
-											? issueClassName(rule.example.severity)
-											: undefined
-									}
-								>
-									{segment.text}
-								</span>
-							))}
-						</dd>
-					</div>
-				</dl>
+				{rule.example && <TextToolsRuleExample example={rule.example} />}
 				<PopoverArrow />
 			</PopoverContent>
 		</Popover>

@@ -24,6 +24,8 @@ export type Summary = {
 	polarity: Analysis['polarity']
 	/** The document-wide dash rate, gated on the `dashOveruse` rule. */
 	dashOveruse: Analysis['dashOveruse']
+	/** The document's overall reading difficulty, gated on the `readability` rule. */
+	overallReadability: Analysis['overallReadability']
 }
 
 const READABILITY_LABELS = {
@@ -76,5 +78,8 @@ export function summarize(
 		total: issues.length,
 		polarity: enabled.has('polarity') ? analysis.polarity : null,
 		dashOveruse: enabled.has('dashOveruse') ? analysis.dashOveruse : null,
+		overallReadability: enabled.has('readability')
+			? analysis.overallReadability
+			: null,
 	}
 }

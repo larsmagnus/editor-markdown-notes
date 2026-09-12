@@ -65,7 +65,10 @@ export function TextToolsPanel({
 			<div className="flex flex-col gap-1 p-3 scroll-fade overflow-y-auto">
 				<div className="flex flex-col gap-2">
 					<TextToolsStats sentenceCount={analysis.sentenceCount} />
-					<TextToolsReadabilityLines lines={summary.readability} />
+					<TextToolsReadabilityLines
+						overall={summary.overallReadability}
+						lines={summary.readability}
+					/>
 					<TextToolsPolarityLine temperature={summary.polarity} />
 					<TextToolsDashOveruseLine summary={summary.dashOveruse} />
 

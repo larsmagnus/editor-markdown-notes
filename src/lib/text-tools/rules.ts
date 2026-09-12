@@ -18,8 +18,16 @@ export type TextToolRule = {
 	 * the popover is there to explain. `rules.test.ts` runs both halves through
 	 * the real pipeline, because an example the check disagrees with teaches the
 	 * reader the wrong thing.
+	 *
+	 * Omitted for a rule with no single flagged span to show, such as
+	 * `OVERALL_READABILITY_RULE` - a document-level score, not a per-sentence
+	 * marker.
 	 */
-	example: { after: string; before: ExampleSegment[]; severity: IssueSeverity }
+	example?: {
+		after: string
+		before: ExampleSegment[]
+		severity: IssueSeverity
+	}
 }
 
 /** A run of the flawed example, `flagged` where the check would mark it. */
@@ -37,7 +45,10 @@ type ExampleSegment = { text: string; flagged?: boolean }
  * - `description` is one line for a tooltip. `explanation` is a few short
  *   sentences: what the check looks for, when it's fine, and what to do.
  */
-export const RULES: Record<TextToolRuleId, TextToolRule> = {
+export const RULES: Record<
+	TextToolRuleId,
+	TextToolRule & { example: NonNullable<TextToolRule['example']> }
+> = {
 	passive: {
 		label: 'Passive voice',
 		description: 'Sentences where the subject receives the action.',
@@ -139,7 +150,7 @@ export const RULES: Record<TextToolRuleId, TextToolRule> = {
 		},
 	},
 	readability: {
-		label: 'Hard to read',
+		label: 'Readability',
 		description: 'Sentences above the target reading age.',
 		explanation:
 			'Reading formulas score each sentence on its length and how hard its words are. A sentence lands here when they agree it sits above your target reading age. Splitting it in two usually clears it.',
@@ -172,4 +183,18 @@ export const RULES: Record<TextToolRuleId, TextToolRule> = {
 			severity: 'warning',
 		},
 	},
+}
+
+/**
+ * Content for the overall readability verdict's info popover
+ * (`overall-readability.ts`). Not part of `RULES`: it is not a `TextToolRuleId`,
+ * only a document-level score gated on the `readability` rule, so it has no
+ * single flagged span to build an `example` from.
+ */
+export const OVERALL_READABILITY_RULE: TextToolRule = {
+	label: 'Overall readability',
+	description:
+		'How easy the whole document is to read, based on word and sentence length.',
+	explanation:
+		'This score comes from a formula called the Automated Readability Index. It looks at the average length of your words and sentences, not what they mean. The formula gives a grade from about 1 to 14, then five years are added to show an age instead. Most adults read best at a level far below their own reading skill, often around grade 7 or 8. A low score means the writing is clear, not childish. Mixing short and long sentences reads better than keeping every sentence the same length.',
 }

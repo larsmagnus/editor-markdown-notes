@@ -56,7 +56,7 @@ export function TextToolsRuleCheckboxes({
 							setLanguage={setSpellingLanguage}
 						/>
 					)}
-					<TextToolsRuleInfo ruleId={ruleId} />
+					<TextToolsRuleInfo rule={RULES[ruleId]} />
 				</Field>
 			))}
 			{hasSpellingFailed && (

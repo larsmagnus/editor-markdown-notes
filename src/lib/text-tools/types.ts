@@ -1,4 +1,5 @@
 import type { DashOveruseSummary } from '#src/lib/text-tools/dash-rate-summary'
+import type { OverallReadability } from '#src/lib/text-tools/overall-readability'
 import type { PolarityTemperature } from '#src/lib/text-tools/polarity-temperature'
 import type { SpellingLanguage, TextToolRuleId } from '#src/shared/messages'
 
@@ -58,6 +59,12 @@ export type Analysis = {
 	 * rule surface as ordinary `issues` instead.
 	 */
 	dashOveruse: DashOveruseSummary | null
+	/**
+	 * The document's overall reading difficulty. `null` when the `readability`
+	 * rule is off or the document has no words to score - distinct from the
+	 * per-sentence hard/very-hard tiers, which flag individual sentences.
+	 */
+	overallReadability: OverallReadability | null
 }
 
 /**

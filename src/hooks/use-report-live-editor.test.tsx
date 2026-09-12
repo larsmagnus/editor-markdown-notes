@@ -17,6 +17,7 @@ describe('useReportLiveEditor', () => {
 			sentenceCount: 1,
 			polarity: null,
 			dashOveruse: null,
+			overallReadability: null,
 		}
 
 		renderHook(() =>
@@ -55,6 +56,7 @@ describe('useReportLiveEditor', () => {
 					sentenceCount: 1,
 					polarity: null,
 					dashOveruse: null,
+					overallReadability: null,
 				},
 				isAnalyzing: false,
 				hasSpellingFailed: false,

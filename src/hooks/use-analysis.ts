@@ -10,6 +10,7 @@ export const EMPTY_ANALYSIS: Analysis = {
 	sentenceCount: 0,
 	polarity: null,
 	dashOveruse: null,
+	overallReadability: null,
 }
 
 type FlattenedText = { text: string }

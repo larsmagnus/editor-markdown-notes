@@ -98,6 +98,9 @@ importers:
       '@tiptap/suggestion':
         specifier: 3.29.2
         version: 3.29.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.29.2(@tiptap/pm@3.29.2))(@tiptap/pm@3.29.2)
+      automated-readability:
+        specifier: 2.0.1
+        version: 2.0.1
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1

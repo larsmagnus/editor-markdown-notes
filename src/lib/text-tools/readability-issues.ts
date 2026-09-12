@@ -18,7 +18,7 @@ import { offsetsOf, toIssue } from '#src/lib/text-tools/vfile-message-to-issue'
  * with the default target of 16, "very hard" means still too hard at 22, which
  * is roughly postgraduate reading.
  */
-const VERY_HARD_AGE_OFFSET = 6
+export const VERY_HARD_AGE_OFFSET = 6
 
 /**
  * `unified` merges the options of a plugin used twice on the same processor, so

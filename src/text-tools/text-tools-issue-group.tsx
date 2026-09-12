@@ -9,6 +9,7 @@ import {
 import { findIssueRange } from '#src/editor/extensions/text-tools/text-tools-extension'
 import { selectRawRange } from '#src/editor/select-raw-range'
 import { useRawTextToolsLocation } from '#src/hooks/use-raw-text-tools-location'
+import { RULES } from '#src/lib/text-tools/rules'
 import type { RuleGroup } from '#src/lib/text-tools/summarize'
 import type { TextIssue } from '#src/lib/text-tools/types'
 import { TextToolsRuleInfo } from '#src/text-tools/text-tools-rule-info'
@@ -60,7 +61,7 @@ export function TextToolsIssueGroup({ group }: TextToolsIssueGroupProps) {
 						<AccordionTrigger className="text-xs w-full font-medium tracking-wide text-muted-foreground uppercase">
 							{group.label} ({group.issues.length})
 						</AccordionTrigger>
-						<TextToolsRuleInfo ruleId={group.ruleId} />
+						<TextToolsRuleInfo rule={RULES[group.ruleId]} />
 					</div>
 					<AccordionContent>
 						<ul className="flex flex-col gap-1">

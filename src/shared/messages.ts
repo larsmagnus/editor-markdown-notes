@@ -18,11 +18,11 @@ export type Theme = 'dark' | 'light' | 'system'
  * drops that rule from a user's saved selection.
  */
 export const TEXT_TOOL_RULE_IDS = [
+	'readability',
 	'passive',
 	'simplify',
 	'intensify',
 	'repeatedWords',
-	'readability',
 	'spelling',
 	'polarity',
 	'dashOveruse',
@@ -132,11 +132,11 @@ export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
 	// legitimate writing. A spread would quietly enable every rule added
 	// after it too.
 	textToolRules: [
+		'readability',
 		'passive',
 		'simplify',
 		'intensify',
 		'repeatedWords',
-		'readability',
 	],
 	spellingLanguage: 'en-US',
 	spellingIgnoreWords: [],

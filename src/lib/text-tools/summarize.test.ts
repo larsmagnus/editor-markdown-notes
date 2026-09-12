@@ -22,12 +22,15 @@ function issue(overrides: Partial<TextIssue> = {}): TextIssue {
 const analysis = (
 	issues: TextIssue[],
 	sentenceCount: number,
-	overrides: Partial<Pick<Analysis, 'polarity' | 'dashOveruse'>> = {}
+	overrides: Partial<
+		Pick<Analysis, 'polarity' | 'dashOveruse' | 'overallReadability'>
+	> = {}
 ): Analysis => ({
 	issues,
 	sentenceCount,
 	polarity: null,
 	dashOveruse: null,
+	overallReadability: null,
 	...overrides,
 })
 
@@ -163,5 +166,39 @@ describe('summarize', () => {
 		)
 
 		expect(result.dashOveruse).toBeNull()
+	})
+
+	it('carries the overall readability verdict through when the rule is on', () => {
+		const result = summarize(
+			analysis([], 3, {
+				overallReadability: {
+					age: 12,
+					label: 'good',
+					text: 'Readability: Good (age 12)',
+				},
+			}),
+			ALL_RULES
+		)
+
+		expect(result.overallReadability).toEqual({
+			age: 12,
+			label: 'good',
+			text: 'Readability: Good (age 12)',
+		})
+	})
+
+	it('hides the overall readability verdict when the rule is switched off', () => {
+		const result = summarize(
+			analysis([], 3, {
+				overallReadability: {
+					age: 12,
+					label: 'good',
+					text: 'Readability: Good (age 12)',
+				},
+			}),
+			ALL_RULES.filter((id) => id !== 'readability')
+		)
+
+		expect(result.overallReadability).toBeNull()
 	})
 })

@@ -334,6 +334,7 @@
 		"@tiptap/react": "3.29.2",
 		"@tiptap/starter-kit": "3.29.2",
 		"@tiptap/suggestion": "3.29.2",
+		"automated-readability": "2.0.1",
 		"class-variance-authority": "0.7.1",
 		"cn": "0.2.6",
 		"dictionary-en": "4.0.0",

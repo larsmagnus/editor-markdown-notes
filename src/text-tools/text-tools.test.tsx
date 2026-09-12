@@ -85,13 +85,16 @@ const SPELLING_ISSUE: TextIssue = {
 function analysisOf(
 	issues: TextIssue[],
 	sentenceCount = 1,
-	overrides: Partial<Pick<Analysis, 'polarity' | 'dashOveruse'>> = {}
+	overrides: Partial<
+		Pick<Analysis, 'polarity' | 'dashOveruse' | 'overallReadability'>
+	> = {}
 ): Analysis {
 	return {
 		issues,
 		sentenceCount,
 		polarity: null,
 		dashOveruse: null,
+		overallReadability: null,
 		...overrides,
 	}
 }
