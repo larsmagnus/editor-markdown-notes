@@ -122,9 +122,13 @@ export function useMarkdownEditor(
 	})
 	useFlushOnDeactivate(active, flushQueuedSync)
 
+	// Not gated on `active` - the sidebar showing this analysis now stays on
+	// screen while raw mode is active too (`EditorBody`), and this editor keeps
+	// absorbing content while hidden regardless, so there is nothing stale about
+	// running it in the background.
 	const { analysis, isAnalyzing, hasSpellingFailed } = useTextTools({
 		editor,
-		enabled: viewOptions.textTools && active,
+		enabled: viewOptions.textTools,
 		rules: viewOptions.textToolRules,
 		targetAge: settings.textToolsTargetAge,
 		spellingLanguage: viewOptions.spellingLanguage,

@@ -9,7 +9,7 @@ import { getDocumentText } from '#src/lib/text-tools/document-text'
 import { placeIssues } from '#src/lib/text-tools/place-issues'
 import type { Analysis } from '#src/lib/text-tools/types'
 
-const EMPTY_ANALYSIS: Analysis = {
+export const EMPTY_ANALYSIS: Analysis = {
 	issues: [],
 	sentenceCount: 0,
 	polarity: null,

@@ -1,7 +1,6 @@
 import type { EditorContentProps } from '@tiptap/react'
 import { EditorConsumer, EditorContent } from '@tiptap/react'
 import { cn } from 'cn'
-import type { ReactNode } from 'react'
 
 import { TableControls } from '#src/editor/extensions/table/controls'
 import type { CodeBlockStyle } from '#src/hooks/use-syntax-highlight'
@@ -21,63 +20,46 @@ export const EDITOR_KEYBOARD_HINT_ID = 'editor-keyboard-hint'
 
 type EditorSurfaceProps = Omit<EditorContentProps, 'editor'> & {
 	includeTypesetClassNames?: boolean
-	/**
-	 * Rendered beside the document; omitted entirely when the tools are off.
-	 *
-	 * Must not suspend. A boundary here would sit above `EditorContent`, and
-	 * unwinding to it re-renders the editor, whose mount `flushSync`s straight
-	 * back into the render that suspended — see `text-tools-aside.tsx`.
-	 */
-	panel?: ReactNode
 	/** The resolved Shiki theme's colors; undefined until one has loaded. */
 	codeBlockStyle?: CodeBlockStyle
 }
 
 /**
- * The document itself, with the text tools panel alongside it.
+ * The rendered document itself.
  *
- * Reads the editor off `EditorContext` rather than taking it as a prop, so the
- * panel beside it can do the same.
+ * Reads the editor off `EditorContext` rather than taking it as a prop.
  *
  * `codeBlockStyle` is custom properties rather than a class, so hanging it on
- * this container is all every `pre` below it needs.
+ * this container is all every `pre` below it needs. `relative` is what
+ * `TableControls`' `absolute inset-0` measures against - it only needs to be
+ * *some* positioned ancestor wrapping the document, not necessarily this
+ * component's own root, so `EditorBody` owning the surrounding row (doc
+ * column + text-tools aside) doesn't disturb it.
  */
 export function EditorSurface({
 	includeTypesetClassNames,
-	panel,
 	className,
 	codeBlockStyle,
 	...rest
 }: EditorSurfaceProps) {
 	return (
-		<div className="flex flex-1 items-start gap-4" style={codeBlockStyle}>
-			{/* The table handles are positioned against this box, so they measure
-			    the document column rather than the viewport. self-stretch (not
-			    the row's default items-start) makes it fill the row's full
-			    height instead of collapsing to the document's own content
-			    height, so the whole column is a click target - not just the
-			    text. The sticky text-tools panel stays top-aligned. */}
-			<div className="relative min-w-xs flex-1 self-stretch">
-				<p id={EDITOR_KEYBOARD_HINT_ID} className="sr-only">
-					Press Escape, then Tab, to move keyboard focus out of the document
-					text.
-				</p>
-				<EditorConsumer>
-					{({ editor }) => (
-						<EditorContent
-							editor={editor}
-							className={cn(
-								includeTypesetClassNames && 'typeset typeset-note',
-								className
-							)}
-							{...rest}
-						/>
-					)}
-				</EditorConsumer>
-				<TableControls />
-			</div>
-
-			{panel}
+		<div className="relative min-w-xs" style={codeBlockStyle}>
+			<p id={EDITOR_KEYBOARD_HINT_ID} className="sr-only">
+				Press Escape, then Tab, to move keyboard focus out of the document text.
+			</p>
+			<EditorConsumer>
+				{({ editor }) => (
+					<EditorContent
+						editor={editor}
+						className={cn(
+							includeTypesetClassNames && 'typeset typeset-note',
+							className
+						)}
+						{...rest}
+					/>
+				)}
+			</EditorConsumer>
+			<TableControls />
 		</div>
 	)
 }

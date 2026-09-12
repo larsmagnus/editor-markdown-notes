@@ -3,10 +3,12 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { SettingsProvider } from '#src/components/settings-provider'
 import { EditorBody } from '#src/editor/editor-body'
 import { LIVE_EDITOR_ID } from '#src/editor/editor-mode-live-surface'
 import { RAW_MARKDOWN_EDITOR_ID } from '#src/editor/editor-mode-raw'
 import { skipToEditor } from '#src/editor/extensions/focus-navigation/skip-target'
+import { DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`
 // and the save effect attaches a rejection handler to what it hands back.
@@ -16,7 +18,24 @@ vi.mock('#src/lib/update-notes', () => ({ updateNotes: vi.fn(async () => {}) }))
 // and throws in happy-dom the moment anything moves the selection.
 vi.mock('#src/components/menu-bubble', () => ({ MenuBubble: () => null }))
 
+// The real client boots an inline blob worker, which happy-dom cannot run -
+// covered against the real retext stack in `src/lib/text-tools/run-pipeline.test.ts`.
+vi.mock('#src/lib/text-tools/analyze-client', () => ({
+	createAnalyzer: () => ({
+		analyze: vi.fn(async () => ({
+			issues: [],
+			sentenceCount: 0,
+			polarity: null,
+			dashOveruse: null,
+		})),
+		dispose: vi.fn(),
+	}),
+}))
+
+const STORAGE_KEY = 'editor-markdown-notes:view-options'
+
 afterEach(() => {
+	localStorage.clear()
 	vi.clearAllMocks()
 })
 
@@ -91,5 +110,28 @@ describe('EditorBody', () => {
 		skipToEditor()
 
 		expect(document.activeElement?.id).toBe(RAW_MARKDOWN_EDITOR_ID)
+	})
+
+	it('keeps the text-tools sidebar on screen while raw mode is active', async () => {
+		localStorage.setItem(
+			STORAGE_KEY,
+			JSON.stringify({ ...DEFAULT_VIEW_OPTIONS, textTools: true })
+		)
+		const user = userEvent.setup()
+		render(
+			<SettingsProvider>
+				<ToggleableEditorBody initialContent="Ship it." />
+			</SettingsProvider>
+		)
+
+		await within(getLiveEditor()).findByText('Ship it.')
+		await screen.findByRole('complementary', { name: 'Text tools' })
+
+		await user.click(screen.getByRole('button', { name: 'Toggle raw' }))
+		await screen.findByLabelText('Raw markdown')
+
+		expect(
+			screen.getByRole('complementary', { name: 'Text tools' })
+		).toBeInTheDocument()
 	})
 })

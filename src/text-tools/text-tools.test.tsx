@@ -1,11 +1,16 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { Editor } from '@tiptap/react'
+import { EditorContext } from '@tiptap/react'
+import { useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SettingsProvider } from '#src/components/settings-provider'
 import EditorModeLive from '#src/editor/editor-mode-live'
+import { EMPTY_TEXT_TOOLS_STATE } from '#src/hooks/use-report-live-editor'
 import type { Analysis, TextIssue } from '#src/lib/text-tools/types'
 import { DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
+import { TextToolsAside } from '#src/text-tools/text-tools-aside'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`
 // and the save effect attaches a rejection handler to what it hands back.
@@ -91,6 +96,33 @@ function analysisOf(
 	}
 }
 
+/**
+ * `EditorBody` renders the sidebar beside the editor, fed by
+ * `EditorModeLive`'s `onAnalysisChange` callback - reproduced here rather
+ * than pulling in `EditorBody` itself, since that also mounts raw mode's
+ * (hidden but present) copy of `NOTE`, which would make plain-text queries
+ * below match twice.
+ */
+function TextToolsHarness({ content }: { content: string }) {
+	const [state, setState] = useState(EMPTY_TEXT_TOOLS_STATE)
+	const [editor, setEditor] = useState<Editor | null>(null)
+
+	return (
+		<EditorContext.Provider value={{ editor }}>
+			<EditorModeLive
+				content={content}
+				onAnalysisChange={setState}
+				onEditorChange={setEditor}
+			/>
+			<TextToolsAside
+				analysis={state.analysis}
+				isAnalyzing={state.isAnalyzing}
+				hasSpellingFailed={state.hasSpellingFailed}
+			/>
+		</EditorContext.Provider>
+	)
+}
+
 function renderWithTextTools(open = true, viewOptions = {}) {
 	localStorage.setItem(
 		STORAGE_KEY,
@@ -99,7 +131,7 @@ function renderWithTextTools(open = true, viewOptions = {}) {
 
 	return render(
 		<SettingsProvider>
-			<EditorModeLive content={NOTE} />
+			<TextToolsHarness content={NOTE} />
 		</SettingsProvider>
 	)
 }
