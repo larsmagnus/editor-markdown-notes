@@ -1,5 +1,11 @@
 import { useCurrentEditor } from '@tiptap/react'
 
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from '#src/components/ui/accordion'
 import { findIssueRange } from '#src/editor/extensions/text-tools/text-tools-extension'
 import type { RuleGroup } from '#src/lib/text-tools/summarize'
 import type { TextIssue } from '#src/lib/text-tools/types'
@@ -32,35 +38,41 @@ export function TextToolsIssueGroup({ group }: TextToolsIssueGroupProps) {
 
 	return (
 		<section className="flex flex-col gap-1">
-			<div className="flex items-center gap-1">
-				<h3 className="flex-auto text-xs font-medium tracking-wide text-muted-foreground uppercase">
-					{group.label} ({group.issues.length})
-				</h3>
-				<TextToolsRuleInfo ruleId={group.ruleId} />
-			</div>
-			<ul className="flex flex-col gap-1">
-				{group.issues.map((issue) => (
-					<li key={`${issue.start}-${issue.ruleId}-${issue.actual}`}>
-						<button
-							type="button"
-							onClick={() => goToIssue(issue)}
-							className="w-full rounded px-2 py-1 text-left hover:bg-accent"
-						>
-							<span className="font-medium">
-								{issue.ruleId === 'readability'
-									? truncate(issue.actual)
-									: issue.actual}
-							</span>
-							{issue.expected.length > 0 && (
-								<span className="text-muted-foreground">
-									{' → '}
-									{issue.expected.join(', ')}
-								</span>
-							)}
-						</button>
-					</li>
-				))}
-			</ul>
+			<Accordion defaultValue={[group.ruleId]}>
+				<AccordionItem value={group.ruleId}>
+					<div className="flex gap-1 items-center justify-between w-full *:data-orientation:w-full">
+						<AccordionTrigger className="text-xs w-full font-medium tracking-wide text-muted-foreground uppercase">
+							{group.label} ({group.issues.length})
+						</AccordionTrigger>
+						<TextToolsRuleInfo ruleId={group.ruleId} />
+					</div>
+					<AccordionContent>
+						<ul className="flex flex-col gap-1">
+							{group.issues.map((issue) => (
+								<li key={`${issue.start}-${issue.ruleId}-${issue.actual}`}>
+									<button
+										type="button"
+										onClick={() => goToIssue(issue)}
+										className="w-full rounded px-2 py-1 text-left hover:bg-accent"
+									>
+										<span className="font-medium">
+											{issue.ruleId === 'readability'
+												? truncate(issue.actual)
+												: issue.actual}
+										</span>
+										{issue.expected.length > 0 && (
+											<span className="text-muted-foreground">
+												{' → '}
+												{issue.expected.join(', ')}
+											</span>
+										)}
+									</button>
+								</li>
+							))}
+						</ul>
+					</AccordionContent>
+				</AccordionItem>
+			</Accordion>
 		</section>
 	)
 }

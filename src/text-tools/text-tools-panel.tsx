@@ -62,20 +62,21 @@ export function TextToolsPanel({
 				<TextToolsStatus isAnalyzing={isAnalyzing} total={summary.total} />
 			</div>
 
-			<div className="flex flex-col gap-3 p-3 scroll-fade overflow-y-auto">
-				<TextToolsStats sentenceCount={analysis.sentenceCount} />
+			<div className="flex flex-col gap-1 p-3 scroll-fade overflow-y-auto">
+				<div className="flex flex-col gap-2">
+					<TextToolsStats sentenceCount={analysis.sentenceCount} />
+					<TextToolsReadabilityLines lines={summary.readability} />
+					<TextToolsPolarityLine temperature={summary.polarity} />
+					<TextToolsDashOveruseLine summary={summary.dashOveruse} />
 
-				<TextToolsReadabilityLines lines={summary.readability} />
-				<TextToolsPolarityLine temperature={summary.polarity} />
-				<TextToolsDashOveruseLine summary={summary.dashOveruse} />
-
-				<TextToolsRuleCheckboxes
-					rules={rules}
-					setRules={setRules}
-					spellingLanguage={spellingLanguage}
-					setSpellingLanguage={setSpellingLanguage}
-					hasSpellingFailed={hasSpellingFailed}
-				/>
+					<TextToolsRuleCheckboxes
+						rules={rules}
+						setRules={setRules}
+						spellingLanguage={spellingLanguage}
+						setSpellingLanguage={setSpellingLanguage}
+						hasSpellingFailed={hasSpellingFailed}
+					/>
+				</div>
 
 				{summary.groups.map((group) => (
 					<TextToolsIssueGroup key={group.ruleId} group={group} />
