@@ -25,6 +25,18 @@ export type TextToolRule = {
 /** A run of the flawed example, `flagged` where the check would mark it. */
 type ExampleSegment = { text: string; flagged?: boolean }
 
+/**
+ * Text tool rules.
+ *
+ * @note Style guide for `label`, `description`, and `explanation`:
+ * - Write at roughly a grade 3-5 reading level: short sentences, plain words.
+ * - Name the concrete thing a term stands for instead of a vague label
+ *   - e.g instead of "to do a comma's job", say "to join or separate ideas".
+ * - No hyphens, em dashes, or semicolons in the text itself. Split into two
+ *   sentences instead.
+ * - `description` is one line for a tooltip. `explanation` is a few short
+ *   sentences: what the check looks for, when it's fine, and what to do.
+ */
 export const RULES: Record<TextToolRuleId, TextToolRule> = {
 	passive: {
 		label: 'Passive voice',
@@ -146,9 +158,9 @@ export const RULES: Record<TextToolRuleId, TextToolRule> = {
 	},
 	dashOveruse: {
 		label: 'Dash overuse',
-		description: "Sentences leaning on em or en dashes to do a comma's job.",
+		description: 'Sentences using em or en dashes to join or separate ideas.',
 		explanation:
-			"One dash-marked clause reads as a deliberate aside. Several in one sentence, or several sentences in a row, read as a tic - the panel also totals the document's overall dash rate. Try a comma, a period, or a parenthesis instead.",
+			'A dash can replace a comma or a period. Using one now and then is fine. Using many in one sentence, or one in almost every sentence, makes the writing feel restless. The panel also counts how often dashes show up across the whole document. Try a comma, a period, or parentheses instead.',
 		example: {
 			after: 'The report was late. The client noticed immediately.',
 			before: [
