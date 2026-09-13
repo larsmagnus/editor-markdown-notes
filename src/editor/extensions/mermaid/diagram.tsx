@@ -42,7 +42,7 @@ export function MermaidDiagram({
 				// Everything the viewport draws is generated, not authored, so it
 				// stays outside what ProseMirror treats as editable content, and
 				// outside the typography the authored source takes.
-				<div contentEditable={false} className="not-typeset my-4">
+				<div contentEditable={false} className="not-typeset my-4 bg-pattern">
 					<PanZoom
 						minScale={PAN_ZOOM_MIN_SCALE}
 						className={cn(PAN_ZOOM_FRAME_CLASSNAME, 'min-h-20')}
