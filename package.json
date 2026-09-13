@@ -55,6 +55,21 @@
 				"selector": [
 					{
 						"filenamePattern": "*.md"
+					},
+					{
+						"filenamePattern": "*.markdown"
+					},
+					{
+						"filenamePattern": "*.mdown"
+					},
+					{
+						"filenamePattern": "*.mkd"
+					},
+					{
+						"filenamePattern": "*.mdx"
+					},
+					{
+						"filenamePattern": "*.txt"
 					}
 				],
 				"priority": "option"
@@ -164,38 +179,57 @@
 				"command": "editor-markdown-notes.addDictionaryWords",
 				"title": "Add words to dictionary",
 				"category": "Editor Markdown Notes"
+			},
+			{
+				"command": "editor-markdown-notes.openPdfAsNotes",
+				"title": "Open PDF as markdown",
+				"category": "Editor Markdown Notes"
 			}
 		],
 		"menus": {
 			"explorer/context": [
 				{
 					"command": "editor-markdown-notes.openMarkdownEditor",
-					"when": "resourceExtname == .md",
+					"when": "resourceExtname == .md || resourceExtname == .markdown || resourceExtname == .mdown || resourceExtname == .mkd || resourceExtname == .mdx || resourceExtname == .txt",
+					"group": "navigation@1"
+				},
+				{
+					"command": "editor-markdown-notes.openPdfAsNotes",
+					"when": "resourceExtname == .pdf",
 					"group": "navigation@1"
 				}
 			],
 			"editor/context": [
 				{
 					"command": "editor-markdown-notes.openMarkdownEditor",
-					"when": "resourceLangId == markdown",
+					"when": "resourceLangId == markdown || resourceExtname == .mdx || resourceExtname == .txt",
 					"group": "1_open@1"
 				}
 			],
 			"editor/title/context": [
 				{
 					"command": "editor-markdown-notes.openMarkdownEditor",
-					"when": "resourceLangId == markdown",
+					"when": "resourceLangId == markdown || resourceExtname == .mdx || resourceExtname == .txt",
+					"group": "1_open"
+				},
+				{
+					"command": "editor-markdown-notes.openPdfAsNotes",
+					"when": "resourceExtname == .pdf",
 					"group": "1_open"
 				}
 			],
 			"commandPalette": [
 				{
 					"command": "editor-markdown-notes.openFile",
-					"when": "resourceLangId == markdown || resourceExtname == .md"
+					"when": "resourceLangId == markdown || resourceExtname == .md || resourceExtname == .mdx || resourceExtname == .txt"
 				},
 				{
 					"command": "editor-markdown-notes.openMarkdownEditor",
 					"when": "false"
+				},
+				{
+					"command": "editor-markdown-notes.openPdfAsNotes",
+					"when": "resourceExtname == .pdf"
 				},
 				{
 					"command": "editor-markdown-notes.toggleRaw",
@@ -237,9 +271,10 @@
 	"scripts": {
 		"vscode:prepublish": "pnpm run build",
 		"vscode:sentinel": "mkdir -p out && echo '{\"type\":\"commonjs\",\"imports\":{\"#src/*\":\"./*.js\"}}' > out/package.json",
-		"vscode:bundle-agent-sdk": "vite build -c vite.agent-sdk.config.ts && cp src/host/load-agent-sdk.cjs out/host/load-agent-sdk.cjs",
-		"vscode:compile": "tsc -p ./tsconfig.host.json --noEmit && vite build -c vite.host.config.ts && pnpm vscode:bundle-agent-sdk && pnpm vscode:bundle-mcp && pnpm vscode:sentinel",
-		"vscode:watch": "pnpm vscode:sentinel && pnpm vscode:bundle-agent-sdk && pnpm vscode:bundle-mcp && (tsc -watch -p ./tsconfig.host.json --noEmit & vite build -c vite.host.config.ts --watch)",
+		"vscode:bundle-externals": "vite build -c vite.externals.config.ts",
+		"vscode:copy-esm-loader": "cp src/host/load-esm-bundle.cjs out/host/load-esm-bundle.cjs",
+		"vscode:compile": "tsc -p ./tsconfig.host.json --noEmit && vite build -c vite.host.config.ts && pnpm vscode:bundle-externals && pnpm vscode:copy-esm-loader && pnpm vscode:bundle-mcp && pnpm vscode:sentinel",
+		"vscode:watch": "pnpm vscode:sentinel && pnpm vscode:bundle-externals && pnpm vscode:copy-esm-loader && pnpm vscode:bundle-mcp && (tsc -watch -p ./tsconfig.host.json --noEmit & vite build -c vite.host.config.ts --watch)",
 		"vscode:package": "pnpm dlx @vscode/vsce@3.9.2 package --no-dependencies",
 		"vscode:install": "pnpm install && pnpm vscode:package && code --install-extension editor-markdown-notes-$npm_package_version.vsix",
 		"watch": "pnpm vscode:watch",
@@ -334,6 +369,8 @@
 		"@tiptap/react": "3.29.2",
 		"@tiptap/starter-kit": "3.29.2",
 		"@tiptap/suggestion": "3.29.2",
+		"acorn": "8.18.0",
+		"acorn-jsx": "5.3.2",
 		"automated-readability": "2.0.1",
 		"class-variance-authority": "0.7.1",
 		"cn": "0.2.6",
@@ -347,13 +384,16 @@
 		"mdast-util-gfm-strikethrough": "2.0.0",
 		"mdast-util-gfm-table": "2.0.0",
 		"mdast-util-gfm-task-list-item": "2.0.0",
+		"mdast-util-mdx": "3.0.0",
 		"mermaid": "11.16.1",
 		"micromark-extension-gfm-autolink-literal": "2.1.0",
 		"micromark-extension-gfm-strikethrough": "2.1.0",
 		"micromark-extension-gfm-table": "2.1.1",
 		"micromark-extension-gfm-task-list-item": "2.1.0",
+		"micromark-extension-mdxjs": "3.0.0",
 		"micromark-util-combine-extensions": "2.0.1",
 		"nlcst-to-string": "4.0.0",
+		"pdfjs-dist": "6.3.289",
 		"polarity": "4.0.1",
 		"prosemirror-markdown": "1.13.5",
 		"prosemirror-model": "1.25.11",

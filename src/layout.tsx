@@ -8,6 +8,7 @@ import { useNoteSource } from '#src/hooks/use-note-source'
 import { useScrollPosition } from '#src/hooks/use-scroll-position'
 import { useSettings } from '#src/hooks/use-settings'
 import { contentWidthClassName } from '#src/lib/content-width-class'
+import { getFileKind } from '#src/lib/file-kind'
 import { toolbarHeightStyle } from '#src/lib/toolbar-height-style'
 
 const Toolbar = lazy(() => import('#src/components/toolbar'))
@@ -60,6 +61,7 @@ function Layout({ defaultFileName }: LayoutProps) {
 					syncContent={syncContent}
 					raw={viewOptions.raw}
 					className={widthClassName}
+					fileKind={getFileKind(fileName)}
 				/>
 			</main>
 		</div>

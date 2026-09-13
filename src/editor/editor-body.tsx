@@ -10,6 +10,7 @@ import { EditorModeRaw } from '#src/editor/editor-mode-raw'
 import { useAnalyzer } from '#src/hooks/use-analyzer'
 import { RawTextToolsContext } from '#src/hooks/use-raw-text-tools-location'
 import { EMPTY_TEXT_TOOLS_STATE } from '#src/hooks/use-report-live-editor'
+import type { FileKind } from '#src/lib/file-kind'
 import type { SourcePlacedIssue } from '#src/lib/text-tools/place-source-issues'
 import { TextToolsAside } from '#src/text-tools/text-tools-aside'
 
@@ -19,6 +20,7 @@ interface EditorBodyProps {
 	/** Show the markdown source rather than the rendered document. */
 	raw: boolean
 	className?: string
+	fileKind?: FileKind
 }
 
 interface EditorModeSlotProps {
@@ -55,6 +57,7 @@ export function EditorBody({
 	syncContent,
 	raw,
 	className,
+	fileKind,
 }: EditorBodyProps) {
 	const [textTools, setTextTools] = useState(EMPTY_TEXT_TOOLS_STATE)
 	// Rendered as `EditorModeLive`'s sibling below, outside its own
@@ -93,6 +96,7 @@ export function EditorBody({
 								onAnalysisChange={setTextTools}
 								onEditorChange={setLiveEditor}
 								analyzer={analyzer}
+								fileKind={fileKind}
 							/>
 						</AppErrorBoundary>
 					</EditorModeSlot>

@@ -45,7 +45,7 @@ describe('buildAskPrompt', () => {
 })
 
 // `runClaudeAsk`'s `query()` call itself is not unit-tested - it goes through
-// `require('./load-agent-sdk.cjs')` at runtime, a real Node `require` that
+// `require('./load-esm-bundle.cjs')` at runtime, a real Node `require` that
 // bypasses Vite's module graph (and therefore `vi.mock`), same reason the
 // SDK integration is a manual-testing boundary rather than a unit-testing
 // one. See the comment on the `tools` option in `claude-agent.ts` for why it

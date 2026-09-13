@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { EditorContent, useEditor } from '@tiptap/react'
 
-import { extensions } from '#src/editor/extensions/extensions'
+import { buildExtensions } from '#src/editor/extensions/build-extensions'
 
 type FrontmatterViewPreviewProps = { content: string }
 
@@ -19,7 +19,7 @@ type FrontmatterViewPreviewProps = { content: string }
  */
 function FrontmatterViewPreview({ content }: FrontmatterViewPreviewProps) {
 	const editor = useEditor({
-		extensions,
+		extensions: buildExtensions('markdown'),
 		content: '',
 		onCreate: ({ editor }) => editor.commands.setContent(content),
 	})

@@ -50,7 +50,7 @@ export function buildAskPrompt(prompt: string, context: AskContext): string {
  * Loads `query` from the bundled chunk `agent-sdk-bundle.ts` produces, not
  * `@anthropic-ai/claude-agent-sdk` directly - the `.vsix` ships without
  * `node_modules` (`vsce package --no-dependencies`), so a plain import would
- * 404 at activation. Goes through `load-agent-sdk.cjs`'s dynamic `import()`
+ * 404 at activation. Goes through `load-esm-bundle.cjs`'s dynamic `import()`
  * rather than `require()`, since the bundle is real ESM - see that file.
  */
 export async function runClaudeAsk(
@@ -70,11 +70,11 @@ export async function runClaudeAsk(
 
 	try {
 		const {
-			loadAgentSdk,
+			loadEsmBundle,
 		}: {
-			loadAgentSdk: () => Promise<{ query: ClaudeQueryFn }>
-		} = require('./load-agent-sdk.cjs')
-		const { query } = await loadAgentSdk()
+			loadEsmBundle: (name: string) => Promise<{ query: ClaudeQueryFn }>
+		} = require('./load-esm-bundle.cjs')
+		const { query } = await loadEsmBundle('agent-sdk-bundle')
 
 		const stream = query({
 			prompt: buildAskPrompt(prompt, context),

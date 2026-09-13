@@ -41,6 +41,9 @@ const PROSE_MIRROR_NAMES: Record<ProseExclusion, readonly string[]> = {
 export const IGNORED_NODES = new Set([
 	...PROSE_MIRROR_NAMES.codeBlock,
 	'horizontalRule',
+	// Raw MDX source (JSX, `import`/`export`, `{expression}`), not prose -
+	// `.mdx`-only, with no mdast-side analog to keep in parity with.
+	'mdxBlock',
 ])
 const IGNORED_MARKS = new Set(PROSE_MIRROR_NAMES.inlineCode)
 

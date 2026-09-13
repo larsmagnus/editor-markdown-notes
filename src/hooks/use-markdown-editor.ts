@@ -1,12 +1,13 @@
 import { useEditor } from '@tiptap/react'
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 import {
 	EDITOR_KEYBOARD_HINT_ID,
 	LIVE_EDITOR_ID,
 } from '#src/editor/editor-mode-live-surface'
-import { extensions } from '#src/editor/extensions/extensions'
+import { buildExtensions } from '#src/editor/extensions/build-extensions'
 import { useFocusNavigation } from '#src/editor/extensions/focus-navigation/use-focus-navigation'
+import { prepareParseableContent } from '#src/hooks/prepare-parseable-content'
 import type { AnalyzerHandle } from '#src/hooks/use-analyzer'
 import { useSharedAnalyzer } from '#src/hooks/use-analyzer'
 import { useAskProposal } from '#src/hooks/use-ask-proposal'
@@ -19,7 +20,7 @@ import { useSearchReveal } from '#src/hooks/use-search-reveal'
 import { useSettings } from '#src/hooks/use-settings'
 import { useSyntaxHighlight } from '#src/hooks/use-syntax-highlight'
 import { useTextTools } from '#src/hooks/use-text-tools'
-import { splitFrontmatter } from '#src/lib/host/frontmatter'
+import type { FileKind } from '#src/lib/file-kind'
 import { createOwnSyncTracker } from '#src/lib/own-sync-tracker'
 
 /** Stable, so the default does not rebuild `sync` on every render. */
@@ -50,12 +51,16 @@ const noSyncTarget = () => {}
  * spelling dictionary for the same note. Falls back to an analyzer owned here
  * for every standalone mount (stories, component tests) that has no
  * `EditorBody` to share one with.
+ *
+ * `fileKind` picks the schema once, at construction - a panel is bound to one
+ * file for its lifetime, so nothing here reacts to it changing later.
  */
 export function useMarkdownEditor(
 	content: string,
 	syncContent: (content: string) => void = noSyncTarget,
 	active = true,
-	analyzer?: AnalyzerHandle
+	analyzer?: AnalyzerHandle,
+	fileKind: FileKind = 'markdown'
 ) {
 	const { viewOptions, settings, isVSCodeContext } = useSettings()
 	const { getAnalyzer, disposeAnalyzer } = useSharedAnalyzer(analyzer)
@@ -85,13 +90,22 @@ export function useMarkdownEditor(
 		[]
 	)
 
+	// `useEditor` never rebuilds without an explicit deps array, which this
+	// call doesn't pass - both are read exactly once, at construction, so
+	// computing them fresh on every render (a full extension list rebuild, a
+	// full MDX/acorn parse for `.mdx`) would only ever throw the result away.
+	const [editorExtensions] = useState(() => buildExtensions(fileKind))
+	const [initialBody] = useState(
+		() => prepareParseableContent(content, fileKind).body
+	)
+
 	const editor = useEditor({
-		extensions,
-		// markdown-it has no concept of frontmatter and would parse `---` as an
-		// `<hr>`, so the initial content is body-only - `useFrontmatterDocument`
-		// inserts the frontmatter node right after mount, the same way it
-		// rebuilds the doc for any later incoming change.
-		content: splitFrontmatter(content).body,
+		extensions: editorExtensions,
+		// markdown-it has no concept of frontmatter or of MDX's own syntax and
+		// would mangle either, so the initial content has both spliced out -
+		// `useFrontmatterDocument` restores them as real nodes right after mount,
+		// the same way it rebuilds the doc for any later incoming change.
+		content: initialBody,
 		// A note has to open where the reader left it (`useScrollPosition`), and
 		// any autofocus scrolls its caret into view over that. `'end'` also put a
 		// freshly opened note at the bottom of the document rather than the top,
@@ -115,7 +129,7 @@ export function useMarkdownEditor(
 		},
 	})
 
-	useFrontmatterDocument(editor, content, isOwnSync)
+	useFrontmatterDocument(editor, content, isOwnSync, fileKind)
 	useFocusNavigation(editor, active)
 
 	// After the rebuild above, which is what puts the note's real text in the

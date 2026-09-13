@@ -1,7 +1,7 @@
 import type { Content, Extensions } from '@tiptap/core'
 import { Editor } from '@tiptap/core'
 
-import { extensions as appExtensions } from '#src/editor/extensions/extensions'
+import { buildExtensions } from '#src/editor/extensions/build-extensions'
 import { createMountPoint } from '#src/test-utils/mount-point'
 
 type EditorOptions = {
@@ -32,7 +32,7 @@ type EditorOptions = {
 export function createEditor(
 	content: Content = '',
 	{
-		extensions = appExtensions,
+		extensions = buildExtensions('markdown'),
 		mount = false,
 		parseOnly = false,
 	}: EditorOptions = {}

@@ -9,6 +9,7 @@ import type { AnalyzerHandle } from '#src/hooks/use-analyzer'
 import { useMarkdownEditor } from '#src/hooks/use-markdown-editor'
 import type { TextToolsState } from '#src/hooks/use-report-live-editor'
 import { useReportLiveEditor } from '#src/hooks/use-report-live-editor'
+import type { FileKind } from '#src/lib/file-kind'
 
 interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 	content: string
@@ -23,6 +24,7 @@ interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 	 *  back to one owned inside `useMarkdownEditor` when absent, for a
 	 *  standalone mount with no `EditorBody` around it. */
 	analyzer?: AnalyzerHandle
+	fileKind?: FileKind
 	/**
 	 * Reports the latest text-tools analysis to `EditorBody`, which renders the
 	 * one shared `TextToolsAside` beside whichever mode is on screen. Analysis
@@ -43,16 +45,17 @@ interface EditorProps extends Omit<EditorContentProps, 'editor'> {
 function EditorModeLive({
 	content,
 	syncContent,
-	active = true,
+	active,
 	showMenu,
 	includeTypesetClassNames,
 	onAnalysisChange,
 	onEditorChange,
 	analyzer,
+	fileKind,
 	...props
 }: EditorProps) {
 	const { editor, analysis, isAnalyzing, hasSpellingFailed, codeBlockStyle } =
-		useMarkdownEditor(content, syncContent, active, analyzer)
+		useMarkdownEditor(content, syncContent, active, analyzer, fileKind)
 
 	useReportLiveEditor({
 		editor,

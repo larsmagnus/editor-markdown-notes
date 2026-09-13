@@ -3,6 +3,7 @@ import * as path from 'path'
 import * as vscode from 'vscode'
 
 import { VIEW_TYPE } from '#src/host/constants'
+import { isMarkdownFile } from '#src/lib/host/markdown-file-extensions'
 
 /**
  * Opens `uri` — or the active editor's file — with our custom editor.
@@ -20,7 +21,7 @@ export function openFile(uri?: vscode.Uri) {
 	}
 
 	const isMarkdown =
-		target.path.toLowerCase().endsWith('.md') ||
+		isMarkdownFile(target.path) ||
 		(target === activeDocument?.uri && activeDocument.languageId === 'markdown')
 
 	if (!isMarkdown) {

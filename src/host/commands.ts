@@ -3,6 +3,7 @@ import * as vscode from 'vscode'
 import { addDictionaryWords } from '#src/host/dictionary-words-command'
 import { openFile } from '#src/host/open-file-command'
 import { openInTextEditor } from '#src/host/open-in-text-editor-command'
+import { openPdfAsNotes } from '#src/host/open-pdf-command'
 import type { SettingsStore } from '#src/host/settings-store'
 import { pickSpellingLanguage } from '#src/host/spelling-picker'
 import { pickTheme } from '#src/host/theme-picker'
@@ -46,9 +47,10 @@ export function registerCommands(
 	// Two ids share `openFile`: it reads well in the command palette
 	// ("Editor Markdown Notes: Open file"), `openMarkdownEditor` reads well in
 	// the context menus, where the category is not shown.
-	const simpleCommands: Record<string, () => unknown> = {
+	const simpleCommands: Record<string, (uri?: vscode.Uri) => unknown> = {
 		[`${EXTENSION_ID}.openFile`]: openFile,
 		[`${EXTENSION_ID}.openMarkdownEditor`]: openFile,
+		[`${EXTENSION_ID}.openPdfAsNotes`]: (uri) => openPdfAsNotes(uri, log),
 		[`${EXTENSION_ID}.selectTheme`]: () => pickTheme(store, broadcastConfig),
 		[`${EXTENSION_ID}.selectSpellingLanguage`]: () =>
 			pickSpellingLanguage(store, broadcastConfig),

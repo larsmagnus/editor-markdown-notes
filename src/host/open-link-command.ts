@@ -7,20 +7,14 @@ import { deliverHeadingReveal } from '#src/host/heading-reveal-delivery'
 import type { PendingHeadingRevealStore } from '#src/host/pending-heading-reveal-store'
 import { resolveLinkTarget } from '#src/host/resolve-link-target'
 import type { SessionsByUri } from '#src/host/sessions-by-uri'
+import { isMarkdownFile } from '#src/lib/host/markdown-file-extensions'
 import { splitHrefHash } from '#src/lib/host/split-href-hash'
 import type { Logger } from '#src/shared/logger'
 
 /**
- * Opens a relative link's target, resolved against `document`: our own
- * editor for a `.md` file, `vscode.open` (best-effort, VS Code picks the
- * viewer) for anything else. Both reuse a single preview tab per VS Code's
- * own file-link convention.
- *
- * A `#hash` on the href is delivered as a heading reveal once the target is
- * open - see `heading-reveal-delivery.ts` for the already-open-panel vs.
- * not-yet-open branch. Only for a `.md` target: `resolveCustomTextEditor`
- * (the only reader of a not-yet-delivered reveal) never fires for anything
- * else, so queuing one there would sit in `pendingReveals` forever.
+ * Opens a link target: routes to our editor for markdown files, or
+ * `vscode.open` for others. Heading reveals are queued for markdown
+ * targets only—`resolveCustomTextEditor` never fires for other file types.
  */
 export async function openLinkTarget(
 	href: string,
@@ -37,7 +31,7 @@ export async function openLinkTarget(
 	}
 
 	const { uri } = result
-	const isMarkdown = uri.path.toLowerCase().endsWith('.md')
+	const isMarkdown = isMarkdownFile(uri.path)
 
 	// Delivered before opening, not after: a target with no panel open yet is
 	// answered by queuing the hash in `pendingReveals` for

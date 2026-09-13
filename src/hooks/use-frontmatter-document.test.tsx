@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import { buildExtensions } from '#src/editor/extensions/build-extensions'
 import { useFrontmatterDocument } from '#src/hooks/use-frontmatter-document'
 import { createEditor } from '#src/test-utils/editor'
 
@@ -92,5 +93,21 @@ describe('useFrontmatterDocument', () => {
 			editor.commands.undo()
 			expect(editor.getText()).toBe('Ship it.')
 		})
+	})
+
+	it('leaves a leading --- block untouched when the file kind has no frontmatter node', () => {
+		const editor = createEditor('Ship it.', {
+			extensions: buildExtensions('txt'),
+			parseOnly: true,
+		})
+
+		renderHook(
+			({ content }) =>
+				useFrontmatterDocument(editor, content, undefined, 'txt'),
+			{ initialProps: { content: '---\ntitle: Roadmap\n---\n\nShip it.' } }
+		)
+
+		expect(editor.getText()).toContain('---')
+		expect(editor.getText()).toContain('title: Roadmap')
 	})
 })

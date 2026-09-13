@@ -35,6 +35,11 @@
 		"out",
 		// esbuild's entry point, never tsc's - see the file's own comment.
 		"src/host/agent-sdk-bundle.ts",
+		// Same treatment for pdfjs-dist, whose Node build ships no type
+		// declarations for its worker entry point. Its logic file is excluded
+		// too: nothing in the tsc-compiled graph imports it directly.
+		"src/host/pdf-extractor-bundle.ts",
+		"src/host/pdf-text-extraction.ts",
 		// Its own esbuild bundle and its own process - pulls in the retext stack
 		// and hunspell dictionaries, which this dependency-free CJS build doesn't
 		// vendor.

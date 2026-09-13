@@ -1,7 +1,7 @@
 import { EditorContent, EditorContext, useEditor } from '@tiptap/react'
 import type { ReactNode } from 'react'
 
-import { extensions } from '#src/editor/extensions/extensions'
+import { buildExtensions } from '#src/editor/extensions/build-extensions'
 
 interface EditorContextDecoratorProps {
 	/** Optional, for stories that only need the mounted content itself. */
@@ -23,7 +23,7 @@ export function EditorContextDecorator({
 	content = '<p>Some sample text to format.</p>',
 }: EditorContextDecoratorProps) {
 	const editor = useEditor({
-		extensions,
+		extensions: buildExtensions('markdown'),
 		content,
 		autofocus: 'end',
 	})

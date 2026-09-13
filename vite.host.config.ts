@@ -84,7 +84,7 @@ export default defineConfig({
 		rollupOptions: {
 			input: hostEntries(),
 			// A hand-written loader for a sibling ESM chunk, not Rollup output.
-			external: (id) => id === 'vscode' || id.endsWith('load-agent-sdk.cjs'),
+			external: (id) => id === 'vscode' || id.endsWith('load-esm-bundle.cjs'),
 			// Every entry's real consumer (VS Code, mocha, a whitebox test) is
 			// outside this bundle's graph, so Rollup can't see the exports are
 			// used and drops them without this.

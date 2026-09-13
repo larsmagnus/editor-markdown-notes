@@ -8,7 +8,7 @@
  * SDK itself calls `createRequire(import.meta.url)`, and esbuild's CJS output
  * shims `import.meta.url` to an empty object, breaking that call. `.mjs` (not
  * `.js`) forces Node to load it as a real module despite `out/package.json`'s
- * `"type": "commonjs"` sentinel. `load-agent-sdk.cjs` is what loads it -
+ * `"type": "commonjs"` sentinel. `load-esm-bundle.cjs` is what loads it -
  * `claude-agent.ts`'s own `tsc`-compiled `import()` would otherwise be
  * downleveled to a `require()` that cannot read an ES module.
  */

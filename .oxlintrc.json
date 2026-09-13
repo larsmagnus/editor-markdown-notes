@@ -28,18 +28,18 @@
 		},
 		{
 			// Hand-written, not `tsc`-compiled - see the file's own comment. It loads
-			// a sibling `.mjs` chunk that's an esbuild output artifact, not a module
+			// a sibling `.mjs` chunk that's a bundler output artifact, not a module
 			// under `src/`, so `#src/*` cannot reach it.
-			"files": ["src/host/load-agent-sdk.cjs"],
+			"files": ["src/host/load-esm-bundle.cjs"],
 			"rules": {
 				"no-restricted-imports": "off"
 			}
 		},
 		{
 			// Config-adjacent, not part of the `src/` module graph, so `#src/*`
-			// cannot reach these - a relative import to `./vite/*` is the only route
-			// from `vite.config.ts`.
-			"files": ["vite.config.ts"],
+			// cannot reach these - a relative import to `./vite/*` is the only
+			// route in.
+			"files": ["vite.config.ts", "vite.*.config.ts"],
 			"rules": {
 				"no-restricted-imports": "off"
 			}

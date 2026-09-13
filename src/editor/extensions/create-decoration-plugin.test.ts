@@ -5,8 +5,8 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/react'
 import { describe, expect, it } from 'vitest'
 
+import { buildExtensions } from '#src/editor/extensions/build-extensions'
 import { createDecorationPlugin } from '#src/editor/extensions/create-decoration-plugin'
-import { extensions } from '#src/editor/extensions/extensions'
 import { createEditor } from '#src/test-utils/editor'
 
 type TestRange = { from: number; to: number }
@@ -72,7 +72,7 @@ const StickyTestDecoration = Extension.create({
 
 function editorWith(extension: typeof ClearableTestDecoration) {
 	const editor = createEditor('<p>hello world</p>', {
-		extensions: [...extensions, extension],
+		extensions: [...buildExtensions('markdown'), extension],
 		parseOnly: true,
 	})
 	return editor

@@ -1,6 +1,5 @@
 import type { CommandProps } from '@tiptap/core'
 import { Color } from '@tiptap/extension-color'
-import Document from '@tiptap/extension-document'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
@@ -27,7 +26,6 @@ import { createDelimitedMarkRevealProvider } from '#src/editor/extensions/format
 import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
 import { inlineCodeDelimiterSpec } from '#src/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
 import { StrikeExtension } from '#src/editor/extensions/formatting/strike-extension'
-import { Frontmatter } from '#src/editor/extensions/frontmatter/frontmatter-extension'
 import { HeadingExtension } from '#src/editor/extensions/heading/heading-extension'
 import { HorizontalRuleExtension } from '#src/editor/extensions/horizontal-rule/horizontal-rule-extension'
 import { ImageSource } from '#src/editor/extensions/image/edit-source'
@@ -41,6 +39,7 @@ import { ListEnter } from '#src/editor/extensions/list/list-enter-extension'
 import { ListItemExtension } from '#src/editor/extensions/list/list-item-extension'
 import { MarkdownClipboard } from '#src/editor/extensions/markdown/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '#src/editor/extensions/markdown/markdown-escaping'
+import { MdxBlockExtension } from '#src/editor/extensions/mdx-block/mdx-block-extension'
 import { ParagraphExtension } from '#src/editor/extensions/paragraph-extension'
 import { SearchRevealHighlight } from '#src/editor/extensions/search-reveal/search-reveal-extension'
 import { SlashCommand } from '#src/editor/extensions/slash-command/slash-command-extension'
@@ -55,12 +54,19 @@ import { TextTools } from '#src/editor/extensions/text-tools/text-tools-extensio
 patchMarkdownEscaping()
 
 /**
- * The TipTap schema the editor runs on. `tiptap-markdown`'s table/task-list/
- * image serializers only activate when a same-named extension is registered -
- * without the nodes below, markdown-it parses them into HTML that the schema
- * then drops, and the next auto-save writes the loss to disk.
+ * `tiptap-markdown`'s table/task-list/image serializers only activate when a
+ * same-named extension is registered somewhere in `SHARED_HEAD_EXTENSIONS`/
+ * `SHARED_TAIL_EXTENSIONS` below - without a node for each of them,
+ * markdown-it parses that construct into HTML the schema then drops, and the
+ * next auto-save writes the loss to disk.
  */
-export const extensions = [
+
+/**
+ * The extensions every file kind shares, minus `Document`/`Frontmatter` -
+ * `buildExtensions` (`build-extensions.ts`) splices those two in per file
+ * kind, since they're the only pair that varies.
+ */
+export const SHARED_HEAD_EXTENSIONS = [
 	Color.configure({ types: [TextStyle.name, ListItemExtension.name] }),
 	TextStyle.configure({
 		types: [ListItemExtension.name],
@@ -97,13 +103,19 @@ export const extensions = [
 		// Replaced below so consecutive blank lines survive serialization.
 		paragraph: false,
 	}),
-	// `frontmatter?` first, so the schema itself enforces "at most one, always
-	// the document's first child" - no `appendTransaction` policing needed.
-	Document.extend({ content: 'frontmatter? block+' }),
-	Frontmatter,
+]
+
+/**
+ * Everything after the `Document`/`Frontmatter` pair `buildExtensions`
+ * (`build-extensions.ts`) splices in per file kind.
+ */
+export const SHARED_TAIL_EXTENSIONS = [
 	ParagraphExtension,
 	CodeBlockExtension,
 	HorizontalRuleExtension,
+	// Only reachable on `.mdx` files - `restoreMdxBlocksInTransaction` is the
+	// sole place that ever creates one. Harmless to register unconditionally.
+	MdxBlockExtension,
 	HeadingExtension,
 	BlockquoteExtension,
 	ListItemExtension,

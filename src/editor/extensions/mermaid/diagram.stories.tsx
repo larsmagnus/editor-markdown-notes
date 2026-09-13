@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { EditorContent, useEditor } from '@tiptap/react'
 
-import { extensions } from '#src/editor/extensions/extensions'
+import { buildExtensions } from '#src/editor/extensions/build-extensions'
 
 type MermaidDiagramPreviewProps = { content: string }
 
@@ -14,7 +14,7 @@ type MermaidDiagramPreviewProps = { content: string }
  * shape.
  */
 function MermaidDiagramPreview({ content }: MermaidDiagramPreviewProps) {
-	const editor = useEditor({ extensions, content })
+	const editor = useEditor({ extensions: buildExtensions('markdown'), content })
 
 	if (!editor) return null
 

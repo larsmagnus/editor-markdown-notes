@@ -2,7 +2,9 @@ import type { Editor } from '@tiptap/react'
 import { useEffect, useRef } from 'react'
 
 import { frontmatterFenceText } from '#src/editor/extensions/frontmatter/frontmatter-fence'
-import { splitFrontmatter } from '#src/lib/host/frontmatter'
+import { restoreMdxBlocksInTransaction } from '#src/editor/extensions/mdx-block/restore-mdx-blocks'
+import { prepareParseableContent } from '#src/hooks/prepare-parseable-content'
+import type { FileKind } from '#src/lib/file-kind'
 
 /** Stable, so the default does not re-run the effect on every render. */
 const neverOwnSync = () => false
@@ -24,10 +26,10 @@ export const CONTENT_SYNC_META = 'contentSync'
  * Frontmatter is a real node inside the doc, so `editor.storage.markdown.
  * getMarkdown()` already reproduces the `---` fences - comparing it to the
  * whole incoming `content` is what lets this skip a rebuild when nothing
- * actually changed. markdown-it still has no concept of frontmatter and would
- * parse `---` as an `<hr>`, so a rebuild still starts with `splitFrontmatter`'s
- * regex and inserts the extracted text as a node afterward, rather than ever
- * handing `---` characters to `setContent`.
+ * actually changed. markdown-it still has no concept of frontmatter (or of
+ * MDX's own syntax) and would mangle either, so a rebuild always starts with
+ * `prepareParseableContent` and restores whatever it split out as real nodes
+ * afterward, rather than ever handing that syntax to `setContent`.
  *
  * `isOwnSync` tells an incoming change the editor caused from one it did not;
  * without it, every autosync would read as an external change.
@@ -35,7 +37,8 @@ export const CONTENT_SYNC_META = 'contentSync'
 export function useFrontmatterDocument(
 	editor: Editor | null,
 	content: string,
-	isOwnSync: (content: string) => boolean = neverOwnSync
+	isOwnSync: (content: string) => boolean = neverOwnSync,
+	fileKind: FileKind = 'markdown'
 ) {
 	// Flipped after the first effect run (the mount pass), per editor *instance*
 	// rather than per panel - `useSearchReveal`'s doc comment records why:
@@ -62,7 +65,10 @@ export function useFrontmatterDocument(
 		// them, for a change the editor is the source of.
 		if (isOwnSync(content)) return
 
-		const { frontmatter, body } = splitFrontmatter(content)
+		const { frontmatter, body, mdxBlocks } = prepareParseableContent(
+			content,
+			fileKind
+		)
 
 		// The mount-time rebuild stays excluded from history: left undoable, it
 		// put a phantom step ahead of the user's very first keystroke, so Ctrl+Z
@@ -84,6 +90,12 @@ export function useFrontmatterDocument(
 				content: [{ type: 'text', text: frontmatterFenceText(frontmatter) }],
 			})
 		}
+		if (mdxBlocks.length > 0) {
+			chain.command(({ tr, state }) => {
+				restoreMdxBlocksInTransaction(tr, state.schema, mdxBlocks)
+				return true
+			})
+		}
 		chain.run()
-	}, [content, editor, isOwnSync])
+	}, [content, editor, isOwnSync, fileKind])
 }
