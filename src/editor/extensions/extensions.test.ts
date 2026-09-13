@@ -9,19 +9,25 @@ describe('buildExtensions', () => {
 	// only ever reaches the document through `useFrontmatterDocument`'s explicit
 	// `insertContentAt`, which is what these cases exercise instead.
 	it('registers a frontmatter node in the schema for markdown files', () => {
-		const editor = createEditor('# Roadmap', { extensions: buildExtensions('markdown') })
+		const editor = createEditor('# Roadmap', {
+			extensions: buildExtensions('markdown'),
+		})
 
 		expect(Boolean(editor.schema.nodes.frontmatter)).toBe(true)
 	})
 
 	it('omits the frontmatter node from the schema for txt files', () => {
-		const editor = createEditor('# Roadmap', { extensions: buildExtensions('txt') })
+		const editor = createEditor('# Roadmap', {
+			extensions: buildExtensions('txt'),
+		})
 
 		expect(editor.schema.nodes.frontmatter).toBeUndefined()
 	})
 
 	it('accepts an inserted frontmatter node as the document first child for markdown files', () => {
-		const editor = createEditor('# Roadmap', { extensions: buildExtensions('markdown') })
+		const editor = createEditor('# Roadmap', {
+			extensions: buildExtensions('markdown'),
+		})
 
 		editor.commands.insertContentAt(0, {
 			type: 'frontmatter',
