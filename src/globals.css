@@ -166,7 +166,7 @@
 	 * so the table's margin never reaches the elements around it.
 	 */
 	.tableWrapper {
-		@apply rounded-md border border-border mb-[1.25em];
+		@apply rounded-md border border-border my-[1.25em];
 	}
 
 	/*
