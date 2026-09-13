@@ -5,7 +5,7 @@ paths:
 
 # Versioning & Changelog Rules
 
-`pnpm release minor` for anything a user would notice as new, `pnpm release patch` for `fix`/`perf`, `major` manually for breaking changes only. Nothing for `chore`/`build`/`docs`/`test`/`refactor`. Log each bump in `CHANGELOG.md` under a matching `## [x.y.z]` heading. Both are release steps of their own (`docs/releases.md`) — feature work leaves `package.json` alone and adds entries under `## [Unreleased]`.
+`pnpm release minor` for anything a user would notice as new, `pnpm release patch` for `fix`/`perf`, `major` manually for breaking changes only. Nothing for `chore`/`build`/`docs`/`test`/`refactor`. Log each bump in `CHANGELOG.md` under a matching `## [x.y.z]` heading. Both are release steps of their own (use `/release` skill) — feature work leaves `package.json` alone and adds entries under `## [Unreleased]`.
 
 Entries are for people using the extension, not for whoever wrote the code. Short and plain beats complete.
 
