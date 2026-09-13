@@ -22,7 +22,19 @@ playwright/**
 # Demo notes and the workspace-root copy of the icon they resolve to. Only
 # public/icon-editor-markdown-notes.png ships, as the extension's icon.
 public/*.md
+public/*.markdown
+public/*.mdown
+public/*.mkd
+public/*.mdx
+public/*.txt
+public/*.pdf
 dist/*.md
+dist/*.markdown
+dist/*.mdown
+dist/*.mkd
+dist/*.mdx
+dist/*.txt
+dist/*.pdf
 icon-editor-markdown-notes.png
 # The readme loads the screenshot over https, so it need not be packaged.
 public/screenshot-*.png

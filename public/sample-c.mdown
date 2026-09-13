@@ -1,0 +1,11 @@
+# Sample .mdown file
+
+Another alternate markdown extension. A [link](https://example.com) and a
+task list:
+
+- [x] Ship the `.mdown` support
+- [ ] Ship the `.mkd` support
+
+```js
+console.log('code blocks work too')
+```

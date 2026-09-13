@@ -1,0 +1,12 @@
+---
+This looks like frontmatter, but .txt has no frontmatter support, so it
+stays a literal horizontal rule instead of vanishing as metadata.
+---
+
+# Sample .txt file
+
+A .txt file is parsed the same way as markdown - headings, lists and
+**formatting** all work - just without frontmatter.
+
+- One
+- Two

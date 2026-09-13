@@ -1,0 +1,11 @@
+# Sample .mkd file
+
+The third alternate markdown extension this editor opens the same way as
+`.md`.
+
+| Extension   | Treated as |
+| ----------- | ---------- |
+| `.md`       | markdown   |
+| `.markdown` | markdown   |
+| `.mdown`    | markdown   |
+| `.mkd`      | markdown   |

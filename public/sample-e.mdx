@@ -1,0 +1,35 @@
+---
+title: Sample MDX file
+---
+
+import { Callout } from './components/callout.jsx'
+import Chart from './components/chart.jsx'
+
+# Sample .mdx file
+
+Ordinary markdown still renders and edits live right alongside MDX-specific
+syntax: **bold**, _italic_, `inline code`, and a [link](https://example.com).
+
+<Callout type="warning">
+	This is a JSX flow element with its own children, including **bold text**.
+</Callout>
+
+A self-closing component with an expression attribute:
+
+<Chart data={[1, 2, 3]} title={'Q3 ' + 'results'} />
+
+An inline expression sits inside a sentence like this: {1 + 2} equals three.
+
+{/* A comment written as an MDX expression, not visible in the output. */}
+
+export const publishedAt = '2024-01-01'
+
+## Still just markdown
+
+- One
+- Two
+
+```js
+// A fenced code block, unrelated to MDX's own JSX/expression syntax.
+console.log('hello')
+```
