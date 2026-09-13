@@ -6,10 +6,11 @@ The tag is the source of truth. `main` moving does not ship anything.
 
 ## Cutting a release
 
-1. In `CHANGELOG.md`, move the `[Unreleased]` items under a new `## [X.Y.Z] - YYYY-MM-DD` heading and leave a fresh empty `## [Unreleased]` above it. Commit.
-2. `pnpm release patch` (or `minor` / `major`) — bumps `package.json`, commits `chore(release): X.Y.Z`, and creates the tag.
-3. `git push --follow-tags`
-4. Watch the run: `gh run watch`.
+1. Verify locally: run `pnpm lint` (includes typecheck, lint and format), and `pnpm test` (all test suites)
+2. In `CHANGELOG.md`, move the `[Unreleased]` items under a new `## [X.Y.Z] - YYYY-MM-DD` heading and leave a fresh empty `## [Unreleased]` above it. Commit.
+3. `pnpm release patch` (or `minor` / `major`) — bumps `package.json`, commits `chore(release): X.Y.Z`, and creates the tag.
+4. `git push --follow-tags`
+5. Watch the run: `gh run watch`.
 
 The changelog heading must match the tag, or the workflow fails at the notes step rather than publishing an empty release.
 
