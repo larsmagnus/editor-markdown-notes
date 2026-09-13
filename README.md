@@ -22,16 +22,24 @@ An integrated live markdown editor for VS Code, built for the AI-first era
 - Mermaid diagrams render inline
 - Toolbar settings persist across tabs and sessions
 
+### Supported files
+
+- `.md`, `.markdown`, `.mdown`, `.mkd`, `.txt` — open and edit directly
+- `.mdx` — opens directly, but JSX, `import`/`export` and `{expression}` blocks show as plain text rather than rendering
+- `.pdf` — its text is extracted into a markdown file, which opens instead
+
 ## Usage
 
 Open the editor in any of these ways:
 
-- Right-click a `.md` file in the Explorer → **Open with Editor Markdown Notes**
-- Right-click inside an open markdown file → **Open with Editor Markdown Notes**
+- Right-click a supported file in the Explorer → **Open with Editor Markdown Notes**
+- Right-click inside an open supported file → **Open with Editor Markdown Notes**
 - Command Palette → **Editor Markdown Notes: Open file**
-- Right-click a `.md` file → **Open With…** → **Editor Markdown Notes**
+- Right-click a supported file → **Open With…** → **Editor Markdown Notes**
 
-The default text editor is unchanged; this editor is registered with `priority: "option"`, so you opt in per file.
+The default text editor is unchanged. This editor is registered with `priority: "option"`, so you opt in per file.
+
+To open a `.pdf`, right-click it → **Open PDF as markdown**, which extracts its text into a markdown file and opens that instead.
 
 ### Always open `.md` files with this editor
 
@@ -70,7 +78,7 @@ All of them are shared across open tabs and persist between sessions.
 | Title                                                  | Command                                        | Purpose                                                                 |
 | ------------------------------------------------------ | ---------------------------------------------- | ----------------------------------------------------------------------- |
 | Editor Markdown Notes: Open file                       | `editor-markdown-notes.openFile`               | Pick a markdown file and open it with this editor                       |
-| Editor Markdown Notes: Open with Editor Markdown Notes | `editor-markdown-notes.openMarkdownEditor`     | Open the active/selected `.md` file with this editor                    |
+| Editor Markdown Notes: Open with Editor Markdown Notes | `editor-markdown-notes.openMarkdownEditor`     | Open the active/selected supported file with this editor                |
 | Editor Markdown Notes: Toggle raw markdown             | `editor-markdown-notes.toggleRaw`              | Switch between the WYSIWYG editor and the raw markdown text (persisted) |
 | Editor Markdown Notes: Toggle full width               | `editor-markdown-notes.toggleFullWidth`        | Toggle whether the content fills the available width (persisted)        |
 | Editor Markdown Notes: Toggle text tools               | `editor-markdown-notes.toggleTextTools`        | Show or hide the writing-checks sidebar (persisted)                     |
@@ -80,6 +88,7 @@ All of them are shared across open tabs and persist between sessions.
 | Editor Markdown Notes: Open in text editor             | `editor-markdown-notes.openInTextEditor`       | Reopen the current file with VSCode's built-in text editor              |
 | Editor Markdown Notes: Toggle toolbar                  | `editor-markdown-notes.toggleHideToolbar`      | Show or hide the toolbar                                                |
 | Editor Markdown Notes: Show logs                       | `editor-markdown-notes.showLogs`               | Open the output channel used to debug a blank panel                     |
+| Editor Markdown Notes: Open PDF as markdown            | `editor-markdown-notes.openPdfAsNotes`         | Extract a PDF's text into a markdown file and open it                   |
 
 ## Text tools
 
