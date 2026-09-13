@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added support for opening `.markdown`, `.mdown`, `.mkd`,`.txt`, `.mdx` and `.pdf` files
+- Added basic `.mdx` syntax handling, showing JSX, import/export and expression blocks as plain text
+- Added the `Open PDF as markdown` command to extract a PDF's text into a markdown file and open it
+
 ## [0.24.0] - 2026-09-12
 
 - Added writing tools highlights to the raw markdown view, matching the live editor
