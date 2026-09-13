@@ -28,12 +28,12 @@ suite('Opening a non-markdown link target', () => {
 		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-link-test-'))
 		try {
 			const source = vscode.Uri.file(path.join(directory, 'source.md'))
-			const target = vscode.Uri.file(path.join(directory, 'notes.txt'))
+			const target = vscode.Uri.file(path.join(directory, 'notes.json'))
 			await fs.writeFile(source.fsPath, '# Source\n')
-			await fs.writeFile(target.fsPath, 'plain text\n')
+			await fs.writeFile(target.fsPath, '{}\n')
 			const document = await vscode.workspace.openTextDocument(source)
 
-			await openTestLink('./notes.txt', document, createLinkDeps())
+			await openTestLink('./notes.json', document, createLinkDeps())
 			const tab = await waitForActiveTab(
 				(tab) =>
 					tab.input instanceof vscode.TabInputText &&

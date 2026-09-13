@@ -29,8 +29,8 @@ suite('Opening notes', () => {
 
 	test('rejects a file that is not markdown', async () => {
 		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))
-		const file = vscode.Uri.file(path.join(directory, 'notes.txt'))
-		await fs.writeFile(file.fsPath, 'not markdown\n')
+		const file = vscode.Uri.file(path.join(directory, 'notes.json'))
+		await fs.writeFile(file.fsPath, '{}\n')
 
 		try {
 			await vscode.commands.executeCommand(
