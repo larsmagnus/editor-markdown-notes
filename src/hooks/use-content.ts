@@ -7,7 +7,16 @@ import { useEffect, useState } from 'react'
  * extension the paths resolve against the file on disk. `import.meta.glob`
  * cannot see into `public/`, so the list is kept here and the files fetched.
  */
-const NOTE_FILE_NAMES = ['notes.md', 'other-note.md']
+const NOTE_FILE_NAMES = [
+	'notes.md',
+	'other-note.md',
+	'markdown-notes-architect.md',
+	'sample-b.markdown',
+	'sample-c.mdown',
+	'sample-d.mkd',
+	'sample-e.mdx',
+	'sample-f.txt',
+]
 
 async function fetchNote(fileName: string) {
 	const response = await fetch(`/${fileName}`)
