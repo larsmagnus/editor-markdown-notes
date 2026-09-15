@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added auto-wrapping selected text when typing formatting trigger characters: backtick for inline code, asterisk or underscore for italic, tilde for strikethrough, and single or double quotes for literal quotes
+- Added pasting an http(s) URL over selected text creates a markdown link with the selected text as link text
 - Fixed formatting shortcuts (Cmd/Ctrl+B/I/E, Shift+X) not working correctly on Windows by replacing DOM-level event interception with VS Code's context-key-gated keybindings, now only claiming the keys when text is actually selected
 
 ## [0.25.0] - 2026-09-13
