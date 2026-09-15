@@ -49,6 +49,14 @@ export const WrapSelectionOnKeypress = Extension.create({
 									view,
 								} as any)
 								return true
+							case '"':
+							case "'":
+								const { from, to } = state.selection
+								const tr = state.tr
+								tr.insertText(char, to)
+								tr.insertText(char, from)
+								view.dispatch(tr)
+								return true
 							default:
 								return false
 						}

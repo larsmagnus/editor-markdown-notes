@@ -81,4 +81,30 @@ test.describe('Wrapping selected text with formatting triggers', () => {
 		const raw = page.getByRole('textbox', { name: 'Raw markdown' })
 		await expect(raw).toHaveValue('word __**bold**__ text')
 	})
+
+	test('pressing double quote wraps selection in quotes', async ({ page }) => {
+		await openInVSCode(page, 'this is quoted')
+		const content = page.getByRole('textbox').first()
+
+		await selectSubstring(content, 'is quoted')
+		await expect(content).toBeFocused()
+		await page.keyboard.type('"')
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		const raw = page.getByRole('textbox', { name: 'Raw markdown' })
+		await expect(raw).toHaveValue('this "is quoted"')
+	})
+
+	test('pressing single quote wraps selection in quotes', async ({ page }) => {
+		await openInVSCode(page, 'this is quoted')
+		const content = page.getByRole('textbox').first()
+
+		await selectSubstring(content, 'is quoted')
+		await expect(content).toBeFocused()
+		await page.keyboard.type("'")
+
+		await page.getByRole('button', { name: 'Raw editor' }).click()
+		const raw = page.getByRole('textbox', { name: 'Raw markdown' })
+		await expect(raw).toHaveValue("this 'is quoted'")
+	})
 })
