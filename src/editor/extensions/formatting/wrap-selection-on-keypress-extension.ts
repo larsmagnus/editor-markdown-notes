@@ -1,4 +1,5 @@
 import { Extension } from '@tiptap/core'
+import type { CommandProps } from '@tiptap/core'
 import type { MarkType } from '@tiptap/pm/model'
 import { Plugin } from '@tiptap/pm/state'
 
@@ -38,16 +39,17 @@ export const WrapSelectionOnKeypress = Extension.create({
 									'italic',
 									() => char
 								)
-								command({
+								const commandProps: CommandProps = {
 									state,
 									dispatch: view.dispatch,
 									editor,
-									chain: editor.chain,
-									can: editor.can,
+									chain: () => editor.chain(),
+									can: () => editor.can(),
 									commands: editor.commands,
 									tr: state.tr,
 									view,
-								} as any)
+								}
+								command(commandProps)
 								return true
 							case '"':
 							case "'":
