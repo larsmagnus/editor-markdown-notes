@@ -18,10 +18,10 @@ export function useSyncSelectionContext(editor: Editor | null): void {
 
 		const updateContext = () => {
 			// editor is guaranteed non-null here due to the guard above
-			const hasSelection = !editor!.state.selection.empty
+			const hasSelection = !editor.state.selection.empty
 			if (lastSentRef.current !== hasSelection) {
 				lastSentRef.current = hasSelection
-				getVSCodeApi().postMessage({
+				getVSCodeApi()?.postMessage({
 					type: 'setHasSelection',
 					hasSelection,
 				})

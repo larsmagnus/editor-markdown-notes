@@ -26,6 +26,7 @@ import { createDelimitedMarkRevealProvider } from '#src/editor/extensions/format
 import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
 import { inlineCodeDelimiterSpec } from '#src/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
 import { StrikeExtension } from '#src/editor/extensions/formatting/strike-extension'
+import { WrapSelectionOnKeypress } from '#src/editor/extensions/formatting/wrap-selection-on-keypress-extension'
 import { HeadingExtension } from '#src/editor/extensions/heading/heading-extension'
 import { HorizontalRuleExtension } from '#src/editor/extensions/horizontal-rule/horizontal-rule-extension'
 import { ImageSource } from '#src/editor/extensions/image/edit-source'
@@ -133,6 +134,7 @@ export const SHARED_TAIL_EXTENSIONS = [
 	CodeExtension,
 	BoldExtension,
 	StrikeExtension,
+	WrapSelectionOnKeypress,
 	// Column resizing needs handle styling and a toolbar to be worth it - tables
 	// are edited in place instead, with Tab/Shift-Tab moving between cells.
 	MarkdownTable,
