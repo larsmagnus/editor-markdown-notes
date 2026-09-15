@@ -9,6 +9,7 @@ import type { AnalyzerHandle } from '#src/hooks/use-analyzer'
 import { useMarkdownEditor } from '#src/hooks/use-markdown-editor'
 import type { TextToolsState } from '#src/hooks/use-report-live-editor'
 import { useReportLiveEditor } from '#src/hooks/use-report-live-editor'
+import { useSyncSelectionContext } from '#src/hooks/use-sync-selection-context'
 import type { FileKind } from '#src/lib/file-kind'
 
 interface EditorProps extends Omit<EditorContentProps, 'editor'> {
@@ -56,6 +57,8 @@ function EditorModeLive({
 }: EditorProps) {
 	const { editor, analysis, isAnalyzing, hasSpellingFailed, codeBlockStyle } =
 		useMarkdownEditor(content, syncContent, active, analyzer, fileKind)
+
+	useSyncSelectionContext(editor)
 
 	useReportLiveEditor({
 		editor,

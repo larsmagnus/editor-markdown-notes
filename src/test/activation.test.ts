@@ -48,6 +48,15 @@ suite('Activation and contributions', () => {
 		}
 	})
 
+	test('registers the formatting shortcut command', async () => {
+		const commands = await vscode.commands.getCommands(true)
+
+		assert.ok(
+			commands.includes('editor-markdown-notes.claimFormattingShortcut'),
+			'claimFormattingShortcut command should be registered'
+		)
+	})
+
 	test('contributes the settings that put a Settings entry on the extension page', () => {
 		const config = vscode.workspace.getConfiguration('editorMarkdownNotes')
 

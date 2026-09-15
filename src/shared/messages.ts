@@ -261,6 +261,8 @@ export type WebviewToHost =
 	 * keeps it in memory only (`ScrollPositionStore`), so it lasts the session.
 	 */
 	| { type: 'setScrollTop'; scrollTop: number }
+	/** Enables keybindings that only apply when text is selected. */
+	| { type: 'setHasSelection'; hasSelection: boolean }
 	/**
 	 * Asks the host to reopen this document with VSCode's built-in text editor.
 	 * Deliberately not part of `ViewOptions` - the webview may be disposed the

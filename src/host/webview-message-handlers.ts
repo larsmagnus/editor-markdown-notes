@@ -12,6 +12,7 @@ import type { ScrollPositionStore } from '#src/host/scroll-position-store'
 import type { SessionsByUri } from '#src/host/sessions-by-uri'
 import type { SettingsStore } from '#src/host/settings-store'
 import { recordWebviewLog } from '#src/lib/host/webview-diagnostics'
+import { EXTENSION_ID } from '#src/shared/constants'
 import type { Logger } from '#src/shared/logger'
 import type {
 	HostToWebview,
@@ -88,6 +89,13 @@ export function createWebviewMessageHandlers({
 		// panel that sent it is already there.
 		setScrollTop: (message) => {
 			scrollPositions.set(document.uri.toString(), message.scrollTop)
+		},
+		setHasSelection: (message) => {
+			void vscode.commands.executeCommand(
+				'setContext',
+				`${EXTENSION_ID}.hasSelection`,
+				message.hasSelection
+			)
 		},
 		log: (message) => recordWebviewLog(log, message.level, message.message),
 		openInTextEditor: () => {

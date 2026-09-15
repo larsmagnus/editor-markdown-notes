@@ -59,6 +59,10 @@ export function registerCommands(
 		[`${EXTENSION_ID}.openInTextEditor`]: openActiveTabInTextEditor,
 		[`${EXTENSION_ID}.toggleHideToolbar`]: toggleHideToolbar,
 		[`${EXTENSION_ID}.showLogs`]: () => log.show(),
+		[`${EXTENSION_ID}.claimFormattingShortcut`]: () => {
+			// Prevents VS Code's default formatting keybindings from firing when
+			// text is selected in the custom editor.
+		},
 	}
 	const simple = Object.entries(simpleCommands).map(([command, handler]) =>
 		vscode.commands.registerCommand(command, handler)

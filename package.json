@@ -125,6 +125,32 @@
 				}
 			}
 		},
+		"keybindings": [
+			{
+				"key": "ctrl+b",
+				"mac": "cmd+b",
+				"command": "editor-markdown-notes.claimFormattingShortcut",
+				"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor && editor-markdown-notes.hasSelection"
+			},
+			{
+				"key": "ctrl+i",
+				"mac": "cmd+i",
+				"command": "editor-markdown-notes.claimFormattingShortcut",
+				"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor && editor-markdown-notes.hasSelection"
+			},
+			{
+				"key": "ctrl+shift+x",
+				"mac": "cmd+shift+x",
+				"command": "editor-markdown-notes.claimFormattingShortcut",
+				"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor && editor-markdown-notes.hasSelection"
+			},
+			{
+				"key": "ctrl+e",
+				"mac": "cmd+e",
+				"command": "editor-markdown-notes.claimFormattingShortcut",
+				"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor && editor-markdown-notes.hasSelection"
+			}
+		],
 		"commands": [
 			{
 				"command": "editor-markdown-notes.openFile",
