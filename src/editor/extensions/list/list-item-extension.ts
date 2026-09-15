@@ -1,9 +1,11 @@
 import type { CommandProps } from '@tiptap/core'
 import ListItem from '@tiptap/extension-list-item'
+import { Plugin, PluginKey } from '@tiptap/pm/state'
 
 import { withMarkerStrip } from '#src/editor/extensions/block-marker/with-marker-strip'
 import { insertLiteralListMarkers } from '#src/editor/extensions/list/insert-literal-list-markers'
 import { listItemMarkdownSerialize } from '#src/editor/extensions/list/list-markdown-spec'
+import { mergeAdjacentLists } from '#src/editor/extensions/list/merge-adjacent-lists'
 
 /**
  * `listItem` stays real ProseMirror structure (nesting, Enter, Tab all
@@ -43,5 +45,15 @@ export const ListItemExtension = ListItem.extend({
 			toggleBulletList: toggle('bulletList'),
 			toggleOrderedList: toggle('orderedList'),
 		}
+	},
+
+	addProseMirrorPlugins() {
+		return [
+			new Plugin({
+				key: new PluginKey('mergeAdjacentLists'),
+				appendTransaction: (_transactions, _oldState, newState) =>
+					mergeAdjacentLists(newState) ?? undefined,
+			}),
+		]
 	},
 })

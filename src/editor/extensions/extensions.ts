@@ -119,6 +119,10 @@ export const SHARED_TAIL_EXTENSIONS = [
 	MdxBlockExtension,
 	HeadingExtension,
 	BlockquoteExtension,
+	// ListItemExtension's merge plugin must run before BlockMarkers' marker-sync
+	// so renumbering happens after lists are merged - the two plugins run in the
+	// same appendTransaction batch, and this registration order controls their
+	// relative execution.
 	ListItemExtension,
 	// The shared strip pass every block marker's toggle-off relies on.
 	BlockMarkers,

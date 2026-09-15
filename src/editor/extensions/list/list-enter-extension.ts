@@ -1,19 +1,20 @@
 import { Extension } from '@tiptap/core'
 
 import { endBlankListItem } from '#src/editor/extensions/list/end-blank-list-item'
+import { splitAfterMarker } from '#src/editor/extensions/list/split-after-marker'
 
 /**
- * Enter on a list item holding nothing but its marker ends that item instead of
- * splitting it. Stock `splitListItem` bails on an empty item and lets the base
- * keymap lift it, but no item here is ever empty - its marker is real text - so
- * without this every Enter on a blank item seeds another blank item, forever.
+ * Blank list items end on Enter, not split. The marker is real text in this
+ * schema, so the default `splitListItem` would loop, creating blank items
+ * endlessly.
  */
 export const ListEnter = Extension.create({
 	name: 'listEnter',
 
 	addKeyboardShortcuts() {
 		return {
-			Enter: () => endBlankListItem(this.editor),
+			Enter: () =>
+				endBlankListItem(this.editor) || splitAfterMarker(this.editor),
 		}
 	},
 })
