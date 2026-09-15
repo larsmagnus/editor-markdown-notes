@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Fixed formatting shortcuts (Cmd/Ctrl+B/I/E, Shift+X) not working correctly on Windows by replacing DOM-level event interception with VS Code's context-key-gated keybindings, now only claiming the keys when text is actually selected
+
 ## [0.25.0] - 2026-09-13
 
 - Added support for opening `.markdown`, `.mdown`, `.mkd`,`.txt`, `.mdx` and `.pdf` files
