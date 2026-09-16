@@ -33,6 +33,7 @@ import { ImageSource } from '#src/editor/extensions/image/edit-source'
 import { ImageExtension } from '#src/editor/extensions/image/image-extension'
 import { italicDelimiterSpec } from '#src/editor/extensions/italic/italic-delimiter-spec'
 import { ItalicExtension } from '#src/editor/extensions/italic/italic-extension'
+import { hasLinkScheme } from '#src/editor/extensions/link/has-link-scheme'
 import { linkDelimiterSpec } from '#src/editor/extensions/link/link-delimiter-spec'
 import { LinkExtension } from '#src/editor/extensions/link/link-extension'
 import { StrictLinkify } from '#src/editor/extensions/link/strict-linkify-extension'
@@ -129,11 +130,17 @@ export const SHARED_TAIL_EXTENSIONS = [
 	// Linkifying is markdown-it's job, kept to URLs with an explicit scheme by
 	// `StrictLinkify`. TipTap's own autolink plugin has no such restriction and
 	// runs on every transaction, turning a heading reading `notes.md` into
-	// `[notes.md](http://notes.md)`.
+	// `[notes.md](http://notes.md)`. Its paste handling has the same gap, so
+	// pasted text links only with a scheme too, and pasting a URL onto a
+	// selection belongs to `paste-url-onto-selection-plugin.ts` alone.
 	//
 	// Registration order is mark rank, which decides nesting: Link before
 	// Italic before Code, so `*text `code` text*` nests `*` around the ticks.
-	LinkExtension.configure({ autolink: false }),
+	LinkExtension.configure({
+		autolink: false,
+		linkOnPaste: false,
+		shouldAutoLink: hasLinkScheme,
+	}),
 	ItalicExtension,
 	CodeExtension,
 	BoldExtension,

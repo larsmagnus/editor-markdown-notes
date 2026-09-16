@@ -1,6 +1,6 @@
 import { pasteText } from '#e2e/lib/clipboard'
 import { expect, test } from '#e2e/lib/fixtures'
-import { selectSubstring } from '#e2e/lib/select-substring'
+import { selectSubstring } from '#e2e/lib/select-text'
 import { openInVSCode } from '#e2e/lib/vscode-host'
 
 test.describe('Pasting URL over selected text creates a link', () => {

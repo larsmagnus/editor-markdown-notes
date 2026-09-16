@@ -36,8 +36,16 @@ describe('looksLikeUrl', () => {
 		expect(looksLikeUrl('check out https://example.com for more')).toBe(false)
 	})
 
-	it('rejects ftp:// and other protocols', () => {
-		expect(looksLikeUrl('ftp://example.com')).toBe(false)
+	it('accepts ftp:// URLs', () => {
+		expect(looksLikeUrl('ftp://example.com')).toBe(true)
+	})
+
+	it('accepts mailto: addresses', () => {
+		expect(looksLikeUrl('mailto:user-123@example.com')).toBe(true)
+	})
+
+	it('rejects a scheme it does not know', () => {
+		expect(looksLikeUrl('slack://channel')).toBe(false)
 	})
 
 	it('rejects empty string', () => {
