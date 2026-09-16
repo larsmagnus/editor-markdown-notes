@@ -85,10 +85,14 @@ export function useFrontmatterDocument(
 			.setMeta(CONTENT_SYNC_META, true)
 			.setContent(body)
 		if (frontmatter !== null) {
-			chain.insertContentAt(0, {
-				type: 'frontmatter',
-				content: [{ type: 'text', text: frontmatterFenceText(frontmatter) }],
-			})
+			chain.insertContentAt(
+				0,
+				{
+					type: 'frontmatter',
+					content: [{ type: 'text', text: frontmatterFenceText(frontmatter) }],
+				},
+				{ updateSelection: false }
+			)
 		}
 		if (mdxBlocks.length > 0) {
 			chain.command(({ tr, state }) => {
