@@ -371,7 +371,8 @@
 	.ProseMirror em [data-token='marker'],
 	.ProseMirror s [data-token='marker'],
 	.ProseMirror code [data-token='marker'],
-	.ProseMirror [data-type='horizontalRule'] [data-token='marker'] {
+	.ProseMirror [data-type='horizontalRule'] [data-token='marker'],
+	.ProseMirror [data-type='frontmatter'] [data-token='marker'] {
 		@apply text-blue-400;
 	}
 

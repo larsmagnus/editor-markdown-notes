@@ -28,10 +28,12 @@ export type RevealSpan = {
 	containerTo: number
 	tokens: RevealToken[]
 	/**
-	 * A node to mark while this span *is* revealed, for a construct drawing
-	 * something that stands in for its own syntax - a list item's bullet, a
-	 * task item's checkbox. That stand-in has to step aside while the real text
-	 * is on screen, or the item reads `• - Buy milk`.
+	 * The node to mark `CONSTRUCT_REVEALED_CLASS` on while this span *is*
+	 * revealed - every block construct's own element, whether or not it draws
+	 * a stand-in for its syntax. A list item's bullet or a task item's
+	 * checkbox is the one case that *must* react to it, stepping aside so the
+	 * item doesn't read `• - Buy milk`; every other construct's element picks
+	 * up the class too, as a hook for styling it while it's being edited.
 	 */
 	revealedNode?: [number, number]
 }
