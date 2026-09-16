@@ -80,7 +80,7 @@ suite('Search reveal delivery', function () {
 		const note = vscode.Uri.joinPath(workspace.uri, 'public', 'other-note.md')
 		const document = await vscode.workspace.openTextDocument(note)
 
-		await runSearch('zzz-nothing-matches-this-zzz')
+		await runSearch('zzz-nothing-matches-this-zzz', { expectMatches: false })
 
 		assert.strictEqual(await readSearchReveal(document, log), undefined)
 	})

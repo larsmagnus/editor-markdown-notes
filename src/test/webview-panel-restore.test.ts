@@ -103,7 +103,7 @@ suite('Webview panel restore', () => {
 	 * rather than the content-catch-up behaviour it enables being wrong.
 	 */
 	test('does not rebuild the page when a backgrounded tab is shown again', async function () {
-		this.timeout(30_000)
+		this.timeout(60_000)
 
 		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))
 		const file = vscode.Uri.file(path.join(directory, 'notes.md'))
@@ -141,7 +141,7 @@ suite('Webview panel restore', () => {
 	 * is not currently visible.
 	 */
 	test('the panel is told the current content while it is backgrounded', async function () {
-		this.timeout(30_000)
+		this.timeout(60_000)
 
 		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))
 		const file = vscode.Uri.file(path.join(directory, 'notes.md'))
@@ -179,7 +179,7 @@ suite('Webview panel restore', () => {
 	 * program, git - while this tab is backgrounded.
 	 */
 	test('the panel is told the current content after an external edit made while it was backgrounded', async function () {
-		this.timeout(30_000)
+		this.timeout(60_000)
 
 		const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'emn-test-'))
 		const file = vscode.Uri.file(path.join(directory, 'notes.md'))

@@ -66,7 +66,7 @@ suite('Clipboard-free search match', function () {
 		assert.ok(workspace, 'expected a workspace folder')
 		const note = vscode.Uri.joinPath(workspace.uri, 'public', 'other-note.md')
 
-		await runSearch('zzz-nothing-matches-this-zzz')
+		await runSearch('zzz-nothing-matches-this-zzz', { expectMatches: false })
 
 		assert.deepStrictEqual(await readSearchMatches(note), [])
 	})
