@@ -49,10 +49,11 @@ export const ListItemExtension = ListItem.extend({
 
 	addProseMirrorPlugins() {
 		return [
+			...(this.parent?.() ?? []),
 			new Plugin({
 				key: new PluginKey('mergeAdjacentLists'),
-				appendTransaction: (_transactions, _oldState, newState) =>
-					mergeAdjacentLists(newState) ?? undefined,
+				appendTransaction: (transactions, oldState, newState) =>
+					mergeAdjacentLists(transactions, oldState, newState) ?? undefined,
 			}),
 		]
 	},
