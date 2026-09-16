@@ -2,19 +2,21 @@ import * as assert from 'assert'
 
 import * as vscode from 'vscode'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+import { EXTENSION_ID as COMMAND_PREFIX } from '#src/shared/constants'
+
+const MARKETPLACE_ID = 'larsmagnus.editor-markdown-notes'
 
 suite('Formatting keybindings context key', () => {
 	suiteSetup(async () => {
-		const extension = vscode.extensions.getExtension(EXTENSION_ID)
-		assert.ok(extension, `Extension ${EXTENSION_ID} is not installed`)
+		const extension = vscode.extensions.getExtension(MARKETPLACE_ID)
+		assert.ok(extension, `Extension ${MARKETPLACE_ID} is not installed`)
 		await extension.activate()
 	})
 
 	test('context key is initialized', async () => {
-		const hasSelection = await vscode.commands.executeCommand<boolean>(
+		await vscode.commands.executeCommand<boolean>(
 			'setContext',
-			`${EXTENSION_ID}.hasSelection`,
+			`${COMMAND_PREFIX}.hasSelection`,
 			false
 		)
 		// setContext doesn't return a value, but executing it should not throw
@@ -24,7 +26,7 @@ suite('Formatting keybindings context key', () => {
 	test('context key can be set to true', async () => {
 		await vscode.commands.executeCommand(
 			'setContext',
-			`${EXTENSION_ID}.hasSelection`,
+			`${COMMAND_PREFIX}.hasSelection`,
 			true
 		)
 		assert.ok(true)
@@ -33,7 +35,7 @@ suite('Formatting keybindings context key', () => {
 	test('context key can be set to false', async () => {
 		await vscode.commands.executeCommand(
 			'setContext',
-			`${EXTENSION_ID}.hasSelection`,
+			`${COMMAND_PREFIX}.hasSelection`,
 			false
 		)
 		assert.ok(true)
@@ -42,7 +44,7 @@ suite('Formatting keybindings context key', () => {
 	test('formatting shortcut command is registered', async () => {
 		const commands = await vscode.commands.getCommands(true)
 		assert.ok(
-			commands.includes(`${EXTENSION_ID}.claimFormattingShortcut`),
+			commands.includes(`${COMMAND_PREFIX}.claimFormattingShortcut`),
 			'claimFormattingShortcut command should be registered'
 		)
 	})

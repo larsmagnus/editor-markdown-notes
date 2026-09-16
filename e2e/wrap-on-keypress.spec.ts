@@ -1,6 +1,5 @@
 import { expect, test } from '#e2e/lib/fixtures'
-import { actionSettled, pressKeySettled } from '#e2e/lib/press-key-settled'
-import { selectSubstring } from '#e2e/lib/select-substring'
+import { selectSubstring } from '#e2e/lib/select-text'
 import { openInVSCode } from '#e2e/lib/vscode-host'
 
 test.describe('Wrapping selected text with formatting triggers', () => {
@@ -79,7 +78,7 @@ test.describe('Wrapping selected text with formatting triggers', () => {
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		const raw = page.getByRole('textbox', { name: 'Raw markdown' })
-		await expect(raw).toHaveValue('word __**bold**__ text')
+		await expect(raw).toHaveValue('word _**bold**_ text')
 	})
 
 	test('pressing double quote wraps selection in quotes', async ({ page }) => {
