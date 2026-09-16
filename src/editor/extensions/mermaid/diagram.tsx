@@ -45,7 +45,7 @@ export function MermaidDiagram({
 				<div contentEditable={false} className="not-typeset my-4 bg-pattern">
 					<PanZoom
 						minScale={PAN_ZOOM_MIN_SCALE}
-						className={cn(PAN_ZOOM_FRAME_CLASSNAME, 'min-h-20')}
+						className={cn(PAN_ZOOM_FRAME_CLASSNAME, 'min-h-28')}
 						controls={
 							<MermaidToolbar code={code} svg={result.svg} onEdit={onEdit} />
 						}

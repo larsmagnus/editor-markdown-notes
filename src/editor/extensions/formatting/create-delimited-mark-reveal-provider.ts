@@ -27,14 +27,26 @@ export function createDelimitedMarkRevealProvider(
 				if (openLength === 0 || closeLength === 0) return []
 				if (openLength + closeLength > runText.length) return []
 
+				const closeStart = run.to - closeLength
+				const closeText = runText.slice(runText.length - closeLength)
+				const closeTokens = (
+					spec.closeTokens?.(closeText) ?? [
+						{ role: 'marker', from: 0, to: closeLength },
+					]
+				).map(({ role, from, to }) => ({
+					role,
+					from: closeStart + from,
+					to: closeStart + to,
+				}))
+
 				return [
 					{
 						containerFrom: run.from,
 						containerTo: run.to,
-						syntaxRanges: [
-							[run.from, run.from + openLength],
-							[run.to - closeLength, run.to],
-						] as [number, number][],
+						tokens: [
+							{ role: 'marker', from: run.from, to: run.from + openLength },
+							...closeTokens,
+						],
 					},
 				]
 			})

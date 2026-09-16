@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
 	imageMarkdownSource,
 	imageMarkdownText,
+	imageMarkdownTokens,
 	parseImageMarkdown,
 } from '#src/editor/extensions/image/image-markdown-text'
 
@@ -115,5 +116,53 @@ describe('parseImageMarkdown', () => {
 	it('round-trips through imageMarkdownText', () => {
 		const attrs = { src: './a(1).png', alt: 'A photo', title: 'A "title"' }
 		expect(parseImageMarkdown(imageMarkdownText(attrs))).toEqual(attrs)
+	})
+})
+
+describe('imageMarkdownTokens', () => {
+	it('splits markdown with no title into marker/url/marker tokens', () => {
+		const text = '![Diagram](./diagram.png)'
+		const altEnd = 2 + 'Diagram'.length
+		const urlFrom = altEnd + 2
+		const urlTo = urlFrom + './diagram.png'.length
+
+		expect(imageMarkdownTokens(text)).toEqual([
+			{ role: 'marker', from: 0, to: 2 },
+			{ role: 'marker', from: altEnd, to: altEnd + 2 },
+			{ role: 'url', from: urlFrom, to: urlTo },
+			{ role: 'marker', from: text.length - 1, to: text.length },
+		])
+	})
+
+	it('splits markdown with a title into marker/url/title/marker tokens', () => {
+		const text = '![Diagram](./diagram.png "Architecture")'
+		const altEnd = 2 + 'Diagram'.length
+		const urlFrom = altEnd + 2
+		const urlTo = urlFrom + './diagram.png'.length
+		const titleFrom = urlTo + 1
+		const titleTo = titleFrom + '"Architecture"'.length
+
+		expect(imageMarkdownTokens(text)).toEqual([
+			{ role: 'marker', from: 0, to: 2 },
+			{ role: 'marker', from: altEnd, to: altEnd + 2 },
+			{ role: 'url', from: urlFrom, to: urlTo },
+			{ role: 'title', from: titleFrom, to: titleTo },
+			{ role: 'marker', from: titleTo, to: titleTo + 1 },
+		])
+	})
+
+	it('offsets tokens correctly with an empty alt', () => {
+		const text = '![](./a.png)'
+
+		expect(imageMarkdownTokens(text)).toEqual([
+			{ role: 'marker', from: 0, to: 2 },
+			{ role: 'marker', from: 2, to: 4 },
+			{ role: 'url', from: 4, to: 4 + './a.png'.length },
+			{ role: 'marker', from: text.length - 1, to: text.length },
+		])
+	})
+
+	it('returns an empty array for text that is not valid image markdown', () => {
+		expect(imageMarkdownTokens('not an image')).toEqual([])
 	})
 })

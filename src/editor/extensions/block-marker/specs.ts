@@ -74,7 +74,6 @@ export const listMarkerSpec: BlockMarkerSpec = {
 	nodeTypes: ['listItem', 'taskItem'],
 	markerHost: 'firstParagraph',
 	revealScope: 'marker',
-	drawsMarkerStandIn: true,
 	backspaceRemovesMarker: true,
 	length: (text) => parseListMarker(text)?.markerLength ?? 0,
 	resolve: ({ node, parent, index, text }) => {

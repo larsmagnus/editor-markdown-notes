@@ -1,6 +1,7 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
 import { forEachMarkerHost } from '#src/editor/extensions/block-marker/marker-host'
+import { revealContainerRange } from '#src/editor/extensions/block-marker/reveal-container-range'
 import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
 import type {
 	RevealProvider,
@@ -25,25 +26,34 @@ export function createMarkerRevealProvider(
 				const trailingLength = spec.trailingLength?.(text) ?? 0
 				if (markerLength === 0 && trailingLength === 0) return
 
-				const syntaxRanges: [number, number][] = []
+				const tokens: RevealSpan['tokens'] = []
 				if (markerLength > 0) {
-					syntaxRanges.push([host.textStart, host.textStart + markerLength])
+					tokens.push({
+						role: 'marker',
+						from: host.textStart,
+						to: host.textStart + markerLength,
+					})
 				}
 				if (trailingLength > 0) {
 					const textEnd = host.textStart + text.length
-					syntaxRanges.push([textEnd - trailingLength, textEnd])
+					tokens.push({
+						role: 'marker',
+						from: textEnd - trailingLength,
+						to: textEnd,
+					})
 				}
 
-				const wholeNode = spec.revealScope === 'node'
+				const [containerFrom, containerTo] = revealContainerRange(
+					spec,
+					pos,
+					node.nodeSize,
+					markerLength
+				)
 				spans.push({
-					containerFrom: wholeNode ? pos : host.textStart,
-					containerTo: wholeNode
-						? pos + node.nodeSize
-						: host.textStart + markerLength,
-					syntaxRanges,
-					revealedNode: spec.drawsMarkerStandIn
-						? [pos, pos + node.nodeSize]
-						: undefined,
+					containerFrom,
+					containerTo,
+					tokens,
+					revealedNode: [pos, pos + node.nodeSize],
 				})
 			})
 

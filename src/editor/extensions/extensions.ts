@@ -29,6 +29,7 @@ import { StrikeExtension } from '#src/editor/extensions/formatting/strike-extens
 import { WrapSelectionOnKeypress } from '#src/editor/extensions/formatting/wrap-selection-on-keypress-extension'
 import { HeadingExtension } from '#src/editor/extensions/heading/heading-extension'
 import { HorizontalRuleExtension } from '#src/editor/extensions/horizontal-rule/horizontal-rule-extension'
+import { createImageSourceRevealProvider } from '#src/editor/extensions/image/create-image-source-reveal-provider'
 import { ImageSource } from '#src/editor/extensions/image/edit-source'
 import { ImageExtension } from '#src/editor/extensions/image/image-extension'
 import { italicDelimiterSpec } from '#src/editor/extensions/italic/italic-delimiter-spec'
@@ -213,6 +214,7 @@ export const SHARED_TAIL_EXTENSIONS = [
 			createDelimitedMarkRevealProvider('strike', fixedDelimiter('~~')),
 			createDelimitedMarkRevealProvider('italic', italicDelimiterSpec()),
 			createDelimitedMarkRevealProvider('code', inlineCodeDelimiterSpec()),
+			createImageSourceRevealProvider(),
 		],
 	}),
 	// Unhandled, Tab moves focus rather than indenting. Declines inside a table

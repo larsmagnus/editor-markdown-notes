@@ -5,6 +5,7 @@ import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
 import {
 	detectLinkClose,
 	linkCloseText,
+	linkCloseTokens,
 } from '#src/editor/extensions/link/link-close-text'
 
 /**
@@ -23,6 +24,7 @@ export function linkDelimiterSpec(): DelimiterSpec {
 		resolveClose: (_doc, run) => linkCloseText(hrefOf(run), titleOf(run)),
 		isBare: isBareAutolink,
 		isMidEdit: hasUnparseableClose,
+		closeTokens: linkCloseTokens,
 	}
 }
 

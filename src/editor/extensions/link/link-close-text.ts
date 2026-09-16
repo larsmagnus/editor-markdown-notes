@@ -1,3 +1,6 @@
+import type { RevealToken } from '#src/editor/extensions/syntax-reveal/reveal-provider'
+import { urlTitleTokens } from '#src/editor/extensions/syntax-reveal/url-title-tokens'
+
 /**
  * A link's closing delimiter, `](href)` or `](href "title")` - the literal
  * text `link-delimiter-spec.ts` detects/synthesizes and this module builds/
@@ -6,7 +9,7 @@
  * escaped, matching `prosemirror-markdown`'s own default link serializer so
  * a hand-typed URL containing one still round-trips.
  */
-const CLOSE_PATTERN = /\]\((\S*)(?:\s+"((?:[^"\\]|\\.)*)")?\)$/
+const CLOSE_PATTERN = /\]\((\S*)(?:\s+"((?:[^"\\]|\\.)*)")?\)$/d
 
 export type ParsedLinkClose = { href: string; title: string | null }
 
@@ -34,4 +37,23 @@ export function linkCloseText(
 	const escapedHref = href.replace(/[()]/g, '\\$&')
 	const titlePart = title ? ` "${title.replace(/"/g, '\\"')}"` : ''
 	return `](${escapedHref}${titlePart})`
+}
+
+/**
+ * `closeText`'s `](`/`)` as `marker` tokens, its href as a `url` token, and -
+ * when present - its `"title"` (quotes included) as a `title` token. Reused
+ * by `createDelimitedMarkRevealProvider` to style a link's parts separately;
+ * see `delimiter-spec.ts`'s `closeTokens`.
+ */
+export function linkCloseTokens(closeText: string): RevealToken[] {
+	const match = CLOSE_PATTERN.exec(closeText)
+	if (!match?.indices) return []
+
+	const [, hrefRange, titleRange] = match.indices
+	if (!hrefRange) return []
+
+	return [
+		{ role: 'marker', from: 0, to: 2 },
+		...urlTitleTokens(closeText, hrefRange, titleRange),
+	]
 }

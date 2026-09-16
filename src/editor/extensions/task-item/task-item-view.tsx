@@ -2,6 +2,7 @@ import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 
 import { Checkbox } from '#src/components/ui/checkbox'
+import { listMarkerSpec } from '#src/editor/extensions/block-marker/specs'
 import { parseListMarker } from '#src/editor/extensions/list/list-marker'
 import { createToggleTaskCheckedCommand } from '#src/editor/extensions/task-item/toggle-task-checked-command'
 import { useMarkerRevealed } from '#src/hooks/use-marker-revealed'
@@ -19,7 +20,13 @@ export function TaskItemView({ node, editor, getPos }: NodeViewProps) {
 	// The checkbox stands in for the `- [ ] ` the item actually holds. While
 	// that text is revealed it is on screen itself, and drawing both leaves the
 	// item reading `☐ - [ ] Buy milk`.
-	const markerRevealed = useMarkerRevealed({ editor, getPos, markerLength })
+	const markerRevealed = useMarkerRevealed({
+		editor,
+		getPos,
+		node,
+		spec: listMarkerSpec,
+		markerLength,
+	})
 
 	const handleCheckedChange = (value: boolean) => {
 		const pos = typeof getPos === 'function' ? getPos() : undefined

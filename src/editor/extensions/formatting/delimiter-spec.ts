@@ -2,6 +2,7 @@ import type { Mark, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
 import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
+import type { RevealToken } from '#src/editor/extensions/syntax-reveal/reveal-provider'
 
 type MarkBoundary =
 	| string
@@ -49,6 +50,14 @@ export type DelimiterSpec = {
 	 * and agrees with those attributes, so nothing takes it back out.
 	 */
 	isMidEdit?(text: string): boolean
+	/**
+	 * How the closing delimiter decomposes into typed sub-tokens, for a
+	 * construct whose close carries more than punctuation - a link's
+	 * `](href "title")`. Offsets are relative to the closing delimiter's own
+	 * text. Absent means "the whole close is one marker token", the correct
+	 * default for bold/strike/italic/code.
+	 */
+	closeTokens?(closeText: string): RevealToken[]
 }
 
 /** The literal text to wrap a fresh selection in; inline code's two ends differ. */

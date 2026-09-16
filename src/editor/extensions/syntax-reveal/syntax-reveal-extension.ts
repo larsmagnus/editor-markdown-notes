@@ -8,6 +8,7 @@ import {
 	revealKey,
 } from '#src/editor/extensions/syntax-reveal/compute-reveal-decorations'
 import type { RevealProvider } from '#src/editor/extensions/syntax-reveal/reveal-provider'
+import { revealRanges } from '#src/editor/extensions/syntax-reveal/reveal-ranges'
 
 /** The decorations in force, and the state they were derived from. */
 type RevealState = { set: DecorationSet; key: string }
@@ -39,10 +40,13 @@ export const SyntaxReveal = Extension.create<{ providers: RevealProvider[] }>({
 	addProseMirrorPlugins() {
 		const { providers } = this.options
 
-		const derive = (state: EditorState): RevealState => ({
-			set: computeRevealDecorations(state.doc, state.selection, providers),
-			key: revealKey(state.doc, state.selection, providers),
-		})
+		const derive = (state: EditorState): RevealState => {
+			const ranges = revealRanges(state.doc, state.selection, providers)
+			return {
+				set: computeRevealDecorations(state.doc, ranges),
+				key: revealKey(ranges),
+			}
+		}
 
 		return [
 			new Plugin<RevealState>({
@@ -50,7 +54,9 @@ export const SyntaxReveal = Extension.create<{ providers: RevealProvider[] }>({
 				state: {
 					init: (_config, state) => derive(state),
 					apply: (tr, previous, _oldState, newState) => {
-						const key = revealKey(newState.doc, newState.selection, providers)
+						const key = revealKey(
+							revealRanges(newState.doc, newState.selection, providers)
+						)
 						if (key !== previous.key) return derive(newState)
 						if (!tr.docChanged) return previous
 						return { set: previous.set.map(tr.mapping, tr.doc), key }

@@ -6,7 +6,7 @@ import {
 	findImageSource,
 	matchesImageAttrs,
 } from '#src/editor/extensions/image/image-source-node'
-import { revealsContainer } from '#src/editor/extensions/syntax-reveal/compute-reveal-decorations'
+import { revealsContainer } from '#src/editor/extensions/syntax-reveal/reveal-ranges'
 
 /**
  * Keeps a revealed image source in sync with the image it belongs to, and

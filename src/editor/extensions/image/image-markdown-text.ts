@@ -1,3 +1,6 @@
+import type { RevealToken } from '#src/editor/extensions/syntax-reveal/reveal-provider'
+import { urlTitleTokens } from '#src/editor/extensions/syntax-reveal/url-title-tokens'
+
 export type ImageAttrs = { src: string; alt: string; title: string | null }
 
 export type ImageMarkdownSource = {
@@ -37,7 +40,7 @@ export function imageMarkdownText(attrs: ImageAttrs): string {
 }
 
 const IMAGE_MARKDOWN_PATTERN =
-	/^!\[((?:[^\]\\]|\\.)*)\]\((\S*)(?:\s+"((?:[^"\\]|\\.)*)")?\)$/
+	/^!\[((?:[^\]\\]|\\.)*)\]\((\S*)(?:\s+"((?:[^"\\]|\\.)*)")?\)$/d
 
 /** Parses a value typed into the revealed markdown text back into image attrs. */
 export function parseImageMarkdown(text: string): ImageAttrs | null {
@@ -49,4 +52,25 @@ export function parseImageMarkdown(text: string): ImageAttrs | null {
 		src: match[2].replace(/\\([()])/g, '$1'),
 		title: match[3] === undefined ? null : match[3].replace(/\\"/g, '"'),
 	}
+}
+
+/**
+ * `text`'s `![`/`](`/`)` as `marker` tokens, its src as a `url` token, and -
+ * when present - its `"title"` (quotes included) as a `title` token; the alt
+ * text stays untagged, same as a link's own visible text. Empty for text that
+ * is not valid image markdown - reveal state should not surface mid-edit.
+ */
+export function imageMarkdownTokens(text: string): RevealToken[] {
+	const match = IMAGE_MARKDOWN_PATTERN.exec(text)
+	if (!match?.indices) return []
+
+	const [, altRange, srcRange, titleRange] = match.indices
+	if (!altRange || !srcRange) return []
+
+	const altEnd = altRange[1]
+	return [
+		{ role: 'marker', from: 0, to: 2 },
+		{ role: 'marker', from: altEnd, to: altEnd + 2 },
+		...urlTitleTokens(text, srcRange, titleRange),
+	]
 }

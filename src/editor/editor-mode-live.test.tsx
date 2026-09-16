@@ -81,11 +81,12 @@ describe('Editor Mode Live', () => {
 
 		const table = await screen.findByRole('table')
 		expect(table.querySelector('p')).toBeNull()
-		// The `**` delimiters are real, marked text now (see `formatting/`), so
-		// they're part of both the cell's accessible name and its markup.
-		expect(screen.getByRole('cell', { name: '**1.2M**' })).toContainHTML(
-			'<strong>**1.2M**</strong>'
-		)
+		// The `**` delimiters are real, marked text now (see `formatting/`), each
+		// wrapped in its own revealed-syntax span (see `syntax-reveal/`) - which
+		// is also why the accessible name gains spaces the source text doesn't
+		// have, one per element the name is assembled from.
+		const cell = screen.getByRole('cell', { name: '** 1.2M **' })
+		expect(cell.querySelector('strong')?.textContent).toBe('**1.2M**')
 	})
 
 	it('renders a column the markdown aligns, header and body alike', async () => {

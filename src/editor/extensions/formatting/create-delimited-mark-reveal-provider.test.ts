@@ -3,10 +3,11 @@ import { describe, expect, it } from 'vitest'
 
 import { createDelimitedMarkRevealProvider } from '#src/editor/extensions/formatting/create-delimited-mark-reveal-provider'
 import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec'
+import { linkDelimiterSpec } from '#src/editor/extensions/link/link-delimiter-spec'
 import { createEditor } from '#src/test-utils/editor'
 
 describe('createDelimitedMarkRevealProvider', () => {
-	it('spans the whole run, with delimiter ranges at each end', () => {
+	it('spans the whole run, with a marker token at each end', () => {
 		const editor = createEditor('', { extensions: [StarterKit] })
 		// "hello " is 6 chars (positions 1-7); "**world**" (bold) runs 7-16.
 		editor.commands.setContent('<p>hello <strong>**world**</strong> there</p>')
@@ -18,9 +19,9 @@ describe('createDelimitedMarkRevealProvider', () => {
 
 		expect(span.containerFrom).toBe(7)
 		expect(span.containerTo).toBe(16)
-		expect(span.syntaxRanges).toEqual([
-			[7, 9],
-			[14, 16],
+		expect(span.tokens).toEqual([
+			{ role: 'marker', from: 7, to: 9 },
+			{ role: 'marker', from: 14, to: 16 },
 		])
 	})
 
@@ -59,5 +60,27 @@ describe('createDelimitedMarkRevealProvider', () => {
 				fixedDelimiter('**')
 			).collect(editor.state.doc)
 		).toEqual([])
+	})
+
+	it("decomposes a link's close delimiter into marker/url/title tokens via closeTokens", () => {
+		const href = 'https://example.com'
+		const editor = createEditor(`[docs](${href} "The docs") now.`)
+
+		const [span] = createDelimitedMarkRevealProvider(
+			'link',
+			linkDelimiterSpec()
+		).collect(editor.state.doc)
+
+		const urlFrom = 8
+		const urlTo = urlFrom + href.length
+		const titleFrom = urlTo + 1 // the opening quote, one space past the url
+		const titleTo = titleFrom + '"The docs"'.length
+		expect(span.tokens).toEqual([
+			{ role: 'marker', from: 1, to: 2 },
+			{ role: 'marker', from: 6, to: 8 },
+			{ role: 'url', from: urlFrom, to: urlTo },
+			{ role: 'title', from: titleFrom, to: titleTo },
+			{ role: 'marker', from: titleTo, to: titleTo + 1 },
+		])
 	})
 })

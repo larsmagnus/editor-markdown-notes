@@ -1,17 +1,17 @@
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
-import { Code } from 'lucide-react'
+import { cn } from 'cn'
 
-import { ButtonAction } from '#src/components/button-action'
-import { ButtonCopy } from '#src/components/button-copy'
 import { ErrorFallback } from '#src/components/error-fallback'
+import { frontmatterMarkerSpec } from '#src/editor/extensions/block-marker/fenced-specs'
 import { focusBlockContentStart } from '#src/editor/extensions/focus-block-content-start'
-import { ButtonDelete } from '#src/editor/extensions/frontmatter/button-delete'
 import {
 	frontmatterYaml,
 	parseFrontmatterFence,
 } from '#src/editor/extensions/frontmatter/frontmatter-fence'
+import { FrontmatterHeader } from '#src/editor/extensions/frontmatter/frontmatter-header'
 import { useCopyToClipboard } from '#src/hooks/use-copy-to-clipboard'
+import { useMarkerRevealed } from '#src/hooks/use-marker-revealed'
 
 /**
  * The node view every `frontmatter` block renders through: a bordered box with
@@ -31,6 +31,13 @@ export function FrontmatterView({ node, editor, getPos }: NodeViewProps) {
 	const [copied, handleCopy] = useCopyToClipboard(
 		frontmatterYaml(node.textContent)
 	)
+	const revealed = useMarkerRevealed({
+		editor,
+		getPos,
+		node,
+		spec: frontmatterMarkerSpec,
+		markerLength: 0,
+	})
 
 	function handleEditSource() {
 		focusBlockContentStart(editor, getPos)
@@ -39,30 +46,18 @@ export function FrontmatterView({ node, editor, getPos }: NodeViewProps) {
 	return (
 		<NodeViewWrapper
 			data-type="frontmatter"
-			className="not-typeset relative mb-3 rounded-md border bg-muted/50 focus-within:ring-2"
+			className={cn(
+				'not-typeset relative mb-3 rounded-md border bg-muted/50 focus-within:ring-2',
+				revealed && 'ring-2 ring-primary/30'
+			)}
 		>
-			<div
-				className="flex items-center justify-between border-b px-3 py-1.5"
-				contentEditable={false}
-			>
-				<span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-					Frontmatter
-				</span>
-				<div className="flex items-center gap-1">
-					<ButtonAction
-						icon={<Code />}
-						label="Edit frontmatter source"
-						tooltip="Edit source"
-						onClick={handleEditSource}
-					/>
-					<ButtonCopy
-						copied={copied}
-						label="Copy frontmatter"
-						onClick={handleCopy}
-					/>
-					<ButtonDelete editor={editor} getPos={getPos} />
-				</div>
-			</div>
+			<FrontmatterHeader
+				editor={editor}
+				getPos={getPos}
+				copied={copied}
+				onCopy={handleCopy}
+				onEditSource={handleEditSource}
+			/>
 
 			{!hasClosingFence ? (
 				<ErrorFallback title="Needs a closing --- fence" className="m-2" />

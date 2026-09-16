@@ -321,8 +321,11 @@
 	 * checkbox - so only ever one of the two is visible. `list-style` alone,
 	 * leaving the indent, so revealing a marker does not shift the line.
 	 */
-	.ProseMirror li.marker-revealed {
+	.ProseMirror li.construct-revealed {
 		@apply list-none;
+		> p > [data-token] {
+			@apply -ml-5.5 mr-2;
+		}
 	}
 
 	/*
@@ -347,6 +350,40 @@
 		line-height: 0;
 		overflow: hidden;
 		white-space: nowrap;
+	}
+
+	/*
+	 * Every revealed syntax token (`data-token="marker"|"url"|"title"`) carries
+	 * this once it is on screen, so it can be styled distinctly from the
+	 * content around it without touching that content at all - a heading's `#`
+	 * or a link's brackets/URL/title, each independently. `data-token` is the
+	 * shared vocabulary `compute-reveal-decorations.ts` writes it with.
+	 */
+	.ProseMirror h1 [data-token='marker'],
+	.ProseMirror h2 [data-token='marker'],
+	.ProseMirror h3 [data-token='marker'],
+	.ProseMirror h4 [data-token='marker'],
+	.ProseMirror h5 [data-token='marker'],
+	.ProseMirror h6 [data-token='marker'],
+	.ProseMirror li [data-token='marker'],
+	.ProseMirror blockquote [data-token='marker'],
+	.ProseMirror strong [data-token='marker'],
+	.ProseMirror em [data-token='marker'],
+	.ProseMirror s [data-token='marker'],
+	.ProseMirror code [data-token='marker'],
+	.ProseMirror [data-type='horizontalRule'] [data-token='marker'] {
+		@apply text-blue-400;
+	}
+
+	.ProseMirror a [data-token='marker'],
+	.ProseMirror a [data-token='url'],
+	.ProseMirror [data-type='image-source'] [data-token='marker'],
+	.ProseMirror [data-type='image-source'] [data-token='url'] {
+		@apply text-blue-400;
+	}
+	.ProseMirror a [data-token='title'],
+	.ProseMirror [data-type='image-source'] [data-token='title'] {
+		@apply text-blue-400 italic;
 	}
 
 	/*
