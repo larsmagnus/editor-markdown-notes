@@ -26,7 +26,9 @@ export async function tabUntilFocused(
  *
  * The editor's own `role="textbox"` root repeats this path for every caret
  * position inside it, so a walk legitimately revisits it between widgets -
- * the caret's own anchor node/offset disambiguates that one case.
+ * the caret's anchor node's own path disambiguates that one case. Its text
+ * won't: revealed syntax puts each marker in a span of its own, and one
+ * document holds any number of identical `## ` markers.
  *
  * Duplicated into `tab-walk.ts`'s `page.waitForFunction` call, which runs
  * entirely in the browser and can't call this function.
@@ -35,27 +37,37 @@ export async function focusedElementSignature(
 	page: Page
 ): Promise<string | null> {
 	return page.evaluate(() => {
+		const pathOf = (node: Node) => {
+			const path: number[] = []
+			for (
+				let current = node;
+				current.parentElement;
+				current = current.parentElement
+			) {
+				path.unshift(
+					Array.prototype.indexOf.call(
+						current.parentElement.childNodes,
+						current
+					)
+				)
+			}
+			return path.join('.')
+		}
+
 		const element = document.activeElement
 		if (!element || element === document.body) return null
-
-		const path: number[] = []
-		for (let node = element; node.parentElement; node = node.parentElement) {
-			path.unshift(
-				Array.prototype.indexOf.call(node.parentElement.children, node)
-			)
-		}
 
 		const selection = document.getSelection()
 		const caret =
 			element.getAttribute('role') === 'textbox' && selection?.anchorNode
-				? `${selection.anchorNode.textContent?.slice(0, 20)}@${selection.anchorOffset}`
+				? `${pathOf(selection.anchorNode)}@${selection.anchorOffset}`
 				: ''
 
 		return [
 			element.tagName,
 			element.getAttribute('role') ?? '',
 			element.getAttribute('aria-label') ?? '',
-			path.join('.'),
+			pathOf(element),
 			caret,
 		].join('|')
 	})

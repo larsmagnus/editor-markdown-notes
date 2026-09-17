@@ -22,17 +22,22 @@ test.describe('Links in the live editor', () => {
 		await openInVSCode(page, 'Read [the notes](https://example.com) first.')
 		const content = page.getByRole('textbox').first()
 		const link = content.locator('a')
-		const delimiters = link.locator('.syntax-hidden')
 		const before = content.getByText('Read', { exact: false }).first()
+		// Asserts the joined text rather than count: internal tokenization is
+		// an implementation detail that may change.
+		const hiddenSyntax = () =>
+			link
+				.locator('.syntax-hidden')
+				.evaluateAll((spans) => spans.map((span) => span.textContent).join(''))
 
 		await before.click({ position: { x: 2, y: 2 } })
-		await expect(delimiters).toHaveCount(2)
+		await expect.poll(hiddenSyntax).toBe('[](https://example.com)')
 
 		await link.click()
-		await expect(delimiters).toHaveCount(0)
+		await expect(link.locator('.syntax-hidden')).toHaveCount(0)
 
 		await before.click({ position: { x: 2, y: 2 } })
-		await expect(delimiters).toHaveCount(2)
+		await expect.poll(hiddenSyntax).toBe('[](https://example.com)')
 	})
 
 	test('editing the revealed URL text directly changes what gets saved', async ({

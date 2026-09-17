@@ -23,29 +23,36 @@ async function waitForFocusChange(
 	const changed = await page
 		.waitForFunction<string | false, [string | null, string]>(
 			([prev, noSignature]) => {
+				const pathOf = (node: Node) => {
+					const path: number[] = []
+					for (
+						let current = node;
+						current.parentElement;
+						current = current.parentElement
+					) {
+						path.unshift(
+							Array.prototype.indexOf.call(
+								current.parentElement.childNodes,
+								current
+							)
+						)
+					}
+					return path.join('.')
+				}
+
 				const element = document.activeElement
 				let signature: string | null = null
 				if (element && element !== document.body) {
-					const path: number[] = []
-					for (
-						let node = element;
-						node.parentElement;
-						node = node.parentElement
-					) {
-						path.unshift(
-							Array.prototype.indexOf.call(node.parentElement.children, node)
-						)
-					}
 					const selection = document.getSelection()
 					const caret =
 						element.getAttribute('role') === 'textbox' && selection?.anchorNode
-							? `${selection.anchorNode.textContent?.slice(0, 20)}@${selection.anchorOffset}`
+							? `${pathOf(selection.anchorNode)}@${selection.anchorOffset}`
 							: ''
 					signature = [
 						element.tagName,
 						element.getAttribute('role') ?? '',
 						element.getAttribute('aria-label') ?? '',
-						path.join('.'),
+						pathOf(element),
 						caret,
 					].join('|')
 				}
