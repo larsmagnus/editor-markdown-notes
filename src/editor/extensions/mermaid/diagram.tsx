@@ -1,8 +1,10 @@
 import { cn } from 'cn'
+import type { CSSProperties } from 'react'
 
 import { AppErrorBoundary } from '#src/components/app-error-boundary'
 import { PAN_ZOOM_MIN_SCALE, PanZoom } from '#src/components/pan-zoom'
 import { PAN_ZOOM_FRAME_CLASSNAME } from '#src/components/pan-zoom-frame'
+import { diagramWidth } from '#src/editor/extensions/mermaid/diagram-width'
 import { MermaidToolbar } from '#src/editor/extensions/mermaid/toolbar'
 import type { MermaidResult } from '#src/lib/render-mermaid'
 
@@ -12,6 +14,14 @@ type MermaidDiagramProps = {
 	/** Whether the block's own source is on screen; the diagram gives way to it. */
 	showSource: boolean
 	onEdit: () => void
+}
+
+/** The diagram's own width, as the custom property the stylesheet scales it
+ *  against. */
+function diagramWidthStyle(svg: string): CSSProperties {
+	const width = diagramWidth(svg)
+
+	return { '--diagram-width': width && `${width}px` } as CSSProperties
 }
 
 /**
@@ -45,7 +55,13 @@ export function MermaidDiagram({
 				<div contentEditable={false} className="not-typeset my-4 bg-pattern">
 					<PanZoom
 						minScale={PAN_ZOOM_MIN_SCALE}
-						className={cn(PAN_ZOOM_FRAME_CLASSNAME, 'min-h-28')}
+						className={cn(
+							PAN_ZOOM_FRAME_CLASSNAME,
+							// The floor a diagram too small to fill it is centred in,
+							// wide enough that the toolbar never overhangs the frame it
+							// sits in - the same bargain `imageFrameClassName` strikes.
+							'flex items-center min-h-40 min-w-40'
+						)}
 						controls={
 							<MermaidToolbar code={code} svg={result.svg} onEdit={onEdit} />
 						}
@@ -53,6 +69,8 @@ export function MermaidDiagram({
 						<div
 							role="img"
 							aria-label="Mermaid diagram"
+							className="mermaid-diagram"
+							style={diagramWidthStyle(result.svg)}
 							dangerouslySetInnerHTML={{ __html: result.svg }}
 						/>
 					</PanZoom>

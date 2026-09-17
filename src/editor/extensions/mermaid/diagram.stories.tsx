@@ -43,6 +43,32 @@ export const Primary: Story = {
 	},
 }
 
+export const Wide: Story = {
+	args: {
+		content: [
+			'```mermaid',
+			'flowchart LR',
+			'  A[Collect] --> B[Transform] --> C[Validate] --> D[Publish] --> E[Archive]',
+			'```',
+		].join('\n'),
+	},
+}
+
+export const Tall: Story = {
+	args: {
+		content: [
+			'```mermaid',
+			'flowchart TD',
+			'  A[Draft] --> B[Review]',
+			'  B --> C[Revise]',
+			'  C --> D[Approve]',
+			'  D --> E[Publish]',
+			'  E --> F[Archive]',
+			'```',
+		].join('\n'),
+	},
+}
+
 export const Error: Story = {
 	args: {
 		content: [

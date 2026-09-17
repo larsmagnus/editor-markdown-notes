@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added wrapping selected text in backticks, asterisks, underscores, tildes or quotes when you type them
 - Added pasting an http(s) URL over selected text creates a markdown link with the selected text as link text
+- Changed mermaid diagrams to scale up to the width available to them instead of staying at a fixed size
 - Fixed formatting shortcuts not working correctly on Windows
 - Fixed pasting a bare domain or filename turning it into a link
 - Fixed deleting a list item leaving two lists apart instead of joined

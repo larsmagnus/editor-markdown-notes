@@ -169,6 +169,28 @@
 	}
 
 	/*
+	 * Mermaid caps its own SVG at the width its layout pass happened to produce
+	 * (`max-width: <intrinsic>px`), so a diagram can shrink below the column but
+	 * never grow into it. That cap is overridden here rather than removed from
+	 * the markup, which the copy and export actions hand out verbatim, and
+	 * re-expressed against `diagram-width.ts`'s measurement of the same
+	 * number.
+	 *
+	 * Half again is as far as a diagram narrower than the column grows: the
+	 * ceiling only ever binds on a narrow diagram, which is a tall one, and the
+	 * text scales with it. The column itself is the other bound, and there is
+	 * deliberately no height bound at all - a tall diagram grows as tall as it
+	 * needs.
+	 */
+	.mermaid-diagram {
+		width: min(100%, calc(var(--diagram-width, 100%) * 1.5));
+
+		svg {
+			@apply w-full h-auto max-w-none!;
+		}
+	}
+
+	/*
 	 * Typeset's own flow margin lands on `table`, but ProseMirror wraps every
 	 * table in this div - the sibling that actually sits in document flow -
 	 * so the table's margin never reaches the elements around it.
