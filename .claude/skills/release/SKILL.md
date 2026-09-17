@@ -1,3 +1,9 @@
+---
+name: release
+description: Cuts a release by bumping the version, updating the changelog, and pushing the tag to trigger CI. Use when the user asks to release, ship, or cut a new version, or invokes /release.
+allowed-tools: Bash(pnpm lint), Bash(pnpm test), Bash(pnpm release*), Bash(git status), Bash(git push*), Bash(git tag*), Bash(gh run watch), Read, Edit
+---
+
 # Release Skill
 
 Guides through cutting a release by bumping the version, updating the changelog, and pushing the tag to trigger CI.
