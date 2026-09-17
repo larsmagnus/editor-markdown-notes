@@ -2,13 +2,13 @@ import { useCurrentEditor } from '@tiptap/react'
 import { useState } from 'react'
 
 import { ButtonHandle } from '#src/editor/extensions/table/button-handle'
-import { TableDropIndicator } from '#src/editor/extensions/table/drop-indicator'
 import type { TableAnchor } from '#src/editor/extensions/table/geometry'
 import { TableHandleMenu } from '#src/editor/extensions/table/handle-menu'
 import type {
 	TableAxis,
 	TableMenuItem,
 } from '#src/editor/extensions/table/menu-items'
+import { OptionalTableDropIndicator } from '#src/editor/extensions/table/optional-drop-indicator'
 import { useTableHandleDrag } from '#src/hooks/use-table-handle-drag'
 
 interface TableHandleProps {
@@ -41,9 +41,11 @@ export function TableHandle({ axis, anchor }: TableHandleProps) {
 
 	return (
 		<>
-			{targetIndex === null ? null : (
-				<TableDropIndicator axis={axis} anchor={anchor} index={targetIndex} />
-			)}
+			<OptionalTableDropIndicator
+				axis={axis}
+				anchor={anchor}
+				index={targetIndex}
+			/>
 			<div
 				className="pointer-events-auto absolute z-10 -translate-x-1/2 -translate-y-1/2"
 				style={{ left: handle.left, top: handle.top }}

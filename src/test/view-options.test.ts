@@ -5,20 +5,11 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
-const VIEW_TYPE = 'editor-markdown-notes.markdownEditor'
-
-/** Opening a custom editor is asynchronous; give the tab a moment to appear. */
-async function waitForActiveTab(predicate: (tab: vscode.Tab) => boolean) {
-	for (let attempt = 0; attempt < 50; attempt++) {
-		const tab = vscode.window.tabGroups.activeTabGroup.activeTab
-		if (tab && predicate(tab)) return tab
-
-		await new Promise((resolve) => setTimeout(resolve, 100))
-	}
-
-	return undefined
-}
+import {
+	EXTENSION_ID,
+	isCustomEditorTab,
+	waitForActiveTab,
+} from '#src/test/tab-test-support'
 
 suite('View options', () => {
 	suiteSetup(async () => {
@@ -45,11 +36,7 @@ suite('View options', () => {
 				file
 			)
 
-			const tab = await waitForActiveTab(
-				(tab) =>
-					tab.input instanceof vscode.TabInputCustom &&
-					tab.input.viewType === VIEW_TYPE
-			)
+			const tab = await waitForActiveTab(isCustomEditorTab)
 			assert.ok(tab, 'the custom editor should open with the stored options')
 		} finally {
 			// Restore the defaults so the remaining tests see a clean slate.

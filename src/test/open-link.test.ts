@@ -5,13 +5,12 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
+import { createLinkDeps, openTestLink } from '#src/test/link-test-support'
 import {
-	createLinkDeps,
 	EXTENSION_ID,
 	isCustomEditorTab,
-	openTestLink,
 	waitForActiveTab,
-} from '#src/test/link-test-support'
+} from '#src/test/tab-test-support'
 
 suite('Opening a link target', () => {
 	suiteSetup(async () => {
@@ -45,9 +44,7 @@ suite('Opening a link target', () => {
 			await openTestLink('./second.md', source, deps)
 			const secondTab = await waitForActiveTab(
 				(tab) =>
-					isCustomEditorTab(tab) &&
-					tab.input instanceof vscode.TabInputCustom &&
-					tab.input.uri.fsPath === second.fsPath
+					isCustomEditorTab(tab) && tab.input.uri.fsPath === second.fsPath
 			)
 			assert.ok(secondTab, 'the second link should open with our custom editor')
 

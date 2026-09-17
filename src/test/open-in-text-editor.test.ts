@@ -5,20 +5,11 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
-const VIEW_TYPE = 'editor-markdown-notes.markdownEditor'
-
-/** Opening an editor is asynchronous; give the tab a moment to appear. */
-async function waitForActiveTab(predicate: (tab: vscode.Tab) => boolean) {
-	for (let attempt = 0; attempt < 50; attempt++) {
-		const tab = vscode.window.tabGroups.activeTabGroup.activeTab
-		if (tab && predicate(tab)) return tab
-
-		await new Promise((resolve) => setTimeout(resolve, 100))
-	}
-
-	return undefined
-}
+import {
+	EXTENSION_ID,
+	isCustomEditorTab,
+	waitForActiveTab,
+} from '#src/test/tab-test-support'
 
 suite('Open in text editor', () => {
 	suiteSetup(async () => {
@@ -38,11 +29,7 @@ suite('Open in text editor', () => {
 				file
 			)
 
-			const customTab = await waitForActiveTab(
-				(tab) =>
-					tab.input instanceof vscode.TabInputCustom &&
-					tab.input.viewType === VIEW_TYPE
-			)
+			const customTab = await waitForActiveTab(isCustomEditorTab)
 			assert.ok(customTab, 'the file should open with our custom editor')
 
 			await vscode.commands.executeCommand(
@@ -65,11 +52,7 @@ suite('Open in text editor', () => {
 				file
 			)
 
-			const returnedTab = await waitForActiveTab(
-				(tab) =>
-					tab.input instanceof vscode.TabInputCustom &&
-					tab.input.viewType === VIEW_TYPE
-			)
+			const returnedTab = await waitForActiveTab(isCustomEditorTab)
 			assert.ok(
 				returnedTab,
 				'reopening with the extension should return to the live editor'

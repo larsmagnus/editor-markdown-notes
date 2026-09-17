@@ -5,20 +5,11 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
-const VIEW_TYPE = 'editor-markdown-notes.markdownEditor'
-
-/** Opening a custom editor is asynchronous; give the tab a moment to appear. */
-async function waitForActiveTab(predicate: (tab: vscode.Tab) => boolean) {
-	for (let attempt = 0; attempt < 50; attempt++) {
-		const tab = vscode.window.tabGroups.activeTabGroup.activeTab
-		if (tab && predicate(tab)) return tab
-
-		await new Promise((resolve) => setTimeout(resolve, 100))
-	}
-
-	return undefined
-}
+import {
+	EXTENSION_ID,
+	isCustomEditorTab,
+	waitForActiveTab,
+} from '#src/test/tab-test-support'
 
 suite('Opening notes', () => {
 	suiteSetup(async () => {
@@ -40,10 +31,7 @@ suite('Opening notes', () => {
 
 			const tab = vscode.window.tabGroups.activeTabGroup.activeTab
 			assert.ok(
-				!(
-					tab?.input instanceof vscode.TabInputCustom &&
-					tab.input.viewType === VIEW_TYPE
-				),
+				!tab || !isCustomEditorTab(tab),
 				'a non-markdown file should not open in the custom editor'
 			)
 		} finally {
@@ -65,11 +53,7 @@ suite('Opening notes', () => {
 				file
 			)
 
-			const tab = await waitForActiveTab(
-				(tab) =>
-					tab.input instanceof vscode.TabInputCustom &&
-					tab.input.viewType === VIEW_TYPE
-			)
+			const tab = await waitForActiveTab(isCustomEditorTab)
 
 			assert.ok(tab, 'the custom editor should still open')
 		} finally {
@@ -95,11 +79,7 @@ suite('Opening notes', () => {
 
 			await vscode.commands.executeCommand('editor-markdown-notes.openFile')
 
-			const tab = await waitForActiveTab(
-				(tab) =>
-					tab.input instanceof vscode.TabInputCustom &&
-					tab.input.viewType === VIEW_TYPE
-			)
+			const tab = await waitForActiveTab(isCustomEditorTab)
 
 			assert.ok(tab, 'the custom editor tab should become active')
 		} finally {

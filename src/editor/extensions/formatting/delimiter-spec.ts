@@ -1,6 +1,7 @@
 import type { Mark, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 
+import { edgeDelimiterLength } from '#src/editor/extensions/formatting/edge-delimiter-length'
 import type { MarkRun } from '#src/editor/extensions/formatting/find-mark-runs'
 import type { RevealToken } from '#src/editor/extensions/syntax-reveal/reveal-provider'
 
@@ -66,8 +67,8 @@ export type DelimiterPair = { open: string; close: string }
 /** A delimiter that is the same fixed string at both ends. */
 export function fixedDelimiter(delimiter: string): DelimiterSpec {
 	return {
-		detectOpen: (text) => (text.startsWith(delimiter) ? delimiter.length : 0),
-		detectClose: (text) => (text.endsWith(delimiter) ? delimiter.length : 0),
+		detectOpen: (text) => edgeDelimiterLength(text, delimiter, 'open'),
+		detectClose: (text) => edgeDelimiterLength(text, delimiter, 'close'),
 		...edgeResolvers(() => delimiter),
 	}
 }

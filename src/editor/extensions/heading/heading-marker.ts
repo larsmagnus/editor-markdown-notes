@@ -23,3 +23,10 @@ export function headingMarkerLength(text: string): number {
 export function headingMarkerText(level: number): string {
 	return '#'.repeat(level) + ' '
 }
+
+/** The marker text one level down from `text`'s, or `null` at the top level -
+ *  where the heading is taken apart instead of demoted further. */
+export function demoteHeadingMarker(text: string): string | null {
+	const level = parseHeadingLevel(text)
+	return level > 1 ? headingMarkerText(level - 1) : null
+}

@@ -1,3 +1,5 @@
+import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
+
 /**
  * A list item's literal leading marker - `- `/`+ `/`* ` for a bullet,
  * `N.`/`N)` for an ordered item, `- [ ]`/`- [x]` for a task - the only
@@ -69,4 +71,35 @@ export function taskMarkerText(checked: boolean): string {
  */
 export function firstParagraphStart(itemPos: number): number {
 	return itemPos + 2
+}
+
+/**
+ * A list item's marker, corrected against its own node type and its parent
+ * list rather than re-read from `text` - see `listMarkerSpec`'s doc comment
+ * on why kind and numbering, not style, are the only things ever corrected.
+ */
+export function resolveListMarker(
+	node: ProseMirrorNode,
+	parent: ProseMirrorNode | null,
+	index: number,
+	text: string
+): string {
+	const parsed = parseListMarker(text)
+
+	if (node.type.name === 'taskItem') {
+		return parsed?.kind === 'task'
+			? text.slice(0, parsed.markerLength)
+			: taskMarkerText(Boolean(node.attrs.checked))
+	}
+
+	if (parent?.type.name === 'orderedList') {
+		const expected = (parent.attrs.start ?? 1) + index
+		return parsed?.kind === 'ordered' && parsed.number === expected
+			? text.slice(0, parsed.markerLength)
+			: orderedMarkerText(expected)
+	}
+
+	return parsed?.kind === 'bullet'
+		? text.slice(0, parsed.markerLength)
+		: bulletMarkerText()
 }

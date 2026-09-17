@@ -1,8 +1,8 @@
 import type { Editor, EditorContentProps } from '@tiptap/react'
 import { EditorContext } from '@tiptap/react'
 
-import { MenuBar } from '#src/components/menu-bar'
 import { MenuBubble } from '#src/components/menu-bubble'
+import { OptionalMenuBar } from '#src/components/optional-menu-bar'
 import { EditorSurface } from '#src/editor/editor-mode-live-surface'
 import { ButtonAdd } from '#src/editor/extensions/frontmatter/button-add'
 import type { AnalyzerHandle } from '#src/hooks/use-analyzer'
@@ -73,7 +73,7 @@ function EditorModeLive({
 
 	return (
 		<EditorContext.Provider value={{ editor }}>
-			{showMenu ? <MenuBar /> : null}
+			<OptionalMenuBar show={showMenu} />
 			<ButtonAdd editor={editor} />
 			<EditorSurface
 				includeTypesetClassNames={includeTypesetClassNames}

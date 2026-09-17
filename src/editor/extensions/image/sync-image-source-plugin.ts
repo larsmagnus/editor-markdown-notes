@@ -1,11 +1,11 @@
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 
 import { parseImageMarkdown } from '#src/editor/extensions/image/image-markdown-text'
+import { finalizeImageSource } from '#src/editor/extensions/image/image-source-node'
 import {
-	finalizeImageSource,
 	findImageSource,
 	matchesImageAttrs,
-} from '#src/editor/extensions/image/image-source-node'
+} from '#src/editor/extensions/image/image-source-query'
 import { revealsContainer } from '#src/editor/extensions/syntax-reveal/reveal-ranges'
 
 /**

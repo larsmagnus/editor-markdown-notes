@@ -1,5 +1,5 @@
 import { imageMarkdownTokens } from '#src/editor/extensions/image/image-markdown-text'
-import { findImageSource } from '#src/editor/extensions/image/image-source-node'
+import { findImageSource } from '#src/editor/extensions/image/image-source-query'
 import type { RevealProvider } from '#src/editor/extensions/syntax-reveal/reveal-provider'
 
 /**

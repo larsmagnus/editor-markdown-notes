@@ -1,6 +1,7 @@
 import type { ChangeEvent, RefObject } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { useAdoptContentOnBlur } from '#src/hooks/use-adopt-content-on-blur'
 import { useFlushOnDeactivate } from '#src/hooks/use-flush-on-deactivate'
 import { useNoteSync } from '#src/hooks/use-note-sync'
 
@@ -73,15 +74,12 @@ export function useRawDraftSync({
 		setDraft(content)
 	}, [content, textareaRef])
 
-	// `content` will not change a second time, so the effect above never gets
-	// another chance at a change that landed while the caret was here. Without
-	// this the note shows text nobody wrote until it is closed and reopened.
-	const handleBlur = useCallback(() => {
-		if (draftRef.current !== adoptedRef.current) return
-
-		adoptedRef.current = content
-		setDraft(content)
-	}, [content])
+	const handleBlur = useAdoptContentOnBlur({
+		content,
+		draftRef,
+		adoptedRef,
+		setDraft,
+	})
 
 	const handleChange = useCallback(
 		(event: ChangeEvent<HTMLTextAreaElement>) => {

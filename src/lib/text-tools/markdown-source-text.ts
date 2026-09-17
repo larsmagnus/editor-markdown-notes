@@ -2,18 +2,14 @@ import type { Nodes, PhrasingContent, RootContent } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 
 import { splitFrontmatter } from '#src/lib/host/frontmatter'
+import { flattenInlineNodes } from '#src/lib/text-tools/flatten-inline-nodes'
 import { frontmatterRuns } from '#src/lib/text-tools/frontmatter-prose'
 import {
 	GFM_MDAST_EXTENSIONS,
 	GFM_MICROMARK_EXTENSION,
 } from '#src/lib/text-tools/gfm-without-footnotes'
-import type { ProseExclusion } from '#src/lib/text-tools/prose-policy'
-import {
-	BLOCK_SEPARATOR,
-	PROSE_SUBSTITUTE,
-} from '#src/lib/text-tools/prose-policy'
+import { BLOCK_SEPARATOR } from '#src/lib/text-tools/prose-policy'
 import type { SourceSlice } from '#src/lib/text-tools/source-offset'
-import { alignedSlices } from '#src/lib/text-tools/source-offset'
 
 /**
  * Flattens a markdown source string into the plain text retext analyses,
@@ -28,29 +24,6 @@ import { alignedSlices } from '#src/lib/text-tools/source-offset'
  * textarea) and the MCP server (`src/mcp/markdown-text.ts`, which layers a
  * line/column conversion on top for an agent to act on).
  */
-
-/**
- * This tree's own name for each excluded construct.
- *
- * Keyed by `ProseExclusion` so a construct added to the shared policy fails to
- * compile here until this walk handles it too. Block-level `code` and `html`
- * are dropped by being leaves the block walk never descends into; the names
- * listed here are what the *inline* walk matches against.
- */
-const MDAST_TYPES: Record<ProseExclusion, readonly string[]> = {
-	codeBlock: ['code'],
-	inlineCode: ['inlineCode'],
-	hardBreak: ['break'],
-	atomInline: ['image', 'imageReference', 'html', 'footnoteReference'],
-}
-
-const INLINE_SUBSTITUTE = new Map(
-	(Object.keys(MDAST_TYPES) as ProseExclusion[]).flatMap((exclusion) =>
-		MDAST_TYPES[exclusion].map(
-			(type) => [type, PROSE_SUBSTITUTE[exclusion]] as const
-		)
-	)
-)
 
 /**
  * Nodes holding inline content directly, and so the ones a blank line goes
@@ -75,50 +48,17 @@ export function getMarkdownSourceText(markdown: string): MarkdownSourceText {
 		if (text) text += BLOCK_SEPARATOR
 	}
 
-	const appendInline = (nodes: readonly PhrasingContent[], base: number) => {
-		for (const node of nodes) {
-			const substitute = INLINE_SUBSTITUTE.get(node.type)
-			if (substitute !== undefined) {
-				text += substitute
-				continue
-			}
-
-			if (node.type === 'text') {
-				const start = node.position?.start.offset
-				const end = node.position?.end.offset
-				if (start !== undefined && end !== undefined) {
-					// The raw source is handed over alongside the decoded value: an
-					// escape or an entity makes the two different lengths, and only the
-					// source says where each decoded character actually came from.
-					slices.push(
-						...alignedSlices(
-							node.value,
-							body.slice(start, end),
-							text.length,
-							start + base
-						)
-					)
-				}
-				text += node.value
-				continue
-			}
-
-			// Emphasis, strong, links and the like carry prose inside their own
-			// markup - a link's text is prose, its URL is not, and the URL is not a
-			// child so it drops out on its own.
-			if ('children' in node) {
-				appendInline(node.children, base)
-				continue
-			}
-
-			text += PROSE_SUBSTITUTE.atomInline
-		}
-	}
-
 	const walk = (node: Nodes | RootContent, base: number) => {
 		if (TEXT_BLOCKS.has(node.type) && 'children' in node) {
 			startBlock()
-			appendInline(node.children as PhrasingContent[], base)
+			const result = flattenInlineNodes(
+				node.children as PhrasingContent[],
+				body,
+				base,
+				text.length
+			)
+			text += result.text
+			slices.push(...result.slices)
 			return
 		}
 

@@ -3,6 +3,7 @@ import { PluginKey } from '@tiptap/pm/state'
 
 import { askProposalCommands } from '#src/editor/extensions/ask/ask-proposal-commands'
 import { createAskProposalPlugin } from '#src/editor/extensions/ask/ask-proposal-plugin'
+import { askProposalStreamCommands } from '#src/editor/extensions/ask/ask-proposal-stream-commands'
 import { unmountActiveWidget } from '#src/editor/extensions/ask/ask-proposal-widget-mount'
 
 type AskProposalStatus = 'streaming' | 'done' | 'error'
@@ -65,7 +66,7 @@ export const AskSuggestion = Extension.create({
 	name: 'askSuggestion',
 
 	addCommands() {
-		return askProposalCommands
+		return { ...askProposalStreamCommands, ...askProposalCommands }
 	},
 
 	addProseMirrorPlugins() {

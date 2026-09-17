@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { askInlineStatusPluginKey } from '#src/editor/extensions/ask/ask-inline-status-extension'
-import { streamAskInto } from '#src/editor/extensions/slash-command/ask-command'
+import { streamAskInto } from '#src/editor/extensions/slash-command/ask-stream-reply'
 import { createEditor } from '#src/test-utils/editor'
 
 const ask = vi.hoisted(() => vi.fn())

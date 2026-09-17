@@ -5,13 +5,12 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
+import { createLinkDeps, openTestLink } from '#src/test/link-test-support'
 import {
-	createLinkDeps,
 	EXTENSION_ID,
 	isCustomEditorTab,
-	openTestLink,
 	waitForActiveTab,
-} from '#src/test/link-test-support'
+} from '#src/test/tab-test-support'
 
 suite('Opening a non-markdown link target', () => {
 	suiteSetup(async () => {

@@ -10,6 +10,7 @@ import {
 import { BLOCKQUOTE_MARKER } from '#src/editor/extensions/blockquote/blockquote-marker'
 import { blockquoteMarkerLength } from '#src/editor/extensions/blockquote/blockquote-marker'
 import {
+	demoteHeadingMarker,
 	headingMarkerLength,
 	headingMarkerText,
 	parseHeadingLevel,
@@ -19,10 +20,8 @@ import {
 	horizontalRuleLength,
 } from '#src/editor/extensions/horizontal-rule/horizontal-rule-marker'
 import {
-	bulletMarkerText,
-	orderedMarkerText,
 	parseListMarker,
-	taskMarkerText,
+	resolveListMarker,
 } from '#src/editor/extensions/list/list-marker'
 
 /**
@@ -40,10 +39,7 @@ const headingMarkerSpec: BlockMarkerSpec = {
 	backspaceRemovesMarker: true,
 	length: headingMarkerLength,
 	resolve: ({ text }) => headingMarkerText(parseHeadingLevel(text)),
-	demote: (text) => {
-		const level = parseHeadingLevel(text)
-		return level > 1 ? headingMarkerText(level - 1) : null
-	},
+	demote: demoteHeadingMarker,
 	unwrap: unwrapToParagraph,
 }
 
@@ -76,26 +72,8 @@ export const listMarkerSpec: BlockMarkerSpec = {
 	revealScope: 'marker',
 	backspaceRemovesMarker: true,
 	length: (text) => parseListMarker(text)?.markerLength ?? 0,
-	resolve: ({ node, parent, index, text }) => {
-		const parsed = parseListMarker(text)
-
-		if (node.type.name === 'taskItem') {
-			return parsed?.kind === 'task'
-				? text.slice(0, parsed.markerLength)
-				: taskMarkerText(Boolean(node.attrs.checked))
-		}
-
-		if (parent?.type.name === 'orderedList') {
-			const expected = (parent.attrs.start ?? 1) + index
-			return parsed?.kind === 'ordered' && parsed.number === expected
-				? text.slice(0, parsed.markerLength)
-				: orderedMarkerText(expected)
-		}
-
-		return parsed?.kind === 'bullet'
-			? text.slice(0, parsed.markerLength)
-			: bulletMarkerText()
-	},
+	resolve: ({ node, parent, index, text }) =>
+		resolveListMarker(node, parent, index, text),
 	demote: () => null,
 	unwrap: liftOutOfConstruct,
 }
