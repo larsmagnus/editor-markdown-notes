@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-09-17
+
 - Added wrapping selected text in backticks, asterisks, underscores, tildes or quotes when you type them
 - Added pasting an http(s) URL over selected text creates a markdown link with the selected text as link text
 - Changed mermaid diagrams to scale up to the width available to them instead of staying at a fixed size
