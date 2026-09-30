@@ -102,6 +102,14 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 		broadcastToPanels(this.panelRegistry.panels, message)
 	}
 
+	/** Only the focused tab opens its index; the others stay as they are. */
+	public showNoteIndex = () => {
+		const message: HostToWebview = { type: 'showNoteIndex' }
+		const active = [...this.panelRegistry.panels].find((panel) => panel.active)
+
+		void active?.webview.postMessage(message)
+	}
+
 	public async resolveCustomTextEditor(
 		document: vscode.TextDocument,
 		webviewPanel: vscode.WebviewPanel,

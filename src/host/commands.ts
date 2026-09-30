@@ -21,7 +21,8 @@ const VIEW_OPTION_TOGGLES = {
 export function registerCommands(
 	store: SettingsStore,
 	log: vscode.LogOutputChannel,
-	broadcastConfig: () => void
+	broadcastConfig: () => void,
+	showNoteIndex: () => void
 ): vscode.Disposable {
 	const toggles = Object.entries(VIEW_OPTION_TOGGLES).map(([command, key]) =>
 		vscode.commands.registerCommand(command, async () => {
@@ -45,6 +46,7 @@ export function registerCommands(
 		[`${EXTENSION_ID}.openInTextEditor`]: openActiveTabInTextEditor,
 		[`${EXTENSION_ID}.toggleHideToolbar`]: toggleHideToolbar,
 		[`${EXTENSION_ID}.showLogs`]: () => log.show(),
+		[`${EXTENSION_ID}.openIndex`]: showNoteIndex,
 		[`${EXTENSION_ID}.claimFormattingShortcut`]: () => {
 			// Prevents VS Code's default formatting keybindings from firing when
 			// text is selected in the custom editor.

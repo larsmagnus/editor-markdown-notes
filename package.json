@@ -122,6 +122,14 @@
 					"type": "string",
 					"default": "assets",
 					"description": "Where the slash command's \"image\" action copies a file picked from outside the workspace, relative to the open document's folder. A file already inside the workspace is referenced in place instead of being copied."
+				},
+				"editorMarkdownNotes.index.exclude": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [],
+					"markdownDescription": "Glob patterns for notes to leave out of the index, on top of `#files.exclude#` and the dependency and build folders it always skips (`node_modules`, `.git`, `dist` and the like). For example `**/archive/**`."
 				}
 			}
 		},
@@ -210,6 +218,11 @@
 				"command": "editor-markdown-notes.openPdfAsNotes",
 				"title": "Open PDF as markdown",
 				"category": "Editor Markdown Notes"
+			},
+			{
+				"command": "editor-markdown-notes.openIndex",
+				"title": "Open index",
+				"category": "Editor Markdown Notes"
 			}
 		],
 		"menus": {
@@ -283,6 +296,10 @@
 				},
 				{
 					"command": "editor-markdown-notes.toggleHideToolbar",
+					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+				},
+				{
+					"command": "editor-markdown-notes.openIndex",
 					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
 				}
 			]

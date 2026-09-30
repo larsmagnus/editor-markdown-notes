@@ -1,8 +1,11 @@
+import { LayoutGrid } from 'lucide-react'
+
 import { ButtonCopyPage } from '#src/components/button-copy-page'
 import type { DevFileSelectorProps } from '#src/components/dev-file-selector'
 import { editModeFromViewOptions } from '#src/components/edit-mode-options'
 import { OptionalDevFileSelector } from '#src/components/optional-dev-file-selector'
 import ThemeToggle from '#src/components/theme-toggle'
+import { Button } from '#src/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '#src/components/ui/toggle-group'
 import { ViewToggleIcon } from '#src/components/view-toggle-icon'
 import {
@@ -18,9 +21,16 @@ type ToolbarProps = {
 	fileName: string
 	setFileName: DevFileSelectorProps['setValue']
 	content: string
+	onOpenIndex: () => void
 }
 
-function Toolbar({ files, fileName, setFileName, content }: ToolbarProps) {
+function Toolbar({
+	files,
+	fileName,
+	setFileName,
+	content,
+	onOpenIndex,
+}: ToolbarProps) {
 	const { viewOptions, setViewOptions, isVSCodeContext } = useSettings()
 	const { editModeOptions, handleEditModeChange } = useToolbarEditMode()
 
@@ -29,6 +39,16 @@ function Toolbar({ files, fileName, setFileName, content }: ToolbarProps) {
 			role="toolbar"
 			className="sticky top-0 left-0 bg-background/20 backdrop-blur-md p-3 flex gap-2 items-center z-20 scroll-fade overflow-x-auto"
 		>
+			<Button
+				variant="outline"
+				size="icon"
+				aria-label="Open index"
+				title="Index"
+				onClick={onOpenIndex}
+			>
+				<LayoutGrid />
+			</Button>
+
 			<OptionalDevFileSelector
 				show={!isVSCodeContext}
 				files={files}

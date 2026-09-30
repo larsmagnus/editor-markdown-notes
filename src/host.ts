@@ -39,7 +39,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		provider.register(),
-		registerCommands(store, log, provider.broadcastConfig),
+		registerCommands(
+			store,
+			log,
+			provider.broadcastConfig,
+			provider.showNoteIndex
+		),
 		registerMcpProvider(context, store, log)
 	)
 }

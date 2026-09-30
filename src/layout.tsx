@@ -1,14 +1,17 @@
 import { cn } from 'cn'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 
 import { AppErrorBoundary } from '#src/components/app-error-boundary'
+import { NoteIndexOverlay } from '#src/components/note-index-overlay'
 import { SkipLinks } from '#src/components/skip-links'
 import { EditorBody } from '#src/editor/editor-body'
+import { useHostMessage } from '#src/hooks/use-host-message'
 import { useNoteSource } from '#src/hooks/use-note-source'
 import { useScrollPosition } from '#src/hooks/use-scroll-position'
 import { useSettings } from '#src/hooks/use-settings'
 import { contentWidthClassName } from '#src/lib/content-width-class'
 import { getFileKind } from '#src/lib/file-kind'
+import { showNoteIndexMessageSchema } from '#src/lib/schemas'
 import { toolbarHeightStyle } from '#src/lib/toolbar-height-style'
 
 const Toolbar = lazy(() => import('#src/components/toolbar'))
@@ -18,9 +21,16 @@ type LayoutProps = {
 }
 
 function Layout({ defaultFileName }: LayoutProps) {
-	const { viewOptions, settings } = useSettings()
+	const { viewOptions, settings, isVSCodeContext } = useSettings()
 	const { content, fileName, setFileName, files, syncContent } =
 		useNoteSource(defaultFileName)
+	const [indexOpen, setIndexOpen] = useState(false)
+
+	function openIndex() {
+		setIndexOpen(true)
+	}
+
+	useHostMessage(showNoteIndexMessageSchema, openIndex, isVSCodeContext)
 
 	// The one scrolling element on the page, so one offset covers the rich
 	// editor and the raw markdown view alike.
@@ -50,10 +60,21 @@ function Layout({ defaultFileName }: LayoutProps) {
 							fileName={fileName}
 							setFileName={setFileName}
 							content={content}
+							onOpenIndex={openIndex}
 						/>
 					</Suspense>
 				</AppErrorBoundary>
 			)}
+
+			<AppErrorBoundary title="The index stopped working">
+				<NoteIndexOverlay
+					open={indexOpen}
+					onOpenChange={setIndexOpen}
+					files={files}
+					fileName={fileName}
+					setFileName={setFileName}
+				/>
+			</AppErrorBoundary>
 
 			<main className="flex flex-col p-3 min-h-screen">
 				<EditorBody

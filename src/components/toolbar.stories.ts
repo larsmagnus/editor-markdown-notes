@@ -19,5 +19,6 @@ export const Primary: Story = {
 		fileName: 'asd',
 		setFileName: fn(),
 		content: '# Roadmap\n\nShip it.',
+		onOpenIndex: fn(),
 	},
 }

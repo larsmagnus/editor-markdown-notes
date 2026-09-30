@@ -247,6 +247,41 @@ export type ShikiThemePayload = {
 	raw: Record<string, unknown> | null
 }
 
+/** What a note's card in the index shows, as the host read it from disk. */
+export type NoteSummary = {
+	title: string
+	description: string | null
+	tags: string[]
+	/** `null` for a note too large to read in full. */
+	characters: number | null
+	words: number | null
+}
+
+/** One note in the index. `uri` is opaque to the webview; it only sends it back. */
+export type NoteIndexEntry = NoteSummary & {
+	uri: string
+	fileName: string
+	/** Relative to the workspace, `''` at its root. */
+	directory: string
+	/** Epoch milliseconds, `null` where the file has no known time (the demo notes). */
+	modified: number | null
+	size: number
+	/** The note the index was opened from. */
+	current: boolean
+}
+
+/**
+ * `total` counts every note found, so the webview can say how many
+ * `NOTE_INDEX_LIMIT` left out.
+ */
+export type NoteIndex = { entries: NoteIndexEntry[]; total: number }
+
+/**
+ * The most notes the index reads and lists, newest first. Each one costs a file
+ * read and a card, and a monorepo can hold tens of thousands.
+ */
+export const NOTE_INDEX_LIMIT = 2000
+
 export type WebviewToHost =
 	/** Applies `content` to the `TextDocument`, which makes it dirty - it does
 	 *  not write anything to disk. Only VS Code itself saves. */
@@ -335,6 +370,10 @@ export type WebviewToHost =
 	 * reveal once the target is open.
 	 */
 	| { type: 'openLink'; href: string }
+	/** Asks for every note in the workspace. Answered once, by `noteIndex`. */
+	| { type: 'getNoteIndex' }
+	/** `beside` opens it in the editor group to the side. */
+	| { type: 'openNoteIndexEntry'; uri: string; beside: boolean }
 
 export type HostToWebview =
 	| { type: 'update'; content: string; fileName: string }
@@ -369,3 +408,9 @@ export type HostToWebview =
 	 *  see `HeadingReveal`. A freshly opened panel gets the same information
 	 *  injected as `window.headingReveal` instead. */
 	| ({ type: 'revealHeading' } & HeadingReveal)
+	/** Sent in reply to `getNoteIndex`. */
+	| ({ type: 'noteIndex' } & NoteIndex)
+	/** Sent in reply to `getNoteIndex` when the search itself failed. */
+	| { type: 'noteIndexFailed' }
+	/** The command palette's "Open index", posted to the active panel only. */
+	| { type: 'showNoteIndex' }

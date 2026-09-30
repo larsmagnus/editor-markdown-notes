@@ -7,6 +7,7 @@ import {
 	SPELLING_LANGUAGES,
 	TEXT_TOOL_RULE_IDS,
 } from '#src/shared/messages'
+import type { NoteIndexEntry } from '#src/shared/messages'
 
 /**
  * Runtime validation for everything the webview receives from outside itself:
@@ -353,4 +354,53 @@ export const documentSavedMessageSchema = z
 		title: 'Document saved',
 		description:
 			'Posted by the host once the document is written to disk. No `.catch()`, same reason as `requestLatest`.',
+	})
+
+const noteIndexEntrySchema: z.ZodType<NoteIndexEntry> = z.object({
+	uri: z.string(),
+	fileName: z.string(),
+	directory: z.string(),
+	title: z.string(),
+	description: z.string().nullable(),
+	tags: z.array(z.string()),
+	modified: z.number().nullable(),
+	size: z.number(),
+	characters: z.number().nullable(),
+	words: z.number().nullable(),
+	current: z.boolean(),
+})
+
+export const noteIndexMessageSchema = z
+	.object({
+		type: z.literal('noteIndex'),
+		entries: z.array(noteIndexEntrySchema),
+		total: z.number(),
+	})
+	.meta({
+		id: 'NoteIndexMessage',
+		title: 'Note index',
+		description:
+			'Posted by the host in reply to `getNoteIndex`. No `.catch()`, same reason as `requestLatest`.',
+	})
+
+export const showNoteIndexMessageSchema = z
+	.object({
+		type: z.literal('showNoteIndex'),
+	})
+	.meta({
+		id: 'ShowNoteIndexMessage',
+		title: 'Show note index',
+		description:
+			'Posted by the host to the active panel when "Open index" runs from the command palette. No `.catch()`, same reason as `requestLatest`.',
+	})
+
+export const noteIndexFailedMessageSchema = z
+	.object({
+		type: z.literal('noteIndexFailed'),
+	})
+	.meta({
+		id: 'NoteIndexFailedMessage',
+		title: 'Note index failed',
+		description:
+			'Posted by the host in reply to `getNoteIndex` when the workspace search fails. No `.catch()`, same reason as `requestLatest`.',
 	})

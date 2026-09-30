@@ -3,9 +3,11 @@ import * as vscode from 'vscode'
 import { createAskClaudeHandlers } from '#src/host/ask-claude-handlers'
 import type { DocumentWriter } from '#src/host/document-updates'
 import { postDocumentUpdate } from '#src/host/document-updates'
+import { buildNoteIndex } from '#src/host/note-index'
 import { openClaudeTerminal } from '#src/host/open-claude-terminal-command'
 import { openInTextEditor } from '#src/host/open-in-text-editor-command'
 import { openLinkTarget } from '#src/host/open-link-command'
+import { openNoteIndexEntry } from '#src/host/open-note-index-entry'
 import type { PendingHeadingRevealStore } from '#src/host/pending-heading-reveal-store'
 import { pickImagePath } from '#src/host/pick-image-command'
 import type { ScrollPositionStore } from '#src/host/scroll-position-store'
@@ -134,6 +136,20 @@ export function createWebviewMessageHandlers({
 			const message: HostToWebview = { type: 'imagePicked', path }
 			void panel.webview.postMessage(message)
 		},
+		// Also answers the asking panel alone.
+		// A failure still gets a reply, or the dialog waits on its spinner forever.
+		getNoteIndex: async () => {
+			const message: HostToWebview = await buildNoteIndex(document.uri).then(
+				(index) => ({ type: 'noteIndex', ...index }),
+				(error: unknown) => {
+					log.error(`Could not build the note index: ${String(error)}`)
+					return { type: 'noteIndexFailed' }
+				}
+			)
+			void panel.webview.postMessage(message)
+		},
+		openNoteIndexEntry: (message) =>
+			openNoteIndexEntry(message.uri, message.beside),
 		askClaude,
 		cancelAsk,
 		// Resolved by `requestLatestContent`'s own ad-hoc listener, scoped to one

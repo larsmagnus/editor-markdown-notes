@@ -2,7 +2,7 @@
  * File extensions this extension's markdown editor treats as full markdown
  * documents, lowercase and including the leading dot.
  */
-const MARKDOWN_FILE_EXTENSIONS = [
+export const MARKDOWN_FILE_EXTENSIONS = [
 	'.md',
 	'.markdown',
 	'.mdown',

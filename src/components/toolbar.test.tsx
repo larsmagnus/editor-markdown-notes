@@ -34,6 +34,7 @@ describe('view option toggles', () => {
 					fileName="notes.md"
 					setFileName={() => {}}
 					content=""
+					onOpenIndex={() => {}}
 				/>
 			</SettingsProvider>
 		)
@@ -58,6 +59,7 @@ describe('view option toggles', () => {
 					fileName="notes.md"
 					setFileName={() => {}}
 					content=""
+					onOpenIndex={() => {}}
 				/>
 			</SettingsProvider>
 		)
@@ -84,6 +86,7 @@ describe('edit mode', () => {
 					fileName="notes.md"
 					setFileName={() => {}}
 					content=""
+					onOpenIndex={() => {}}
 				/>
 			</SettingsProvider>
 		)
@@ -106,6 +109,7 @@ describe('edit mode', () => {
 					fileName="notes.md"
 					setFileName={() => {}}
 					content=""
+					onOpenIndex={() => {}}
 				/>
 			</SettingsProvider>
 		)
@@ -128,6 +132,7 @@ describe('edit mode', () => {
 					fileName="notes.md"
 					setFileName={() => {}}
 					content=""
+					onOpenIndex={() => {}}
 				/>
 			</SettingsProvider>
 		)
@@ -152,6 +157,7 @@ describe('edit mode', () => {
 					fileName="notes.md"
 					setFileName={() => {}}
 					content=""
+					onOpenIndex={() => {}}
 				/>
 			</SettingsProvider>
 		)
@@ -173,6 +179,7 @@ describe('edit mode', () => {
 					fileName="notes.md"
 					setFileName={() => {}}
 					content=""
+					onOpenIndex={() => {}}
 				/>
 			</SettingsProvider>
 		)
