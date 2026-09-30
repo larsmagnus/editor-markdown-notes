@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-09-30
+
+- Added an index of every note in the workspace, opened from the toolbar or the `Open index` command, showing each note's title, file, folder, last edit, word and character counts, and frontmatter tags
+- Added filtering the index by title, file, folder or tag, and sorting it by last edit, title or path
+- Added the `editorMarkdownNotes.index.exclude` setting to leave folders or files out of the index
+
 ## [0.26.0] - 2026-09-17
 
 - Added wrapping selected text in backticks, asterisks, underscores, tildes or quotes when you type them
