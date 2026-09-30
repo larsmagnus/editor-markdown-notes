@@ -23,5 +23,5 @@ export function useAdoptContentOnBlur({
 
 		adoptedRef.current = content
 		setDraft(content)
-	}, [content])
+	}, [content, draftRef, adoptedRef, setDraft])
 }
