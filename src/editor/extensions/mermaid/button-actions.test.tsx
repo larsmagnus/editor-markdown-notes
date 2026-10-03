@@ -10,7 +10,9 @@ import { copyToClipboard } from '#src/lib/clipboard'
 // Mocked at the module rather than at `navigator`, which is the app's one seam
 // onto the clipboard. Tolerating a missing clipboard is that module's job and
 // is tested there.
-vi.mock('#src/lib/clipboard', () => ({ copyToClipboard: vi.fn() }))
+vi.mock('#src/lib/clipboard', () => ({
+	copyToClipboard: vi.fn().mockResolvedValue(true),
+}))
 
 const DIAGRAM_CODE = 'flowchart LR\n  A[Start] --> B[Ship it]'
 const DIAGRAM_SVG = '<svg aria-roledescription="flowchart-v2"></svg>'

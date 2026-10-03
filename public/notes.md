@@ -155,6 +155,10 @@ sequenceDiagram
 
 ![Editor Markdown Notes icon](./icon-editor-markdown-notes.png)
 
+## Image (draw.io diagram)
+
+![Architecture](./architecture.drawio.svg)
+
 ## Links
 
 An inline [link to example.com](https://example.com), a [link with a title](https://example.com 'Example Domain'), a reference-style link[^ref], and a bare autolink: https://example.com

@@ -8,21 +8,22 @@ afterEach(() => {
 })
 
 describe('copyToClipboard', () => {
-	it('writes the text to the clipboard', () => {
+	it('writes the text to the clipboard', async () => {
 		const writeText = vi.fn().mockResolvedValue(undefined)
 		vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } })
 
-		copyToClipboard('title: Roadmap')
+		const written = await copyToClipboard('title: Roadmap')
 
 		expect(writeText).toHaveBeenCalledWith('title: Roadmap')
+		expect(written).toBe(true)
 	})
 
 	// A webview can be served without clipboard access at all, and a copy
 	// button that throws is worse than one that quietly does nothing.
-	it('does nothing when there is no clipboard', () => {
+	it('does nothing when there is no clipboard', async () => {
 		vi.stubGlobal('navigator', { ...navigator, clipboard: undefined })
 
-		expect(() => copyToClipboard('title: Roadmap')).not.toThrow()
+		expect(await copyToClipboard('title: Roadmap')).toBe(false)
 	})
 
 	// `writeText` rejects when the document is not focused or permission is
@@ -34,9 +35,9 @@ describe('copyToClipboard', () => {
 		vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } })
 		const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-		copyToClipboard('title: Roadmap')
-		await vi.waitFor(() => expect(consoleError).toHaveBeenCalled())
+		const written = await copyToClipboard('title: Roadmap')
 
+		expect(written).toBe(false)
 		expect(consoleError).toHaveBeenCalledWith(
 			'Could not copy to the clipboard:',
 			error

@@ -6,6 +6,7 @@ import { imageFrameClassName } from '#src/editor/extensions/image/image-frame-cl
 import { ImageToolbar } from '#src/editor/extensions/image/toolbar'
 import { useImageCaretAdjacent } from '#src/hooks/use-image-caret-adjacent'
 import { useImageCopy } from '#src/hooks/use-image-copy'
+import { useImageCopyAsMermaid } from '#src/hooks/use-image-copy-as-mermaid'
 import { useImageEditSource } from '#src/hooks/use-image-edit-source'
 import { useImageLink } from '#src/hooks/use-image-link'
 import { resolveImageSrc } from '#src/lib/host/resolve-image-src'
@@ -34,6 +35,8 @@ export function ImageView({
 		title: node.attrs.title ? String(node.attrs.title) : null,
 	}
 
+	const resolvedSrc = resolveImageSrc(attrs.src, window.imageBaseUris)
+	const copyAsMermaid = useImageCopyAsMermaid(attrs.src, resolvedSrc)
 	const softFocused = useImageCaretAdjacent({ editor, getPos })
 	const link = useImageLink({ node, editor, getPos })
 	const [copied, onCopy] = useImageCopy(attrs)
@@ -56,13 +59,14 @@ export function ImageView({
 						onEditSource={handleEditSource}
 						onDelete={deleteNode}
 						copy={{ copied, onCopy }}
+						copyAsMermaid={copyAsMermaid}
 						link={link}
 						visible={softFocused}
 					/>
 				}
 			>
 				<img
-					src={resolveImageSrc(attrs.src, window.imageBaseUris)}
+					src={resolvedSrc}
 					alt={attrs.alt}
 					title={attrs.title ?? undefined}
 					contentEditable={false}

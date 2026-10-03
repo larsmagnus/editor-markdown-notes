@@ -45,8 +45,9 @@ export async function copyDiagramAsDrawio(
 			import('#src/editor/extensions/mermaid/drawio/svg-to-drawio'),
 			import('#src/editor/extensions/mermaid/drawio/node-types'),
 		])
-		copyToClipboard(svgToDrawio(svg, await readNodeTypes(code)))
-		onCopied()
+		if (await copyToClipboard(svgToDrawio(svg, await readNodeTypes(code)))) {
+			onCopied()
+		}
 	} catch (error) {
 		console.error('Could not copy the diagram as draw.io:', error)
 	}
