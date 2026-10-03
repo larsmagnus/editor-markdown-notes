@@ -101,6 +101,9 @@ describe('Layout, when the host reports an outside change', () => {
 			})
 		)
 
+		// Which side of the text a click puts the caret on is up to happy-dom, which
+		// has no layout, so the typed text may land either side of the update.
+		//
 		// Clicked into rather than typed into straight away: the editor does not
 		// autofocus, so that a note opens where it was last scrolled to rather
 		// than wherever a caret puts itself.
@@ -113,7 +116,9 @@ describe('Layout, when the host reports an outside change', () => {
 			() => {
 				expect(postMessage).toHaveBeenCalledWith({
 					type: 'syncDocument',
-					content: 'Ship it tomorrow. Really.',
+					content: expect.stringMatching(
+						/Really\..*Ship it tomorrow\.|Ship it tomorrow\..*Really\./
+					),
 				})
 			},
 			{ timeout: 2000 }

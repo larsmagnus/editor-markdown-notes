@@ -1,10 +1,15 @@
 import '@testing-library/jest-dom/vitest'
 
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { Editor } from '@tiptap/core'
 import { afterEach } from 'vitest'
 
 import { MOUNT_SELECTOR } from '#src/test-utils/mount-point'
+
+// `waitFor` and `findBy*` give up after one second by default, which a lazy
+// `import()` (the draw.io converter) can outlast on a loaded runner. Only a
+// failing assertion pays for the longer wait.
+configure({ asyncUtilTimeout: 5000 })
 
 const editors = new Set<Editor>()
 

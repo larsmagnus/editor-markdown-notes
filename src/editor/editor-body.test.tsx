@@ -79,17 +79,19 @@ describe('EditorBody', () => {
 	})
 
 	it('undoes a raw round-trip back to what was typed in live mode', async () => {
+		// happy-dom has no layout, so which side of the original text a click puts
+		// the caret on is arbitrary - nothing here depends on it.
 		const user = userEvent.setup()
 		render(<ToggleableEditorBody initialContent="Ship it." />)
 
 		await user.click(await within(getLiveEditor()).findByText('Ship it.'))
 		await user.keyboard(' Today.')
-		await within(getLiveEditor()).findByText('Ship it. Today.')
+		await within(getLiveEditor()).findByText(/Today\./)
 
 		await user.click(screen.getByRole('button', { name: 'Toggle raw' }))
 		await screen.findByLabelText('Raw markdown')
 		await user.click(screen.getByRole('button', { name: 'Toggle raw' }))
-		const restored = await within(getLiveEditor()).findByText('Ship it. Today.')
+		const restored = await within(getLiveEditor()).findByText(/Today\./)
 
 		// Ctrl+Z reaches whatever holds focus, which the toggle button does after
 		// the clicks above - not the editor, which never autofocuses.
