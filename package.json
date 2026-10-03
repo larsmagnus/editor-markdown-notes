@@ -339,11 +339,13 @@
 		"complexity": "fta src --config-path fta.json --score-cap 50",
 		"duplication": "jscpd -c .jscpd.json",
 		"duplication:ci": "jscpd -c .jscpd.json --reporters console,json --threshold 1",
+		"check": "pnpm typecheck && pnpm lint:ci && pnpm complexity && pnpm duplication:ci",
 		"knip": "knip",
 		"preview": "vite preview",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
-		"vscode:bundle-mcp": "vite build -c vite.mcp.config.ts && node out/mcp/copy-dictionaries.mjs"
+		"vscode:bundle-mcp": "vite build -c vite.mcp.config.ts && node out/mcp/copy-dictionaries.mjs",
+		"prepare": "lefthook install"
 	},
 	"devDependencies": {
 		"@cspell/dict-software-terms": "5.4.3",
@@ -371,6 +373,7 @@
 		"happy-dom": "20.11.1",
 		"jscpd": "5.0.16",
 		"knip": "6.32.0",
+		"lefthook": "2.1.16",
 		"oxfmt": "0.62.0",
 		"oxlint": "1.77.0",
 		"shadcn": "4.21.0",
