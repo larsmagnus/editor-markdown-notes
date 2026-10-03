@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-10-04
+
 - Added copying a draw.io diagram (`.drawio.svg` image) as a mermaid flowchart from its image toolbar
 - Added copying a mermaid diagram as draw.io from the diagram actions menu, pasting flowcharts as editable shapes and other diagram types as an image
 
