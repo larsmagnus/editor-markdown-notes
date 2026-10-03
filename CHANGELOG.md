@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added copying a mermaid diagram as draw.io from the diagram actions menu, pasting flowcharts as editable shapes and other diagram types as an image
+
 ## [0.27.0] - 2026-09-30
 
 - Added an index of every note in the workspace, opened from the toolbar or the `Open index` command, showing each note's title, file, folder, last edit, word and character counts, and frontmatter tags

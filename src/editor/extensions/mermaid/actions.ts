@@ -26,3 +26,28 @@ export function openDiagramInClaude(
 	window.open('https://claude.ai', '_blank', 'noopener,noreferrer')
 	return true
 }
+
+/**
+ * Copies one diagram to the clipboard as draw.io XML.
+ *
+ * The converter and mermaid's parser are imported on demand since most
+ * diagrams are never exported. A failure is reported rather than thrown so the
+ * click never ends in an unhandled rejection, and `onCopied` only runs for a
+ * copy that happened.
+ */
+export async function copyDiagramAsDrawio(
+	code: string,
+	svg: string,
+	onCopied: () => void
+) {
+	try {
+		const [{ svgToDrawio }, { readNodeTypes }] = await Promise.all([
+			import('#src/editor/extensions/mermaid/drawio/svg-to-drawio'),
+			import('#src/editor/extensions/mermaid/drawio/node-types'),
+		])
+		copyToClipboard(svgToDrawio(svg, await readNodeTypes(code)))
+		onCopied()
+	} catch (error) {
+		console.error('Could not copy the diagram as draw.io:', error)
+	}
+}

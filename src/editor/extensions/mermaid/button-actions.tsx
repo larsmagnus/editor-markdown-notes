@@ -1,4 +1,4 @@
-import { ChevronDown, Code, FileCode } from 'lucide-react'
+import { ChevronDown, Code, FileCode, Workflow } from 'lucide-react'
 
 import { ButtonCopy } from '#src/components/button-copy'
 import { CopyActionsMenu } from '#src/components/copy-actions-menu'
@@ -7,7 +7,10 @@ import {
 	DropdownMenu,
 	DropdownMenuTrigger,
 } from '#src/components/ui/dropdown-menu'
-import { openDiagramInClaude } from '#src/editor/extensions/mermaid/actions'
+import {
+	copyDiagramAsDrawio,
+	openDiagramInClaude,
+} from '#src/editor/extensions/mermaid/actions'
 import { useCopiedFeedback } from '#src/hooks/use-copied-feedback'
 import { useSettings } from '#src/hooks/use-settings'
 import { copyToClipboard } from '#src/lib/clipboard'
@@ -36,6 +39,10 @@ export function ButtonActions({ code, svg }: ButtonActionsProps) {
 	function copySvg() {
 		copyToClipboard(svg)
 		showCopiedFeedback()
+	}
+
+	function copyDrawio() {
+		return copyDiagramAsDrawio(code, svg, showCopiedFeedback)
 	}
 
 	function openInClaude() {
@@ -71,6 +78,11 @@ export function ButtonActions({ code, svg }: ButtonActionsProps) {
 					copyItems={[
 						{ icon: <Code />, label: 'Copy diagram code', onClick: copyCode },
 						{ icon: <FileCode />, label: 'Copy SVG', onClick: copySvg },
+						{
+							icon: <Workflow />,
+							label: 'Copy as draw.io',
+							onClick: copyDrawio,
+						},
 					]}
 					onOpenInClaude={openInClaude}
 				/>

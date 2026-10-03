@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -50,6 +50,26 @@ describe('ButtonActions', () => {
 		await userEvent.click(await screen.findByText('Copy SVG'))
 
 		expect(copyToClipboard).toHaveBeenCalledWith(DIAGRAM_SVG)
+	})
+
+	it('copies the diagram as draw.io XML from the menu', async () => {
+		render(
+			<SettingsProvider>
+				<TooltipProvider>
+					<ButtonActions code={DIAGRAM_CODE} svg={DIAGRAM_SVG} />
+				</TooltipProvider>
+			</SettingsProvider>
+		)
+
+		await userEvent.click(screen.getByLabelText('Diagram actions'))
+		await userEvent.click(await screen.findByText('Copy as draw.io'))
+
+		await waitFor(() =>
+			expect(copyToClipboard).toHaveBeenCalledWith(
+				expect.stringMatching(/^<mxGraphModel[\s>]/)
+			)
+		)
+		expect(screen.getByRole('status')).toHaveTextContent('Copied')
 	})
 
 	// The host knows which file this is but nothing about which of its diagrams
