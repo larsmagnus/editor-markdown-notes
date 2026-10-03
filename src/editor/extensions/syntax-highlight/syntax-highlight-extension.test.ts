@@ -1,10 +1,18 @@
+import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
+import { SyntaxHighlight } from '#src/editor/extensions/syntax-highlight/syntax-highlight-extension'
 import { createEditor } from '#src/test-utils/editor'
 
+/**
+ * Stock code block on purpose: the app's React node view draws nothing in an
+ * editor with no `EditorContent`, which would leave the DOM assertions below
+ * passing against an empty block.
+ */
 function editorWithCode() {
-	const editor = createEditor(['```ts', 'const total = 1', '```'].join('\n'))
-	return editor
+	return createEditor('<pre><code>const total = 1</code></pre>', {
+		extensions: [StarterKit, SyntaxHighlight],
+	})
 }
 
 describe('SyntaxHighlight', () => {
@@ -86,12 +94,12 @@ describe('SyntaxHighlight', () => {
 	 *  re-highlight would queue an auto-save of unchanged content. */
 	it('does not change the document', () => {
 		const editor = editorWithCode()
-		const before = String(editor.storage.markdown.getMarkdown())
+		const before = editor.state.doc
 
 		editor.commands.setSyntaxHighlightRanges([
 			{ from: 1, to: 6, color: '#ff7b72' },
 		])
 
-		expect(String(editor.storage.markdown.getMarkdown())).toBe(before)
+		expect(editor.state.doc.eq(before)).toBe(true)
 	})
 })
