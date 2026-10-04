@@ -177,7 +177,33 @@ WINDOW_ID="$(node -e "process.stdout.write(String(JSON.parse(process.argv[1]).fo
 }
 
 echo "Capturing $OUT (window id: $WINDOW_ID)"
-screencapture -x -l"$WINDOW_ID" "$OUT"
+
+# The webview DOM is out of reach from here, so "text tools finished" is read
+# off the pixels: the Checking... spinner animates, so the window only holds
+# still once analysis is done. Several identical frames in a row, not two,
+# since a frame taken before the worker boots is static too.
+STABLE_FRAMES_NEEDED=3
+MAX_CAPTURE_ATTEMPTS=60
+PREV_FRAME="$(mktemp -t screenshot-prev.png)"
+trap 'rm -f "$POSITION_SCRIPT" "$WINDOW_ID_SCRIPT" "$PREV_FRAME"' EXIT
+
+stableFrames=0
+settled=false
+for _ in $(seq 1 "$MAX_CAPTURE_ATTEMPTS"); do
+  screencapture -x -l"$WINDOW_ID" "$OUT"
+  if cmp -s "$OUT" "$PREV_FRAME"; then
+    stableFrames=$((stableFrames + 1))
+  else
+    stableFrames=0
+  fi
+  if [ "$stableFrames" -ge "$STABLE_FRAMES_NEEDED" ]; then
+    settled=true
+    break
+  fi
+  cp "$OUT" "$PREV_FRAME"
+  sleep 1
+done
+[ "$settled" = "true" ] || echo "Warning: window never stopped changing (text tools still checking?); kept the last frame" >&2
 
 # Quit only this process, never a blanket `quit` of Code (see header).
 osascript -e "

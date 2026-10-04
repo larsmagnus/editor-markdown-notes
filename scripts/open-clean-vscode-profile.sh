@@ -38,9 +38,40 @@ command -v code >/dev/null || {
 # Explorer has no equivalent setting - VSCode only auto-hides it for a window
 # with no folder open - so close it with Cmd+B after the window appears.
 mkdir -p "$USER_DIR/User" "$EXT_DIR"
-cat > "$USER_DIR/User/settings.json" <<'JSON'
+
+# Match the everyday editor's look. The theme is a marketplace extension, so
+# the clean profile has to be given a copy of it (the profile has no network
+# step of its own). Override both to shoot with another theme; an empty
+# THEME_EXTENSION_ID means a built-in theme.
+THEME_NAME="${THEME_NAME:-One Dark Pro Darker}"
+THEME_EXTENSION_ID="${THEME_EXTENSION_ID-zhuangtongfa.material-theme}"
+if [ -n "$THEME_EXTENSION_ID" ]; then
+  THEME_SRC="$(ls -d "$HOME/.vscode/extensions/$THEME_EXTENSION_ID"-* 2>/dev/null | sort -V | tail -1 || true)"
+  [ -n "$THEME_SRC" ] || {
+    echo "Theme extension '$THEME_EXTENSION_ID' not found in ~/.vscode/extensions. Install it, or set THEME_EXTENSION_ID= for a built-in theme." >&2
+    exit 1
+  }
+  cp -R "$THEME_SRC" "$EXT_DIR/"
+fi
+
+cat > "$USER_DIR/User/settings.json" <<JSON
 {
-  "workbench.colorTheme": "Default Dark Modern",
+  "workbench.colorTheme": "$THEME_NAME",
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#020618",
+    "titleBar.inactiveBackground": "#020618",
+    "titleBar.border": "#020618",
+    "editorGroupHeader.tabsBackground": "#020618",
+    "editorGroupHeader.tabsBorder": "#020618",
+    "tab.activeBackground": "#0f172b",
+    "tab.inactiveBackground": "#020618",
+    "tab.border": "#020618",
+    "tab.activeBorder": "#020618",
+    "tab.unfocusedActiveBackground": "#0f172b",
+    "breadcrumb.background": "#020618",
+    "editor.background": "#020618",
+    "editorGroup.border": "#020618"
+  },
   "workbench.startupEditor": "none",
   "workbench.activityBar.location": "hidden",
   "workbench.statusBar.visible": false,
