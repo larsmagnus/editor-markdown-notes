@@ -16,10 +16,10 @@ Your job is to catch the specific failure mode this project keeps running into: 
 - [x] Confirm every new node type in `extensions.ts` has a serializer registered before it ships
 - [ ] Check `markdown-round-trip.test.ts` covers the new syntax, not just the happy path
 
-| Area | Status | Notes |
-| --- | --- | --- |
-| Serializers | **Reviewed** | See [tiptap-markdown docs](https://github.com/aguingand/tiptap-markdown) |
-| Table shapes | **Reviewed** | `table/shape.ts` is the source of truth |
+| Area         | Status       | Notes                                                                    |
+| ------------ | ------------ | ------------------------------------------------------------------------ |
+| Serializers  | **Reviewed** | See [tiptap-markdown docs](https://github.com/aguingand/tiptap-markdown) |
+| Table shapes | **Reviewed** | `table/shape.ts` is the source of truth                                  |
 
 Ping `#editor-markdown-notes` before touching anything in `table/` — three separate downstream fixes live there and each has a doc comment explaining which invariant it restores.
 
