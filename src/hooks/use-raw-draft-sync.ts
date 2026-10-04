@@ -1,5 +1,11 @@
 import type { ChangeEvent, RefObject } from 'react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from 'react'
 
 import { useAdoptContentOnBlur } from '#src/hooks/use-adopt-content-on-blur'
 import { useFlushOnDeactivate } from '#src/hooks/use-flush-on-deactivate'
@@ -26,8 +32,12 @@ export function useRawDraftSync({
 }: RawDraftSyncOptions) {
 	const [draft, setDraft] = useState(content)
 
+	// Written in a layout effect, not during render, so it only ever holds the
+	// committed draft - and still lands before any passive effect reads it.
 	const draftRef = useRef(draft)
-	draftRef.current = draft
+	useLayoutEffect(() => {
+		draftRef.current = draft
+	}, [draft])
 
 	// The text this view last agreed with the host about, from either direction:
 	// what it took from `content`, or what it wrote back. A draft that still

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 import type { ZodType } from 'zod'
 
 /**
@@ -18,15 +18,14 @@ export function useHostMessage<T>(
 	enabled: boolean
 ) {
 	// Lets the caller pass an inline handler without re-subscribing every render.
-	const handlerRef = useRef(onMessage)
-	handlerRef.current = onMessage
+	const handleParsed = useEffectEvent(onMessage)
 
 	useEffect(() => {
 		if (!enabled) return
 
 		const handleMessage = (event: MessageEvent) => {
 			const parsed = schema.safeParse(event.data)
-			if (parsed.success) handlerRef.current(parsed.data)
+			if (parsed.success) handleParsed(parsed.data)
 		}
 
 		window.addEventListener('message', handleMessage)

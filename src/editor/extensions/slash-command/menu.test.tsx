@@ -77,6 +77,48 @@ describe('SlashCommandMenu', () => {
 		)
 	})
 
+	it('puts the highlight back on the first item when the items change order', () => {
+		const ref = createRef<SlashCommandMenuHandle>()
+		const { rerender } = render(
+			<SlashCommandMenu ref={ref} items={ITEMS} onSelect={vi.fn()} />
+		)
+		act(() =>
+			ref.current?.onKeyDown(new KeyboardEvent('keydown', { key: 'ArrowDown' }))
+		)
+
+		rerender(
+			<SlashCommandMenu
+				ref={ref}
+				items={[...ITEMS].reverse()}
+				onSelect={vi.fn()}
+			/>
+		)
+
+		expect(screen.getByRole('option', { name: 'Table' })).toHaveAttribute(
+			'aria-selected',
+			'true'
+		)
+	})
+
+	it('puts the highlight back on the first item when the query narrows the list', () => {
+		const ref = createRef<SlashCommandMenuHandle>()
+		const { rerender } = render(
+			<SlashCommandMenu ref={ref} items={ITEMS} onSelect={vi.fn()} />
+		)
+		act(() =>
+			ref.current?.onKeyDown(new KeyboardEvent('keydown', { key: 'ArrowDown' }))
+		)
+
+		rerender(
+			<SlashCommandMenu ref={ref} items={[ITEMS[1]]} onSelect={vi.fn()} />
+		)
+
+		expect(screen.getByRole('option', { name: 'Table' })).toHaveAttribute(
+			'aria-selected',
+			'true'
+		)
+	})
+
 	it('selects the highlighted item on Enter', () => {
 		const onSelect = vi.fn()
 		const ref = createRef<SlashCommandMenuHandle>()

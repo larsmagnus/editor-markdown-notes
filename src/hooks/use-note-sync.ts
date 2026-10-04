@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useEffectEvent, useRef } from 'react'
 import { useDebounceValue } from 'usehooks-ts'
 
 import { useHostMessage } from '#src/hooks/use-host-message'
@@ -132,39 +132,36 @@ export function useNoteSync({
 		})
 	}, [debouncedValue, isVSCodeContext, syncContent])
 
-	// Read through refs rather than taken as effect dependencies below: an
-	// inline `currentFile`/`syncContent` is a new identity every render, and
-	// depending on them directly would run the flush effect's cleanup on
-	// every re-render the debounce firing causes - racing the effect above
-	// that clears `pendingRef`, since React runs a commit's cleanups before
-	// its new effects regardless of hook order.
-	const currentFileRef = useRef(currentFile)
-	currentFileRef.current = currentFile
-	const syncContentRef = useRef(syncContent)
-	syncContentRef.current = syncContent
-	const isVSCodeContextRef = useRef(isVSCodeContext)
-	isVSCodeContextRef.current = isVSCodeContext
-
+	// An effect event rather than effect dependencies: an inline
+	// `currentFile`/`syncContent` is a new identity every render, and depending
+	// on them directly would run the flush effect's cleanup on every re-render
+	// the debounce firing causes - racing the effect above that clears
+	// `pendingRef`, since React runs a commit's cleanups before its new effects
+	// regardless of hook order.
+	//
 	// The flush half of the comment above: whatever the cancelled timer would
 	// have written, written directly instead - through the same VSCode/standalone
 	// fork the debounce effect above uses, since `syncContent` posts to a VS
-	// Code API that does not exist outside VSCode. Empty deps so this only runs
-	// on the hook's actual unmount, not on every render.
-	useEffect(() => {
-		return () => {
-			if (!pendingRef.current) return
-			const file = currentFileRef.current()
-			if (file === null) return
+	// Code API that does not exist outside VSCode.
+	const flushPendingSync = useEffectEvent(() => {
+		if (!pendingRef.current) return
+		const file = currentFile()
+		if (file === null) return
 
-			if (isVSCodeContextRef.current) {
-				syncContentRef.current(file)
-				return
-			}
-
-			updateNotes(file).catch((error) => {
-				console.error('Error saving markdown:', error)
-			})
+		if (isVSCodeContext) {
+			syncContent(file)
+			return
 		}
+
+		updateNotes(file).catch((error) => {
+			console.error('Error saving markdown:', error)
+		})
+	})
+
+	// Empty deps so this only runs on the hook's actual unmount, not on every
+	// render.
+	useEffect(() => {
+		return () => flushPendingSync()
 	}, [])
 
 	const cancelQueuedSync = useCallback(() => {

@@ -39,24 +39,33 @@ export function useNoteIndex({ open, files, fileName }: UseNoteIndexOptions): {
 		[files, fileName]
 	)
 
+	const isAskingHost = isVSCodeContext && open
+
 	useHostMessage(
 		noteIndexMessageSchema,
 		({ entries, total }) => setHostIndex({ entries, total }),
-		isVSCodeContext && open
+		isAskingHost
 	)
 	useHostMessage(
 		noteIndexFailedMessageSchema,
 		() => setFailed(true),
-		isVSCodeContext && open
+		isAskingHost
 	)
 
-	useEffect(() => {
-		if (!isVSCodeContext || !open) return
+	// Every open starts from nothing, so the previous answer is forgotten during
+	// render rather than shown for a frame while the new one is on its way.
+	const [wasAskingHost, setWasAskingHost] = useState(isAskingHost)
+	if (wasAskingHost !== isAskingHost) {
+		setWasAskingHost(isAskingHost)
+		if (isAskingHost) {
+			setHostIndex(null)
+			setFailed(false)
+		}
+	}
 
-		setHostIndex(null)
-		setFailed(false)
-		getVSCodeApi()?.postMessage({ type: 'getNoteIndex' })
-	}, [isVSCodeContext, open])
+	useEffect(() => {
+		if (isAskingHost) getVSCodeApi()?.postMessage({ type: 'getNoteIndex' })
+	}, [isAskingHost])
 
 	return isVSCodeContext
 		? { index: hostIndex, failed }

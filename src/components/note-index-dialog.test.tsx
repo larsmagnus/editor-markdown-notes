@@ -325,6 +325,73 @@ describe('NoteIndexDialog filtering and sorting', () => {
 		])
 	})
 
+	it('keeps last-edited times steady while filtering', async () => {
+		const user = userEvent.setup()
+		render(
+			<NoteIndexDialog
+				open
+				onOpenChange={() => {}}
+				index={index}
+				onOpenEntry={() => {}}
+			/>
+		)
+		expect(
+			within(
+				screen.getByRole('button', { name: /Quarterly roadmap/ })
+			).getByText('3 days ago')
+		).toBeTruthy()
+
+		vi.setSystemTime(NOW + DAY)
+		await user.type(
+			screen.getByRole('searchbox', { name: 'Filter notes' }),
+			'q3'
+		)
+
+		expect(
+			within(
+				screen.getByRole('button', { name: /Quarterly roadmap/ })
+			).getByText('3 days ago')
+		).toBeTruthy()
+	})
+
+	it('refreshes last-edited times the next time the index opens', async () => {
+		const { rerender } = render(
+			<NoteIndexDialog
+				open
+				onOpenChange={() => {}}
+				index={index}
+				onOpenEntry={() => {}}
+			/>
+		)
+		vi.setSystemTime(NOW + DAY)
+
+		rerender(
+			<NoteIndexDialog
+				open={false}
+				onOpenChange={() => {}}
+				index={index}
+				onOpenEntry={() => {}}
+			/>
+		)
+		await waitFor(() =>
+			expect(screen.queryByRole('list', { name: 'Notes' })).toBeNull()
+		)
+		rerender(
+			<NoteIndexDialog
+				open
+				onOpenChange={() => {}}
+				index={index}
+				onOpenEntry={() => {}}
+			/>
+		)
+
+		expect(
+			within(
+				screen.getByRole('button', { name: /Quarterly roadmap/ })
+			).getByText('4 days ago')
+		).toBeTruthy()
+	})
+
 	it('narrows the grid to notes matching the filter', async () => {
 		const user = userEvent.setup()
 		render(

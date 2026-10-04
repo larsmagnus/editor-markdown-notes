@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { PropsWithChildren } from 'react'
 
 import { useHostMessage } from '#src/hooks/use-host-message'
@@ -34,7 +34,9 @@ export function SettingsProvider({
 	// Lets `setViewOptions` read the current options without depending on them,
 	// so the callback stays stable and the writes stay outside the reducer.
 	const viewOptionsRef = useRef(state.viewOptions)
-	viewOptionsRef.current = state.viewOptions
+	useLayoutEffect(() => {
+		viewOptionsRef.current = state.viewOptions
+	}, [state.viewOptions])
 
 	// The host broadcasts to every open panel, which is what keeps tabs in sync.
 	useHostMessage(

@@ -14,6 +14,11 @@ export function useItalicMarker(editor: Editor | null, marker: ItalicMarker) {
 	useEffect(() => {
 		if (!editor) return
 
+		// TipTap documents extension storage as mutable runtime state, reachable
+		// from outside the extension through `editor.storage`. The editor is an
+		// external system this effect synchronizes, not a hook argument to keep
+		// immutable.
+		// oxlint-disable-next-line react/immutability
 		editor.storage.italic.preferredMarkup = marker
 	}, [editor, marker])
 }

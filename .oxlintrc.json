@@ -6,6 +6,10 @@
 		"consistent-type-specifier-style": "error",
 		"react/rules-of-hooks": "error",
 		"react/exhaustive-deps": "error",
+		"react/refs": "error",
+		"react/set-state-in-effect": "error",
+		"react/purity": "error",
+		"react/immutability": "error",
 		"react/only-export-components": ["warn", { "allowConstantExport": true }],
 		"no-restricted-imports": [
 			"error",

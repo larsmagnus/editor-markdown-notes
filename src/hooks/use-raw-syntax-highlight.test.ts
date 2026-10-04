@@ -116,4 +116,34 @@ describe('useRawSyntaxHighlight', () => {
 			{ offset: 6, length: 6, color: '#ff0000' },
 		])
 	}, 5_000)
+
+	/**
+	 * Remapping colors from a note the author has since emptied would paint
+	 * the next thing they type with whatever the old text happened to share.
+	 */
+	it('carries no colors forward from a note that was emptied', async () => {
+		const { result, rerender } = renderHook(
+			({ draft }) => useRawSyntaxHighlight(draft, true),
+			{ initialProps: { draft: 'first' } }
+		)
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, SETTLE_MS))
+		})
+		expect(result.current).toHaveLength(1)
+
+		rerender({ draft: '' })
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, SETTLE_MS))
+		})
+		expect(result.current).toEqual([])
+
+		rerender({ draft: 'first' })
+
+		expect(result.current).toEqual([])
+
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, SETTLE_MS))
+		})
+		expect(result.current).toEqual([{ offset: 0, length: 5, color: '#ff0000' }])
+	}, 5_000)
 })

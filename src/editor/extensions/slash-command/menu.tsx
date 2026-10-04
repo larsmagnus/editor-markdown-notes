@@ -1,5 +1,5 @@
 import { cn } from 'cn'
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 
 import type { SlashCommandItem } from '#src/editor/extensions/slash-command/commands'
 
@@ -31,9 +31,11 @@ export const SlashCommandMenu = forwardRef<
 
 	// The list re-filters on every keystroke of the query; the highlight
 	// should not point at whatever index used to be there.
-	useEffect(() => {
+	const [highlightedItems, setHighlightedItems] = useState(items)
+	if (highlightedItems !== items) {
+		setHighlightedItems(items)
 		setSelectedIndex(0)
-	}, [items])
+	}
 
 	useImperativeHandle(
 		ref,

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { RefObject } from 'react'
 
 import type { OpenNoteIndexEntry } from '#src/components/note-index-card'
@@ -18,7 +19,9 @@ export function NoteIndexGrid({
 	onOpenEntry,
 }: NoteIndexGridProps) {
 	const handleKeyDown = useGridArrowKeys(gridRef)
-	const now = Date.now()
+	// Read once per time the index opens, so filtering does not make every
+	// card's "edited" time drift while the author is looking at it.
+	const [now] = useState(Date.now)
 
 	return (
 		<ul

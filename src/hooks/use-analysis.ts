@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 
 import { useAnalysisOptions } from '#src/hooks/use-analysis-options'
 import type { AnalysisRequest } from '#src/hooks/use-analysis-options'
@@ -62,39 +62,50 @@ export function useAnalysis<Text extends FlattenedText>({
 		spellingLanguage,
 		spellingIgnoreWords,
 	})
-	const optionsRef = useRef(options)
-	optionsRef.current = options
+	// Effect events, so a new `options` identity or an inline
+	// `getFlattenedText` does not re-run the analysis effect; `key` and
+	// `revisionKey` are what say a run is due.
+	const readOptions = useEffectEvent(() => options)
+	const readFlattenedText = useEffectEvent(getFlattenedText)
 
-	const getFlattenedTextRef = useRef(getFlattenedText)
-	getFlattenedTextRef.current = getFlattenedText
+	// Switching off forgets the last result during render rather than from an
+	// effect, so switching back on never flashes it for a frame.
+	const [wasEnabled, setWasEnabled] = useState(enabled)
+	if (wasEnabled !== enabled) {
+		setWasEnabled(enabled)
+		if (!enabled) {
+			setAnalysis(EMPTY_ANALYSIS)
+			setAnalyzedText(null)
+			setIsAnalyzing(false)
+		}
+	}
 
 	// Split from the analysis effect below so it runs on the transition only.
 	// Sharing that effect's dependencies would dispatch a no-op run every
 	// debounce tick while the tools are off, for the whole session.
 	useEffect(() => {
-		if (enabled) return
-
-		disposeAnalyzer()
-		setAnalysis(EMPTY_ANALYSIS)
-		setAnalyzedText(null)
-		setIsAnalyzing(false)
+		if (!enabled) disposeAnalyzer()
 	}, [enabled, disposeAnalyzer])
 
 	useEffect(() => {
 		if (!enabled) return
 
-		const flattened = getFlattenedTextRef.current()
+		const flattened = readFlattenedText()
 		if (!flattened) return
 
-		const options = optionsRef.current
+		const runOptions = readOptions()
 		let cancelled = false
+		// Marks the worker round trip as started, the same shape as react.dev's
+		// own "Fetching data with Effects" example. Deriving it instead would mean
+		// reading the editor during render to know whether a run is even due.
+		// oxlint-disable-next-line react/set-state-in-effect
 		setIsAnalyzing(true)
 
 		const run = async () => {
 			const analyzer = await getAnalyzer()
 			if (!analyzer || cancelled) return
 
-			const result = await analyzer.analyze(flattened.text, options)
+			const result = await analyzer.analyze(flattened.text, runOptions)
 
 			// The text may have moved on while the worker was busy. `analyzedText`
 			// would then no longer match `result`, and the debounce already has the

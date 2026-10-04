@@ -1,5 +1,5 @@
 import type { Editor } from '@tiptap/react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 
 import { useAnalysis } from '#src/hooks/use-analysis'
 import type { AnalysisRequest } from '#src/hooks/use-analysis-options'
@@ -30,11 +30,10 @@ export function useTextTools({
 	const debouncedRevision = useDocumentRevision(editor)
 
 	// `viewOptions.textToolRules` is rebuilt by its zod `.transform` on every
-	// config broadcast (see `use-analysis-options.ts`), so a ref keeps the
-	// placement effect below from re-dispatching on an unrelated settings
+	// config broadcast (see `use-analysis-options.ts`), so an effect event keeps
+	// the placement effect below from re-dispatching on an unrelated settings
 	// change - it only needs to react once `analysis`/`analyzedText` land.
-	const rulesRef = useRef(rules)
-	rulesRef.current = rules
+	const readRules = useEffectEvent(() => rules)
 
 	const { analysis, analyzedText, isAnalyzing, hasSpellingFailed } =
 		useAnalysis({
@@ -59,7 +58,7 @@ export function useTextTools({
 		}
 
 		editor.commands.setTextToolIssues(
-			placeIssues(analysis.issues, analyzedText, new Set(rulesRef.current))
+			placeIssues(analysis.issues, analyzedText, new Set(readRules()))
 		)
 	}, [editor, analysis, analyzedText])
 

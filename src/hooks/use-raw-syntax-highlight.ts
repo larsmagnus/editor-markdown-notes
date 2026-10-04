@@ -14,6 +14,8 @@ import type { RelativeToken } from '#src/lib/syntax-highlight-tokens'
  */
 const HIGHLIGHT_DEBOUNCE_MS = 120
 
+const NO_RESULT = { text: '', tokens: [] }
+
 /**
  * Tokenizes the whole raw-mode draft with Shiki's `markdown` grammar,
  * debounced the same way the live editor's code-block highlighting is.
@@ -36,7 +38,14 @@ export function useRawSyntaxHighlight(
 	const [result, setResult] = useState<{
 		text: string
 		tokens: RelativeToken[]
-	}>({ text: '', tokens: [] })
+	}>(NO_RESULT)
+
+	// An emptied note has nothing left to tokenize, so the last pass is
+	// forgotten during render; otherwise its colors would be remapped onto
+	// whatever the author types next.
+	if (active && !debouncedDraft && result !== NO_RESULT) {
+		setResult(NO_RESULT)
+	}
 
 	useEffect(() => {
 		// Hidden behind live mode (`EditorBody`) - nobody can see the colors, and
@@ -44,10 +53,7 @@ export function useRawSyntaxHighlight(
 		// that only ever changes by absorbing a content sync.
 		if (!active) return
 
-		if (!debouncedDraft) {
-			setResult({ text: '', tokens: [] })
-			return
-		}
+		if (!debouncedDraft) return
 
 		let cancelled = false
 

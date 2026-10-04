@@ -1,5 +1,5 @@
 import type { Editor, NodeViewProps } from '@tiptap/react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 
 type EditorEvent = 'selectionUpdate' | 'transaction' | 'focus' | 'blur'
 
@@ -29,13 +29,12 @@ export function useEditorFlag(
 ): boolean {
 	const [flag, setFlag] = useState(false)
 
-	// Held in a ref so the subscription depends only on the editor and the
+	// An effect event so the subscription depends only on the editor and the
 	// position: every caller defines `compute` inline, and depending on it
 	// would tear the listeners down and rebuild them on every render - while
 	// capturing it in the effect instead would leave the listener calling a
 	// stale closure once anything it reads changes.
-	const computeRef = useRef(compute)
-	computeRef.current = compute
+	const computeFlag = useEffectEvent(compute)
 
 	useEffect(() => {
 		const update = () => {
@@ -46,7 +45,7 @@ export function useEditorFlag(
 			// effect cleanup, so this listener does fire - and reading the document
 			// at `undefined` throws out of the effect, taking the editor with it.
 			const pos = typeof getPos === 'function' ? getPos() : undefined
-			setFlag(pos === undefined ? false : computeRef.current(pos, editor))
+			setFlag(pos === undefined ? false : computeFlag(pos, editor))
 		}
 
 		for (const event of events) editor.on(event, update)

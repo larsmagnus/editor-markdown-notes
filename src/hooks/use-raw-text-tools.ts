@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { useDebounceValue } from 'usehooks-ts'
 
 import { useAnalysis } from '#src/hooks/use-analysis'
@@ -9,6 +9,7 @@ import { useSettings } from '#src/hooks/use-settings'
 import { getMarkdownSourceText } from '#src/lib/text-tools/markdown-source-text'
 import type { SourcePlacedIssue } from '#src/lib/text-tools/place-source-issues'
 import { placeSourceIssues } from '#src/lib/text-tools/place-source-issues'
+import { TEXT_TOOL_RULE_IDS } from '#src/shared/messages'
 
 /**
  * The raw editor's counterpart to `use-text-tools.ts`: runs the same writing
@@ -32,10 +33,10 @@ export function useRawTextTools(
 	const [debouncedDraft] = useDebounceValue(draft, ANALYSIS_DEBOUNCE_MS)
 
 	// Rebuilt by its zod `.transform` on every config broadcast (see
-	// `use-analysis-options.ts`), so a ref keeps the memo below from
-	// recomputing on an unrelated settings change.
-	const rulesRef = useRef(viewOptions.textToolRules)
-	rulesRef.current = viewOptions.textToolRules
+	// `use-analysis-options.ts`), so the memo below keys on the ids themselves
+	// rather than the array, which would recompute on an unrelated settings
+	// change. Rule ids are plain words, so a comma cannot occur inside one.
+	const rulesKey = viewOptions.textToolRules.join(',')
 
 	const { analysis, analyzedText } = useAnalysis({
 		getFlattenedText: () => getMarkdownSourceText(debouncedDraft),
@@ -54,7 +55,9 @@ export function useRawTextTools(
 		return placeSourceIssues(
 			analysis.issues,
 			analyzedText,
-			new Set(rulesRef.current)
+			new Set(
+				TEXT_TOOL_RULE_IDS.filter((id) => rulesKey.split(',').includes(id))
+			)
 		)
-	}, [analysis, analyzedText])
+	}, [analysis, analyzedText, rulesKey])
 }
