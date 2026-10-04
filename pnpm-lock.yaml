@@ -114,8 +114,8 @@ importers:
         specifier: 0.7.1
         version: 0.7.1
       cn:
-        specifier: 0.2.6
-        version: 0.2.6
+        specifier: 0.4.0
+        version: 0.4.0
       dictionary-en:
         specifier: 4.0.0
         version: 4.0.0
@@ -253,8 +253,8 @@ importers:
         specifier: 1.63.0
         version: 1.63.0
       '@storybook/addon-mcp':
-        specifier: 0.7.0
-        version: 0.7.0(@storybook/addon-vitest@10.6.1(@vitest/browser-playwright@4.1.10)(@vitest/browser@4.1.10)(@vitest/runner@4.1.10)(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(vitest@4.1.10))(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(typescript@7.0.2)
+        specifier: 10.6.1
+        version: 10.6.1(@storybook/addon-vitest@10.6.1(@vitest/browser-playwright@4.1.10)(@vitest/browser@4.1.10)(@vitest/runner@4.1.10)(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(vitest@4.1.10))(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(typescript@7.0.2)
       '@storybook/addon-themes':
         specifier: 10.6.1
         version: 10.6.1(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))
@@ -1864,11 +1864,11 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
-  '@storybook/addon-mcp@0.7.0':
-    resolution: {integrity: sha512-f/IWGRMzWynBg5kDJ3DYvvnafuSX88kykGNFzzLOlkLVpfxEZoAmQF6AS47tw25GuH6EFIqSo6ZDBLHLVyZ/IQ==}
+  '@storybook/addon-mcp@10.6.1':
+    resolution: {integrity: sha512-ILh1wAI/3SgkkjRi4lZRXwT1jq6gEGEjDed5Z2Gd6ykO3yfLX2QnBM3UG2FSDv+uMKyxv8P80uXRDgKUhtmcOQ==}
     peerDependencies:
-      '@storybook/addon-vitest': ^0.0.0-0 || ^9.1.16 || ^10.0.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0 || ^10.4.0-0 || ^10.5.0-0
-      storybook: ^0.0.0-0 || ^9.1.16 || ^10.0.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0 || ^10.4.0-0 || ^10.5.0-0
+      '@storybook/addon-vitest': ^10.6.1
+      storybook: ^10.6.1
     peerDependenciesMeta:
       '@storybook/addon-vitest':
         optional: true
@@ -1909,9 +1909,6 @@ packages:
     resolution: {integrity: sha512-Fxh9vYpX9bQqFeHRiY8h2ApeRGDzRSMLwJwNZ/AIRqnyOKHxRKL+yFe+ctEkVJmuptRE9u1Hrn8ZZNHyfDKKNg==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
-  '@storybook/mcp@0.8.0':
-    resolution: {integrity: sha512-G+XDgoWGrE98moXqKSee8fQyMQxoIWxRAbPG8r/HQ95pKodratevDqNyOgW+t6ZigM6AAVN1WHiFc5MI+hc8sg==}
 
   '@storybook/react-dom-shim@10.6.1':
     resolution: {integrity: sha512-OkPFycR6kVE+9ZsgQWRqnUfZm/sLY6dxsNAn3lsvV7DSAQWH9QnHLkqP9E/N/Hg6cKPDtGzDZ8vPNDz2FuaDuQ==}
@@ -2646,10 +2643,10 @@ packages:
   '@upsetjs/venn.js@2.0.0':
     resolution: {integrity: sha512-WbBhLrooyePuQ1VZxrJjtLvTc4NVfpOyKx0sKqioq9bX1C1m7Jgykkn8gLrtwumBioXIqam8DLxp88Adbue6Hw==}
 
-  '@valibot/to-json-schema@1.7.1':
-    resolution: {integrity: sha512-3qkmU6KXWh8GIThEAW3kuRHPQBMjWkKy+Ppz3WkUucx53DTpOa6siMn4xDGSOhlVyMrDaJTCTMLYPZVAIk1P0A==}
+  '@valibot/to-json-schema@1.8.0':
+    resolution: {integrity: sha512-a0M+uwCuQZEPAo65NYkFSJ14O5c213KoSZmPdoCfuFvUhfULi4T2Z6Tpjv6lTVMW9RoLm74RpRAjNEa43KcN+g==}
     peerDependencies:
-      valibot: ^1.4.0
+      valibot: ^1.5.0
 
   '@vitejs/plugin-react@6.1.1':
     resolution: {integrity: sha512-yxLaQV9gkhS8ezJqCM6+ndU7mDY6gqAg75NQ+0IjwEI8IYOmQCgkRwHKVSfWXW076DsqMo0Dk+0FK1U+M5RgFw==}
@@ -2985,6 +2982,11 @@ packages:
 
   cn@0.2.6:
     resolution: {integrity: sha512-+i4L0zUGgRcEnhsxueVrP7iBGxBx5iD0WOTYg1MwFEu2ZyCmH5Ov2V1cul2Ht5UchRQQgftCf4be/RxspuW6QQ==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  cn@0.4.0:
+    resolution: {integrity: sha512-qOAeUhPwPzBxx6jaeQdo646XIKliKHc2j1ZF7Ngb1o0pJZKH5gq8FkA0aVdUdPFUDXNXyUCXpCtoJISo6dhizg==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -3990,8 +3992,8 @@ packages:
   json-parse-even-better-errors@2.3.1:
     resolution: {integrity: sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==}
 
-  json-rpc-2.0@1.7.1:
-    resolution: {integrity: sha512-JqZjhjAanbpkXIzFE7u8mE/iFblawwlXtONaCvRqI+pyABVz7B4M1EUNpyVW+dZjqgQ2L5HFmZCmOCgUKm00hg==}
+  json-rpc-2.0@1.8.1:
+    resolution: {integrity: sha512-BmN42JKn6FI36pcMMzHCXQhpKNEfbeqgSIcUYHKnifq0/4Ey6PDinovwUOgajT7NsgUtpWdDXaCWlpI4LHXN3g==}
 
   json-schema-to-ts@3.1.1:
     resolution: {integrity: sha512-+DWg8jCJG2TEnpy7kOm/7/AxaYoaRbjVB4LFZLySZlWn8exGs3A4OLJR966cVvU26N7X9TWxl+Jsw7dzAqKT6g==}
@@ -4803,9 +4805,6 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
-  picoquery@2.5.0:
-    resolution: {integrity: sha512-j1kgOFxtaCyoFCkpoYG2Oj3OdGakadO7HZ7o5CqyRazlmBekKhbDoUnNnXASE07xSY4nDImWZkrZv7toSxMi/g==}
-
   pkce-challenge@5.0.1:
     resolution: {integrity: sha512-wQ0b/W4Fr01qtpHlqSqspcj3EhBvimsdh0KlHhH8HRZnMsEa0ea2fTULOXOS9ccQr3om+GcGRk4e+isrZWV8qQ==}
     engines: {node: '>=16.20.0'}
@@ -5392,8 +5391,8 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.0.1
 
-  tmcp@1.19.4:
-    resolution: {integrity: sha512-fMoUJ3Gef9iA0yKZNeW2SQCCKTluCwghUyOz/qxPS8XxrQk6Jlw4lgql3S+s6L//FteLeSJ7erKxMWl727mZoQ==}
+  tmcp@1.20.0:
+    resolution: {integrity: sha512-dcDximKQBGqLP/aEAVA26HcWRHhKipstg1w0fbDDJ0HcFZ6lolLU1YYmStYEn/73f534i7WrDNcjRfRYdV9CoA==}
 
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
@@ -5533,8 +5532,8 @@ packages:
     resolution: {integrity: sha512-kiGUalWN+rgBJ/1OHZsBtU4rXZOfj/7rKQxULKlIzwzQSvMJUUNgPwJEEh7gU6xEVxC0ahoOBvN2YI8GH6FNgA==}
     engines: {node: '>=10.12.0'}
 
-  valibot@1.2.0:
-    resolution: {integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==}
+  valibot@1.5.0:
+    resolution: {integrity: sha512-nil6AkP2TChWL43Z5uJ6GTxX01CUA+g8LWUM+N/rB9NBbkUMaUsi9PUNzlUPgoKASgmx9f7eGOYpJ04/fSa6FQ==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -6945,15 +6944,13 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@storybook/addon-mcp@0.7.0(@storybook/addon-vitest@10.6.1(@vitest/browser-playwright@4.1.10)(@vitest/browser@4.1.10)(@vitest/runner@4.1.10)(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(vitest@4.1.10))(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(typescript@7.0.2)':
+  '@storybook/addon-mcp@10.6.1(@storybook/addon-vitest@10.6.1(@vitest/browser-playwright@4.1.10)(@vitest/browser@4.1.10)(@vitest/runner@4.1.10)(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(vitest@4.1.10))(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(typescript@7.0.2)':
     dependencies:
-      '@storybook/mcp': 0.8.0(typescript@7.0.2)
-      '@tmcp/adapter-valibot': 0.1.6(tmcp@1.19.4(typescript@7.0.2))(valibot@1.2.0(typescript@7.0.2))
-      '@tmcp/transport-http': 0.8.6(tmcp@1.19.4(typescript@7.0.2))
-      picoquery: 2.5.0
+      '@tmcp/adapter-valibot': 0.1.6(tmcp@1.20.0(typescript@7.0.2))(valibot@1.5.0(typescript@7.0.2))
+      '@tmcp/transport-http': 0.8.6(tmcp@1.20.0(typescript@7.0.2))
       storybook: 10.6.1(@types/react@19.3.0)(react@19.3.0)
-      tmcp: 1.19.4(typescript@7.0.2)
-      valibot: 1.2.0(typescript@7.0.2)
+      tmcp: 1.20.0(typescript@7.0.2)
+      valibot: 1.5.0(typescript@7.0.2)
     optionalDependencies:
       '@storybook/addon-vitest': 10.6.1(@vitest/browser-playwright@4.1.10)(@vitest/browser@4.1.10)(@vitest/runner@4.1.10)(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(vitest@4.1.10)
     transitivePeerDependencies:
@@ -6989,16 +6986,6 @@ snapshots:
   '@storybook/icons@2.1.0(react@19.3.0)':
     dependencies:
       react: 19.3.0
-
-  '@storybook/mcp@0.8.0(typescript@7.0.2)':
-    dependencies:
-      '@tmcp/adapter-valibot': 0.1.6(tmcp@1.19.4(typescript@7.0.2))(valibot@1.2.0(typescript@7.0.2))
-      '@tmcp/transport-http': 0.8.6(tmcp@1.19.4(typescript@7.0.2))
-      tmcp: 1.19.4(typescript@7.0.2)
-      valibot: 1.2.0(typescript@7.0.2)
-    transitivePeerDependencies:
-      - '@tmcp/auth'
-      - typescript
 
   '@storybook/react-dom-shim@10.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))':
     dependencies:
@@ -7378,22 +7365,22 @@ snapshots:
       '@tiptap/core': 3.31.3(@tiptap/pm@3.31.3)
       '@tiptap/pm': 3.31.3
 
-  '@tmcp/adapter-valibot@0.1.6(tmcp@1.19.4(typescript@7.0.2))(valibot@1.2.0(typescript@7.0.2))':
+  '@tmcp/adapter-valibot@0.1.6(tmcp@1.20.0(typescript@7.0.2))(valibot@1.5.0(typescript@7.0.2))':
     dependencies:
       '@standard-schema/spec': 1.1.0
-      '@valibot/to-json-schema': 1.7.1(valibot@1.2.0(typescript@7.0.2))
-      tmcp: 1.19.4(typescript@7.0.2)
-      valibot: 1.2.0(typescript@7.0.2)
+      '@valibot/to-json-schema': 1.8.0(valibot@1.5.0(typescript@7.0.2))
+      tmcp: 1.20.0(typescript@7.0.2)
+      valibot: 1.5.0(typescript@7.0.2)
 
-  '@tmcp/session-manager@0.2.2(tmcp@1.19.4(typescript@7.0.2))':
+  '@tmcp/session-manager@0.2.2(tmcp@1.20.0(typescript@7.0.2))':
     dependencies:
-      tmcp: 1.19.4(typescript@7.0.2)
+      tmcp: 1.20.0(typescript@7.0.2)
 
-  '@tmcp/transport-http@0.8.6(tmcp@1.19.4(typescript@7.0.2))':
+  '@tmcp/transport-http@0.8.6(tmcp@1.20.0(typescript@7.0.2))':
     dependencies:
-      '@tmcp/session-manager': 0.2.2(tmcp@1.19.4(typescript@7.0.2))
+      '@tmcp/session-manager': 0.2.2(tmcp@1.20.0(typescript@7.0.2))
       esm-env: 1.2.2
-      tmcp: 1.19.4(typescript@7.0.2)
+      tmcp: 1.20.0(typescript@7.0.2)
 
   '@ts-morph/common@0.27.0':
     dependencies:
@@ -7705,9 +7692,9 @@ snapshots:
       d3-selection: 3.0.0
       d3-transition: 3.0.1(d3-selection@3.0.0)
 
-  '@valibot/to-json-schema@1.7.1(valibot@1.2.0(typescript@7.0.2))':
+  '@valibot/to-json-schema@1.8.0(valibot@1.5.0(typescript@7.0.2))':
     dependencies:
-      valibot: 1.2.0(typescript@7.0.2)
+      valibot: 1.5.0(typescript@7.0.2)
 
   '@vitejs/plugin-react@6.1.1(vite@8.3.2(@types/node@20.19.1)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))':
     dependencies:
@@ -8071,6 +8058,8 @@ snapshots:
   clsx@2.1.1: {}
 
   cn@0.2.6: {}
+
+  cn@0.4.0: {}
 
   code-block-writer@13.0.3: {}
 
@@ -9023,7 +9012,7 @@ snapshots:
 
   json-parse-even-better-errors@2.3.1: {}
 
-  json-rpc-2.0@1.7.1: {}
+  json-rpc-2.0@1.8.1: {}
 
   json-schema-to-ts@3.1.1:
     dependencies:
@@ -10159,8 +10148,6 @@ snapshots:
 
   picomatch@4.0.7: {}
 
-  picoquery@2.5.0: {}
-
   pkce-challenge@5.0.1: {}
 
   pkg-up@3.1.0:
@@ -10923,13 +10910,13 @@ snapshots:
       markdown-it-task-lists: 2.1.1
       prosemirror-markdown: 1.13.8
 
-  tmcp@1.19.4(typescript@7.0.2):
+  tmcp@1.20.0(typescript@7.0.2):
     dependencies:
       '@standard-schema/spec': 1.1.0
-      json-rpc-2.0: 1.7.1
+      json-rpc-2.0: 1.8.1
       sqids: 0.3.0
       uri-template-matcher: 1.1.2
-      valibot: 1.2.0(typescript@7.0.2)
+      valibot: 1.5.0(typescript@7.0.2)
     transitivePeerDependencies:
       - typescript
 
@@ -11088,7 +11075,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.6
       convert-source-map: 2.0.0
 
-  valibot@1.2.0(typescript@7.0.2):
+  valibot@1.5.0(typescript@7.0.2):
     optionalDependencies:
       typescript: 7.0.2
 
