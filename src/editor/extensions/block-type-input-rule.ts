@@ -12,15 +12,15 @@ import { canSetBlockType } from '#src/editor/extensions/can-set-block-type'
  * leaving the block converted but holding no marker at all.
  *
  * `write` receives the rule's own transaction with the block already retyped,
- * and is where each construct puts its own text. Note that `range` covers only
- * what was typed *before* the character that triggered the match: the
- * framework intercepts that one before it reaches the document, so a rule
- * whose marker includes it has to write it back.
+ * for a construct that needs more than the typed marker. `range` covers the
+ * whole match, including the character that triggered it: the framework puts
+ * that one into the document before the rule runs, so the marker is already
+ * in place and a rule must not write it a second time.
  */
 export function createBlockTypeInputRule(
 	find: RegExp,
 	type: NodeType,
-	write: (tr: Transaction, range: Range, match: RegExpMatchArray) => void,
+	write?: (tr: Transaction, range: Range, match: RegExpMatchArray) => void,
 	/**
 	 * A further condition on the block the rule is about to retype. Matching is
 	 * anchored to the block's start but stops at the caret, so a rule fires on
@@ -38,7 +38,7 @@ export function createBlockTypeInputRule(
 
 			const { tr } = state
 			tr.setBlockType(range.from, range.from, type)
-			write(tr, range, match)
+			write?.(tr, range, match)
 			// Must not `return null` past the guard above - the framework reads
 			// that as "this rule didn't match" and discards the transaction
 			// wholesale, steps and all, even though they are already built.

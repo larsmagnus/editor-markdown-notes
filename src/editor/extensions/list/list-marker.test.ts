@@ -1,9 +1,12 @@
+import { getSchema } from '@tiptap/core'
+import StarterKit from '@tiptap/starter-kit'
 import { describe, expect, it } from 'vitest'
 
 import {
 	bulletMarkerText,
 	orderedMarkerText,
 	parseListMarker,
+	resolveListMarker,
 	taskMarkerText,
 } from '#src/editor/extensions/list/list-marker'
 
@@ -103,5 +106,19 @@ describe('taskMarkerText', () => {
 
 	it('builds a checked marker', () => {
 		expect(taskMarkerText(true)).toBe('- [x] ')
+	})
+})
+
+describe('resolveListMarker', () => {
+	const { listItem } = getSchema([StarterKit]).nodes
+
+	/**
+	 * Typing `- [ ] ` into a bullet item passes through this text before the
+	 * task input rule converts it, and newer TipTap runs repair in between.
+	 */
+	it('keeps a task-shaped marker on a bullet item rather than rewriting it', () => {
+		const item = listItem.create()
+
+		expect(resolveListMarker(item, null, 0, '- [ ] Ship it')).toBe('- [ ] ')
 	})
 })

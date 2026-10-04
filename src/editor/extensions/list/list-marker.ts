@@ -99,7 +99,9 @@ export function resolveListMarker(
 			: orderedMarkerText(expected)
 	}
 
-	return parsed?.kind === 'bullet'
+	// A task-shaped marker survives on a bullet item: it is the author typing
+	// `- [ ] `, which the task input rule converts once the typed text is in.
+	return parsed?.kind === 'bullet' || parsed?.kind === 'task'
 		? text.slice(0, parsed.markerLength)
 		: bulletMarkerText()
 }

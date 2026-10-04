@@ -9,10 +9,6 @@ import { stepOutOfRule } from '#src/editor/extensions/horizontal-rule/step-out-o
  * text as the node's content - a construct whose marker *is* its content has
  * nothing left if the rule consumes its match.
  *
- * The third character triggered the match and never reached the document, so
- * it is written back here; without it the node holds `--`, which no longer
- * reads as a rule at all.
- *
  * Declines where the block holds anything past the caret: a rule is a whole
  * line, and matching stops at the caret, so `---` typed in front of existing
  * text would otherwise swallow that text into a rule.
@@ -27,11 +23,7 @@ export function createHorizontalRuleInputRule(type: NodeType): InputRule {
 	return createBlockTypeInputRule(
 		/^(-{3}|\*{3}|_{3})$/,
 		type,
-		(tr, range, match) => {
-			const hostEnd = tr.doc.resolve(range.from).after()
-			tr.insertText(match[0].slice(-1), range.to)
-			stepOutOfRule(tr, tr.mapping.map(hostEnd))
-		},
+		(tr, range) => stepOutOfRule(tr, tr.doc.resolve(range.from).after()),
 		($start, range) => range.to === $start.end()
 	)
 }
