@@ -45,7 +45,7 @@ export function TextToolsPanel({
 			id={TEXT_TOOLS_PANEL_ID}
 			tabIndex={-1}
 			aria-label="Text tools"
-			className="sticky top-16 overflow-y-hidden flex max-h-[calc(100vh-5rem)] w-72 shrink-0 flex-col rounded-md border bg-muted/30 text-sm"
+			className="sticky top-16 overflow-y-hidden flex max-h-[calc(100vh-5rem)] w-72 shrink-0 flex-col text-sm"
 		>
 			<LinkSkip
 				href={`#${LIVE_EDITOR_ID}`}
@@ -55,14 +55,14 @@ export function TextToolsPanel({
 				Skip to editor
 			</LinkSkip>
 
-			<div className="flex items-center justify-between gap-2 border-b p-3 py-1.5 min-h-10 bg-muted/50">
+			<div className="flex items-center justify-between gap-2 pb-1.5">
 				<h2 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
 					Text tools
 				</h2>
 				<TextToolsStatus isAnalyzing={isAnalyzing} total={summary.total} />
 			</div>
 
-			<div className="flex flex-col gap-1 p-3 scroll-fade overflow-y-auto">
+			<div className="flex flex-col gap-1 py-3 scroll-fade overflow-y-auto">
 				<div className="flex flex-col gap-2">
 					<TextToolsStats sentenceCount={analysis.sentenceCount} />
 					<TextToolsReadabilityLines

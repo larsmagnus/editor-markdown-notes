@@ -74,7 +74,7 @@ export function EditorBody({
 
 	return (
 		<EditorContext.Provider value={{ editor: liveEditor }}>
-			<div className="flex flex-1 items-start gap-4">
+			<div className="flex flex-1 items-start gap-4 md:gap-6">
 				{/* Shared by both modes so `MenuBar`/`ButtonAdd`/`MenuBubble` (rendered
 				    inside live mode) stack above the document as normal block-flow
 				    children of this div, rather than becoming flex-row items beside
