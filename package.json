@@ -5,7 +5,7 @@
 	"publisher": "larsmagnus",
 	"author": "Lars Magnus Klavenes <larsmagnus@gmail.com> (https://larsmagnus.co)",
 	"license": "MIT",
-	"version": "0.29.0",
+	"version": "1.0.0",
 	"type": "module",
 	"imports": {
 		"#src/*": [
