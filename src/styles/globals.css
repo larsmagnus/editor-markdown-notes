@@ -7,6 +7,10 @@
 
 @plugin 'tailwindcss-animate';
 
+@theme {
+	--color-brand: #ff1984;
+}
+
 @theme inline {
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);

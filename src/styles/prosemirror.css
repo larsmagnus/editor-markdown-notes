@@ -200,18 +200,18 @@
 	.ProseMirror code [data-token='marker'],
 	.ProseMirror [data-type='horizontalRule'] [data-token='marker'],
 	.ProseMirror [data-type='frontmatter'] [data-token='marker'] {
-		@apply text-blue-400;
+		@apply text-brand;
 	}
 
 	.ProseMirror a [data-token='marker'],
 	.ProseMirror a [data-token='url'],
 	.ProseMirror [data-type='image-source'] [data-token='marker'],
 	.ProseMirror [data-type='image-source'] [data-token='url'] {
-		@apply text-blue-400;
+		@apply text-brand;
 	}
 	.ProseMirror a [data-token='title'],
 	.ProseMirror [data-type='image-source'] [data-token='title'] {
-		@apply text-blue-400 italic;
+		@apply text-brand italic;
 	}
 
 	/* Both colors come from the Shiki theme: token colors assume their own background. */
