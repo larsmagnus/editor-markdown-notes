@@ -26,7 +26,12 @@ function renderToolbarAtScale(scale: number) {
 	mockScale = scale
 	return render(
 		<TooltipProvider>
-			<MermaidToolbar code={DIAGRAM_CODE} svg={DIAGRAM_SVG} onEdit={() => {}} />
+			<MermaidToolbar
+				code={DIAGRAM_CODE}
+				svg={DIAGRAM_SVG}
+				onEdit={() => {}}
+				onEditVisually={() => {}}
+			/>
 		</TooltipProvider>
 	)
 }

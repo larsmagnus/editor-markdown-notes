@@ -101,6 +101,12 @@ importers:
       '@tiptap/suggestion':
         specifier: 3.31.4
         version: 3.31.4(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4)
+      '@visimer/core':
+        specifier: 1.1.2
+        version: 1.1.2
+      '@visimer/dom':
+        specifier: 1.1.2
+        version: 1.1.2
       acorn:
         specifier: 8.18.0
         version: 8.18.0
@@ -2669,6 +2675,12 @@ packages:
     resolution: {integrity: sha512-a0M+uwCuQZEPAo65NYkFSJ14O5c213KoSZmPdoCfuFvUhfULi4T2Z6Tpjv6lTVMW9RoLm74RpRAjNEa43KcN+g==}
     peerDependencies:
       valibot: ^1.5.0
+
+  '@visimer/core@1.1.2':
+    resolution: {integrity: sha512-do8MDqlLQeDRI1fy2PUTVnzBkLrzpaq260UX1WrtE/3XtSoLge4T5oY+cvSXFyINhYiYKB9tgetkx+o14LFrjA==}
+
+  '@visimer/dom@1.1.2':
+    resolution: {integrity: sha512-Ir+Nl5vRgZA8rQwjGEQrC9ijOkdR0BmD3EjjqU/VedgK0lxleo5dKj8YIoHiocEDS1hlQwmzRZKIKg8MuV2FJw==}
 
   '@vitejs/plugin-react@6.1.1':
     resolution: {integrity: sha512-yxLaQV9gkhS8ezJqCM6+ndU7mDY6gqAg75NQ+0IjwEI8IYOmQCgkRwHKVSfWXW076DsqMo0Dk+0FK1U+M5RgFw==}
@@ -7727,6 +7739,12 @@ snapshots:
   '@valibot/to-json-schema@1.8.0(valibot@1.5.0(typescript@7.0.2))':
     dependencies:
       valibot: 1.5.0(typescript@7.0.2)
+
+  '@visimer/core@1.1.2': {}
+
+  '@visimer/dom@1.1.2':
+    dependencies:
+      '@visimer/core': 1.1.2
 
   '@vitejs/plugin-react@6.1.1(vite@8.3.2(@types/node@24.19.1)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))':
     dependencies:

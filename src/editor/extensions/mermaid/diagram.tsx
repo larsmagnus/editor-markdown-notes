@@ -14,6 +14,7 @@ type MermaidDiagramProps = {
 	/** Whether the block's own source is on screen; the diagram gives way to it. */
 	showSource: boolean
 	onEdit: () => void
+	onEditVisually: () => void
 }
 
 /** The diagram's own width, as the custom property the stylesheet scales it
@@ -43,6 +44,7 @@ export function MermaidDiagram({
 	result,
 	showSource,
 	onEdit,
+	onEditVisually,
 }: MermaidDiagramProps) {
 	const failed = result && 'error' in result
 
@@ -63,7 +65,12 @@ export function MermaidDiagram({
 							'flex items-center min-h-40 min-w-40'
 						)}
 						controls={
-							<MermaidToolbar code={code} svg={result.svg} onEdit={onEdit} />
+							<MermaidToolbar
+								code={code}
+								svg={result.svg}
+								onEdit={onEdit}
+								onEditVisually={onEditVisually}
+							/>
 						}
 					>
 						<div

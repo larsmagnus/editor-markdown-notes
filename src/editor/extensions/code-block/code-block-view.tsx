@@ -1,5 +1,6 @@
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewWrapper } from '@tiptap/react'
+import { useState } from 'react'
 
 import { CodeBlockSource } from '#src/editor/extensions/code-block/code-block-source'
 import {
@@ -7,7 +8,7 @@ import {
 	fenceLanguage,
 } from '#src/editor/extensions/code-block/code-fence'
 import { focusBlockContentStart } from '#src/editor/extensions/focus-block-content-start'
-import { MermaidDiagram } from '#src/editor/extensions/mermaid/diagram'
+import { DiagramSlot } from '#src/editor/extensions/mermaid/diagram-slot'
 import { MERMAID_LANGUAGE } from '#src/editor/extensions/mermaid/language'
 import { useMermaidSource } from '#src/hooks/use-mermaid-source'
 
@@ -37,17 +38,29 @@ export function CodeBlockView({ node, editor, getPos }: NodeViewProps) {
 
 	// Moving the caret into the block is what reveals the source - there is no
 	// separate editing flag to set.
+	const [visual, setVisual] = useState(false)
 	const startEditing = () => focusBlockContentStart(editor, getPos)
+	const startEditingVisually = () => setVisual(true)
+	const stopEditingVisually = () => setVisual(false)
 
 	return (
 		<NodeViewWrapper className="group relative">
-			<MermaidDiagram
+			<DiagramSlot
+				editor={editor}
+				getPos={getPos}
 				code={code}
 				result={result}
 				showSource={showSource}
-				onEdit={startEditing}
+				editingVisually={visual}
+				onEditSource={startEditing}
+				onEditVisually={startEditingVisually}
+				onDoneEditingVisually={stopEditingVisually}
 			/>
-			<CodeBlockSource code={code} language={language} visible={showSource} />
+			<CodeBlockSource
+				code={code}
+				language={language}
+				visible={showSource && !visual}
+			/>
 		</NodeViewWrapper>
 	)
 }

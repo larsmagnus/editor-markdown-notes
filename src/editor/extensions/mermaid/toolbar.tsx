@@ -1,4 +1,10 @@
-import { Code, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
+import {
+	Code,
+	MousePointerClick,
+	RotateCcw,
+	ZoomIn,
+	ZoomOut,
+} from 'lucide-react'
 import type { ReactZoomPanPinchContextState } from 'react-zoom-pan-pinch'
 import { useControls, useTransformComponent } from 'react-zoom-pan-pinch'
 
@@ -21,6 +27,7 @@ type MermaidToolbarProps = {
 	/** Opens the block's source. Clicking the diagram no longer does - a click
 	 *  there is the start of a pan. */
 	onEdit: () => void
+	onEditVisually: () => void
 }
 
 /**
@@ -29,7 +36,12 @@ type MermaidToolbarProps = {
  *
  * Renders inside `PanZoom`, which is what lets it drive the viewport.
  */
-export function MermaidToolbar({ code, svg, onEdit }: MermaidToolbarProps) {
+export function MermaidToolbar({
+	code,
+	svg,
+	onEdit,
+	onEditVisually,
+}: MermaidToolbarProps) {
 	const { zoomIn, zoomOut, resetTransform } = useControls()
 	const scale = useTransformComponent(selectScale)
 	// Nothing to reset to at the starting scale, and nothing further to zoom
@@ -70,6 +82,12 @@ export function MermaidToolbar({ code, svg, onEdit }: MermaidToolbarProps) {
 				label="Edit diagram source"
 				tooltip="Edit source"
 				onClick={onEdit}
+			/>
+			<ButtonAction
+				icon={<MousePointerClick />}
+				label="Edit diagram visually"
+				tooltip="Edit visually"
+				onClick={onEditVisually}
 			/>
 
 			<ButtonActions code={code} svg={svg} />

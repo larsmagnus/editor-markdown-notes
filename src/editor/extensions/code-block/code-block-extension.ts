@@ -12,6 +12,7 @@ import { createFenceInputRule } from '#src/editor/extensions/code-block/fence-in
 import { createToggleCodeBlockCommand } from '#src/editor/extensions/code-block/toggle-code-block-command'
 import type { MarkdownIt } from '#src/editor/extensions/markdown/markdown-it-types'
 import { serializeVerbatim } from '#src/editor/extensions/markdown/serialize-verbatim'
+import { keepVisualEditorEvents } from '#src/editor/extensions/mermaid/visual-editor/keep-visual-editor-events'
 
 /** Never reconfigured elsewhere in this project - see the stock extension's own default. */
 const LANGUAGE_CLASS_PREFIX = 'language-'
@@ -51,7 +52,7 @@ export const CodeBlockExtension = CodeBlock.extend({
 	},
 
 	addNodeView() {
-		return ReactNodeViewRenderer(CodeBlockView)
+		return keepVisualEditorEvents(ReactNodeViewRenderer(CodeBlockView))
 	},
 
 	/**

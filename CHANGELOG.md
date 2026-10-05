@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added visual diagram editing, from the diagram toolbar: retype labels, add nodes, connect them by dragging, and grow a node into a new connected one with the `+` beside it
+
 ## [0.28.0] - 2026-10-04
 
 - Added copying a draw.io diagram (`.drawio.svg` image) as a mermaid flowchart from its image toolbar
