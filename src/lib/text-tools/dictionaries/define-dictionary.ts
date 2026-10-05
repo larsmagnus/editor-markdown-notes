@@ -1,3 +1,4 @@
+import { CURATED_TERMS } from '#src/lib/text-tools/dictionaries/curated-terms'
 import { mergeTechnicalTerms } from '#src/lib/text-tools/dictionaries/technical-terms'
 import { TECHNICAL_TERMS } from '#src/lib/text-tools/dictionaries/technical-terms.generated'
 import type { HunspellDictionary } from '#src/lib/text-tools/types'
@@ -12,10 +13,12 @@ import type { HunspellDictionary } from '#src/lib/text-tools/types'
  * `Uint8Array` it falls through to stringifying the byte array, and every word
  * then reads as a misspelling.
  *
- * The technical-terms wordlist is spliced in here rather than per-language,
+ * The technical-terms wordlists (generated, then hand-curated) are spliced in
+ * here rather than per-language,
  * since all three languages this ships (`en-US`/`en-GB`/`en-AU`) are English
  * variants it applies to unconditionally.
  */
 export function defineDictionary(aff: string, dic: string): HunspellDictionary {
-	return mergeTechnicalTerms({ aff, dic }, TECHNICAL_TERMS)
+	const words = [...new Set([...TECHNICAL_TERMS, ...CURATED_TERMS])]
+	return mergeTechnicalTerms({ aff, dic }, words)
 }
