@@ -23,6 +23,7 @@ export const CURATED_TERMS: string[] = [
 	'Shiki',
 	'TipTap',
 	'Vite',
+	'Vitest',
 	'retext',
 	'shadcn',
 	'zod',

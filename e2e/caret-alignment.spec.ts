@@ -7,8 +7,12 @@ import { openInVSCode } from '#e2e/lib/vscode-host'
 
 const SUBPIXEL = 1
 
-/** Inline code pads its pill by 0.3em, and the caret sits outside the pill. */
-const INLINE_CODE_PADDING = 4
+/**
+ * Inline code pads its pill by 0.3em of its own 0.85em font size, and the
+ * caret sits outside the pill. Layout rounds to a fraction of a pixel either
+ * side of that.
+ */
+const INLINE_CODE_PADDING = 0.3 * 0.85 * 16 + SUBPIXEL
 
 /**
  * A caret beside revealed syntax has to be drawn on the edge of a character.
