@@ -26,7 +26,7 @@ export async function openLinkTarget(
 	const result = await resolveLinkTarget(href, document)
 
 	if ('error' in result) {
-		vscode.window.showErrorMessage(`Editor Markdown Notes: ${result.error}`)
+		vscode.window.showErrorMessage(`punchdown: ${result.error}`)
 		return
 	}
 

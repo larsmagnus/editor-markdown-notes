@@ -105,11 +105,11 @@ fetches; a non-allowlisted host prompts rather than fetching silently.
 
 ### R4 — Settings
 
-Two settings under the existing `editorMarkdownNotes` contribution:
+Two settings under the existing `punchdown` contribution:
 
 ```jsonc
-"editorMarkdownNotes.frontmatterSchemaDefaults": true,
-"editorMarkdownNotes.frontmatterSchemas": {
+"punchdown.frontmatterSchemaDefaults": true,
+"punchdown.frontmatterSchemas": {
   "https://…/claude-code-skill.json": ["**/skills/*/SKILL.md"],
   "./schemas/post.json": ["content/blog/**/*.md"],
   "~/schemas/agent.json": ["**/.claude/agents/*.md"],

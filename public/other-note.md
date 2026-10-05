@@ -86,7 +86,7 @@ type Result<T> = { ok: true; value: T } | { ok: false; error: string }
 
 ```json
 {
-	"editorMarkdownNotes": {
+	"punchdown": {
 		"theme": "system",
 		"fullWidth": false,
 		"targetReadingAge": 12
@@ -103,7 +103,7 @@ type Result<T> = { ok: true; value: T } | { ok: false; error: string }
 }
 ```
 
-A line with `inline code`, a config key like `editorMarkdownNotes.theme`,
+A line with `inline code`, a config key like `punchdown.theme`,
 and a shell flag such as `--fix` mentioned mid-sentence.
 
 ## Mermaid diagram
@@ -133,7 +133,7 @@ flowchart LR
 
 ## Image (absolute path)
 
-![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)
+![punchdown icon](/icon-punchdown.png)
 
 ## Links
 

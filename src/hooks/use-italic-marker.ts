@@ -8,7 +8,7 @@ import type { ItalicMarker } from '#src/shared/messages'
  *
  * The italic mark reads this at the moment a new italic is created. `extensions`
  * is built once, so mutable storage is the only way for a live change to
- * `editorMarkdownNotes.italicMarker` to reach it.
+ * `punchdown.italicMarker` to reach it.
  */
 export function useItalicMarker(editor: Editor | null, marker: ItalicMarker) {
 	useEffect(() => {

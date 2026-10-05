@@ -7,7 +7,7 @@ import { TEXT_TOOL_RULE_IDS } from '#src/shared/messages'
 
 const ALL_RULES = [...TEXT_TOOL_RULE_IDS]
 
-/** The default the `editorMarkdownNotes.textToolsTargetAge` setting ships with. */
+/** The default the `punchdown.textToolsTargetAge` setting ships with. */
 const TARGET_AGE = 16
 
 const decoder = new TextDecoder()

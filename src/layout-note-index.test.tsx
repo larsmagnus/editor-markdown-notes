@@ -161,7 +161,7 @@ describe('Layout index, inside VS Code', () => {
 
 		expect(
 			await screen.findByText(
-				'Could not list the notes. “Editor Markdown Notes: Show logs” has the details.'
+				'Could not list the notes. “punchdown: Show logs” has the details.'
 			)
 		).toBeTruthy()
 		expect(screen.queryByText('Finding notes…')).toBeNull()

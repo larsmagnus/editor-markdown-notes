@@ -23,7 +23,7 @@ suite('Workspace note index', () => {
 		const note = findEntry(entries, 'public', 'notes.md')
 
 		assert.ok(note, 'public/notes.md should be indexed')
-		assert.strictEqual(note.title, 'Editor Markdown Notes — Feature Playground')
+		assert.strictEqual(note.title, 'punchdown — Feature Playground')
 		assert.strictEqual(note.fileName, 'notes.md')
 		assert.strictEqual(note.directory, 'public')
 		assert.deepStrictEqual(note.tags, ['testing', 'markdown', 'editor'])

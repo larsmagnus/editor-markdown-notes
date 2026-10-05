@@ -5,7 +5,7 @@ import * as vscode from 'vscode'
 
 import { getDocumentResourceRoots } from '#src/host/image-base-uris'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const EXTENSION_ID = 'larsmagnus.punchdown'
 
 /**
  * A webview refuses any file outside `localResourceRoots`, however correct the
@@ -26,11 +26,7 @@ suite('Sample note resource roots', () => {
 		const note = vscode.Uri.file(path.join(workspaceRoot, 'public', 'notes.md'))
 		const document = await vscode.workspace.openTextDocument(note)
 		const roots = getDocumentResourceRoots(document)
-		const image = path.join(
-			workspaceRoot,
-			'public',
-			'icon-editor-markdown-notes.png'
-		)
+		const image = path.join(workspaceRoot, 'public', 'icon-punchdown.png')
 
 		assert.ok(
 			roots.some(
@@ -50,7 +46,7 @@ suite('Sample note resource roots', () => {
 		)
 		const document = await vscode.workspace.openTextDocument(note)
 		const roots = getDocumentResourceRoots(document)
-		const image = path.join(workspaceRoot, 'icon-editor-markdown-notes.png')
+		const image = path.join(workspaceRoot, 'icon-punchdown.png')
 
 		assert.ok(
 			roots.some(

@@ -32,7 +32,7 @@ export function registerCommands(
 	)
 
 	// Two ids share `openFile`: it reads well in the command palette
-	// ("Editor Markdown Notes: Open file"), `openMarkdownEditor` reads well in
+	// ("punchdown: Open file"), `openMarkdownEditor` reads well in
 	// the context menus, where the category is not shown.
 	const simpleCommands: Record<string, (uri?: vscode.Uri) => unknown> = {
 		[`${EXTENSION_ID}.openFile`]: openFile,

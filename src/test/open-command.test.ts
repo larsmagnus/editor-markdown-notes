@@ -24,10 +24,7 @@ suite('Opening notes', () => {
 		await fs.writeFile(file.fsPath, '{}\n')
 
 		try {
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.openFile',
-				file
-			)
+			await vscode.commands.executeCommand('punchdown.openFile', file)
 
 			const tab = vscode.window.tabGroups.activeTabGroup.activeTab
 			assert.ok(
@@ -48,10 +45,7 @@ suite('Opening notes', () => {
 		await fs.writeFile(file.fsPath, '# Docs\n\n`</script>`\n')
 
 		try {
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.openFile',
-				file
-			)
+			await vscode.commands.executeCommand('punchdown.openFile', file)
 
 			const tab = await waitForActiveTab(isCustomEditorTab)
 
@@ -77,7 +71,7 @@ suite('Opening notes', () => {
 			const document = await vscode.workspace.openTextDocument(file)
 			await vscode.window.showTextDocument(document)
 
-			await vscode.commands.executeCommand('editor-markdown-notes.openFile')
+			await vscode.commands.executeCommand('punchdown.openFile')
 
 			const tab = await waitForActiveTab(isCustomEditorTab)
 

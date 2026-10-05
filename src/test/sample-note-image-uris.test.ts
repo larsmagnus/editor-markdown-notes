@@ -6,7 +6,7 @@ import * as vscode from 'vscode'
 import { getImageBaseUris } from '#src/host/image-base-uris'
 import { resolveImageSrc } from '#src/lib/host/resolve-image-src'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const EXTENSION_ID = 'larsmagnus.punchdown'
 
 /**
  * One test per image-resolution rule, against the demo note that documents it -
@@ -30,7 +30,7 @@ suite('Sample note image URIs', () => {
 		// A throwaway panel purely for its `Webview`: `asWebviewUri` is the piece
 		// under test, and only a real webview has it.
 		const panel = vscode.window.createWebviewPanel(
-			'editor-markdown-notes.test',
+			'punchdown.test',
 			'Image resolution',
 			vscode.ViewColumn.One,
 			{ localResourceRoots: [] }
@@ -38,12 +38,12 @@ suite('Sample note image URIs', () => {
 
 		try {
 			const resolved = resolveImageSrc(
-				'./icon-editor-markdown-notes.png',
+				'./icon-punchdown.png',
 				getImageBaseUris(panel.webview, document)
 			)
 			const expected = panel.webview.asWebviewUri(
 				vscode.Uri.file(
-					path.join(workspaceRoot, 'public', 'icon-editor-markdown-notes.png')
+					path.join(workspaceRoot, 'public', 'icon-punchdown.png')
 				)
 			)
 
@@ -67,7 +67,7 @@ suite('Sample note image URIs', () => {
 		const document = await vscode.workspace.openTextDocument(note)
 
 		const panel = vscode.window.createWebviewPanel(
-			'editor-markdown-notes.test',
+			'punchdown.test',
 			'Image resolution',
 			vscode.ViewColumn.One,
 			{ localResourceRoots: [] }
@@ -75,13 +75,11 @@ suite('Sample note image URIs', () => {
 
 		try {
 			const resolved = resolveImageSrc(
-				'/icon-editor-markdown-notes.png',
+				'/icon-punchdown.png',
 				getImageBaseUris(panel.webview, document)
 			)
 			const expected = panel.webview.asWebviewUri(
-				vscode.Uri.file(
-					path.join(workspaceRoot, 'icon-editor-markdown-notes.png')
-				)
+				vscode.Uri.file(path.join(workspaceRoot, 'icon-punchdown.png'))
 			)
 
 			assert.strictEqual(

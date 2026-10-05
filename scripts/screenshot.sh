@@ -7,7 +7,7 @@ set -euo pipefail
 # by Playwright against the web build - clicking and selecting inside a native
 # window is not reliable - and run first, since they need no permissions.
 #
-# The hero shot, public/screenshot-editor-markdown-notes.png, is headless: opens
+# The hero shot, public/screenshot-punchdown.png, is headless: opens
 # the fixture note in the clean profile, then captures the window natively
 # (traffic lights, shadow) the way a manual Cmd+Shift+4 capture would.
 #
@@ -28,7 +28,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 (cd "$ROOT" && pnpm exec playwright test -c playwright.screenshots.config.ts)
 
-OUT="$ROOT/public/screenshot-editor-markdown-notes.png"
+OUT="$ROOT/public/screenshot-punchdown.png"
 # Must match CLEAN/USER_DIR/EXT_DIR in open-clean-vscode-profile.sh.
 USER_DIR="/tmp/vscode-clean/user"
 EXT_DIR="/tmp/vscode-clean/ext"
@@ -44,8 +44,8 @@ WIN_H=1040
 
 export SEED_GLOBAL_STATE_SQL="
   INSERT INTO ItemTable (key, value) VALUES (
-    'larsmagnus.editor-markdown-notes',
-    '{\"editorMarkdownNotes.viewOptions\":{\"raw\":false,\"fullWidth\":true,\"theme\":\"system\",\"textTools\":true,\"textToolRules\":[\"passive\",\"simplify\",\"intensify\",\"readability\"]}}'
+    'larsmagnus.punchdown',
+    '{\"punchdown.viewOptions\":{\"raw\":false,\"fullWidth\":true,\"theme\":\"system\",\"textTools\":true,\"textToolRules\":[\"passive\",\"simplify\",\"intensify\",\"readability\"]}}'
   );
 "
 

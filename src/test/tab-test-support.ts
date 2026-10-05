@@ -2,8 +2,8 @@ import * as vscode from 'vscode'
 
 /** Shared fixtures and helpers for the VS Code tab-integration suites. */
 
-export const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
-const VIEW_TYPE = 'editor-markdown-notes.markdownEditor'
+export const EXTENSION_ID = 'larsmagnus.punchdown'
+const VIEW_TYPE = 'punchdown.markdownEditor'
 
 /** Opening a tab is asynchronous; give it a moment to appear. */
 export async function waitForActiveTab(

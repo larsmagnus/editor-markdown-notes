@@ -17,7 +17,7 @@ export async function addDictionaryWords(
 	onAdded: () => void
 ): Promise<void> {
 	const entered = await vscode.window.showInputBox({
-		title: 'Editor Markdown Notes: add words to dictionary',
+		title: 'punchdown: add words to dictionary',
 		prompt: 'Words the spelling check should accept, separated by commas',
 		placeHolder: 'nspell, retext, frontmatter',
 	})

@@ -16,7 +16,7 @@ import {
 	VIEW_TYPE,
 } from '#src/test/webview-panel-restore-support'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const EXTENSION_ID = 'larsmagnus.punchdown'
 const log = { info: () => {}, warn: () => {}, error: () => {} }
 
 /** Long enough for VS Code to settle a background/reveal transition. */

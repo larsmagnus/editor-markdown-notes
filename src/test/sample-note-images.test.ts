@@ -4,7 +4,7 @@ import * as path from 'path'
 
 import * as vscode from 'vscode'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const EXTENSION_ID = 'larsmagnus.punchdown'
 
 /**
  * The two demo notes that exist to document an image-resolution rule, named
@@ -31,18 +31,12 @@ suite('Sample note images', () => {
 		const document = await vscode.workspace.openTextDocument(note)
 
 		assert.ok(
-			document
-				.getText()
-				.includes(
-					'![Editor Markdown Notes icon](./icon-editor-markdown-notes.png)'
-				),
+			document.getText().includes('![punchdown icon](./icon-punchdown.png)'),
 			'notes.md is the demo note for a document-relative image and should keep documenting one'
 		)
 
 		await assert.doesNotReject(
-			fs.access(
-				path.join(workspaceRoot, 'public', 'icon-editor-markdown-notes.png')
-			),
+			fs.access(path.join(workspaceRoot, 'public', 'icon-punchdown.png')),
 			'a document-relative image resolves out of the note folder, so the copy in public/ is the one it needs'
 		)
 	})
@@ -57,16 +51,12 @@ suite('Sample note images', () => {
 		const document = await vscode.workspace.openTextDocument(note)
 
 		assert.ok(
-			document
-				.getText()
-				.includes(
-					'![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)'
-				),
+			document.getText().includes('![punchdown icon](/icon-punchdown.png)'),
 			'other-note.md is the demo note for a workspace-root image and should keep documenting one'
 		)
 
 		await assert.doesNotReject(
-			fs.access(path.join(workspaceRoot, 'icon-editor-markdown-notes.png')),
+			fs.access(path.join(workspaceRoot, 'icon-punchdown.png')),
 			'a root-absolute image resolves out of the workspace root, so the copy there is the one it needs'
 		)
 	})

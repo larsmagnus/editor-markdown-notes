@@ -5,7 +5,7 @@ import { hasMessageType } from '#src/host/message-guards'
 
 export { pause } from '#src/test/search-test-support'
 
-export const VIEW_TYPE = 'editor-markdown-notes.markdownEditor'
+export const VIEW_TYPE = 'punchdown.markdownEditor'
 
 /**
  * `resolveCustomTextEditor` is a callback, not an event (see

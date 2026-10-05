@@ -9,12 +9,11 @@ import { EXTENSION_ID } from '#src/shared/constants'
  */
 export const VIEW_TYPE = `${EXTENSION_ID}.markdownEditor`
 
-export const CONFIG_SECTION = 'editorMarkdownNotes'
+export const CONFIG_SECTION = 'punchdown'
 
-export const VIEW_OPTIONS_KEY = 'editorMarkdownNotes.viewOptions'
+export const VIEW_OPTIONS_KEY = 'punchdown.viewOptions'
 
-export const HIDDEN_NOTE_DIRECTORIES_KEY =
-	'editorMarkdownNotes.hiddenNoteDirectories'
+export const HIDDEN_NOTE_DIRECTORIES_KEY = 'punchdown.hiddenNoteDirectories'
 
 /**
  * Must match the `contributes.mcpServerDefinitionProviders` entry in

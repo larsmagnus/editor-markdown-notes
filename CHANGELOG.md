@@ -1,11 +1,15 @@
 # Change Log
 
-All notable changes to the "editor-markdown-notes" extension are documented in this file.
+All notable changes to the "punchdown" extension are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-05
+
+- Changed the extension's name to punchdown, which installs as a new extension rather than updating the old one. Uninstall `editor-markdown-notes`, and point any `*.md` editor association at `punchdown.markdownEditor`
+- Changed every setting and command prefix to `punchdown.`. Re-apply customized settings, since they and the remembered toggles do not carry over
 - Changed the document text to one consistent size, no longer shrinking on wide windows
 - Changed table headers to semibold and table cells to slightly different padding
 - Fixed the gap cursor being invisible in dark mode

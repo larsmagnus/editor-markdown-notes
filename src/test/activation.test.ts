@@ -2,7 +2,7 @@ import * as assert from 'assert'
 
 import * as vscode from 'vscode'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const EXTENSION_ID = 'larsmagnus.punchdown'
 
 suite('Activation and contributions', () => {
 	suiteSetup(async () => {
@@ -20,16 +20,16 @@ suite('Activation and contributions', () => {
 		const commands = await vscode.commands.getCommands(true)
 
 		assert.ok(
-			commands.includes('editor-markdown-notes.openFile'),
-			'"Editor Markdown Notes: Open file" should be registered'
+			commands.includes('punchdown.openFile'),
+			'"punchdown: Open file" should be registered'
 		)
 		assert.ok(
-			commands.includes('editor-markdown-notes.openMarkdownEditor'),
-			'"Open with Editor Markdown Notes" should be registered'
+			commands.includes('punchdown.openMarkdownEditor'),
+			'"Open with punchdown" should be registered'
 		)
 		assert.ok(
-			commands.includes('editor-markdown-notes.showLogs'),
-			'"Editor Markdown Notes: Show logs" should be registered'
+			commands.includes('punchdown.showLogs'),
+			'"punchdown: Show logs" should be registered'
 		)
 	})
 
@@ -37,12 +37,12 @@ suite('Activation and contributions', () => {
 		const commands = await vscode.commands.getCommands(true)
 
 		for (const command of [
-			'editor-markdown-notes.toggleRaw',
-			'editor-markdown-notes.toggleFullWidth',
-			'editor-markdown-notes.toggleTextTools',
-			'editor-markdown-notes.selectTheme',
-			'editor-markdown-notes.selectSpellingLanguage',
-			'editor-markdown-notes.openInTextEditor',
+			'punchdown.toggleRaw',
+			'punchdown.toggleFullWidth',
+			'punchdown.toggleTextTools',
+			'punchdown.selectTheme',
+			'punchdown.selectSpellingLanguage',
+			'punchdown.openInTextEditor',
 		]) {
 			assert.ok(commands.includes(command), `${command} should be registered`)
 		}
@@ -52,13 +52,13 @@ suite('Activation and contributions', () => {
 		const commands = await vscode.commands.getCommands(true)
 
 		assert.ok(
-			commands.includes('editor-markdown-notes.claimFormattingShortcut'),
+			commands.includes('punchdown.claimFormattingShortcut'),
 			'claimFormattingShortcut command should be registered'
 		)
 	})
 
 	test('contributes the settings that put a Settings entry on the extension page', () => {
-		const config = vscode.workspace.getConfiguration('editorMarkdownNotes')
+		const config = vscode.workspace.getConfiguration('punchdown')
 
 		assert.strictEqual(config.get('hideToolbar'), false)
 		assert.strictEqual(config.get('centerContent'), false)

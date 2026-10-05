@@ -37,7 +37,7 @@ const loadDictionary = vi.hoisted(() =>
 
 vi.mock('#src/lib/text-tools/load-dictionary', () => ({ loadDictionary }))
 
-const STORAGE_KEY = 'editor-markdown-notes:view-options'
+const STORAGE_KEY = 'punchdown:view-options'
 
 const NOTE = 'The report was written by the committee.'
 

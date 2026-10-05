@@ -7,7 +7,7 @@ import * as vscode from 'vscode'
 
 import { pause, VIEW_TYPE } from '#src/test/webview-panel-restore-support'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const EXTENSION_ID = 'larsmagnus.punchdown'
 
 /** Past the editor's 1000ms auto-save debounce, with room for the write. */
 const PAST_AUTOSAVE_MS = 4000

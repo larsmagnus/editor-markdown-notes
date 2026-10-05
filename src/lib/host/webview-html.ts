@@ -50,7 +50,7 @@ export function buildWebviewHtml({
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="Content-Security-Policy" content="${contentSecurityPolicy}">
-        <title>Editor Markdown Notes</title>
+        <title>punchdown_</title>
         ${styleUris.map((uri) => `<link rel="stylesheet" crossorigin href="${uri}">`).join('\n        ')}
         ${preloadUris.map((uri) => `<link rel="modulepreload" crossorigin href="${uri}" nonce="${nonce}">`).join('\n        ')}
         <style>
@@ -98,7 +98,7 @@ export function buildMissingAssetsHtml(): string {
 	return `<!DOCTYPE html>
     <html lang="en">
     <body>
-        <h1>Editor Markdown Notes could not start</h1>
+        <h1>punchdown could not start</h1>
         <p>The built webview assets are missing. Run <code>pnpm build</code> and reopen the file.</p>
     </body>
     </html>`

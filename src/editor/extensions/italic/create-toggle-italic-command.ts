@@ -12,7 +12,7 @@ import { italicWrapMarkup } from '#src/editor/extensions/italic/italic-wrap-mark
  * before it can be passed on, where bold/strike's `createToggleMarkCommand`
  * already knows its fixed delimiter up front. `getPreferredMarkup` reads
  * `storage.preferredMarkup` lazily rather than once, since it can change
- * live (`editorMarkdownNotes.italicMarker`) between calls.
+ * live (`punchdown.italicMarker`) between calls.
  */
 export function createToggleItalicCommand(
 	markType: MarkType,

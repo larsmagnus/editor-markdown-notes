@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { getVSCodeApi, isVSCodeWebview } from '#src/lib/vscode-api'
 
 /**
- * Keeps the VS Code context key `editor-markdown-notes.hasSelection` in sync
+ * Keeps the VS Code context key `punchdown.hasSelection` in sync
  * with whether the TipTap editor has a text selection, so keybindings can gate
  * on selection state.
  */

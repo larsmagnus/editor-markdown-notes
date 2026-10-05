@@ -121,12 +121,12 @@ const extensionSettingsSchema = z
 		centerContent: z.boolean().catch(DEFAULT_SETTINGS.centerContent).meta({
 			title: 'Center content',
 			description:
-				'Center the content horizontally when full width is off. Maps to `editorMarkdownNotes.centerContent`.',
+				'Center the content horizontally when full width is off. Maps to `punchdown.centerContent`.',
 		}),
 		hideToolbar: z.boolean().catch(DEFAULT_SETTINGS.hideToolbar).meta({
 			title: 'Hide toolbar',
 			description:
-				'Hide the toolbar. The toggles remain reachable from the command palette. Maps to `editorMarkdownNotes.hideToolbar`.',
+				'Hide the toolbar. The toggles remain reachable from the command palette. Maps to `punchdown.hideToolbar`.',
 		}),
 		textToolsTargetAge: z
 			.number()
@@ -137,12 +137,12 @@ const extensionSettingsSchema = z
 			.meta({
 				title: 'Text tools target age',
 				description:
-					'Reading age the readability check scores against. Maps to `editorMarkdownNotes.textToolsTargetAge`.',
+					'Reading age the readability check scores against. Maps to `punchdown.textToolsTargetAge`.',
 			}),
 		italicMarker: z.enum(['_', '*']).catch(DEFAULT_SETTINGS.italicMarker).meta({
 			title: 'Italic marker',
 			description:
-				'Marker used when italicizing from the editor itself. Maps to `editorMarkdownNotes.italicMarker`.',
+				'Marker used when italicizing from the editor itself. Maps to `punchdown.italicMarker`.',
 		}),
 		claudePromptTemplate: z
 			.string()
@@ -151,7 +151,7 @@ const extensionSettingsSchema = z
 			.meta({
 				title: 'Claude prompt template',
 				description:
-					'Prompt sent to `claude` by the toolbar\'s "Open in Claude" action, with `%@` replaced by the note as an at-reference. Maps to `editorMarkdownNotes.claudePromptTemplate`.',
+					'Prompt sent to `claude` by the toolbar\'s "Open in Claude" action, with `%@` replaced by the note as an at-reference. Maps to `punchdown.claudePromptTemplate`.',
 			}),
 		claudeInlinePromptTemplate: z
 			.string()
@@ -160,7 +160,7 @@ const extensionSettingsSchema = z
 			.meta({
 				title: 'Claude inline prompt template',
 				description:
-					'Prompt sent to `claude` by "Open in Claude" on one part of the note, with `%c` replaced by that part\'s source. Maps to `editorMarkdownNotes.claudeInlinePromptTemplate`.',
+					'Prompt sent to `claude` by "Open in Claude" on one part of the note, with `%c` replaced by that part\'s source. Maps to `punchdown.claudeInlinePromptTemplate`.',
 			}),
 		imageCopyDirectory: z
 			.string()
@@ -168,7 +168,7 @@ const extensionSettingsSchema = z
 			.meta({
 				title: 'Image copy directory',
 				description:
-					'Where the slash command\'s "image" action copies a file picked from outside the workspace, relative to the document\'s folder. Maps to `editorMarkdownNotes.imageCopyDirectory`.',
+					'Where the slash command\'s "image" action copies a file picked from outside the workspace, relative to the document\'s folder. Maps to `punchdown.imageCopyDirectory`.',
 			}),
 	})
 	.catch(DEFAULT_SETTINGS)
@@ -176,7 +176,7 @@ const extensionSettingsSchema = z
 		id: 'ExtensionSettings',
 		title: 'Extension settings',
 		description:
-			'Read-only in the webview — owned by VS Code Settings under the `editorMarkdownNotes` section and pushed down by the host.',
+			'Read-only in the webview — owned by VS Code Settings under the `punchdown` section and pushed down by the host.',
 	})
 
 export const configSchema = z

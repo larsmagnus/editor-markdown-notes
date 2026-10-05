@@ -20,7 +20,7 @@ describe('createUnlinkCommand', () => {
 
 	it('removes the mark from an image with no text run to strip delimiters from', () => {
 		const editor = createEditor(
-			'[![alt](/icon-editor-markdown-notes.png)](https://example.com)',
+			'[![alt](/icon-punchdown.png)](https://example.com)',
 			{ parseOnly: true }
 		)
 		editor.commands.setNodeSelection(0)
@@ -31,7 +31,7 @@ describe('createUnlinkCommand', () => {
 		)
 
 		expect(editor.storage.markdown.getMarkdown()).toBe(
-			'![alt](/icon-editor-markdown-notes.png)'
+			'![alt](/icon-punchdown.png)'
 		)
 	})
 

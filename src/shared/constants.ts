@@ -14,10 +14,10 @@
  * key is built from.
  *
  * Not the id VS Code resolves an installed extension by - that one is qualified
- * with the publisher (`larsmagnus.editor-markdown-notes`) and only the
+ * with the publisher (`larsmagnus.punchdown`) and only the
  * `src/test/**` suites, which look the extension up at runtime, need it.
  */
-export const EXTENSION_ID = 'editor-markdown-notes'
+export const EXTENSION_ID = 'punchdown'
 
 /**
  * Separates the workspace folder paths the host hands the MCP server, which

@@ -30,7 +30,7 @@ let liveStorage: Storage['italic'] | null = null
  * CommonMark-valid depends on the intraword rule and on `preferredMarkup`.
  *
  * `markup` is read from `data-markup`. A fresh italic has no source marker, so
- * it uses `preferredMarkup`, kept live from `editorMarkdownNotes.italicMarker`.
+ * it uses `preferredMarkup`, kept live from `punchdown.italicMarker`.
  */
 export const ItalicExtension = createDelimitedMarkExtension(ItalicMark, {
 	ensureSpec: italicDelimiterSpec(),

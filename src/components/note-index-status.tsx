@@ -19,7 +19,7 @@ export function NoteIndexStatus({
 	matchCount,
 }: NoteIndexStatusProps) {
 	const message = failed
-		? 'Could not list the notes. “Editor Markdown Notes: Show logs” has the details.'
+		? 'Could not list the notes. “punchdown: Show logs” has the details.'
 		: statusMessage(index, query, matchCount)
 	if (!message) return null
 

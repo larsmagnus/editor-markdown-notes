@@ -7,7 +7,7 @@ import * as vscode from 'vscode'
 
 import { getWebviewProblems } from '#src/lib/host/webview-diagnostics'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const EXTENSION_ID = 'larsmagnus.punchdown'
 
 suite('Webview startup', () => {
 	suiteSetup(async () => {
@@ -28,10 +28,7 @@ suite('Webview startup', () => {
 		)
 
 		try {
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.openFile',
-				file
-			)
+			await vscode.commands.executeCommand('punchdown.openFile', file)
 
 			// The webview's watchdog reports an empty #root two seconds in, so a
 			// quiet channel past that point means the app really did render - not
@@ -60,17 +57,11 @@ suite('Webview startup', () => {
 		await fs.writeFile(file.fsPath, '# Hello\n\nA note worth returning to.\n')
 
 		try {
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.openFile',
-				file
-			)
+			await vscode.commands.executeCommand('punchdown.openFile', file)
 			await new Promise((resolve) => setTimeout(resolve, 3000))
 			await vscode.commands.executeCommand('workbench.action.closeAllEditors')
 
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.openFile',
-				file
-			)
+			await vscode.commands.executeCommand('punchdown.openFile', file)
 			await new Promise((resolve) => setTimeout(resolve, 3000))
 
 			assert.deepStrictEqual(getWebviewProblems(), [])
@@ -94,15 +85,10 @@ suite('Webview startup', () => {
 			'# Hello\n\nThe report was written by the committee, which will utilize it.\n'
 		)
 
-		await vscode.commands.executeCommand(
-			'editor-markdown-notes.toggleTextTools'
-		)
+		await vscode.commands.executeCommand('punchdown.toggleTextTools')
 
 		try {
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.openFile',
-				file
-			)
+			await vscode.commands.executeCommand('punchdown.openFile', file)
 
 			// Past the watchdog, and well past the 500ms analysis debounce, so the
 			// worker has had to start for real.
@@ -111,9 +97,7 @@ suite('Webview startup', () => {
 			assert.deepStrictEqual(getWebviewProblems(), [])
 		} finally {
 			// Left on, the toggle would leak into every test that follows.
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.toggleTextTools'
-			)
+			await vscode.commands.executeCommand('punchdown.toggleTextTools')
 			await vscode.commands.executeCommand('workbench.action.closeAllEditors')
 			await fs.rm(directory, { recursive: true, force: true })
 		}

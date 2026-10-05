@@ -1,12 +1,12 @@
 ---
-title: Editor Markdown Notes — Feature Playground
+title: punchdown — Feature Playground
 author: Lars Magnus Klavenes
 date: 2026-08-07
 tags: [testing, markdown, editor]
 draft: false
 ---
 
-# Editor Markdown Notes
+# punchdown
 
 This note is a manual test fixture. It is meant to exercise every markdown feature the editor round-trips, plus a few long paragraphs for the writing tools (passive voice, simpler words, weak words, readability).
 
@@ -94,7 +94,7 @@ function isAdmin(user: User): boolean {
 
 ```json
 {
-	"name": "editor-markdown-notes",
+	"name": "punchdown",
 	"private": true,
 	"features": ["editor", "preview", "text-tools"],
 	"version": 3
@@ -153,7 +153,7 @@ sequenceDiagram
 
 ## Image (relative path)
 
-![Editor Markdown Notes icon](./icon-editor-markdown-notes.png)
+![punchdown icon](./icon-punchdown.png)
 
 ## Image (draw.io diagram)
 

@@ -20,7 +20,7 @@ blob-report/**
 playwright/**
 **/*.log
 # Demo notes and the workspace-root copy of the icon they resolve to. Only
-# public/icon-editor-markdown-notes.png ships, as the extension's icon.
+# public/icon-punchdown.png ships, as the extension's icon.
 public/*.md
 public/*.markdown
 public/*.mdown
@@ -35,7 +35,7 @@ dist/*.mkd
 dist/*.mdx
 dist/*.txt
 dist/*.pdf
-icon-editor-markdown-notes.png
+icon-punchdown.png
 # The readme loads the screenshot over https, so it need not be packaged.
 public/screenshot-*.png
 dist/screenshot-*.png

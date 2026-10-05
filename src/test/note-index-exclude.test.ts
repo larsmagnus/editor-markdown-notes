@@ -32,7 +32,7 @@ suite('Workspace note index exclusions', () => {
 	})
 
 	test('leaves out folders listed in the index exclude setting', async () => {
-		const config = vscode.workspace.getConfiguration('editorMarkdownNotes')
+		const config = vscode.workspace.getConfiguration('punchdown')
 		await config.update(
 			'index.exclude',
 			['**/public/**'],

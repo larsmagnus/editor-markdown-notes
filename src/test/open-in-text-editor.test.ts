@@ -24,17 +24,12 @@ suite('Open in text editor', () => {
 		await fs.writeFile(file.fsPath, '# Hello\n')
 
 		try {
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.openFile',
-				file
-			)
+			await vscode.commands.executeCommand('punchdown.openFile', file)
 
 			const customTab = await waitForActiveTab(isCustomEditorTab)
 			assert.ok(customTab, 'the file should open with our custom editor')
 
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.openInTextEditor'
-			)
+			await vscode.commands.executeCommand('punchdown.openInTextEditor')
 
 			const textTab = await waitForActiveTab(
 				(tab) => tab.input instanceof vscode.TabInputText
@@ -47,10 +42,7 @@ suite('Open in text editor', () => {
 				'the text editor should open the same file'
 			)
 
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.openFile',
-				file
-			)
+			await vscode.commands.executeCommand('punchdown.openFile', file)
 
 			const returnedTab = await waitForActiveTab(isCustomEditorTab)
 			assert.ok(

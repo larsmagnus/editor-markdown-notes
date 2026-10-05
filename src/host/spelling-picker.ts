@@ -25,7 +25,7 @@ export function pickSpellingLanguage(
 		store,
 		{
 			key: 'spellingLanguage',
-			title: 'Editor Markdown Notes: spelling language',
+			title: 'punchdown: spelling language',
 			placeHolder: 'Select the English the spelling check uses',
 			choices: LANGUAGE_CHOICES,
 		},

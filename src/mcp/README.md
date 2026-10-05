@@ -13,7 +13,7 @@ No setup. The server ships with the extension and VSCode discovers it on its own
 - **It follows your settings.** Reading age, English variant, which checks are enabled and your personal word list all come from the extension's own configuration, so an agent judges a note the way your sidebar does. Change a setting and the server picks it up the next time it starts.
 - **Just ask in plain language.** The agent picks the tool. "Check this note for passive voice", "which sentences here are too hard for a 14-year-old?", "spell-check my draft and fix the real typos".
 - **It advises, it does not edit.** Findings come back with a line number and the sentence they sit in; the agent makes the edits with its normal tools, so they land in undo history like any other change.
-- **Accepting project jargon.** Ask the agent which flagged words look like vocabulary rather than mistakes, then add the ones you want with **Editor Markdown Notes: Add words to dictionary** in the Command Palette. The server cannot change your settings itself.
+- **Accepting project jargon.** Ask the agent which flagged words look like vocabulary rather than mistakes, then add the ones you want with **punchdown: Add words to dictionary** in the Command Palette. The server cannot change your settings itself.
 - **If something looks wrong.** Search `MCP` in the Command Palette: the output view carries this server's log, and there are commands to restart it or reset its cached tool list.
 
 ### What the agent gets

@@ -47,7 +47,7 @@ export async function openPdfAsNotes(
 				`Failed to check for an existing companion file: ${String(error)}`
 			)
 			vscode.window.showErrorMessage(
-				`Editor Markdown Notes: Failed to open the companion file — ${String(error)}`
+				`punchdown: Failed to open the companion file — ${String(error)}`
 			)
 			return
 		}
@@ -74,7 +74,7 @@ export async function openPdfAsNotes(
 	} catch (error: unknown) {
 		log.error(`Failed to convert PDF to notes: ${String(error)}`)
 		vscode.window.showErrorMessage(
-			`Editor Markdown Notes: Failed to convert PDF — ${String(error)}`
+			`punchdown: Failed to convert PDF — ${String(error)}`
 		)
 	}
 }

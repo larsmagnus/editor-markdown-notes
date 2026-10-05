@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs'
 
 import * as vscode from 'vscode'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const EXTENSION_ID = 'larsmagnus.punchdown'
 
 /**
  * The MCP surface, checked against the running editor rather than the typings.
@@ -40,7 +40,7 @@ suite('MCP server definition provider', () => {
 
 		assert.deepStrictEqual(
 			contributed.map((entry) => entry.id),
-			['editor-markdown-notes.text-tools']
+			['punchdown.text-tools']
 		)
 	})
 
@@ -73,7 +73,7 @@ suite('MCP server definition provider', () => {
 		const commands = await vscode.commands.getCommands(true)
 
 		assert.ok(
-			commands.includes('editor-markdown-notes.addDictionaryWords'),
+			commands.includes('punchdown.addDictionaryWords'),
 			'the MCP server cannot write settings itself - see suggest_dictionary_words'
 		)
 	})

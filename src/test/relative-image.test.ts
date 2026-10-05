@@ -8,7 +8,7 @@ import * as vscode from 'vscode'
 import { getImageBaseUris } from '#src/host/image-base-uris'
 import { resolveImageSrc } from '#src/lib/host/resolve-image-src'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const EXTENSION_ID = 'larsmagnus.punchdown'
 
 /** A 1x1 transparent PNG, so the image on disk is a real one. */
 const PIXEL_PNG = Buffer.from(
@@ -22,7 +22,7 @@ const PIXEL_PNG = Buffer.from(
  */
 async function withWebview<T>(run: (webview: vscode.Webview) => Promise<T>) {
 	const panel = vscode.window.createWebviewPanel(
-		'editor-markdown-notes.test',
+		'punchdown.test',
 		'Image resolution',
 		vscode.ViewColumn.One,
 		{ localResourceRoots: [] }

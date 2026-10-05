@@ -51,8 +51,8 @@ describe('resolveImageSrc in a VSCode webview', () => {
 
 describe('resolveImageSrc outside VSCode', () => {
 	it('leaves the path untouched when there are no bases', () => {
-		expect(resolveImageSrc('/icon-editor-markdown-notes.png', undefined)).toBe(
-			'/icon-editor-markdown-notes.png'
+		expect(resolveImageSrc('/icon-punchdown.png', undefined)).toBe(
+			'/icon-punchdown.png'
 		)
 		expect(resolveImageSrc('./diagram.png', undefined)).toBe('./diagram.png')
 	})

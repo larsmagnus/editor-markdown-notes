@@ -161,8 +161,7 @@ describe('task lists', () => {
 
 describe('images and links', () => {
 	it('keeps an image with its alt text', () => {
-		const markdown =
-			'![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)'
+		const markdown = '![punchdown icon](/icon-punchdown.png)'
 
 		expect(roundTrip(markdown)).toBe(markdown)
 	})
@@ -181,7 +180,7 @@ describe('images and links', () => {
 
 	it('keeps an image separate from the paragraph that follows it', () => {
 		const markdown = [
-			'![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)',
+			'![punchdown icon](/icon-punchdown.png)',
 			'',
 			'Link',
 		].join('\n')
@@ -191,7 +190,7 @@ describe('images and links', () => {
 
 	it('keeps an image wrapped in a link', () => {
 		const markdown =
-			'[![Editor Markdown Notes icon](/icon-editor-markdown-notes.png)](https://example.com)'
+			'[![punchdown icon](/icon-punchdown.png)](https://example.com)'
 
 		expect(roundTrip(markdown)).toBe(markdown)
 	})

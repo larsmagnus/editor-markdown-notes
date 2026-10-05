@@ -26,7 +26,7 @@ export function openFile(uri?: vscode.Uri) {
 
 	if (!isMarkdown) {
 		vscode.window.showErrorMessage(
-			`Editor Markdown Notes cannot open ${path.basename(target.path)} — it is not a markdown file`
+			`punchdown cannot open ${path.basename(target.path)} — it is not a markdown file`
 		)
 		return
 	}

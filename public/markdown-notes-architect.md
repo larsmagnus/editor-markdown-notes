@@ -21,7 +21,7 @@ Your job is to catch the specific failure mode this project keeps running into: 
 | Serializers  | **Reviewed** | See [tiptap-markdown docs](https://github.com/aguingand/tiptap-markdown) |
 | Table shapes | **Reviewed** | `table/shape.ts` is the source of truth                                  |
 
-Ping `#editor-markdown-notes` before touching anything in `table/` — three separate downstream fixes live there and each has a doc comment explaining which invariant it restores.
+Ping `#punchdown` before touching anything in `table/` — three separate downstream fixes live there and each has a doc comment explaining which invariant it restores.
 
 ```ts
 // Sketch: a test that would have caught the missing serializer
@@ -54,7 +54,7 @@ A paragraph mixing **bold**, _italic_, and `inline code`, plus a [link to the sc
 
 ## Where the pieces live
 
-![Editor Markdown Notes icon](./icon-editor-markdown-notes.png)
+![punchdown icon](./icon-punchdown.png)
 
 ![Architecture](./architecture.drawio.svg)
 

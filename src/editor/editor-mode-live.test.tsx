@@ -202,15 +202,14 @@ describe('Editor Mode Live', () => {
 	// Outside VSCode the notes are served from the site root, so the author's
 	// path is already the right one and must reach the DOM untouched.
 	it('renders an image with its alt text', async () => {
-		const content =
-			'![Editor Markdown Notes icon](./icon-editor-markdown-notes.png)'
+		const content = '![punchdown icon](./icon-punchdown.png)'
 
 		render(<EditorModeLive content={content} />)
 
 		const image = await screen.findByRole('img', {
-			name: 'Editor Markdown Notes icon',
+			name: 'punchdown icon',
 		})
-		expect(image).toHaveAttribute('src', './icon-editor-markdown-notes.png')
+		expect(image).toHaveAttribute('src', './icon-punchdown.png')
 	})
 
 	it('points images at a vscode-resource URI without rewriting the markdown', async () => {

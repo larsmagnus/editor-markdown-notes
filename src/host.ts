@@ -16,10 +16,10 @@ import { SettingsStore } from '#src/host/settings-store'
 import { ShikiThemeStore } from '#src/host/shiki-theme-store'
 
 export function activate(context: vscode.ExtensionContext) {
-	// Surfaced as "Editor Markdown Notes" in the Output panel. `log: true` makes
+	// Surfaced as "punchdown" in the Output panel. `log: true` makes
 	// it a LogOutputChannel, so entries carry a timestamp and level and the
 	// panel's own level picker filters them.
-	const log = vscode.window.createOutputChannel('Editor Markdown Notes', {
+	const log = vscode.window.createOutputChannel('punchdown', {
 		log: true,
 	})
 	context.subscriptions.push(log)

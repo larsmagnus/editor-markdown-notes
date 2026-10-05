@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Launch a clean VSCode instance with Editor Markdown Notes installed, for
+# Launch a clean VSCode instance with the extension installed, for
 # taking screenshots. Everything lives in a throwaway profile under /tmp, so
 # your normal VSCode settings and extensions are untouched.
 #
@@ -79,7 +79,7 @@ cat > "$USER_DIR/User/settings.json" <<JSON
   "window.zoomLevel": 1,
   "extensions.ignoreRecommendations": true,
   "workbench.editorAssociations": {
-    "*.md": "editor-markdown-notes.markdownEditor"
+    "*.md": "punchdown.markdownEditor"
   }
 }
 JSON
@@ -106,7 +106,7 @@ pnpm build
 pnpm dlx @vscode/vsce package --no-dependencies
 
 VERSION="$(node -p "require('$ROOT/package.json').version")"
-VSIX="$ROOT/editor-markdown-notes-$VERSION.vsix"
+VSIX="$ROOT/punchdown-$VERSION.vsix"
 [ -f "$VSIX" ] || {
   echo "Expected $VSIX, not found" >&2
   exit 1

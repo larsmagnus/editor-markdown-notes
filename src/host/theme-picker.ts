@@ -18,7 +18,7 @@ export function pickTheme(
 		store,
 		{
 			key: 'theme',
-			title: 'Editor Markdown Notes: theme',
+			title: 'punchdown: theme',
 			placeHolder: 'Select a theme',
 			choices: THEME_CHOICES,
 		},

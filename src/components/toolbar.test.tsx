@@ -6,7 +6,7 @@ import { SettingsProvider } from '#src/components/settings-provider'
 import Toolbar from '#src/components/toolbar'
 import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
-const STORAGE_KEY = 'editor-markdown-notes:view-options'
+const STORAGE_KEY = 'punchdown:view-options'
 
 afterEach(() => {
 	localStorage.clear()

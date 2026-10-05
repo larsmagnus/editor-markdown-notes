@@ -55,7 +55,7 @@ export function registerMcpProvider(
 				// `process.execPath` is the editor's own Node, so the server does not
 				// depend on one being installed or on which version it is.
 				new vscode.McpStdioServerDefinition(
-					'Markdown Notes Text Tools',
+					'punchdown Text Tools',
 					process.execPath,
 					[entry.fsPath],
 					{},

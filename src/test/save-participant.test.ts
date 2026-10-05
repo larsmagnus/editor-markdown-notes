@@ -13,7 +13,7 @@ import {
 	VIEW_TYPE,
 } from '#src/test/webview-panel-restore-support'
 
-const EXTENSION_ID = 'larsmagnus.editor-markdown-notes'
+const EXTENSION_ID = 'larsmagnus.punchdown'
 
 /** Opens a note in the custom editor and hands back the real panel. */
 async function openNote(file: vscode.Uri) {

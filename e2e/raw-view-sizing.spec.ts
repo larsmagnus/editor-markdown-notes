@@ -13,7 +13,7 @@ test.describe('Raw view', () => {
 		await openInVSCode(page, content)
 
 		await expect(
-			page.getByRole('heading', { name: 'Editor Markdown Notes', level: 1 })
+			page.getByRole('heading', { name: 'punchdown', level: 1 })
 		).toBeVisible()
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()

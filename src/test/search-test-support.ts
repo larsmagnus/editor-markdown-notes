@@ -17,7 +17,7 @@ const SEARCH_DEADLINE_MS = 20_000
  * set afterwards mean "this query found nothing" rather than "ripgrep has yet
  * to answer".
  */
-const SEED_QUERY = 'editor-markdown-notes'
+const SEED_QUERY = 'punchdown'
 
 /**
  * Whether the search view is serving `query`'s results rather than a previous

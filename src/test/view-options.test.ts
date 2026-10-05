@@ -19,10 +19,8 @@ suite('View options', () => {
 	})
 
 	test('toggling raw and full width persists across invocations', async () => {
-		await vscode.commands.executeCommand('editor-markdown-notes.toggleRaw')
-		await vscode.commands.executeCommand(
-			'editor-markdown-notes.toggleFullWidth'
-		)
+		await vscode.commands.executeCommand('punchdown.toggleRaw')
+		await vscode.commands.executeCommand('punchdown.toggleFullWidth')
 
 		// Reopening the editor is what proves persistence: the toggles are stored
 		// in globalState by the host, not in any one webview.
@@ -31,19 +29,14 @@ suite('View options', () => {
 		await fs.writeFile(file.fsPath, '# Hello\n')
 
 		try {
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.openFile',
-				file
-			)
+			await vscode.commands.executeCommand('punchdown.openFile', file)
 
 			const tab = await waitForActiveTab(isCustomEditorTab)
 			assert.ok(tab, 'the custom editor should open with the stored options')
 		} finally {
 			// Restore the defaults so the remaining tests see a clean slate.
-			await vscode.commands.executeCommand('editor-markdown-notes.toggleRaw')
-			await vscode.commands.executeCommand(
-				'editor-markdown-notes.toggleFullWidth'
-			)
+			await vscode.commands.executeCommand('punchdown.toggleRaw')
+			await vscode.commands.executeCommand('punchdown.toggleFullWidth')
 			await vscode.commands.executeCommand('workbench.action.closeAllEditors')
 			await fs.rm(directory, { recursive: true, force: true })
 		}
@@ -53,7 +46,7 @@ suite('View options', () => {
 		// Not awaited up front: the command resolves only once the quick pick
 		// closes, so awaiting it here would deadlock the test.
 		const picked = vscode.commands.executeCommand(
-			'editor-markdown-notes.selectSpellingLanguage'
+			'punchdown.selectSpellingLanguage'
 		)
 
 		await new Promise((resolve) => setTimeout(resolve, 200))

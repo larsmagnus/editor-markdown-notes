@@ -32,7 +32,7 @@ vi.mock('#src/lib/text-tools/analyze-client', () => ({
 	}),
 }))
 
-const STORAGE_KEY = 'editor-markdown-notes:view-options'
+const STORAGE_KEY = 'punchdown:view-options'
 
 afterEach(() => {
 	localStorage.clear()

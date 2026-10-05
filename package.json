@@ -1,11 +1,11 @@
 {
-	"name": "editor-markdown-notes",
-	"displayName": "Editor Markdown Notes",
+	"name": "punchdown",
+	"displayName": "punchdown_",
 	"description": "An integrated live markdown editor for VS Code, built for the AI-first era",
 	"publisher": "larsmagnus",
 	"author": "Lars Magnus Klavenes <larsmagnus@gmail.com> (https://larsmagnus.co)",
 	"license": "MIT",
-	"version": "0.29.0",
+	"version": "1.0.0",
 	"type": "module",
 	"imports": {
 		"#src/*": [
@@ -21,7 +21,7 @@
 	"private": true,
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/larsmagnus/editor-markdown-notes"
+		"url": "https://github.com/larsmagnus/punchdown"
 	},
 	"engines": {
 		"vscode": "^1.101.0"
@@ -41,7 +41,7 @@
 		"writing",
 		"formatting"
 	],
-	"icon": "public/icon-editor-markdown-notes.png",
+	"icon": "public/icon-punchdown.png",
 	"activationEvents": [
 		"onLanguage:markdown",
 		"onStartupFinished"
@@ -50,8 +50,8 @@
 	"contributes": {
 		"customEditors": [
 			{
-				"viewType": "editor-markdown-notes.markdownEditor",
-				"displayName": "Editor Markdown Notes",
+				"viewType": "punchdown.markdownEditor",
+				"displayName": "punchdown_",
 				"selector": [
 					{
 						"filenamePattern": "*.md"
@@ -76,19 +76,19 @@
 			}
 		],
 		"configuration": {
-			"title": "Editor Markdown Notes",
+			"title": "punchdown",
 			"properties": {
-				"editorMarkdownNotes.centerContent": {
+				"punchdown.centerContent": {
 					"type": "boolean",
 					"default": false,
 					"description": "Center the editor content horizontally when full width is off."
 				},
-				"editorMarkdownNotes.hideToolbar": {
+				"punchdown.hideToolbar": {
 					"type": "boolean",
 					"default": false,
 					"description": "Hide the editor's toolbar. The raw, full width, text tools, theme and spelling language toggles remain available from the command palette."
 				},
-				"editorMarkdownNotes.italicMarker": {
+				"punchdown.italicMarker": {
 					"type": "string",
 					"enum": [
 						"_",
@@ -97,33 +97,33 @@
 					"default": "_",
 					"description": "Marker used when italicizing text from the editor (toolbar, bubble menu or Cmd/Ctrl+I) rather than by typing markdown syntax directly. Italics already present in a file, however they were written, keep their original marker."
 				},
-				"editorMarkdownNotes.textToolsTargetAge": {
+				"punchdown.textToolsTargetAge": {
 					"type": "integer",
 					"default": 16,
 					"minimum": 5,
 					"maximum": 30,
 					"description": "Reading age the text tools score sentences against. A sentence too hard for this age reads as \"hard\"; one still too hard six years later, \"very hard\"."
 				},
-				"editorMarkdownNotes.claudePromptTemplate": {
+				"punchdown.claudePromptTemplate": {
 					"type": "string",
 					"default": "Read %@ so I can ask you questions about it.",
 					"maxLength": 500,
 					"editPresentation": "multilineText",
 					"description": "Prompt sent to `claude` by the toolbar's \"Open in Claude\" action. `%@` is replaced with the note as an at-reference (`@notes/roadmap.md`), `%s` with its bare path relative to the workspace root."
 				},
-				"editorMarkdownNotes.claudeInlinePromptTemplate": {
+				"punchdown.claudeInlinePromptTemplate": {
 					"type": "string",
 					"default": "Read %@, then focus on the part of it that starts with \"%c\" so I can ask you questions about that.",
 					"maxLength": 500,
 					"editPresentation": "multilineText",
 					"description": "Prompt sent to `claude` by \"Open in Claude\" on one part of a note, such as a diagram. Takes the same `%@` and `%s` tokens as the note-wide template, plus `%c` for the source of the part in question (flattened to one line and truncated)."
 				},
-				"editorMarkdownNotes.imageCopyDirectory": {
+				"punchdown.imageCopyDirectory": {
 					"type": "string",
 					"default": "assets",
 					"description": "Where the slash command's \"image\" action copies a file picked from outside the workspace, relative to the open document's folder. A file already inside the workspace is referenced in place instead of being copied."
 				},
-				"editorMarkdownNotes.index.exclude": {
+				"punchdown.index.exclude": {
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -137,177 +137,177 @@
 			{
 				"key": "ctrl+b",
 				"mac": "cmd+b",
-				"command": "editor-markdown-notes.claimFormattingShortcut",
-				"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor && editor-markdown-notes.hasSelection"
+				"command": "punchdown.claimFormattingShortcut",
+				"when": "activeCustomEditorId == punchdown.markdownEditor && punchdown.hasSelection"
 			},
 			{
 				"key": "ctrl+i",
 				"mac": "cmd+i",
-				"command": "editor-markdown-notes.claimFormattingShortcut",
-				"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor && editor-markdown-notes.hasSelection"
+				"command": "punchdown.claimFormattingShortcut",
+				"when": "activeCustomEditorId == punchdown.markdownEditor && punchdown.hasSelection"
 			},
 			{
 				"key": "ctrl+shift+x",
 				"mac": "cmd+shift+x",
-				"command": "editor-markdown-notes.claimFormattingShortcut",
-				"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor && editor-markdown-notes.hasSelection"
+				"command": "punchdown.claimFormattingShortcut",
+				"when": "activeCustomEditorId == punchdown.markdownEditor && punchdown.hasSelection"
 			},
 			{
 				"key": "ctrl+e",
 				"mac": "cmd+e",
-				"command": "editor-markdown-notes.claimFormattingShortcut",
-				"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor && editor-markdown-notes.hasSelection"
+				"command": "punchdown.claimFormattingShortcut",
+				"when": "activeCustomEditorId == punchdown.markdownEditor && punchdown.hasSelection"
 			}
 		],
 		"commands": [
 			{
-				"command": "editor-markdown-notes.openFile",
+				"command": "punchdown.openFile",
 				"title": "Open file",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.openMarkdownEditor",
-				"title": "Open with Editor Markdown Notes"
+				"command": "punchdown.openMarkdownEditor",
+				"title": "Open with punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.toggleRaw",
+				"command": "punchdown.toggleRaw",
 				"title": "Toggle raw markdown",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.toggleFullWidth",
+				"command": "punchdown.toggleFullWidth",
 				"title": "Toggle full width",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.toggleTextTools",
+				"command": "punchdown.toggleTextTools",
 				"title": "Toggle text tools",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.selectTheme",
+				"command": "punchdown.selectTheme",
 				"title": "Select theme",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.selectSpellingLanguage",
+				"command": "punchdown.selectSpellingLanguage",
 				"title": "Select spelling language",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.openInTextEditor",
+				"command": "punchdown.openInTextEditor",
 				"title": "Open in text editor",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.toggleHideToolbar",
+				"command": "punchdown.toggleHideToolbar",
 				"title": "Toggle toolbar",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.showLogs",
+				"command": "punchdown.showLogs",
 				"title": "Show logs",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.addDictionaryWords",
+				"command": "punchdown.addDictionaryWords",
 				"title": "Add words to dictionary",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.openPdfAsNotes",
+				"command": "punchdown.openPdfAsNotes",
 				"title": "Open PDF as markdown",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			},
 			{
-				"command": "editor-markdown-notes.openIndex",
+				"command": "punchdown.openIndex",
 				"title": "Open index",
-				"category": "Editor Markdown Notes"
+				"category": "punchdown"
 			}
 		],
 		"menus": {
 			"explorer/context": [
 				{
-					"command": "editor-markdown-notes.openMarkdownEditor",
+					"command": "punchdown.openMarkdownEditor",
 					"when": "resourceExtname == .md || resourceExtname == .markdown || resourceExtname == .mdown || resourceExtname == .mkd || resourceExtname == .mdx || resourceExtname == .txt",
 					"group": "navigation@1"
 				},
 				{
-					"command": "editor-markdown-notes.openPdfAsNotes",
+					"command": "punchdown.openPdfAsNotes",
 					"when": "resourceExtname == .pdf",
 					"group": "navigation@1"
 				}
 			],
 			"editor/context": [
 				{
-					"command": "editor-markdown-notes.openMarkdownEditor",
+					"command": "punchdown.openMarkdownEditor",
 					"when": "resourceLangId == markdown || resourceExtname == .mdx || resourceExtname == .txt",
 					"group": "1_open@1"
 				}
 			],
 			"editor/title/context": [
 				{
-					"command": "editor-markdown-notes.openMarkdownEditor",
+					"command": "punchdown.openMarkdownEditor",
 					"when": "resourceLangId == markdown || resourceExtname == .mdx || resourceExtname == .txt",
 					"group": "1_open"
 				},
 				{
-					"command": "editor-markdown-notes.openPdfAsNotes",
+					"command": "punchdown.openPdfAsNotes",
 					"when": "resourceExtname == .pdf",
 					"group": "1_open"
 				}
 			],
 			"commandPalette": [
 				{
-					"command": "editor-markdown-notes.openFile",
+					"command": "punchdown.openFile",
 					"when": "resourceLangId == markdown || resourceExtname == .md || resourceExtname == .mdx || resourceExtname == .txt"
 				},
 				{
-					"command": "editor-markdown-notes.openMarkdownEditor",
+					"command": "punchdown.openMarkdownEditor",
 					"when": "false"
 				},
 				{
-					"command": "editor-markdown-notes.openPdfAsNotes",
+					"command": "punchdown.openPdfAsNotes",
 					"when": "resourceExtname == .pdf"
 				},
 				{
-					"command": "editor-markdown-notes.toggleRaw",
-					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+					"command": "punchdown.toggleRaw",
+					"when": "activeCustomEditorId == punchdown.markdownEditor"
 				},
 				{
-					"command": "editor-markdown-notes.toggleFullWidth",
-					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+					"command": "punchdown.toggleFullWidth",
+					"when": "activeCustomEditorId == punchdown.markdownEditor"
 				},
 				{
-					"command": "editor-markdown-notes.toggleTextTools",
-					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+					"command": "punchdown.toggleTextTools",
+					"when": "activeCustomEditorId == punchdown.markdownEditor"
 				},
 				{
-					"command": "editor-markdown-notes.selectTheme",
-					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+					"command": "punchdown.selectTheme",
+					"when": "activeCustomEditorId == punchdown.markdownEditor"
 				},
 				{
-					"command": "editor-markdown-notes.selectSpellingLanguage",
-					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+					"command": "punchdown.selectSpellingLanguage",
+					"when": "activeCustomEditorId == punchdown.markdownEditor"
 				},
 				{
-					"command": "editor-markdown-notes.openInTextEditor",
-					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+					"command": "punchdown.openInTextEditor",
+					"when": "activeCustomEditorId == punchdown.markdownEditor"
 				},
 				{
-					"command": "editor-markdown-notes.toggleHideToolbar",
-					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+					"command": "punchdown.toggleHideToolbar",
+					"when": "activeCustomEditorId == punchdown.markdownEditor"
 				},
 				{
-					"command": "editor-markdown-notes.openIndex",
-					"when": "activeCustomEditorId == editor-markdown-notes.markdownEditor"
+					"command": "punchdown.openIndex",
+					"when": "activeCustomEditorId == punchdown.markdownEditor"
 				}
 			]
 		},
 		"mcpServerDefinitionProviders": [
 			{
-				"id": "editor-markdown-notes.text-tools",
-				"label": "Markdown Notes Text Tools"
+				"id": "punchdown.text-tools",
+				"label": "punchdown Text Tools"
 			}
 		]
 	},
@@ -319,7 +319,7 @@
 		"vscode:compile": "tsc -p ./tsconfig.host.json --noEmit && vite build -c vite.host.config.ts && pnpm vscode:bundle-externals && pnpm vscode:copy-esm-loader && pnpm vscode:bundle-mcp && pnpm vscode:sentinel",
 		"vscode:watch": "pnpm vscode:sentinel && pnpm vscode:bundle-externals && pnpm vscode:copy-esm-loader && pnpm vscode:bundle-mcp && (tsc -watch -p ./tsconfig.host.json --noEmit & vite build -c vite.host.config.ts --watch)",
 		"vscode:package": "pnpm dlx @vscode/vsce@3.9.2 package --no-dependencies",
-		"vscode:install": "pnpm install && pnpm vscode:package && code --install-extension editor-markdown-notes-$npm_package_version.vsix",
+		"vscode:install": "pnpm install && pnpm vscode:package && code --install-extension punchdown-$npm_package_version.vsix",
 		"watch": "pnpm vscode:watch",
 		"screenshot": "scripts/screenshot.sh",
 		"dictionaries:generate": "node scripts/generate-technical-terms.ts",

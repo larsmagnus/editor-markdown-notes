@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 
 import { EXTENSION_ID as COMMAND_PREFIX } from '#src/shared/constants'
 
-const MARKETPLACE_ID = 'larsmagnus.editor-markdown-notes'
+const MARKETPLACE_ID = 'larsmagnus.punchdown'
 
 suite('Formatting keybindings context key', () => {
 	suiteSetup(async () => {
