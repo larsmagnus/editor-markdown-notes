@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Changed the extension icon to the new punchdown logo
+- Changed the extension package to leave out development-only files, making the install smaller
+
 ## [1.0.0] - 2026-10-05
 
 - Changed the extension's name to punchdown, which installs as a new extension rather than updating the old one. Uninstall `editor-markdown-notes`, and point any `*.md` editor association at `punchdown.markdownEditor`
