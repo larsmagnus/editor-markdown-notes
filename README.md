@@ -6,27 +6,35 @@ An integrated live markdown editor for VS Code, built for the AI-first era
 
 ## Why
 
-- Markdown is ideal for simple editing of plain text, but not for reading or improving the quality of the text. I want one tool that excels at all these without compromising on any.
-- There's more markdown than ever in development — specs, prompts, agent definitions, and config. A better writing and reading experience matters
-- I love [Obsidian](https://obsidian.md) but prefer not switching windows.
+- Markdown suits writing, not reading or refining. One tool must do all three
+- Specs, prompts, agent definitions and config are markdown and deserve a focused experience
+- Staying in VS Code keeps your notes, code and Claude side by side, so you stay in the flow
 
 ## Features
 
 - Live, raw and text edit modes
-- Contextual formatting and editing tools
+- Slash commands for diagrams, code blocks, task lists, tables and images
+- Editable markdown syntax, revealed only under the caret
+- Typing shortcuts: wrap a selection in backticks, asterisks, underscores, tildes or quotes, or paste a URL over text to make a link
 - Claude Code integration for opening, asking and rewriting
-- Writing checks flag passive voice, weak words and hard-to-read sentences
+- Writing checks flag passive voice, weak words, hard-to-read sentences and misspellings
+- Sentiment analysis flags emotionally charged words and scores the tone of the whole note
+- Document stats and an overall readability score
 - Text quality checks exposed to AI agents over MCP
-- Code blocks and frontmatter editing with syntax highlighting (matches your VS Code theme)
+- First-class frontmatter support: edit YAML in a dedicated block with syntax highlighting, add, copy or delete it in one click, or type it by hand
+- Code blocks with syntax highlighting (matches your VS Code theme)
 - Table and image editing tools
-- Mermaid diagrams render inline
+- Mermaid diagrams render inline and support visual editing
+- draw.io support: `.drawio.svg` images render inline and copy as mermaid flowcharts, and mermaid diagrams copy back to draw.io
+- Copy a note as markdown or plain text, and a diagram as source or SVG
+- Note index of every note in the workspace, with filtering and sorting by title, folder, tag or last edit
 - Toolbar settings persist across tabs and sessions
 
 ### Supported files
 
-- `.md`, `.markdown`, `.mdown`, `.mkd`, `.txt` — open and edit directly
-- `.mdx` — opens directly, but JSX, `import`/`export` and `{expression}` blocks show as plain text rather than rendering
-- `.pdf` — its text is extracted into a markdown file, which opens instead
+- `.md`, `.markdown`, `.mdown`, `.mkd`, `.txt`: open and edit directly
+- `.mdx`: opens directly, but JSX, `import`/`export` and `{expression}` blocks show as plain text rather than rendering
+- `.pdf`: its text is extracted into a markdown file, which opens instead
 
 ## Usage
 
@@ -66,8 +74,9 @@ Available under Settings → Extensions → Editor Markdown Notes (or the cog on
 | `editorMarkdownNotes.claudePromptTemplate`       | `Read %@ so I can ask you questions about it.`                                                       | Prompt sent to `claude` by the toolbar's "Open in Claude" action                                                            |
 | `editorMarkdownNotes.claudeInlinePromptTemplate` | `Read %@, then focus on the part of it that starts with "%c" so I can ask you questions about that.` | Prompt sent by "Open in Claude" on one part of a note, such as a diagram                                                    |
 | `editorMarkdownNotes.imageCopyDirectory`         | `assets`                                                                                             | Where the slash command's "image" action copies a file picked from outside the workspace, relative to the document's folder |
+| `editorMarkdownNotes.index.exclude`              | `[]`                                                                                                 | Glob patterns for notes to leave out of the index, such as `**/archive/**`                                                  |
 
-Both templates take the same tokens: `%@` the note as an at-reference (`@notes/roadmap.md`), `%s` its bare path, and `%c` the source of the part being asked about — a diagram's, for the inline template, and nothing for the note-wide one.
+Both templates take the same tokens: `%@` the note as an at-reference (`@notes/roadmap.md`), `%s` its bare path, and `%c` the source of the part being asked about. For the inline template that is a diagram's source, and the note-wide one has none.
 
 The toolbar toggles are available from the command palette while the editor is focused, so they stay reachable with `hideToolbar` turned on.
 
@@ -89,32 +98,38 @@ All of them are shared across open tabs and persist between sessions.
 | Editor Markdown Notes: Toggle toolbar                  | `editor-markdown-notes.toggleHideToolbar`      | Show or hide the toolbar                                                |
 | Editor Markdown Notes: Show logs                       | `editor-markdown-notes.showLogs`               | Open the output channel used to debug a blank panel                     |
 | Editor Markdown Notes: Open PDF as markdown            | `editor-markdown-notes.openPdfAsNotes`         | Extract a PDF's text into a markdown file and open it                   |
+| Editor Markdown Notes: Open index                      | `editor-markdown-notes.openIndex`              | Browse, filter and sort every note in the workspace                     |
 
 ## Text tools
 
 The text tools sidebar checks the prose as you write, highlighting findings in the document and listing them alongside it. Click one to jump to it.
 
-| Check         | Flags                                                   |
-| ------------- | ------------------------------------------------------- |
-| Passive voice | Sentences where the subject receives the action         |
-| Simpler words | Long or formal words with plainer equivalents           |
-| Weak words    | Filler, hedges and vague intensifiers                   |
-| Hard to read  | Sentences above `textToolsTargetAge`, in two severities |
-| Spelling      | Words missing from the English dictionary you pick      |
+| Check          | Flags                                                   |
+| -------------- | ------------------------------------------------------- |
+| Passive voice  | Sentences where the subject receives the action         |
+| Simpler words  | Long or formal words with plainer equivalents           |
+| Weak words     | Filler, hedges and vague intensifiers                   |
+| Hard to read   | Sentences above `textToolsTargetAge`, in two severities |
+| Spelling       | Words missing from the English dictionary you pick      |
+| Sentiment      | Emotionally charged words, plus the note's overall tone |
+| Repeated words | The same word typed twice in a row                      |
+| Dash overuse   | Sentences overusing em and en dashes                    |
 
-Readability is scored by seven algorithms (Dale–Chall, Flesch, SMOG and others). A sentence too hard for the target age reads as _hard_; one still too hard six years later, _very hard_.
-
-Spelling is off until you switch it on, and measures against American, British or Australian English — pick one beside the check, or from **Editor Markdown Notes: Select spelling language**. Code blocks and inline code spans are left alone, as are the keys in YAML frontmatter.
-
-Individual checks can be switched off in the panel, and the selection persists. Nothing is analysed — and none of the analysis code is even downloaded — until the panel is opened. The dictionary is a download of its own, fetched the first time spelling is switched on.
+- **Readability:** scored by seven algorithms. A sentence is _hard_ above the target age and _very hard_ six years above it
+- **Spelling:** off by default. Pick American, British or Australian English beside the check, or with **Editor Markdown Notes: Select spelling language**
+- **Skipped:** code blocks, inline code and YAML frontmatter keys
+- **Toggles:** switch checks off individually. Your choice persists
+- **Lazy:** nothing loads until you open the panel, and the dictionary downloads when you first enable spelling
 
 ### For AI agents
 
-Text quality checks are available to AI agents in the editor over MCP, using your configured reading age, language and custom words list — so an agent judges a note the way the text tools sidebar does. It ships with the extension and needs no setup; accept the editor's prompt to refresh its tools when it first appears.
+Agents in the editor run the same checks over MCP, using your reading age, language and custom words. No setup. Accept the editor's prompt to refresh its tools.
 
-Ask in plain language ("check this note for passive voice", "which sentences are too hard for a 14-year-old?"). Findings come back with a line number and the sentence they sit in, and the agent makes the edits with its normal tools.
+- Ask in plain language: "check this note for passive voice"
+- Findings include the line number and sentence
+- The agent makes the edits itself
 
-See [`src/mcp/README.md`](src/mcp/README.md) for what it does and why.
+See [`src/mcp/README.md`](src/mcp/README.md) for details.
 
 ## Troubleshooting
 
@@ -135,7 +150,7 @@ pnpm vscode:install
 
 Reload the window (Command Palette → **Developer: Reload Window**) after installing.
 
-Uninstall
+To uninstall:
 
 ```sh
 code --uninstall-extension larsmagnus.editor-markdown-notes
