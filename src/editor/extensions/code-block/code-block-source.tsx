@@ -46,7 +46,7 @@ export function CodeBlockSource({
 					copied={copied}
 					label="Copy code"
 					size="icon"
-					className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
+					className="absolute top-[min(calc(50%-1rem),0.5rem)] right-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
 					onClick={handleCopy}
 				/>
 			) : null}
