@@ -1,4 +1,4 @@
-import type { ChangeEvent, KeyboardEvent, RefObject } from 'react'
+import type { ChangeEvent, KeyboardEvent, ReactNode, RefObject } from 'react'
 
 import { NoteIndexSortToggle } from '#src/components/note-index-sort-toggle'
 import { Input } from '#src/components/ui/input'
@@ -12,9 +12,10 @@ type NoteIndexControlsProps = {
 	onSortChange: (sort: NoteIndexSort) => void
 	/** ArrowDown in the filter, to hand focus on to the results. */
 	onLeaveFilter: () => void
+	filterControl?: ReactNode
 }
 
-/** The index's filter field and sort order. */
+/** The index's filter field, what else narrows it, and its sort order. */
 export function NoteIndexControls({
 	filterRef,
 	query,
@@ -22,6 +23,7 @@ export function NoteIndexControls({
 	sort,
 	onSortChange,
 	onLeaveFilter,
+	filterControl,
 }: NoteIndexControlsProps) {
 	function handleQueryChange(event: ChangeEvent<HTMLInputElement>) {
 		onQueryChange(event.target.value)
@@ -46,6 +48,7 @@ export function NoteIndexControls({
 				onKeyDown={handleFilterKeyDown}
 				className="max-w-sm"
 			/>
+			{filterControl}
 			<NoteIndexSortToggle sort={sort} onSortChange={onSortChange} />
 		</div>
 	)

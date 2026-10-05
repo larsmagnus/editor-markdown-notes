@@ -65,4 +65,59 @@ test.describe('Index of notes', () => {
 		await expect(page.getByRole('dialog', { name: 'Index' })).toBeHidden()
 		await expect(openIndex).toBeFocused()
 	})
+
+	test('gives every card the same height, whatever the note holds', async ({
+		page,
+	}) => {
+		await page.goto('/')
+		await page.getByRole('button', { name: 'Open index' }).click()
+
+		const cards = page.getByRole('list', { name: 'Notes' }).getByRole('button')
+		await expect(cards.first()).toBeVisible()
+		const heights = await cards.evaluateAll((elements) =>
+			elements.map((element) =>
+				Math.round(element.getBoundingClientRect().height)
+			)
+		)
+
+		expect(heights.length).toBeGreaterThan(1)
+		expect(new Set(heights).size).toBe(1)
+	})
+
+	test('labels the folder of each card with its full path on hover', async ({
+		page,
+	}) => {
+		await page.goto('/')
+		await page.getByRole('button', { name: 'Open index' }).click()
+
+		const cards = page.getByRole('list', { name: 'Notes' }).getByRole('button')
+		await expect(cards.first()).toBeVisible()
+
+		await expect(cards.first().locator('[title]').first()).toHaveAttribute(
+			'title',
+			/.+/
+		)
+	})
+
+	test('keeps the details inside the card at a narrow width', async ({
+		page,
+	}) => {
+		await page.setViewportSize({ width: 560, height: 900 })
+		await page.goto('/')
+		await page.getByRole('button', { name: 'Open index' }).click()
+
+		const cards = page.getByRole('list', { name: 'Notes' }).getByRole('button')
+		await expect(cards.first()).toBeVisible()
+		const overflowing = await cards.evaluateAll(
+			(elements) =>
+				elements.filter((card) => {
+					const cardRight = card.getBoundingClientRect().right
+					return [...card.querySelectorAll('time, span')].some(
+						(part) => part.getBoundingClientRect().right > cardRight
+					)
+				}).length
+		)
+
+		expect(overflowing).toBe(0)
+	})
 })

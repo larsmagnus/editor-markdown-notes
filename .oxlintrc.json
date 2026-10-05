@@ -11,6 +11,7 @@
 		"react/purity": "error",
 		"react/immutability": "error",
 		"react/only-export-components": ["warn", { "allowConstantExport": true }],
+		"react/no-multi-comp": "error",
 		"no-restricted-imports": [
 			"error",
 			{
@@ -28,6 +29,7 @@
 			"files": ["src/components/ui/**"],
 			"rules": {
 				"react/only-export-components": "off",
+				"react/no-multi-comp": "off",
 				"no-restricted-imports": "off"
 			}
 		},

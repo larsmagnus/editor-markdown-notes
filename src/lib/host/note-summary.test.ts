@@ -175,7 +175,7 @@ describe('summarizeNote frontmatter fields', () => {
 			'---',
 		].join('\n')
 
-		expect(summarizeNote(markdown, 'agent.md').description).toBeNull()
+		expect(summarizeNote(markdown, 'agent.md').content).toBeNull()
 	})
 
 	it('falls through a block scalar title to the h1', () => {
@@ -197,23 +197,70 @@ describe('summarizeNote frontmatter fields', () => {
 		expect(summarizeNote(markdown, 'plan.md').tags).toEqual(['planning', 'q3'])
 	})
 
-	it('reads the description', () => {
+	it('reads the frontmatter description as the content', () => {
 		const markdown = [
 			'---',
 			"description: 'Reviews diffs for bugs'",
 			'---',
 		].join('\n')
 
-		expect(summarizeNote(markdown, 'agent.md').description).toBe(
+		expect(summarizeNote(markdown, 'agent.md').content).toBe(
 			'Reviews diffs for bugs'
 		)
 	})
 
-	it('has no tags or description without frontmatter', () => {
+	it('prefers the frontmatter description over the first paragraph', () => {
+		const markdown = [
+			'---',
+			'description: Reviews diffs',
+			'---',
+			'',
+			'# Reviewer',
+			'',
+			'A longer introduction.',
+		].join('\n')
+
+		expect(summarizeNote(markdown, 'agent.md').content).toBe('Reviews diffs')
+	})
+
+	it('falls back to the first paragraph without a frontmatter description', () => {
+		const markdown = ['# Roadmap', '', 'What ships this quarter.'].join('\n')
+
+		expect(summarizeNote(markdown, 'roadmap.md').content).toBe(
+			'What ships this quarter.'
+		)
+	})
+
+	it('falls back to the first paragraph when the description is a block scalar', () => {
+		const markdown = [
+			'---',
+			'description: >-',
+			'  Reviews diffs',
+			'---',
+			'',
+			'# Reviewer',
+			'',
+			'A longer introduction.',
+		].join('\n')
+
+		expect(summarizeNote(markdown, 'agent.md').content).toBe(
+			'A longer introduction.'
+		)
+	})
+
+	it('does not repeat a title taken from the opening line as the content', () => {
+		const markdown = ['Buy milk', '', 'From the corner shop.'].join('\n')
+
+		expect(summarizeNote(markdown, 'todo.md').content).toBe(
+			'From the corner shop.'
+		)
+	})
+
+	it('has no tags or content for a note holding only a heading', () => {
 		const summary = summarizeNote('# Notes', 'notes.md')
 
 		expect(summary.tags).toEqual([])
-		expect(summary.description).toBeNull()
+		expect(summary.content).toBeNull()
 	})
 })
 

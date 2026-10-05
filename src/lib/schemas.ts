@@ -91,6 +91,22 @@ export const viewOptionsSchema = z
 				description:
 					'Words the spelling check accepts on top of its dictionary. Written by the "Add words to dictionary" command.',
 			}),
+		noteIndexRespectGitignore: z
+			.boolean()
+			.catch(DEFAULT_VIEW_OPTIONS.noteIndexRespectGitignore)
+			.meta({
+				title: 'Note index respects .gitignore',
+				description:
+					"Leave out of the note index whatever the workspace's .gitignore ignores.",
+			}),
+		noteIndexShowAiToolFolders: z
+			.boolean()
+			.catch(DEFAULT_VIEW_OPTIONS.noteIndexShowAiToolFolders)
+			.meta({
+				title: 'Note index shows AI-tool folders',
+				description:
+					"Keep AI tools' own directories (.claude, .cursor, …) in the note index even when they are gitignored.",
+			}),
 	})
 	.catch(DEFAULT_VIEW_OPTIONS)
 	.meta({
@@ -361,7 +377,7 @@ const noteIndexEntrySchema: z.ZodType<NoteIndexEntry> = z.object({
 	fileName: z.string(),
 	directory: z.string(),
 	title: z.string(),
-	description: z.string().nullable(),
+	content: z.string().nullable(),
 	tags: z.array(z.string()),
 	modified: z.number().nullable(),
 	size: z.number(),
@@ -373,8 +389,14 @@ const noteIndexEntrySchema: z.ZodType<NoteIndexEntry> = z.object({
 export const noteIndexMessageSchema = z
 	.object({
 		type: z.literal('noteIndex'),
+		requestId: z.number(),
 		entries: z.array(noteIndexEntrySchema),
 		total: z.number(),
+		directories: z.array(
+			z.object({ directory: z.string(), count: z.number() })
+		),
+		hiddenDirectories: z.array(z.string()),
+		gitUnavailable: z.boolean(),
 	})
 	.meta({
 		id: 'NoteIndexMessage',
@@ -397,6 +419,7 @@ export const showNoteIndexMessageSchema = z
 export const noteIndexFailedMessageSchema = z
 	.object({
 		type: z.literal('noteIndexFailed'),
+		requestId: z.number(),
 	})
 	.meta({
 		id: 'NoteIndexFailedMessage',

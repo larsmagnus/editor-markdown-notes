@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-import type { IndexedFile } from '#src/host/note-index'
+import type { IndexedFile } from '#src/host/note-index-entry'
 import { summarizeNote } from '#src/lib/host/note-summary'
 import type { NoteSummary } from '#src/shared/messages'
 
@@ -17,7 +17,7 @@ export async function readNoteSummary(
 ): Promise<NoteSummary> {
 	const unread = {
 		title: fileName,
-		description: null,
+		content: null,
 		tags: [],
 		characters: null,
 		words: null,

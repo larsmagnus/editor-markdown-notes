@@ -24,6 +24,17 @@ describe('buildNoteIndexExclude', () => {
 		)
 	})
 
+	it.each([
+		['test-results'],
+		['playwright-report'],
+		['.nyc_output'],
+		['.pytest_cache'],
+	])('excludes the %s tool output directory by default', (directory) => {
+		const patterns = excludedPatterns(buildNoteIndexExclude({}, []))
+
+		expect(patterns).toContain(`**/${directory}/**`)
+	})
+
 	it('leaves dot-directories that hold notes, such as .claude, in scope', () => {
 		const patterns = excludedPatterns(buildNoteIndexExclude({}, []))
 

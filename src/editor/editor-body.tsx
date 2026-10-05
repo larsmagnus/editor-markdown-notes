@@ -1,12 +1,11 @@
 import type { Editor } from '@tiptap/react'
 import { EditorContext } from '@tiptap/react'
-import { cn } from 'cn'
-import type { ReactNode } from 'react'
 import { useState } from 'react'
 
 import { AppErrorBoundary } from '#src/components/app-error-boundary'
 import EditorModeLive from '#src/editor/editor-mode-live'
 import { EditorModeRaw } from '#src/editor/editor-mode-raw'
+import { EditorModeSlot } from '#src/editor/editor-mode-slot'
 import { useAnalyzer } from '#src/hooks/use-analyzer'
 import { RawTextToolsContext } from '#src/hooks/use-raw-text-tools-location'
 import { EMPTY_TEXT_TOOLS_STATE } from '#src/hooks/use-report-live-editor'
@@ -21,25 +20,6 @@ interface EditorBodyProps {
 	raw: boolean
 	className?: string
 	fileKind?: FileKind
-}
-
-interface EditorModeSlotProps {
-	active: boolean
-	children: ReactNode
-}
-
-/**
- * A wrapper that either behaves as if it were not there, or hides its
- * subtree entirely.
- *
- * `display: contents` removes the wrapper from the box tree while active, so
- * the layout is exactly what it would be without this component - both slots
- * sit inside the same shared content column below, so neither mode's own
- * root needs to be a flex item itself. `hidden` removes the inactive one
- * from layout, the tab order and the accessibility tree instead.
- */
-function EditorModeSlot({ active, children }: EditorModeSlotProps) {
-	return <div className={cn(active ? 'contents' : 'hidden')}>{children}</div>
 }
 
 /**

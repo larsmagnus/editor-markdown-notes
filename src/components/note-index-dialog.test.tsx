@@ -21,7 +21,7 @@ const roadmap: NoteIndexEntry = {
 	fileName: 'roadmap.md',
 	directory: 'docs/planning',
 	title: 'Quarterly roadmap',
-	description: 'What ships this quarter',
+	content: 'What ships this quarter',
 	tags: ['planning', 'q3'],
 	modified: NOW - 3 * DAY,
 	size: 1_234,
@@ -35,7 +35,7 @@ const reviewer: NoteIndexEntry = {
 	fileName: 'code-reviewer.md',
 	directory: '.claude/agents',
 	title: 'code-reviewer',
-	description: null,
+	content: null,
 	tags: [],
 	modified: NOW - 2 * 60 * 60 * 1000,
 	size: 5_600,
@@ -49,7 +49,7 @@ const changelog: NoteIndexEntry = {
 	fileName: 'CHANGELOG.md',
 	directory: '',
 	title: 'Changelog',
-	description: null,
+	content: null,
 	tags: [],
 	modified: NOW - 10 * DAY,
 	size: 800,
@@ -58,7 +58,13 @@ const changelog: NoteIndexEntry = {
 	current: false,
 }
 
-const index: NoteIndex = { entries: [roadmap, reviewer, changelog], total: 3 }
+const index: NoteIndex = {
+	entries: [roadmap, reviewer, changelog],
+	total: 3,
+	directories: [],
+	hiddenDirectories: [],
+	gitUnavailable: false,
+}
 
 function cardTitles(): string[] {
 	const grid = screen.getByRole('list', { name: 'Notes' })
@@ -91,7 +97,39 @@ describe('NoteIndexDialog cards', () => {
 		expect(within(card).getByText('q3')).toBeTruthy()
 		expect(within(card).getByText('3 days ago')).toBeTruthy()
 		expect(within(card).getByText('210 words')).toBeTruthy()
-		expect(within(card).getByText('1,234 characters')).toBeTruthy()
+		expect(within(card).getByText('1,234 chars')).toBeTruthy()
+	})
+
+	it('gives the folder a tooltip with its full path', () => {
+		render(
+			<NoteIndexDialog
+				open
+				onOpenChange={() => {}}
+				index={index}
+				onOpenEntry={() => {}}
+			/>
+		)
+
+		const card = screen.getByRole('button', { name: 'Quarterly roadmap' })
+
+		expect(
+			within(card).getByText('docs/planning').closest('[title]')
+		).toHaveProperty('title', 'docs/planning')
+	})
+
+	it('labels a note at the workspace root, where it has no folder', () => {
+		render(
+			<NoteIndexDialog
+				open
+				onOpenChange={() => {}}
+				index={index}
+				onOpenEntry={() => {}}
+			/>
+		)
+
+		const card = screen.getByRole('button', { name: 'Changelog' })
+
+		expect(within(card).getByTitle('Workspace root')).toBeTruthy()
 	})
 
 	it('shows the size instead of counts for a note too large to read', () => {
@@ -104,6 +142,9 @@ describe('NoteIndexDialog cards', () => {
 						{ ...roadmap, characters: null, words: null, size: 3_500_000 },
 					],
 					total: 1,
+					directories: [],
+					hiddenDirectories: [],
+					gitUnavailable: false,
 				}}
 				onOpenEntry={() => {}}
 			/>
@@ -112,7 +153,7 @@ describe('NoteIndexDialog cards', () => {
 		const card = screen.getByRole('button', { name: 'Quarterly roadmap' })
 
 		expect(within(card).getByText('3.3 MB')).toBeTruthy()
-		expect(within(card).queryByText(/characters/)).toBeNull()
+		expect(within(card).queryByText(/chars/)).toBeNull()
 	})
 
 	it('omits the last-edited time when it is unknown', () => {
@@ -120,7 +161,13 @@ describe('NoteIndexDialog cards', () => {
 			<NoteIndexDialog
 				open
 				onOpenChange={() => {}}
-				index={{ entries: [{ ...roadmap, modified: null }], total: 1 }}
+				index={{
+					entries: [{ ...roadmap, modified: null }],
+					total: 1,
+					directories: [],
+					hiddenDirectories: [],
+					gitUnavailable: false,
+				}}
 				onOpenEntry={() => {}}
 			/>
 		)
@@ -467,7 +514,13 @@ describe('NoteIndexDialog states', () => {
 			<NoteIndexDialog
 				open
 				onOpenChange={() => {}}
-				index={{ entries: [roadmap, reviewer], total: 2_345 }}
+				index={{
+					entries: [roadmap, reviewer],
+					total: 2_345,
+					directories: [],
+					hiddenDirectories: [],
+					gitUnavailable: false,
+				}}
 				onOpenEntry={() => {}}
 			/>
 		)
@@ -482,7 +535,13 @@ describe('NoteIndexDialog states', () => {
 			<NoteIndexDialog
 				open
 				onOpenChange={() => {}}
-				index={{ entries: [], total: 0 }}
+				index={{
+					entries: [],
+					total: 0,
+					directories: [],
+					hiddenDirectories: [],
+					gitUnavailable: false,
+				}}
 				onOpenEntry={() => {}}
 			/>
 		)

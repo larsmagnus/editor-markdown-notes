@@ -11,7 +11,7 @@ const ROADMAP_ENTRY = {
 	fileName: 'roadmap.md',
 	directory: 'notes',
 	title: 'Roadmap',
-	description: null,
+	content: null,
 	tags: [],
 	modified: 1_700_000_000_000,
 	size: 120,
@@ -61,7 +61,8 @@ describe('useNoteIndex inside VS Code', () => {
 		)
 
 		expect(postMessage).not.toHaveBeenCalled()
-		expect(result.current).toEqual({ index: null, failed: false })
+		expect(result.current.index).toBeNull()
+		expect(result.current.failed).toBe(false)
 	})
 
 	it('asks the host for the notes when the index opens, ignoring the demo files', () => {
@@ -74,7 +75,12 @@ describe('useNoteIndex inside VS Code', () => {
 			{ wrapper: inVSCode }
 		)
 
-		expect(postMessage).toHaveBeenCalledWith({ type: 'getNoteIndex' })
+		expect(postMessage).toHaveBeenCalledWith({
+			type: 'getNoteIndex',
+			requestId: 1,
+			respectGitignore: true,
+			showAiToolFolders: true,
+		})
 		expect(result.current.index).toBeNull()
 	})
 
@@ -92,12 +98,26 @@ describe('useNoteIndex inside VS Code', () => {
 		act(() => {
 			window.dispatchEvent(
 				new MessageEvent('message', {
-					data: { type: 'noteIndex', entries: [ROADMAP_ENTRY], total: 1 },
+					data: {
+						type: 'noteIndex',
+						requestId: 1,
+						entries: [ROADMAP_ENTRY],
+						total: 1,
+						directories: [],
+						hiddenDirectories: [],
+						gitUnavailable: false,
+					},
 				})
 			)
 		})
 
-		expect(result.current.index).toEqual({ entries: [ROADMAP_ENTRY], total: 1 })
+		expect(result.current.index).toEqual({
+			entries: [ROADMAP_ENTRY],
+			total: 1,
+			directories: [],
+			hiddenDirectories: [],
+			gitUnavailable: false,
+		})
 		expect(result.current.failed).toBe(false)
 	})
 
@@ -118,7 +138,8 @@ describe('useNoteIndex inside VS Code', () => {
 			)
 		})
 
-		expect(result.current).toEqual({ index: null, failed: false })
+		expect(result.current.index).toBeNull()
+		expect(result.current.failed).toBe(false)
 	})
 
 	it('reports a failed search', () => {
@@ -134,7 +155,9 @@ describe('useNoteIndex inside VS Code', () => {
 
 		act(() => {
 			window.dispatchEvent(
-				new MessageEvent('message', { data: { type: 'noteIndexFailed' } })
+				new MessageEvent('message', {
+					data: { type: 'noteIndexFailed', requestId: 1 },
+				})
 			)
 		})
 
@@ -151,7 +174,15 @@ describe('useNoteIndex inside VS Code', () => {
 		act(() => {
 			window.dispatchEvent(
 				new MessageEvent('message', {
-					data: { type: 'noteIndex', entries: [ROADMAP_ENTRY], total: 1 },
+					data: {
+						type: 'noteIndex',
+						requestId: 1,
+						entries: [ROADMAP_ENTRY],
+						total: 1,
+						directories: [],
+						hiddenDirectories: [],
+						gitUnavailable: false,
+					},
 				})
 			)
 		})
@@ -159,8 +190,185 @@ describe('useNoteIndex inside VS Code', () => {
 		rerender({ open: false })
 		rerender({ open: true })
 
-		expect(result.current).toEqual({ index: null, failed: false })
+		expect(result.current.index).toBeNull()
+		expect(result.current.failed).toBe(false)
 		expect(postMessage).toHaveBeenCalledTimes(2)
+	})
+
+	it('sends the index switches the author has turned off', () => {
+		const postMessage = vi.fn()
+		window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
+		function withSwitchesOff({ children }: PropsWithChildren) {
+			return (
+				<SettingsContext.Provider
+					value={{
+						viewOptions: {
+							...DEFAULT_VIEW_OPTIONS,
+							noteIndexRespectGitignore: false,
+							noteIndexShowAiToolFolders: false,
+						},
+						setViewOptions: () => {},
+						settings: DEFAULT_SETTINGS,
+						isVSCodeContext: true,
+					}}
+				>
+					{children}
+				</SettingsContext.Provider>
+			)
+		}
+
+		renderHook(
+			() => useNoteIndex({ open: true, files: [], fileName: 'roadmap.md' }),
+			{ wrapper: withSwitchesOff }
+		)
+
+		expect(postMessage).toHaveBeenCalledWith({
+			type: 'getNoteIndex',
+			requestId: 1,
+			respectGitignore: false,
+			showAiToolFolders: false,
+		})
+	})
+
+	it('hides a directory at once and asks again with it hidden', () => {
+		const postMessage = vi.fn()
+		window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
+		const { result } = renderHook(
+			() => useNoteIndex({ open: true, files: [], fileName: 'roadmap.md' }),
+			{ wrapper: inVSCode }
+		)
+
+		act(() => result.current.toggleDirectoryHidden('docs'))
+
+		expect(result.current.hiddenDirectories).toEqual(['docs'])
+		expect(postMessage).toHaveBeenLastCalledWith({
+			type: 'getNoteIndex',
+			requestId: 2,
+			respectGitignore: true,
+			showAiToolFolders: true,
+			hiddenDirectories: ['docs'],
+		})
+	})
+
+	it('shows a hidden directory again, keeping the others hidden', () => {
+		const postMessage = vi.fn()
+		window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
+		const { result } = renderHook(
+			() => useNoteIndex({ open: true, files: [], fileName: 'roadmap.md' }),
+			{ wrapper: inVSCode }
+		)
+		act(() => result.current.toggleDirectoryHidden('docs'))
+		act(() => result.current.toggleDirectoryHidden('archive'))
+
+		act(() => result.current.toggleDirectoryHidden('docs'))
+
+		expect(result.current.hiddenDirectories).toEqual(['archive'])
+	})
+
+	it('starts from what the host stored each time the index opens', () => {
+		const postMessage = vi.fn()
+		window.vscode = { postMessage, getState: vi.fn(), setState: vi.fn() }
+		const { result, rerender } = renderHook(
+			({ open }) => useNoteIndex({ open, files: [], fileName: 'roadmap.md' }),
+			{ initialProps: { open: true }, wrapper: inVSCode }
+		)
+		act(() => result.current.toggleDirectoryHidden('docs'))
+
+		rerender({ open: false })
+		rerender({ open: true })
+
+		expect(postMessage).toHaveBeenLastCalledWith({
+			type: 'getNoteIndex',
+			requestId: 3,
+			respectGitignore: true,
+			showAiToolFolders: true,
+		})
+	})
+
+	it('ignores a late answer to an ask the author has since replaced', () => {
+		window.vscode = {
+			postMessage: vi.fn(),
+			getState: vi.fn(),
+			setState: vi.fn(),
+		}
+		const { result } = renderHook(
+			() => useNoteIndex({ open: true, files: [], fileName: 'roadmap.md' }),
+			{ wrapper: inVSCode }
+		)
+		act(() => result.current.toggleDirectoryHidden('docs'))
+
+		act(() => {
+			window.dispatchEvent(
+				new MessageEvent('message', {
+					data: {
+						type: 'noteIndex',
+						requestId: 1,
+						entries: [ROADMAP_ENTRY],
+						total: 1,
+						directories: [],
+						hiddenDirectories: [],
+						gitUnavailable: false,
+					},
+				})
+			)
+		})
+
+		expect(result.current.index).toBeNull()
+		expect(result.current.hiddenDirectories).toEqual(['docs'])
+	})
+
+	it('lists the answer to the latest ask once it arrives', () => {
+		window.vscode = {
+			postMessage: vi.fn(),
+			getState: vi.fn(),
+			setState: vi.fn(),
+		}
+		const { result } = renderHook(
+			() => useNoteIndex({ open: true, files: [], fileName: 'roadmap.md' }),
+			{ wrapper: inVSCode }
+		)
+		act(() => result.current.toggleDirectoryHidden('docs'))
+
+		act(() => {
+			window.dispatchEvent(
+				new MessageEvent('message', {
+					data: {
+						type: 'noteIndex',
+						requestId: 2,
+						entries: [ROADMAP_ENTRY],
+						total: 1,
+						directories: [],
+						hiddenDirectories: ['docs'],
+						gitUnavailable: false,
+					},
+				})
+			)
+		})
+
+		expect(result.current.index?.entries).toEqual([ROADMAP_ENTRY])
+	})
+
+	it('ignores a late failure of an ask the author has since replaced', () => {
+		window.vscode = {
+			postMessage: vi.fn(),
+			getState: vi.fn(),
+			setState: vi.fn(),
+		}
+		const { result } = renderHook(
+			() => useNoteIndex({ open: true, files: [], fileName: 'roadmap.md' }),
+			{ wrapper: inVSCode }
+		)
+		act(() => result.current.toggleDirectoryHidden('docs'))
+
+		act(() => {
+			window.dispatchEvent(
+				new MessageEvent('message', {
+					data: { type: 'noteIndexFailed', requestId: 1 },
+				})
+			)
+		})
+
+		expect(result.current.failed).toBe(false)
 	})
 
 	it('forgets a failure when the index is opened again', () => {
@@ -175,7 +383,9 @@ describe('useNoteIndex inside VS Code', () => {
 		)
 		act(() => {
 			window.dispatchEvent(
-				new MessageEvent('message', { data: { type: 'noteIndexFailed' } })
+				new MessageEvent('message', {
+					data: { type: 'noteIndexFailed', requestId: 1 },
+				})
 			)
 		})
 
@@ -200,7 +410,15 @@ describe('useNoteIndex inside VS Code', () => {
 		act(() => {
 			window.dispatchEvent(
 				new MessageEvent('message', {
-					data: { type: 'noteIndex', entries: [ROADMAP_ENTRY], total: 1 },
+					data: {
+						type: 'noteIndex',
+						requestId: 1,
+						entries: [ROADMAP_ENTRY],
+						total: 1,
+						directories: [],
+						hiddenDirectories: [],
+						gitUnavailable: false,
+					},
 				})
 			)
 		})

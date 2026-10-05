@@ -1,16 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
-import { useHostMessage } from '#src/hooks/use-host-message'
+import { useHostNoteIndex } from '#src/hooks/use-host-note-index'
 import { useSettings } from '#src/hooks/use-settings'
-import { summarizeNote } from '#src/lib/host/note-summary'
-import {
-	noteIndexFailedMessageSchema,
-	noteIndexMessageSchema,
-} from '#src/lib/schemas'
-import { getVSCodeApi } from '#src/lib/vscode-api'
+import { buildDemoIndex } from '#src/lib/note-index/build-demo-index'
+import type { DemoFile } from '#src/lib/note-index/build-demo-index'
 import type { NoteIndex } from '#src/shared/messages'
-
-type DemoFile = { value: string; content: string }
 
 type UseNoteIndexOptions = {
 	open: boolean
@@ -30,59 +24,18 @@ type UseNoteIndexOptions = {
 export function useNoteIndex({ open, files, fileName }: UseNoteIndexOptions): {
 	index: NoteIndex | null
 	failed: boolean
+	/** What is hidden right now, ahead of the host confirming it. */
+	hiddenDirectories: string[]
+	toggleDirectoryHidden: (directory: string) => void
 } {
 	const { isVSCodeContext } = useSettings()
-	const [hostIndex, setHostIndex] = useState<NoteIndex | null>(null)
-	const [failed, setFailed] = useState(false)
+	const host = useHostNoteIndex(isVSCodeContext && open)
 	const demoIndex = useMemo(
 		() => buildDemoIndex(files, fileName),
 		[files, fileName]
 	)
 
-	const isAskingHost = isVSCodeContext && open
-
-	useHostMessage(
-		noteIndexMessageSchema,
-		({ entries, total }) => setHostIndex({ entries, total }),
-		isAskingHost
-	)
-	useHostMessage(
-		noteIndexFailedMessageSchema,
-		() => setFailed(true),
-		isAskingHost
-	)
-
-	// Every open starts from nothing, so the previous answer is forgotten during
-	// render rather than shown for a frame while the new one is on its way.
-	const [wasAskingHost, setWasAskingHost] = useState(isAskingHost)
-	if (wasAskingHost !== isAskingHost) {
-		setWasAskingHost(isAskingHost)
-		if (isAskingHost) {
-			setHostIndex(null)
-			setFailed(false)
-		}
-	}
-
-	useEffect(() => {
-		if (isAskingHost) getVSCodeApi()?.postMessage({ type: 'getNoteIndex' })
-	}, [isAskingHost])
-
 	return isVSCodeContext
-		? { index: hostIndex, failed }
-		: { index: demoIndex, failed: false }
-}
-
-/** The demo notes have no folder or edit time, only their fetched text. */
-function buildDemoIndex(files: DemoFile[], fileName: string): NoteIndex {
-	const entries = files.map(({ value, content }) => ({
-		...summarizeNote(content, value),
-		uri: value,
-		fileName: value,
-		directory: '',
-		modified: null,
-		size: content.length,
-		current: value === fileName,
-	}))
-
-	return { entries, total: entries.length }
+		? host
+		: { ...host, index: demoIndex, failed: false, hiddenDirectories: [] }
 }

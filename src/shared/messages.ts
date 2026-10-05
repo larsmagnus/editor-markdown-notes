@@ -66,6 +66,13 @@ export type ViewOptions = {
 	 * command and forwarded to the MCP server as `EMN_IGNORE_WORDS`.
 	 */
 	spellingIgnoreWords: string[]
+	/** Whether the note index drops what the workspace's `.gitignore` ignores. */
+	noteIndexRespectGitignore: boolean
+	/**
+	 * Whether the note index keeps AI tools' own directories in view even when
+	 * they are gitignored.
+	 */
+	noteIndexShowAiToolFolders: boolean
 }
 
 export type ItalicMarker = '_' | '*'
@@ -140,6 +147,8 @@ export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
 	],
 	spellingLanguage: 'en-US',
 	spellingIgnoreWords: [],
+	noteIndexRespectGitignore: true,
+	noteIndexShowAiToolFolders: true,
 }
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {
@@ -250,7 +259,8 @@ export type ShikiThemePayload = {
 /** What a note's card in the index shows, as the host read it from disk. */
 export type NoteSummary = {
 	title: string
-	description: string | null
+	/** The frontmatter `description`, else the note's first paragraph of prose. */
+	content: string | null
 	tags: string[]
 	/** `null` for a note too large to read in full. */
 	characters: number | null
@@ -270,11 +280,33 @@ export type NoteIndexEntry = NoteSummary & {
 	current: boolean
 }
 
+/** How many notes sit under one top-level directory of the workspace. */
+export type DirectoryCount = { directory: string; count: number }
+
 /**
  * `total` counts every note found, so the webview can say how many
- * `NOTE_INDEX_LIMIT` left out.
+ * `NOTE_INDEX_LIMIT` left out. `directories` are the ones on offer for hiding,
+ * hidden ones included; `hiddenDirectories` is what the host has stored for
+ * this workspace; `gitUnavailable` means `.gitignore` could not be consulted
+ * for some folder, so only the built-in exclusions applied there.
  */
-export type NoteIndex = { entries: NoteIndexEntry[]; total: number }
+export type NoteIndex = {
+	entries: NoteIndexEntry[]
+	total: number
+	directories: DirectoryCount[]
+	hiddenDirectories: string[]
+	gitUnavailable: boolean
+}
+
+/**
+ * What the index is asked to leave out. `hiddenDirectories` is absent on the
+ * first ask of a session, when the host answers with what it stored.
+ */
+export type NoteIndexRequest = {
+	respectGitignore: boolean
+	showAiToolFolders: boolean
+	hiddenDirectories?: string[]
+}
 
 /**
  * The most notes the index reads and lists, newest first. Each one costs a file
@@ -370,8 +402,12 @@ export type WebviewToHost =
 	 * reveal once the target is open.
 	 */
 	| { type: 'openLink'; href: string }
-	/** Asks for every note in the workspace. Answered once, by `noteIndex`. */
-	| { type: 'getNoteIndex' }
+	/**
+	 * Asks for every note in the workspace. Answered once, by `noteIndex`, which
+	 * echoes `requestId`: scans take different times, so a late answer to an
+	 * earlier ask must be recognisable as stale.
+	 */
+	| ({ type: 'getNoteIndex'; requestId: number } & NoteIndexRequest)
 	/** `beside` opens it in the editor group to the side. */
 	| { type: 'openNoteIndexEntry'; uri: string; beside: boolean }
 
@@ -409,8 +445,8 @@ export type HostToWebview =
 	 *  injected as `window.headingReveal` instead. */
 	| ({ type: 'revealHeading' } & HeadingReveal)
 	/** Sent in reply to `getNoteIndex`. */
-	| ({ type: 'noteIndex' } & NoteIndex)
+	| ({ type: 'noteIndex'; requestId: number } & NoteIndex)
 	/** Sent in reply to `getNoteIndex` when the search itself failed. */
-	| { type: 'noteIndexFailed' }
+	| { type: 'noteIndexFailed'; requestId: number }
 	/** The command palette's "Open index", posted to the active panel only. */
 	| { type: 'showNoteIndex' }

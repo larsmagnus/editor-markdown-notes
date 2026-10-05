@@ -8,7 +8,7 @@ const roadmap: NoteIndexEntry = {
 	fileName: 'roadmap.md',
 	directory: 'docs/planning',
 	title: 'Quarterly roadmap',
-	description: 'Mentions kubernetes',
+	content: 'Mentions kubernetes',
 	tags: ['strategy'],
 	modified: 3_000,
 	size: 900,
@@ -21,7 +21,7 @@ const reviewer: NoteIndexEntry = {
 	fileName: 'code-reviewer.md',
 	directory: '.claude/agents',
 	title: 'code-reviewer',
-	description: null,
+	content: null,
 	tags: [],
 	modified: 1_000,
 	size: 400,
@@ -34,7 +34,7 @@ const changelog: NoteIndexEntry = {
 	fileName: 'CHANGELOG.md',
 	directory: '',
 	title: 'Changelog',
-	description: null,
+	content: null,
 	tags: [],
 	modified: 2_000,
 	size: 800,
@@ -47,7 +47,7 @@ const demoNote: NoteIndexEntry = {
 	fileName: 'notes.md',
 	directory: '',
 	title: 'Notes',
-	description: null,
+	content: null,
 	tags: [],
 	modified: null,
 	size: 300,
@@ -78,7 +78,7 @@ describe('filterEntries', () => {
 		expect(filterEntries(entries, 'strategy')).toEqual([roadmap])
 	})
 
-	it('does not match the description', () => {
+	it('does not match the content', () => {
 		expect(filterEntries(entries, 'kubernetes')).toEqual([])
 	})
 })

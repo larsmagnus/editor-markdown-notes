@@ -1,6 +1,10 @@
 import * as vscode from 'vscode'
 
-import { CONFIG_SECTION, VIEW_OPTIONS_KEY } from '#src/host/constants'
+import {
+	CONFIG_SECTION,
+	HIDDEN_NOTE_DIRECTORIES_KEY,
+	VIEW_OPTIONS_KEY,
+} from '#src/host/constants'
 import {
 	CLAUDE_PROMPT_TEMPLATE_MAX_LENGTH,
 	DEFAULT_SETTINGS,
@@ -55,6 +59,24 @@ export class SettingsStore {
 			...patch,
 		})
 		this.changed.fire()
+	}
+
+	/**
+	 * Per workspace, unlike the view options: a directory worth hiding in one
+	 * repository means nothing in another.
+	 */
+	public getHiddenNoteDirectories(): string[] {
+		return this.context.workspaceState.get<string[]>(
+			HIDDEN_NOTE_DIRECTORIES_KEY,
+			[]
+		)
+	}
+
+	public async setHiddenNoteDirectories(directories: string[]) {
+		await this.context.workspaceState.update(
+			HIDDEN_NOTE_DIRECTORIES_KEY,
+			directories
+		)
 	}
 
 	/**

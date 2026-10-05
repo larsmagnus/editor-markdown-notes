@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 
 import type { OpenNoteIndexEntry } from '#src/components/note-index-card'
 import { NoteIndexControls } from '#src/components/note-index-controls'
@@ -22,6 +23,8 @@ type NoteIndexDialogProps = {
 	/** The host could not search the workspace. */
 	failed?: boolean
 	onOpenEntry: OpenNoteIndexEntry
+	/** What narrows the index beyond its text filter; nothing where there is nothing to narrow. */
+	filterControl?: ReactNode
 }
 
 /**
@@ -35,6 +38,7 @@ export function NoteIndexDialog({
 	index,
 	failed = false,
 	onOpenEntry,
+	filterControl,
 }: NoteIndexDialogProps) {
 	const [query, setQuery] = useState('')
 	const [sort, setSort] = useState<NoteIndexSort>('modified')
@@ -64,6 +68,7 @@ export function NoteIndexDialog({
 					sort={sort}
 					onSortChange={setSort}
 					onLeaveFilter={focusFirstCard}
+					filterControl={filterControl}
 				/>
 
 				<NoteIndexStatus

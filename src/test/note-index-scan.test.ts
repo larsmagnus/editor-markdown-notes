@@ -2,9 +2,12 @@ import * as assert from 'assert'
 
 import * as vscode from 'vscode'
 
-import { buildNoteIndex } from '#src/host/note-index'
 import { NOTE_INDEX_LIMIT } from '#src/shared/messages'
-import { findEntry, workspaceUri } from '#src/test/note-index-test-support'
+import {
+	buildDefaultNoteIndex,
+	findEntry,
+	workspaceUri,
+} from '#src/test/note-index-test-support'
 import { EXTENSION_ID } from '#src/test/tab-test-support'
 
 suite('Workspace note index', () => {
@@ -15,7 +18,7 @@ suite('Workspace note index', () => {
 	})
 
 	test('lists a workspace note with its frontmatter title and details', async () => {
-		const { entries } = await buildNoteIndex(workspaceUri('README.md'))
+		const { entries } = await buildDefaultNoteIndex()
 
 		const note = findEntry(entries, 'public', 'notes.md')
 
@@ -29,7 +32,7 @@ suite('Workspace note index', () => {
 	})
 
 	test('lists every file type the editor opens, and nothing else', async () => {
-		const { entries } = await buildNoteIndex(workspaceUri('README.md'))
+		const { entries } = await buildDefaultNoteIndex()
 
 		assert.ok(findEntry(entries, 'public', 'sample-b.markdown'))
 		assert.ok(findEntry(entries, 'public', 'sample-c.mdown'))
@@ -40,30 +43,20 @@ suite('Workspace note index', () => {
 	})
 
 	test('counts every note found, even past the ones it lists', async () => {
-		const { entries, total } = await buildNoteIndex(workspaceUri('README.md'))
+		const { entries, total } = await buildDefaultNoteIndex()
 
 		assert.ok(entries.length <= NOTE_INDEX_LIMIT)
 		assert.ok(total >= entries.length)
 	})
 
-	test('lists notes inside .claude', async () => {
-		const { entries } = await buildNoteIndex(workspaceUri('README.md'))
-
-		assert.ok(
-			findEntry(entries, '.claude', 'rules', 'testing.md'),
-			'.claude/rules/testing.md should be indexed'
-		)
-	})
-
 	test('marks the note the index was opened from', async () => {
-		const current = workspaceUri('public', 'other-note.md')
+		const { entries } = await buildDefaultNoteIndex(
+			workspaceUri('public', 'other-note.md')
+		)
 
-		const { entries } = await buildNoteIndex(current)
-
-		const currentEntries = entries.filter((entry) => entry.current)
 		assert.deepStrictEqual(
-			currentEntries.map((entry) => entry.uri),
-			[current.toString()]
+			entries.filter((entry) => entry.current).map((entry) => entry.fileName),
+			['other-note.md']
 		)
 	})
 })

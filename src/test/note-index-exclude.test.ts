@@ -2,8 +2,10 @@ import * as assert from 'assert'
 
 import * as vscode from 'vscode'
 
-import { buildNoteIndex } from '#src/host/note-index'
-import { findEntry, workspaceUri } from '#src/test/note-index-test-support'
+import {
+	buildDefaultNoteIndex,
+	findEntry,
+} from '#src/test/note-index-test-support'
 import { EXTENSION_ID } from '#src/test/tab-test-support'
 
 suite('Workspace note index exclusions', () => {
@@ -14,7 +16,7 @@ suite('Workspace note index exclusions', () => {
 	})
 
 	test('leaves out notes inside node_modules and build output', async () => {
-		const { entries } = await buildNoteIndex(workspaceUri('README.md'))
+		const { entries } = await buildDefaultNoteIndex()
 
 		const excluded = entries.filter((entry) =>
 			/(^|\/)(node_modules|out|dist|\.git|\.vscode-test)(\/|$)/.test(
@@ -38,7 +40,7 @@ suite('Workspace note index exclusions', () => {
 		)
 
 		try {
-			const { entries } = await buildNoteIndex(workspaceUri('README.md'))
+			const { entries } = await buildDefaultNoteIndex()
 
 			assert.strictEqual(findEntry(entries, 'public', 'notes.md'), undefined)
 			assert.ok(findEntry(entries, 'README.md'), 'README.md is still indexed')
@@ -61,7 +63,7 @@ suite('Workspace note index exclusions', () => {
 		)
 
 		try {
-			const { entries } = await buildNoteIndex(workspaceUri('README.md'))
+			const { entries } = await buildDefaultNoteIndex()
 
 			assert.strictEqual(findEntry(entries, 'public', 'notes.md'), undefined)
 		} finally {
@@ -83,7 +85,7 @@ suite('Workspace note index exclusions', () => {
 		)
 
 		try {
-			const { entries } = await buildNoteIndex(workspaceUri('README.md'))
+			const { entries } = await buildDefaultNoteIndex()
 
 			assert.strictEqual(findEntry(entries, 'public', 'notes.md'), undefined)
 			assert.strictEqual(

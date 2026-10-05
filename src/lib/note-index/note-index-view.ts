@@ -5,8 +5,8 @@ export type NoteIndexSort = 'modified' | 'title' | 'path'
 
 /**
  * The entries whose title, file name, folder or a tag (the derived agentic
- * tag included) contains `query`, ignoring case. The description is left out: it is prose, and matching it
- * turns a short query into noise.
+ * tag included) contains `query`, ignoring case. The content is left out: it
+ * is prose, and matching it turns a short query into noise.
  */
 export function filterEntries(
 	entries: NoteIndexEntry[],

@@ -10,7 +10,11 @@ type NoteIndexCardDetailsProps = {
 	now: number
 }
 
-/** When the note was last edited and how long it is. */
+/**
+ * When the note was last edited and how long it is, on one line. Each part
+ * gives way with an ellipsis rather than wrapping, since the card has no room
+ * for a second line.
+ */
 export function NoteIndexCardDetails({
 	entry,
 	now,
@@ -18,9 +22,10 @@ export function NoteIndexCardDetails({
 	const hasCounts = entry.words !== null && entry.characters !== null
 
 	return (
-		<span className="mt-auto flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+		<span className="mt-auto flex min-w-0 gap-x-3 text-xs text-muted-foreground">
 			{entry.modified !== null && (
 				<time
+					className="min-w-0 truncate"
 					dateTime={new Date(entry.modified).toISOString()}
 					title={new Date(entry.modified).toLocaleString()}
 				>
@@ -29,11 +34,15 @@ export function NoteIndexCardDetails({
 			)}
 			{hasCounts ? (
 				<>
-					<span>{formatCount(entry.words ?? 0, 'words')}</span>
-					<span>{formatCount(entry.characters ?? 0, 'characters')}</span>
+					<span className="min-w-0 truncate">
+						{formatCount(entry.words ?? 0, 'words')}
+					</span>
+					<span className="min-w-0 truncate">
+						{formatCount(entry.characters ?? 0, 'chars')}
+					</span>
 				</>
 			) : (
-				<span>{formatFileSize(entry.size)}</span>
+				<span className="min-w-0 truncate">{formatFileSize(entry.size)}</span>
 			)}
 		</span>
 	)

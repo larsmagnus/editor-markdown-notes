@@ -1,24 +1,31 @@
-import * as path from 'path'
+import type * as vscode from 'vscode'
 
-import * as vscode from 'vscode'
-
+import { filterNoteUris } from '#src/host/filter-note-uris'
 import { findNoteUris } from '#src/host/find-note-uris'
 import { inBatches } from '#src/host/in-batches'
-import { readNoteSummary } from '#src/host/read-note-summary'
+import type { IndexedFile } from '#src/host/note-index-entry'
+import { statFile, toEntry } from '#src/host/note-index-entry'
+import type { NoteIndexFilters } from '#src/lib/host/note-index-filter'
 import { keepNewest } from '#src/lib/host/note-index-scope'
-import type { NoteIndex, NoteIndexEntry } from '#src/shared/messages'
+import type { NoteIndex } from '#src/shared/messages'
 import { NOTE_INDEX_LIMIT } from '#src/shared/messages'
-
-export type IndexedFile = { uri: vscode.Uri; mtime: number; size: number }
 
 /**
  * Every note in the workspace, read fresh from disk.
  *
  * Rescanned on each request rather than cached behind a file watcher: nothing
  * can go stale, and the index is opened far less often than files change.
+ * Filtered before the `NOTE_INDEX_LIMIT` cut, so notes the author has asked not
+ * to see cannot crowd out the ones they have.
  */
-export async function buildNoteIndex(current: vscode.Uri): Promise<NoteIndex> {
-	const uris = await findNoteUris(current)
+export async function buildNoteIndex(
+	current: vscode.Uri,
+	filters: NoteIndexFilters
+): Promise<NoteIndex> {
+	const { uris, directories, gitUnavailable } = await filterNoteUris(
+		await findNoteUris(current),
+		filters
+	)
 	const files = (await inBatches(uris, statFile)).filter(
 		(file): file is IndexedFile => file !== null
 	)
@@ -26,36 +33,11 @@ export async function buildNoteIndex(current: vscode.Uri): Promise<NoteIndex> {
 		toEntry(file, current)
 	)
 
-	return { entries, total: files.length }
-}
-
-/** `null` for a file deleted between the search and the stat. */
-async function statFile(uri: vscode.Uri): Promise<IndexedFile | null> {
-	try {
-		const { mtime, size } = await vscode.workspace.fs.stat(uri)
-		return { uri, mtime, size }
-	} catch {
-		return null
-	}
-}
-
-/** A card's worth of detail about one file, `current` against the note the index opened from. */
-async function toEntry(
-	file: IndexedFile,
-	current: vscode.Uri
-): Promise<NoteIndexEntry> {
-	const fileName = path.posix.basename(file.uri.path)
-	const directory = path.posix.dirname(
-		vscode.workspace.asRelativePath(file.uri)
-	)
-
 	return {
-		...(await readNoteSummary(file, fileName)),
-		uri: file.uri.toString(),
-		fileName,
-		directory: directory === '.' ? '' : directory,
-		modified: file.mtime,
-		size: file.size,
-		current: file.uri.toString() === current.toString(),
+		entries,
+		total: files.length,
+		directories,
+		hiddenDirectories: [...filters.hiddenDirectories],
+		gitUnavailable,
 	}
 }

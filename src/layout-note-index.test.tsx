@@ -35,21 +35,30 @@ describe('Layout index, inside VS Code', () => {
 
 		await user.click(await screen.findByRole('button', { name: 'Open index' }))
 
-		expect(postMessage).toHaveBeenCalledWith({ type: 'getNoteIndex' })
+		expect(postMessage).toHaveBeenCalledWith({
+			type: 'getNoteIndex',
+			requestId: 1,
+			respectGitignore: true,
+			showAiToolFolders: true,
+		})
 		expect(await screen.findByText('Finding notes…')).toBeTruthy()
 
 		window.dispatchEvent(
 			new MessageEvent('message', {
 				data: {
 					type: 'noteIndex',
+					requestId: 1,
 					total: 1,
+					directories: [],
+					hiddenDirectories: [],
+					gitUnavailable: false,
 					entries: [
 						{
 							uri: 'file:///workspace/.claude/agents/code-reviewer.md',
 							fileName: 'code-reviewer.md',
 							directory: '.claude/agents',
 							title: 'code-reviewer',
-							description: null,
+							content: null,
 							tags: [],
 							modified: 1_790_000_000_000,
 							size: 5_600,
@@ -92,14 +101,18 @@ describe('Layout index, inside VS Code', () => {
 			new MessageEvent('message', {
 				data: {
 					type: 'noteIndex',
+					requestId: 1,
 					total: 1,
+					directories: [],
+					hiddenDirectories: [],
+					gitUnavailable: false,
 					entries: [
 						{
 							uri: 'file:///workspace/docs/roadmap.md',
 							fileName: 'roadmap.md',
 							directory: 'docs',
 							title: 'Quarterly roadmap',
-							description: null,
+							content: null,
 							tags: [],
 							modified: 1_790_000_000_000,
 							size: 900,
@@ -141,7 +154,9 @@ describe('Layout index, inside VS Code', () => {
 
 		await user.click(await screen.findByRole('button', { name: 'Open index' }))
 		window.dispatchEvent(
-			new MessageEvent('message', { data: { type: 'noteIndexFailed' } })
+			new MessageEvent('message', {
+				data: { type: 'noteIndexFailed', requestId: 1 },
+			})
 		)
 
 		expect(
@@ -169,7 +184,12 @@ describe('Layout index, inside VS Code', () => {
 		)
 
 		expect(await screen.findByRole('dialog', { name: 'Index' })).toBeTruthy()
-		expect(postMessage).toHaveBeenCalledWith({ type: 'getNoteIndex' })
+		expect(postMessage).toHaveBeenCalledWith({
+			type: 'getNoteIndex',
+			requestId: 1,
+			respectGitignore: true,
+			showAiToolFolders: true,
+		})
 	})
 
 	it('opens from the command palette with the toolbar hidden', async () => {

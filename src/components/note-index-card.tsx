@@ -2,7 +2,14 @@ import type { MouseEvent } from 'react'
 import { useId } from 'react'
 
 import { NoteIndexCardDetails } from '#src/components/note-index-card-details'
+import { NoteIndexCardDirectory } from '#src/components/note-index-card-directory'
 import { NoteIndexCardTags } from '#src/components/note-index-card-tags'
+import {
+	Item,
+	ItemContent,
+	ItemDescription,
+	ItemTitle,
+} from '#src/components/ui/item'
 import type { NoteIndexEntry } from '#src/shared/messages'
 
 export type OpenNoteIndexEntry = (
@@ -19,6 +26,9 @@ type NoteIndexCardProps = {
 /**
  * One note in the index. Named by its title alone, so a screen reader hears
  * what the note is before the details.
+ *
+ * Every part has a slot of fixed height, filled or not, so the grid's cards are
+ * all the same size whatever a note happens to carry.
  */
 export function NoteIndexCard({ entry, now, onOpen }: NoteIndexCardProps) {
 	const titleId = useId()
@@ -28,33 +38,41 @@ export function NoteIndexCard({ entry, now, onOpen }: NoteIndexCardProps) {
 	}
 
 	return (
-		<button
-			type="button"
-			aria-labelledby={titleId}
-			aria-current={entry.current ? 'page' : undefined}
-			onClick={handleClick}
-			className="flex h-full w-full flex-col gap-2 rounded-lg border border-border bg-muted/80 p-3 text-left text-sm transition-colors outline-none hover:bg-muted/90 focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:border-primary"
+		<Item
+			variant="outline"
+			render={
+				<button
+					type="button"
+					aria-labelledby={titleId}
+					aria-current={entry.current ? 'page' : undefined}
+					onClick={handleClick}
+				/>
+			}
+			className="h-full flex-col flex-nowrap items-stretch gap-2 bg-muted/80 p-3 text-left hover:bg-muted/90 focus-visible:ring-3 aria-[current=page]:border-primary"
 		>
-			<span id={titleId} className="line-clamp-2 font-medium text-foreground">
-				{entry.title}
-			</span>
+			<ItemContent className="flex-none gap-2">
+				<ItemTitle
+					id={titleId}
+					className="line-clamp-2 min-h-[2lh] w-full text-foreground"
+				>
+					{entry.title}
+				</ItemTitle>
 
-			<span className="flex min-w-0 flex-col text-xs text-muted-foreground">
-				<span className="truncate font-mono">{entry.fileName}</span>
-				{entry.directory && (
-					<span className="truncate font-mono">{entry.directory}</span>
-				)}
-			</span>
+				<div className="flex min-w-0 flex-col gap-0.5 text-xs">
+					<span className="truncate font-mono font-medium text-foreground">
+						{entry.fileName}
+					</span>
+					<NoteIndexCardDirectory directory={entry.directory} />
+				</div>
 
-			{entry.description && (
-				<span className="line-clamp-2 text-muted-foreground">
-					{entry.description}
-				</span>
-			)}
+				<ItemDescription className="min-h-[2lh]">
+					{entry.content}
+				</ItemDescription>
+			</ItemContent>
 
 			<NoteIndexCardTags entry={entry} />
 
 			<NoteIndexCardDetails entry={entry} now={now} />
-		</button>
+		</Item>
 	)
 }

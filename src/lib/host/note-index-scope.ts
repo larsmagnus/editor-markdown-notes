@@ -34,6 +34,10 @@ const DEFAULT_EXCLUDED_DIRECTORIES = [
 	'coverage',
 	'vendor',
 	'target',
+	'test-results',
+	'playwright-report',
+	'.nyc_output',
+	'.pytest_cache',
 ]
 
 /**

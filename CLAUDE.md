@@ -102,6 +102,7 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 ### Content Management
 
 - `src/hooks/use-content.ts` - Fetches the standalone web app's demo notes from `public/`. They sit there so their images are reachable by URL; `import.meta.glob` cannot see into `public/`, hence the hardcoded file list
+- Note index filtering (`src/host/filter-note-uris.ts`) shells out to `git ls-files --others --ignored --directory` rather than parsing `.gitignore`, since the host ships without dependencies. It runs before `NOTE_INDEX_LIMIT`, or ignored files crowd real notes out of the newest-first cap. AI-tool directories (`ai-tool-paths.ts`) are an exemption from gitignore, not a hide-list; the built-in denylist applies regardless of the gitignore switch. The popover is VS Code-only, so e2e cannot reach it
 - `src/lib/update-notes.ts` - The standalone save path, and a stub: edits in the web build are logged, not persisted
 - `src/layout.tsx` - Renders the toolbar and `src/editor/editor-body.tsx`, which mounts both the raw markdown textarea and the TipTap editor at once, hiding whichever is off screen (see the Editor System note above). `src/hooks/use-note-source.ts` picks the content source (VSCode vs. local). Its one `overflow-auto` div is the app's scroll container, where `use-scroll-position.ts` reopens each note where it was left — which is why nothing in the editor may autofocus, TipTap scrolling its caret into view over that
 - `src/editor/editor-mode-raw.tsx` - The raw view, which syncs the file **verbatim, frontmatter included**, because it shows the whole file. `use-note-sync.ts` is the debounce path both it and the TipTap editor share; the frontmatter split is the TipTap side's business and has already happened by the time text reaches that hook
@@ -113,7 +114,7 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 - `settings-provider.tsx` - Single source of truth for `viewOptions` (user toggles) and `settings` (VSCode config). In VSCode it seeds from `window.initialConfig`, posts `setViewOptions` to the host, and re-renders on `config` broadcasts; standalone it falls back to `localStorage`. `isVSCodeContext` is the app's only answer to that question and must derive synchronously from `window.vscode` — deriving it in an effect reports `false` on first render, long enough to send a sync down the wrong path.
 - `theme-provider.tsx` & `theme-toggle.tsx` - The theme lives in `viewOptions`, so it persists alongside the other toggles
 
-**One exported component per file.** `react/only-export-components` is enabled (off for `src/components/ui/**`), so contexts and hooks live in `src/hooks/` (`use-settings.ts`, `use-theme.ts`) and the matching `*-provider.tsx` files export only the provider component.
+**One component per file.** `react/only-export-components` and `react/no-multi-comp` are enabled (off for `src/components/ui/**`), so a private helper component gets its own file too, and contexts and hooks live in `src/hooks/` (`use-settings.ts`, `use-theme.ts`) with the matching `*-provider.tsx` files exporting only the provider component.
 
 ### Extension Settings
 

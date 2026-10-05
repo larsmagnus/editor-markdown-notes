@@ -13,6 +13,9 @@ export const CONFIG_SECTION = 'editorMarkdownNotes'
 
 export const VIEW_OPTIONS_KEY = 'editorMarkdownNotes.viewOptions'
 
+export const HIDDEN_NOTE_DIRECTORIES_KEY =
+	'editorMarkdownNotes.hiddenNoteDirectories'
+
 /**
  * Must match the `contributes.mcpServerDefinitionProviders` entry in
  * `package.json` - `registerMcpServerDefinitionProvider` throws if the id it is

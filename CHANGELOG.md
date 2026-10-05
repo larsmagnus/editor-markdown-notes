@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 - Added visual diagram editing, from the diagram toolbar: retype labels, add nodes, connect them by dragging, and grow a node into a new connected one with the `+` beside it
+- Changed the index to leave out files the workspace's `.gitignore` ignores, keeping AI-tool folders such as `.claude` and `.cursor` listed
+- Changed the index to skip tool output folders such as `test-results` and `playwright-report`
+- Added a filter button to the index for turning `.gitignore` and AI-tool folders on or off
+- Added hiding individual top-level folders from the index, remembered per workspace
+- Changed index cards to a consistent height, with the file name set apart from its folder
+- Added the full folder path on hover over a card's folder
+- Changed index cards to show a note's first paragraph when it has no frontmatter description
 
 ## [0.28.0] - 2026-10-04
 

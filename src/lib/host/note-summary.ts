@@ -1,3 +1,4 @@
+import { firstParagraph } from '#src/lib/host/first-paragraph'
 import { splitFrontmatter } from '#src/lib/host/frontmatter'
 import { readFrontmatterFields } from '#src/lib/host/frontmatter-fields'
 import { findH1, firstTextLine } from '#src/lib/host/markdown-title'
@@ -11,20 +12,23 @@ const WORD = /[\p{L}\p{N}][\p{L}\p{N}'’_-]*/gu
  * The title prefers what the author declared over what the text implies:
  * frontmatter `title`, then `name` (agent and skill files), then the first h1,
  * then the opening line of text, and the file name only for a note with none.
- * Counts cover the body alone, since frontmatter is not what anyone wrote.
+ * The content is the frontmatter `description`, else the first paragraph of
+ * prose. Counts cover the body alone, since frontmatter is not what anyone wrote.
  */
 export function summarizeNote(markdown: string, fileName: string): NoteSummary {
 	const { frontmatter, body } = splitFrontmatter(markdown)
 	const fields = readFrontmatterFields(frontmatter ?? '')
 
+	const title =
+		fields.title ??
+		fields.name ??
+		findH1(body) ??
+		firstTextLine(body) ??
+		fileName
+
 	return {
-		title:
-			fields.title ??
-			fields.name ??
-			findH1(body) ??
-			firstTextLine(body) ??
-			fileName,
-		description: fields.description,
+		title,
+		content: fields.description ?? firstParagraph(body, title),
 		tags: fields.tags,
 		characters: [...body].length,
 		words: body.match(WORD)?.length ?? 0,

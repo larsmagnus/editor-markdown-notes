@@ -1,5 +1,6 @@
 import type { OpenNoteIndexEntry } from '#src/components/note-index-card'
 import { NoteIndexDialog } from '#src/components/note-index-dialog'
+import { NoteIndexFilterPopover } from '#src/components/note-index-filter-popover'
 import { useNoteIndex } from '#src/hooks/use-note-index'
 import { useSettings } from '#src/hooks/use-settings'
 import { getVSCodeApi } from '#src/lib/vscode-api'
@@ -25,7 +26,8 @@ export function NoteIndexOverlay({
 	setFileName,
 }: NoteIndexOverlayProps) {
 	const { isVSCodeContext } = useSettings()
-	const { index, failed } = useNoteIndex({ open, files, fileName })
+	const { index, failed, hiddenDirectories, toggleDirectoryHidden } =
+		useNoteIndex({ open, files, fileName })
 
 	const handleOpenEntry: OpenNoteIndexEntry = (entry, { beside }) => {
 		onOpenChange(false)
@@ -49,6 +51,13 @@ export function NoteIndexOverlay({
 			index={index}
 			failed={failed}
 			onOpenEntry={handleOpenEntry}
+			filterControl={
+				<NoteIndexFilterPopover
+					index={index}
+					hiddenDirectories={hiddenDirectories}
+					onToggleDirectoryHidden={toggleDirectoryHidden}
+				/>
+			}
 		/>
 	)
 }
