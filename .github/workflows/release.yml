@@ -32,30 +32,20 @@ jobs:
 
       # The checks run again here rather than trusting main's green run:
       # releases are rare, and the tagged tree is what actually ships.
-      - name: 🤖 Run type checks
-        run: pnpm typecheck
-
-      - name: ✨ Run lint and format checks
-        run: pnpm lint:ci
+      - name: ✨ Run typecheck, lint and format checks
+        run: pnpm lint:check
 
       - name: 🤯 Run code complexity checks
-        run: pnpm run complexity
+        run: pnpm complexity
 
-      # `pnpm test` is avoided here: its `pretest` hook runs `lint`, which is
-      # `oxlint --fix && oxfmt` in write mode. On a release that would package a
-      # tree the tag does not describe. The suites run directly instead, after an
-      # explicit build, since the extension tests need `out/test/**`.
-      - name: 🏗️ Build
-        run: pnpm build
+      - name: 🧬 Run duplication checks
+        run: pnpm duplication:check
 
-      - name: 🧪 Run Vitest tests
-        run: pnpm test:unit
+      - name: 🧹 Run unused code and dependency checks
+        run: pnpm knip
 
-      - name: 🧪 Run VS Code tests
-        run: xvfb-run --auto-servernum pnpm test:extension
-
-      - name: 🧪 Run Playwright tests
-        run: pnpm test:e2e
+      - name: 🧪 Run VS Code, Vitest and Playwright tests
+        run: xvfb-run --auto-servernum pnpm test
 
       # The vsix filename and the version users install come from package.json,
       # while the Release is named for the tag. Nothing else makes them agree.

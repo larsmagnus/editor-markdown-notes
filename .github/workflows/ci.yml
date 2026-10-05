@@ -34,17 +34,17 @@ jobs:
       - name: 🎭 Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: 🤖 Run type checks
-        run: pnpm typecheck
-
-      - name: ✨ Run lint and format checks
-        run: pnpm lint:ci
+      - name: ✨ Run typecheck, lint and format checks
+        run: pnpm lint:check
 
       - name: 🤯 Run code complexity checks
-        run: pnpm run complexity
+        run: pnpm complexity
 
       - name: 🧬 Run duplication checks
-        run: pnpm run duplication:ci
+        run: pnpm duplication:check
+
+      - name: 🧹 Run unused code and dependency checks
+        run: pnpm knip
 
       - name: 🧪 Run VS Code, Vitest and Playwright tests
         run: xvfb-run --auto-servernum pnpm test
