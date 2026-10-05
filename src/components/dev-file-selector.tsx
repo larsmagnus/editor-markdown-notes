@@ -48,7 +48,9 @@ function DevFileSelector({
 					/>
 				}
 			>
-				<ComboboxValue placeholder="Select file..." />
+				<span className="truncate">
+					<ComboboxValue placeholder="Select file..." />
+				</span>
 			</ComboboxTrigger>
 			<ComboboxContent>
 				<ComboboxInput placeholder="Search files..." showTrigger={false} />
