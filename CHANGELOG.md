@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Changed the extension's name to punchdown, which installs as a new extension rather than updating the old one. Uninstall `editor-markdown-notes`, and point any `*.md` editor association at `punchdown.markdownEditor`
 - Changed every setting and command prefix to `punchdown.`. Re-apply customized settings, since they and the remembered toggles do not carry over
+- Changed the colour of revealed markdown syntax and link addresses to the pink accent
 - Changed the document text to one consistent size, no longer shrinking on wide windows
 - Changed table headers to semibold and table cells to slightly different padding
 - Fixed the gap cursor being invisible in dark mode
