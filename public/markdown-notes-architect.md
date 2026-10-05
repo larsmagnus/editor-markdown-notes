@@ -48,6 +48,7 @@ This is basically a pretty simple rule to follow, and it's actually really easy 
 
 ### Rule of thumb
 
+> [!IMPORTANT]
 > Reviewer note: treat `markdown-round-trip.test.ts` as the spec, not just a test file. If a syntax isn't in there, assume it isn't guaranteed to survive a save.
 
 A paragraph mixing **bold**, _italic_, and `inline code`, plus a [link to the schema source](https://example.com) and an em dash — like this one — for good measure.full

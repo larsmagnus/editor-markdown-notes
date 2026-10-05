@@ -9,3 +9,6 @@ and `inline code` all work here.
 - Three
 
 > A blockquote, just to round things out.
+
+> [!TIP]
+> GitHub-style admonitions render the same way in every supported extension.

@@ -10,6 +10,8 @@ import StarterKit from '@tiptap/starter-kit'
 import type { MarkdownStorage } from 'tiptap-markdown'
 import { Markdown } from 'tiptap-markdown'
 
+import { Admonition } from '#src/editor/extensions/admonition/admonition-extension'
+import { createAdmonitionRevealProvider } from '#src/editor/extensions/admonition/admonition-reveal-provider'
 import { AskInlineStatus } from '#src/editor/extensions/ask/ask-inline-status-extension'
 import { AskSuggestion } from '#src/editor/extensions/ask/ask-suggestion-extension'
 import { BlockMarkers } from '#src/editor/extensions/block-marker/block-marker-extension'
@@ -121,6 +123,7 @@ export const SHARED_TAIL_EXTENSIONS = [
 	MdxBlockExtension,
 	HeadingExtension,
 	BlockquoteExtension,
+	Admonition,
 	// ListItemExtension's merge plugin must run before BlockMarkers' marker-sync
 	// so renumbering happens after lists are merged - the two plugins run in the
 	// same appendTransaction batch, and this registration order controls their
@@ -209,6 +212,7 @@ export const SHARED_TAIL_EXTENSIONS = [
 	SyntaxReveal.configure({
 		providers: [
 			createMarkerRevealProvider(BLOCK_MARKER_SPECS),
+			createAdmonitionRevealProvider(),
 			createDelimitedMarkRevealProvider('link', linkDelimiterSpec()),
 			createDelimitedMarkRevealProvider('bold', fixedDelimiter('**')),
 			createDelimitedMarkRevealProvider('strike', fixedDelimiter('~~')),

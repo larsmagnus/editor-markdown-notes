@@ -1,5 +1,6 @@
 import type { Node as ProseMirrorNode } from 'prosemirror-model'
 
+import { readAdmonition } from '#src/editor/extensions/admonition/admonition-of'
 import { blockquoteMarkerLength } from '#src/editor/extensions/blockquote/blockquote-marker'
 import { parseFrontmatterFence } from '#src/editor/extensions/frontmatter/frontmatter-fence'
 import { headingMarkerLength } from '#src/editor/extensions/heading/heading-marker'
@@ -112,6 +113,8 @@ export function getDocumentText(doc: ProseMirrorNode): DocumentText {
 	doc.descendants((node, pos, parent, index) => {
 		if (IGNORED_NODES.has(node.type.name)) return false
 		if (!node.isTextblock) return true
+
+		if (index === 0 && parent && readAdmonition(parent)) return false
 
 		if (node.type.name === 'frontmatter') {
 			text = appendFrontmatterLines(node, pos, text, slices)

@@ -36,6 +36,28 @@ _Italic text_
 >
 > > Nested blockquote
 
+## Admonitions
+
+> [!NOTE]
+> Highlights information that readers should take into account, even when skimming.
+
+> [!TIP]
+> Optional advice that helps readers get more out of the note, with `inline code` and a [link](https://example.com).
+
+> [!IMPORTANT]
+> Crucial information necessary for readers to succeed.
+>
+> A second paragraph, followed by a list:
+>
+> - Back up the vault first
+> - Then **run the migration**
+
+> [!WARNING]
+> Urgent information that needs immediate attention to avoid problems.
+
+> [!CAUTION]
+> Advises about risks or negative outcomes of certain actions.
+
 ---
 
 - Unordered list item 1

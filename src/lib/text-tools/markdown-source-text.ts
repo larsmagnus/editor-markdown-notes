@@ -10,6 +10,7 @@ import {
 } from '#src/lib/text-tools/gfm-without-footnotes'
 import { BLOCK_SEPARATOR } from '#src/lib/text-tools/prose-policy'
 import type { SourceSlice } from '#src/lib/text-tools/source-offset'
+import { withoutAdmonitionTag } from '#src/lib/text-tools/strip-admonition-tag'
 
 /**
  * Flattens a markdown source string into the plain text retext analyses,
@@ -48,11 +49,25 @@ export function getMarkdownSourceText(markdown: string): MarkdownSourceText {
 		if (text) text += BLOCK_SEPARATOR
 	}
 
-	const walk = (node: Nodes | RootContent, base: number) => {
+	const walk = (
+		node: Nodes | RootContent,
+		base: number,
+		parent?: Nodes | RootContent,
+		index = 0
+	) => {
 		if (TEXT_BLOCKS.has(node.type) && 'children' in node) {
+			const inlines = node.children as PhrasingContent[]
+			const admonitionBody =
+				node.type === 'paragraph' &&
+				parent?.type === 'blockquote' &&
+				index === 0
+					? withoutAdmonitionTag(inlines, body)
+					: null
+			if (admonitionBody?.length === 0) return
+
 			startBlock()
 			const result = flattenInlineNodes(
-				node.children as PhrasingContent[],
+				admonitionBody ?? inlines,
 				body,
 				base,
 				text.length
@@ -63,7 +78,9 @@ export function getMarkdownSourceText(markdown: string): MarkdownSourceText {
 		}
 
 		if ('children' in node) {
-			for (const child of node.children) walk(child, base)
+			node.children.forEach((child, childIndex) =>
+				walk(child, base, node, childIndex)
+			)
 		}
 	}
 

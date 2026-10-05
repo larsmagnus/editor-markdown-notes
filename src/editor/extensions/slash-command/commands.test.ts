@@ -119,3 +119,23 @@ describe('image', () => {
 		})
 	})
 })
+
+describe.each([
+	['note', '> [!NOTE]'],
+	['tip', '> [!TIP]'],
+	['important', '> [!IMPORTANT]'],
+	['warning', '> [!WARNING]'],
+	['caution', '> [!CAUTION]'],
+])('%s admonition', (id, tagLine) => {
+	it('opens a tagged blockquote with the caret in an empty body', () => {
+		const editor = createEditor()
+
+		commandFor(id).run(editor, { from: 1, to: 1 })
+
+		const quote = editor.getJSON().content?.[0]
+		expect(quote?.type).toBe('blockquote')
+		expect(editor.state.doc.firstChild?.firstChild?.textContent).toBe(tagLine)
+		expect(editor.state.selection.$from.parent.textContent).toBe('')
+		expect(editor.storage.markdown.getMarkdown().trim()).toBe(tagLine)
+	})
+})

@@ -1,3 +1,4 @@
+import { splitAdmonitionTagParagraph } from '#src/editor/extensions/admonition/split-tag-paragraph'
 import { BLOCKQUOTE_MARKER } from '#src/editor/extensions/blockquote/blockquote-marker'
 
 /**
@@ -10,6 +11,7 @@ import { BLOCKQUOTE_MARKER } from '#src/editor/extensions/blockquote/blockquote-
  * design `create-marker-sync-plugin.ts` documents.
  */
 export function insertLiteralBlockquoteMarker(element: Element): void {
+	splitAdmonitionTagParagraph(element)
 	element.querySelectorAll('blockquote').forEach((quote) => {
 		quote
 			.querySelector(':scope > p:first-child')

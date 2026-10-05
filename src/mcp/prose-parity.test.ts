@@ -50,6 +50,11 @@ describe('prose extraction parity', () => {
 		'a link': 'Read [the guide](https://example.com/guide) first.',
 		'a bullet list': 'Intro line.\n\n- First item.\n- Second item.',
 		'a blockquote': 'Intro line.\n\n> A quoted sentence.',
+		'an admonition': 'Intro line.\n\n> [!WARNING]\n> A quoted sentence.',
+		'an admonition with a second paragraph':
+			'> [!TIP]\n> First point.\n>\n> Second point.',
+		'a heading that looks like a tag': 'Intro line.\n\n> # [!NOTE]\n> Body.',
+		'an admonition tag alone': 'Intro line.\n\n> [!NOTE]',
 		'frontmatter with prose values':
 			'---\ntitle: The report was written\nslug: og_image\n---\n\nBody text.',
 	}

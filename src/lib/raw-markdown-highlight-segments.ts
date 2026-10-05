@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 
 import type { RawLinkRange } from '#src/editor/extensions/link/find-raw-link-ranges'
+import { findRawAdmonitionTags } from '#src/lib/find-raw-admonition-tags'
 import { styleObjectFor } from '#src/lib/shiki-token-style'
 import type { RelativeToken } from '#src/lib/syntax-highlight-tokens'
 import { issueClassName } from '#src/lib/text-tools/issue-class-name'
@@ -23,7 +24,8 @@ export type HighlightSegment = {
 
 /**
  * Splits `text` into runs at every token boundary, every link parens
- * boundary, and every text-tools issue boundary, for rendering as the
+ * boundary, every admonition tag line (colored as its type, over Shiki's
+ * own guess at what `[!NOTE]` is), and every text-tools issue boundary, for rendering as the
  * highlighted mirror behind the raw-mode textarea - `RawMarkdownHighlight`
  * colors a run from its token, marks it with `data-link-range` from
  * `linkRangeIndex` so `use-raw-link-hover.ts` can find a link's rendered rect
@@ -56,6 +58,11 @@ export function buildHighlightSegments(
 		boundaries.add(range.parensStart)
 		boundaries.add(range.parensEnd)
 	}
+	const tags = findRawAdmonitionTags(text)
+	for (const tag of tags) {
+		boundaries.add(tag.from)
+		boundaries.add(tag.to)
+	}
 	for (const issue of issues) {
 		boundaries.add(issue.from)
 		boundaries.add(issue.to)
@@ -85,9 +92,16 @@ export function buildHighlightSegments(
 					: narrowest
 			}, undefined)
 
+		const tag = tags.find(
+			(candidate) => candidate.from <= start && start < candidate.to
+		)
+		const tokenStyle = token ? styleObjectFor(token) : undefined
+
 		segments.push({
 			text: text.slice(start, end),
-			style: token ? styleObjectFor(token) : undefined,
+			style: tag
+				? { ...tokenStyle, color: `var(--admonition-${tag.type})` }
+				: tokenStyle,
 			linkRangeIndex: linkRangeIndex === -1 ? undefined : linkRangeIndex,
 			className: issue ? issueClassName(issue.severity) : undefined,
 			title: issue

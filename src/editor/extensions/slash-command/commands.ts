@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
+import { ADMONITIONS } from '#src/editor/extensions/admonition/admonition-types'
 import {
 	fenceText,
 	parseFence,
@@ -16,6 +17,8 @@ import {
 import { MERMAID_LANGUAGE } from '#src/editor/extensions/mermaid/language'
 import { runAskCommand } from '#src/editor/extensions/slash-command/ask-command'
 import { runInsertImageCommand } from '#src/editor/extensions/slash-command/insert-image-command'
+import { ADMONITION_TYPES, admonitionTagText } from '#src/lib/admonition-tag'
+import type { AdmonitionType } from '#src/lib/admonition-tag'
 
 export type SlashCommandItem = {
 	id: string
@@ -44,6 +47,27 @@ function runWithRange(
 	op: (chain: ChainedCommands) => ChainedCommands
 ): void {
 	op(editor.chain().focus().deleteRange(range)).run()
+}
+
+/** One entry per GFM alert kind, each opening a quote already tagged and ready for its body. */
+function admonitionCommand(type: AdmonitionType): SlashCommandItem {
+	const { label, icon } = ADMONITIONS[type]
+	return {
+		id: type,
+		label,
+		keywords: ['admonition', 'callout', 'alert', 'quote'],
+		icon,
+		run: (editor, range) =>
+			runWithRange(editor, range, (chain) =>
+				chain
+					.setBlockquote()
+					.insertContent({
+						type: 'text',
+						text: `> ${admonitionTagText(type)}`,
+					})
+					.splitBlock()
+			),
+	}
 }
 
 /**
@@ -106,6 +130,7 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
 		run: (editor, range) =>
 			runWithRange(editor, range, (chain) => chain.toggleTaskList()),
 	},
+	...ADMONITION_TYPES.map(admonitionCommand),
 	{
 		id: 'table',
 		label: 'Table',

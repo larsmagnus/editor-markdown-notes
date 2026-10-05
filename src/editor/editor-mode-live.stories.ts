@@ -41,3 +41,27 @@ export const DiagramThatWillNotParse: Story = {
 		includeTypesetClassNames: true,
 	},
 }
+
+/** Every GFM alert kind; the tag line shows as text only while the caret is on it. */
+export const Admonitions: Story = {
+	args: {
+		content: [
+			'> [!NOTE]',
+			'> Useful information that readers should take into account.',
+			'',
+			'> [!TIP]',
+			'> Helpful advice for doing things better.',
+			'',
+			'> [!IMPORTANT]',
+			'> Key information users need to know.',
+			'',
+			'> [!WARNING]',
+			'> Urgent info that needs immediate attention.',
+			'',
+			'> [!CAUTION]',
+			'> Advises about risks or negative outcomes.',
+		].join('\n'),
+		showMenu: true,
+		includeTypesetClassNames: true,
+	},
+}

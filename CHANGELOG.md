@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added GitHub-style admonitions: `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]` render as colored callouts with an icon, and the tag reveals as text when the caret reaches it
+- Added the five admonitions to the `/` menu
+
 ## [1.0.1] - 2026-10-05
 
 - Changed the extension icon to the new punchdown logo

@@ -186,6 +186,57 @@
 		white-space: nowrap;
 	}
 
+	/* A GFM alert is still a blockquote; only its color, and a header standing in for the `[!TYPE]` text, differ. */
+	:root {
+		--admonition-note: #0969da;
+		--admonition-tip: #1a7f37;
+		--admonition-important: #8250df;
+		--admonition-warning: #9a6700;
+		--admonition-caution: #cf222e;
+	}
+	.dark {
+		--admonition-note: #4493f8;
+		--admonition-tip: #3fb950;
+		--admonition-important: #ab7df8;
+		--admonition-warning: #d29922;
+		--admonition-caution: #f85149;
+	}
+	.ProseMirror blockquote.admonition {
+		border: 2px solid var(--admonition-color);
+		background-color: color-mix(
+			in oklab,
+			var(--admonition-color) 10%,
+			var(--background)
+		);
+		color: var(--admonition-color);
+	}
+	.ProseMirror blockquote[data-admonition='note'] {
+		--admonition-color: var(--admonition-note);
+	}
+	.ProseMirror blockquote[data-admonition='tip'] {
+		--admonition-color: var(--admonition-tip);
+	}
+	.ProseMirror blockquote[data-admonition='important'] {
+		--admonition-color: var(--admonition-important);
+	}
+	.ProseMirror blockquote[data-admonition='warning'] {
+		--admonition-color: var(--admonition-warning);
+	}
+	.ProseMirror blockquote[data-admonition='caution'] {
+		--admonition-color: var(--admonition-caution);
+	}
+
+	.ProseMirror .admonition-header {
+		@apply inline-flex items-center gap-2 font-semibold;
+		color: var(--admonition-color);
+	}
+	.ProseMirror blockquote.admonition.construct-revealed .admonition-header {
+		display: none;
+	}
+	.ProseMirror blockquote.admonition [data-token='marker'] {
+		color: var(--admonition-color);
+	}
+
 	.ProseMirror h1 [data-token='marker'],
 	.ProseMirror h2 [data-token='marker'],
 	.ProseMirror h3 [data-token='marker'],
@@ -193,7 +244,7 @@
 	.ProseMirror h5 [data-token='marker'],
 	.ProseMirror h6 [data-token='marker'],
 	.ProseMirror li [data-token='marker'],
-	.ProseMirror blockquote [data-token='marker'],
+	.ProseMirror blockquote:not(.admonition) [data-token='marker'],
 	.ProseMirror strong [data-token='marker'],
 	.ProseMirror em [data-token='marker'],
 	.ProseMirror s [data-token='marker'],

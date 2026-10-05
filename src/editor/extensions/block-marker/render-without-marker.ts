@@ -10,12 +10,15 @@ import { paragraphWithoutLeadingText } from '#src/editor/extensions/paragraph-wi
  * marker exactly the way `prosemirror-markdown` always has, so leaving the
  * real one in the content too would double it up: `- - text`, `> > text`. See
  * `paragraph-without-leading-text.ts` for why the wrapping node stays the sole
- * writer rather than the content.
+ * writer rather than the content. `tightAfterFirst` ends that first paragraph
+ * with a single newline instead of a blank line - written as plain text, which
+ * is all an admonition's tag line ever holds.
  */
 export function renderWithoutMarker(
 	state: MarkdownSerializerState,
 	node: ProseMirrorNode,
-	spec: BlockMarkerSpec
+	spec: BlockMarkerSpec,
+	{ tightAfterFirst = false }: { tightAfterFirst?: boolean } = {}
 ): void {
 	const paragraph = node.firstChild
 	if (!paragraph || paragraph.type.name !== 'paragraph') {
@@ -28,7 +31,12 @@ export function renderWithoutMarker(
 		spec.length(paragraph.textContent)
 	)
 
-	state.render(stripped, node, 0)
+	if (tightAfterFirst) {
+		state.write(stripped.textContent)
+		state.ensureNewLine()
+	} else {
+		state.render(stripped, node, 0)
+	}
 	node.forEach((child, _offset, index) => {
 		if (index === 0) return
 		state.render(child, node, index)
