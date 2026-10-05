@@ -143,19 +143,28 @@ code --uninstall-extension larsmagnus.editor-markdown-notes
 
 ## Development
 
-| Command               | Purpose                                       |
-| --------------------- | --------------------------------------------- |
-| `pnpm dev`            | Vite dev server for the React app standalone  |
-| `pnpm build`          | Build the web app and compile the extension   |
-| `pnpm vscode:watch`   | Watch-mode compile of the extension host code |
-| `pnpm typecheck`      | TypeScript check, no emit                     |
-| `pnpm lint`           | Typecheck + `oxlint --fix` + `oxfmt`          |
-| `pnpm test`           | Run both suites                               |
-| `pnpm test:unit`      | Vitest webview tests                          |
-| `pnpm test:extension` | Extension tests via `vscode-test`             |
-| `pnpm complexity`     | Check file complexity against the FTA budget  |
-| `pnpm knip`           | Find unused files, exports and dependencies   |
-| `pnpm storybook`      | Storybook dev server for components           |
+| Command                  | Purpose                                             |
+| ------------------------ | --------------------------------------------------- |
+| `pnpm dev`               | Vite dev server for the React app standalone        |
+| `pnpm build`             | Build the web app and compile the extension         |
+| `pnpm vscode:watch`      | Watch-mode compile of the extension host code       |
+| `pnpm typecheck`         | TypeScript check, no emit                           |
+| `pnpm lint`              | Typecheck + `oxlint --fix` + `oxfmt`                |
+| `pnpm lint:check`        | Typecheck + `oxlint` + `oxfmt --check`, no fixes    |
+| `pnpm verify`            | Lint with fixes, then complexity, duplication, knip |
+| `pnpm verify:check`      | Every static gate, read-only. What CI runs          |
+| `pnpm test`              | Run all three suites                                |
+| `pnpm test:unit`         | Vitest webview tests                                |
+| `pnpm test:watch`        | Vitest in watch mode                                |
+| `pnpm test:extension`    | Extension tests via `vscode-test`                   |
+| `pnpm test:e2e`          | Playwright browser tests                            |
+| `pnpm screenshot`        | Regenerate the README screenshot                    |
+| `pnpm complexity`        | Fail when a file exceeds the FTA budget             |
+| `pnpm duplication`       | Report copy-pasted code with `jscpd`                |
+| `pnpm duplication:check` | Fail above the duplication threshold                |
+| `pnpm knip`              | Find unused files, exports and dependencies         |
+| `pnpm storybook`         | Storybook dev server for components                 |
+| `pnpm storybook:build`   | Static Storybook build                              |
 
 ### Running from source
 

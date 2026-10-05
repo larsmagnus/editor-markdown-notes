@@ -1,7 +1,7 @@
 ---
 name: release
 description: Cuts a release by bumping the version, updating the changelog, and pushing the tag to trigger CI. Use when the user asks to release, ship, or cut a new version, or invokes /release.
-allowed-tools: Bash(pnpm lint), Bash(pnpm check), Bash(pnpm test), Bash(pnpm release*), Bash(git status), Bash(git push*), Bash(git tag*), Bash(gh run watch), Bash(gh run list*), Read, Edit
+allowed-tools: Bash(pnpm verify:check), Bash(pnpm test), Bash(pnpm release*), Bash(git status), Bash(git push*), Bash(git tag*), Bash(gh run watch), Bash(gh run list*), Read, Edit
 ---
 
 # Release Skill
@@ -21,12 +21,11 @@ Run the full check suite before cutting the release:
 
 ```bash
 gh run list --branch main --workflow ci.yml --limit 1 --json conclusion,headSha
-pnpm check
-pnpm lint
+pnpm verify:check
 pnpm test
 ```
 
-The tag re-runs every CI gate, so a red `main` or a gate failing locally fails the release too. If the latest `main` CI run is not `success`, stop and tell the user. `pnpm check` runs the gates `pnpm lint` and `pnpm test` don't: lint format check, complexity and duplication. If any step fails, fix the issues on `main` and commit before proceeding.
+The tag re-runs every CI gate, so a red `main` or a gate failing locally fails the release too. If the latest `main` CI run is not `success`, stop and tell the user. `pnpm verify:check` is read-only and runs every static gate: typecheck, lint, format, complexity, duplication and knip. If any step fails, fix the issues on `main` and commit before proceeding.
 
 ### 2. Update the changelog
 

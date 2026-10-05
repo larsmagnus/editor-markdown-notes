@@ -1,4 +1,4 @@
 pre-push:
   commands:
     check:
-      run: pnpm check
+      run: pnpm verify:check

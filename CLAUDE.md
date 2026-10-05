@@ -13,6 +13,17 @@ A VSCode extension for editing markdown in a live preview powered by a React web
 
 ## Development Commands
 
+### Script naming
+
+- `name` — local use; may write (auto-fix)
+- `name:check` — read-only, exits non-zero on findings; CI, skills and lefthook (lefthook may run both)
+- `:check` is always the last segment; any other segment is a scope (`test:unit`)
+- No `:ci` suffixes
+- `:check` only where it differs from bare. No fixer means bare must itself fail on findings (`complexity`, `knip`)
+- `duplication` bare only reports; `duplication:check` enforces the threshold
+- `verify` / `verify:check` aggregate the static gates
+- `lint:check` passes on oxlint warnings; only errors gate
+
 ### Quality & Testing
 
 `knip.jsonc` must include `.css` in `project`, or Tailwind v4's `@plugin` directives in `src/globals.css` don't count as usage and those plugins read as unused deps. `src/components/ui/**` exports are exempt, keeping vendored shadcn files a clean overwrite.
