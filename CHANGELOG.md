@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-10-05
+
 - Added visual diagram editing, from the diagram toolbar: retype labels, add nodes, connect them by dragging, and grow a node into a new connected one with the `+` beside it
 - Changed the index to leave out files the workspace's `.gitignore` ignores, keeping AI-tool folders such as `.claude` and `.cursor` listed
 - Changed the index to skip tool output folders such as `test-results` and `playwright-report`
