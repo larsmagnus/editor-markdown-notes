@@ -14,4 +14,5 @@ Entries are for people using the extension, not for whoever wrote the code. Shor
 - One sentence, one change. No trailing period, active voice, no pronouns. Split any bullet whose "and" joins two unrelated changes
 - Add a second sentence only when the user has to act on it (a renamed setting, a migration)
 - Leave out the cause, the file names and the implementation. `Fixed the Paragraph and Code block toolbar buttons, which were permanently disabled` — not the story of why they were
+- Never log a fix for a regression introduced by unreleased work. Check `git log` and the last release tag first: if the bug was never in a shipped version, users never saw it, and the entry belongs only to the change that caused it
 - Omit what is invisible from outside: refactors, tests, tooling, dependency bumps. Include them only when behaviour or performance changed
