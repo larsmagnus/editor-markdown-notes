@@ -1,5 +1,5 @@
 // oxlint-disable-next-line no-restricted-imports no-unassigned-import
-import './globals.css'
+import './styles/globals.css'
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

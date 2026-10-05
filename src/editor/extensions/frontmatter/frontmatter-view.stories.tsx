@@ -21,6 +21,7 @@ function FrontmatterViewPreview({ content }: FrontmatterViewPreviewProps) {
 	const editor = useEditor({
 		extensions: buildExtensions('markdown'),
 		content: '',
+		injectCSS: false,
 		onCreate: ({ editor }) => editor.commands.setContent(content),
 	})
 

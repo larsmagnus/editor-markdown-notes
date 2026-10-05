@@ -5,7 +5,7 @@
 	// no path back to source.
 	"entry": ["src/test/**/*.test.ts"],
 	// `.css` is in here so the Tailwind v4 `@plugin` directive in
-	// `src/globals.css` counts as usage of `tailwindcss-animate`.
+	// `src/styles/globals.css` counts as usage of `tailwindcss-animate`.
 	"project": ["src/**/*.{ts,tsx,css}"],
 	"ignoreIssues": {
 		// Vendored shadcn/ui primitives. They deliberately re-export the full

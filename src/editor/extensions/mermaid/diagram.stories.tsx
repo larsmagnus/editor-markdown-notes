@@ -14,7 +14,11 @@ type MermaidDiagramPreviewProps = { content: string }
  * shape.
  */
 function MermaidDiagramPreview({ content }: MermaidDiagramPreviewProps) {
-	const editor = useEditor({ extensions: buildExtensions('markdown'), content })
+	const editor = useEditor({
+		extensions: buildExtensions('markdown'),
+		content,
+		injectCSS: false,
+	})
 
 	if (!editor) return null
 

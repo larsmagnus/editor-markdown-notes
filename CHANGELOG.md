@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Changed the document text to one consistent size, no longer shrinking on wide windows
+- Changed table headers to semibold and table cells to slightly different padding
+- Fixed the gap cursor being invisible in dark mode
+
 ## [0.29.0] - 2026-10-05
 
 - Added visual diagram editing, from the diagram toolbar: retype labels, add nodes, connect them by dragging, and grow a node into a new connected one with the `+` beside it

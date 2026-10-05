@@ -26,7 +26,7 @@ A VSCode extension for editing markdown in a live preview powered by a React web
 
 ### Quality & Testing
 
-`knip.jsonc` must include `.css` in `project`, or Tailwind v4's `@plugin` directives in `src/globals.css` don't count as usage and those plugins read as unused deps. `src/components/ui/**` exports are exempt, keeping vendored shadcn files a clean overwrite.
+`knip.jsonc` must include `.css` in `project`, or Tailwind v4's `@plugin` directives in `src/styles/globals.css` don't count as usage and those plugins read as unused deps. `src/components/ui/**` exports are exempt, keeping vendored shadcn files a clean overwrite.
 
 Vitest runs `src/**/*.test.{ts,tsx}` except `src/test/**`, which `tsconfig.host.json` compiles without a DOM lib — keep webview tests out of it. Those suites are `pnpm test:extension`, which boots a real VS Code and is the only way to check host behaviour.
 
@@ -51,6 +51,7 @@ Run "Editor Markdown Notes: Show logs" (Output → _Editor Markdown Notes_). The
 ### Editor System (`src/editor/`)
 
 - Styles are a data table, not a dispatch: `text-style-commands.ts`/`list-style-commands.ts` give each style its command, `isActive` name, and `editor.can()` check; `use-editor-styles.ts` reads all three. Replaced three hand-synced switch statements whose bugs — a query that applied the style, two styles falling off the end and reading as permanently disabled — can't happen in a table.
+- `injectCSS` is off on every `useEditor`. TipTap core's injected `<style>` is unlayered, so it beat every rule in our `@layer`s regardless of specificity; `styles/prosemirror.css` owns all editor-surface styling, core's rules included. Typography belongs in `typeset.css`, not `globals.css`. `editor-mode-live.test.tsx` fails if the tag comes back.
 - A `tiptap-markdown` serializer only activates when a matching TipTap extension is registered, otherwise the schema silently drops the feature and the loss reaches disk the next time VS Code saves. Registering the node is the whole fix. `markdown-round-trip.test.ts` documents exactly what survives a sync — read it before changing the schema.
 - Table cells hold inline content directly (not TipTap's default `block+`), so `extensions.ts` carries its own table serializer (`table/extension.ts`); `tiptap-markdown`'s reaches for a paragraph that no longer exists. Same reason pasted HTML goes through `table/flatten-pasted-cells.ts` first.
 - `table/alignment.ts`, `table/slice.ts`, `table/commands.ts`, `table/cell-selection.ts`, and `table/caret.ts` each carry the one downstream consequence of that choice they exist to fix — read their doc comments before touching cell-selection or caret behavior.

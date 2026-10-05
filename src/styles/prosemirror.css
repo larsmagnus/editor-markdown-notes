@@ -1,0 +1,239 @@
+/* Owns what TipTap's unlayered stylesheet used to inject (`injectCSS: false`). */
+@layer base {
+	.ProseMirror {
+		@apply wrap-break-word whitespace-break-spaces;
+		font-variant-ligatures: none;
+		font-feature-settings: 'liga' 0;
+	}
+
+	.ProseMirror [contenteditable='false'] {
+		@apply whitespace-normal;
+	}
+
+	.ProseMirror [contenteditable='false'] [contenteditable='true'] {
+		@apply whitespace-pre-wrap;
+	}
+
+	.ProseMirror pre {
+		@apply whitespace-pre-wrap;
+	}
+
+	img.ProseMirror-separator {
+		@apply inline! m-0! size-0! border-none!;
+	}
+
+	.ProseMirror-gapcursor {
+		@apply pointer-events-none absolute m-0 hidden;
+
+		&::after {
+			@apply absolute -top-0.5 block w-5 border-t border-current content-[''];
+			animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
+		}
+	}
+
+	.ProseMirror-focused .ProseMirror-gapcursor {
+		@apply block;
+	}
+
+	.ProseMirror-hideselection {
+		* {
+			@apply caret-transparent;
+		}
+		& *::selection {
+			@apply bg-transparent;
+		}
+	}
+}
+
+@keyframes ProseMirror-cursor-blink {
+	to {
+		visibility: hidden;
+	}
+}
+
+@layer utilities {
+	.tiptap {
+		@apply min-h-full w-full bg-transparent focus-visible:outline-hidden;
+	}
+
+	/* Fills the column so a click below the last line still lands in the editor. */
+	.ProseMirror {
+		@apply static! min-h-full;
+	}
+
+	/* The pan-zoom frame already draws the hover border. */
+	.ProseMirror img {
+		@apply cursor-grab rounded-md outline-none active:cursor-grabbing;
+	}
+
+	/* Reads the selection decoration: a `NodeSelection` never focuses the `<img>` itself. */
+	.ProseMirror img.ProseMirror-selectednode {
+		@apply border-ring ring-2 ring-ring/50;
+	}
+
+	/* Overrides mermaid's intrinsic-width cap, which stops a diagram growing into the column. */
+	.mermaid-diagram {
+		width: min(100%, calc(var(--diagram-width, 100%) * 1.5));
+
+		svg {
+			@apply w-full h-auto max-w-none!;
+		}
+	}
+
+	.tableWrapper {
+		@apply rounded-md border border-border;
+	}
+
+	/* `border-separate`, not `collapse`: browsers ignore `sticky` on collapsed-border cells. */
+	.ProseMirror table {
+		@apply w-full table-fixed border-separate border-spacing-0 m-0;
+	}
+
+	.ProseMirror {
+		th:first-child {
+			@apply rounded-tl-md;
+		}
+		th:last-child {
+			@apply rounded-tr-md;
+		}
+
+		tr:last-child td:first-child {
+			@apply rounded-bl-md;
+		}
+		tr:last-child td:last-child {
+			@apply rounded-br-md;
+		}
+		th,
+		td {
+			@apply border-b border-border;
+		}
+
+		tr:last-child th,
+		tr:last-child td {
+			@apply border-b-0;
+		}
+
+		th,
+		td {
+			@apply relative border-r border-border last:border-r-0;
+		}
+
+		tr:nth-child(even) td {
+			@apply bg-muted/40;
+		}
+
+		blockquote {
+			@apply bg-muted;
+		}
+	}
+
+	/* Sticks below the toolbar; end cells repeat the wrapper's side border, which scrolls away. */
+	.ProseMirror th {
+		@apply sticky top-[var(--toolbar-height,0px)] z-10 bg-muted;
+
+		&:first-child {
+			@apply border-l border-border;
+		}
+		&:last-child {
+			@apply border-r border-border;
+		}
+	}
+
+	.ProseMirror .selectedCell::after {
+		@apply pointer-events-none absolute inset-0 z-10 bg-accent/40 ring-2
+    ring-ring ring-inset content-[''];
+	}
+
+	.ProseMirror ul[data-type='taskList'] {
+		@apply list-none pl-0;
+	}
+
+	.ProseMirror ul[data-type='taskList'] ul[data-type='taskList'] {
+		@apply pl-6;
+	}
+
+	.ProseMirror ul[data-type='taskList'] li {
+		@apply flex items-start gap-2;
+	}
+
+	.ProseMirror ul[data-type='taskList'] li > label {
+		@apply flex h-lh shrink-0 items-center;
+	}
+
+	.ProseMirror ul[data-type='taskList'] li > div {
+		@apply min-w-0 flex-1;
+	}
+
+	.ProseMirror [data-type='horizontalRule'] {
+		@apply border-t border-border text-muted-foreground;
+	}
+
+	/* Drops the bullet while the marker is revealed. The trailing space, not a margin, keeps the caret beside its character. */
+	.ProseMirror li.construct-revealed {
+		@apply list-none;
+		> p > [data-token] {
+			@apply -ml-5.5 inline-block min-w-5.5 whitespace-pre text-right;
+		}
+	}
+
+	/* Zero-width, not `display: none`, which makes caret placement unreliable at the boundary.
+	   `line-height: 0` keeps the clipped inline-block from growing its line. */
+	.ProseMirror .syntax-hidden {
+		display: inline-block;
+		width: 0;
+		line-height: 0;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	.ProseMirror h1 [data-token='marker'],
+	.ProseMirror h2 [data-token='marker'],
+	.ProseMirror h3 [data-token='marker'],
+	.ProseMirror h4 [data-token='marker'],
+	.ProseMirror h5 [data-token='marker'],
+	.ProseMirror h6 [data-token='marker'],
+	.ProseMirror li [data-token='marker'],
+	.ProseMirror blockquote [data-token='marker'],
+	.ProseMirror strong [data-token='marker'],
+	.ProseMirror em [data-token='marker'],
+	.ProseMirror s [data-token='marker'],
+	.ProseMirror code [data-token='marker'],
+	.ProseMirror [data-type='horizontalRule'] [data-token='marker'],
+	.ProseMirror [data-type='frontmatter'] [data-token='marker'] {
+		@apply text-blue-400;
+	}
+
+	.ProseMirror a [data-token='marker'],
+	.ProseMirror a [data-token='url'],
+	.ProseMirror [data-type='image-source'] [data-token='marker'],
+	.ProseMirror [data-type='image-source'] [data-token='url'] {
+		@apply text-blue-400;
+	}
+	.ProseMirror a [data-token='title'],
+	.ProseMirror [data-type='image-source'] [data-token='title'] {
+		@apply text-blue-400 italic;
+	}
+
+	/* Both colors come from the Shiki theme: token colors assume their own background. */
+	.ProseMirror pre {
+		background-color: var(--shiki-bg, var(--color-muted));
+		color: var(--shiki-fg, inherit);
+	}
+
+	/* A match is often several adjacent spans (Shiki tokens), so only the run's outer corners round. */
+	.ProseMirror .search-reveal-match {
+		@apply rounded-sm bg-yellow-200/30;
+	}
+
+	.ProseMirror .search-reveal-match + .search-reveal-match {
+		@apply rounded-l-none;
+	}
+
+	.ProseMirror .search-reveal-match:has(+ .search-reveal-match) {
+		@apply rounded-r-none;
+	}
+
+	.ProseMirror .search-reveal-match--target {
+		@apply ring-2 ring-yellow-500/60 bg-yellow-300/30;
+	}
+}

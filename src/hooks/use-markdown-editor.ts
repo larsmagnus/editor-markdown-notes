@@ -113,6 +113,8 @@ export function useMarkdownEditor(
 		// showing that block's source - `useCaretInside` reveals whichever block
 		// holds the caret.
 		autofocus: false,
+		// TipTap's stylesheet is unlayered and beats ours, so we define core styles separately.
+		injectCSS: false,
 		editorProps: {
 			// Make space for toolbar + bubble menu
 			scrollMargin: 110,

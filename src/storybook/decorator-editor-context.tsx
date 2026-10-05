@@ -26,6 +26,7 @@ export function EditorContextDecorator({
 		extensions: buildExtensions('markdown'),
 		content,
 		autofocus: 'end',
+		injectCSS: false,
 	})
 
 	if (!editor) return null

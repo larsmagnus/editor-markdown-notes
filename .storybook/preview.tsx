@@ -1,5 +1,5 @@
 // oxlint-disable-next-line no-restricted-imports no-unassigned-import
-import '../src/globals.css'
+import '../src/styles/globals.css'
 
 import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/react-vite'

@@ -1,6 +1,7 @@
 /*
- * shadcn/typeset
- * https://ui.shadcn.com/docs/typeset.
+ * Every typographic rule for the document lives here. Started from
+ * shadcn/typeset (https://ui.shadcn.com/docs/typeset) and is maintained
+ * in-tree, so edit it freely.
  */
 
 @layer components {
@@ -446,6 +447,29 @@
 				border: 1px solid;
 			}
 		}
+	}
+
+	/* ProseMirror's own markup: bordered tables, task lists, rules. */
+	.typeset .tableWrapper {
+		margin-block: var(--typeset-flow);
+	}
+	.typeset .tableWrapper :where(th, td) {
+		padding: 0.5em 0.75em;
+		vertical-align: top;
+		text-align: start;
+	}
+	.typeset .tableWrapper :where(th) {
+		font-weight: 600;
+	}
+	.typeset :where(ul[data-type='taskList'] li p) {
+		margin: 0;
+	}
+	.typeset :where([data-type='horizontalRule']) {
+		font-family: var(--typeset-font-mono);
+		margin-block: 1.5em;
+	}
+	.typeset :where(li.construct-revealed > p > [data-token]) {
+		word-spacing: 0.5rem;
 	}
 
 	/* First child adds no space above. Last so it wins ties. */

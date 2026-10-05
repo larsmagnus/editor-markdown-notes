@@ -47,6 +47,13 @@ afterEach(() => {
 })
 
 describe('Editor Mode Live', () => {
+	it('leaves the stylesheet to the app, injecting none of its own', async () => {
+		render(<EditorModeLive content="A plain note" />)
+
+		await screen.findByRole('textbox')
+		expect(document.head.querySelector('style[data-tiptap-style]')).toBeNull()
+	})
+
 	it('renders a markdown table as a real table', async () => {
 		const content = [
 			'| Quarter | Revenue | Growth |',
