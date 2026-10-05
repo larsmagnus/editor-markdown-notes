@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-05
+
 - Changed the extension icon to the new punchdown logo
 - Changed the extension package to leave out development-only files, making the install smaller
 
