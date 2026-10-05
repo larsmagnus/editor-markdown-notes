@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Regenerates public/screenshot-editor-markdown-notes.png headlessly: opens
+# Regenerates the README screenshots from public/markdown-notes-architect.md.
+#
+# The feature shots (raw mode, visual mermaid editing, Ask Claude) are driven
+# by Playwright against the web build - clicking and selecting inside a native
+# window is not reliable - and run first, since they need no permissions.
+#
+# The hero shot, public/screenshot-editor-markdown-notes.png, is headless: opens
 # the fixture note in the clean profile, then captures the window natively
 # (traffic lights, shadow) the way a manual Cmd+Shift+4 capture would.
 #
@@ -19,6 +25,9 @@ set -euo pipefail
 # window id", not as a permission error.
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+(cd "$ROOT" && pnpm exec playwright test -c playwright.screenshots.config.ts)
+
 OUT="$ROOT/public/screenshot-editor-markdown-notes.png"
 # Must match CLEAN/USER_DIR/EXT_DIR in open-clean-vscode-profile.sh.
 USER_DIR="/tmp/vscode-clean/user"

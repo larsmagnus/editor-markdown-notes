@@ -30,6 +30,18 @@ An integrated live markdown editor for VS Code, built for the AI-first era
 - Note index of every note in the workspace, with filtering and sorting by title, folder, tag or last edit
 - Toolbar settings persist across tabs and sessions
 
+Edit in the live view and the markdown stays yours: switch to the raw editor any time to see and edit the exact file, with syntax highlighting and your undo history intact.
+
+![The raw markdown editor](https://raw.githubusercontent.com/larsmagnus/editor-markdown-notes/main/public/screenshot-raw-editor.png)
+
+Mermaid diagrams render inline. Open the visual editor to add, connect, rename and delete nodes, and the diagram's source follows along.
+
+![Editing a mermaid diagram visually](https://raw.githubusercontent.com/larsmagnus/editor-markdown-notes/main/public/screenshot-mermaid-visual-editing.png)
+
+Select text and press Ask Claude to simplify, shorten, improve or rewrite it. The reply appears in place, ready to accept, decline or redo.
+
+![The Ask Claude popover over selected text](https://raw.githubusercontent.com/larsmagnus/editor-markdown-notes/main/public/screenshot-ask-claude.png)
+
 ### Supported files
 
 - `.md`, `.markdown`, `.mdown`, `.mkd`, `.txt`: open and edit directly
