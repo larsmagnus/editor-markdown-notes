@@ -73,6 +73,7 @@ cat > "$USER_DIR/User/settings.json" <<JSON
   "workbench.layoutControl.enabled": false,
   "workbench.secondarySideBar.defaultVisibility": "hidden",
   "window.commandCenter": false,
+  "window.title": "\${activeEditorShort}",
   "chat.disableAIFeatures": true,
   "editor.minimap.enabled": false,
   "security.workspace.trust.enabled": false,
