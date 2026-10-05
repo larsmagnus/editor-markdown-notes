@@ -14,6 +14,7 @@ export const CURATED_TERMS: string[] = [
 	'GFM',
 	'JSX',
 	'MCP',
+	'CLI',
 	'SVG',
 	'TSX',
 
