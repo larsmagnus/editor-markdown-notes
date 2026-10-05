@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Changed index cards to a consistent height, with the file name set apart from its folder
 - Added the full folder path on hover over a card's folder
 - Changed index cards to show a note's first paragraph when it has no frontmatter description
+- Fixed the caret appearing inside the first character of a list item when its bullet or number is revealed, and the arrow key that crossed the marker doing nothing visible
 
 ## [0.28.0] - 2026-10-04
 

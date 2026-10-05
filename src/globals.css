@@ -342,11 +342,18 @@
 	 * that marker's place - the browser's bullet or number, a task item's
 	 * checkbox - so only ever one of the two is visible. `list-style` alone,
 	 * leaving the indent, so revealing a marker does not shift the line.
+	 *
+	 * The marker takes the bullet's gutter as a box of its own, text flush to
+	 * the right, so the content never moves. The gap that keeps the dash where
+	 * the bullet was is the trailing space's own width, not a margin: a margin
+	 * puts the caret at the marker's end a whole gap away from the character it
+	 * sits before, and the arrow press that crosses it looks dead.
 	 */
 	.ProseMirror li.construct-revealed {
 		@apply list-none;
 		> p > [data-token] {
-			@apply -ml-5.5 mr-2;
+			@apply -ml-5.5 inline-block min-w-5.5 whitespace-pre text-right;
+			word-spacing: 0.5rem;
 		}
 	}
 
