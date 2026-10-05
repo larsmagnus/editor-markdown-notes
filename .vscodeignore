@@ -18,6 +18,7 @@ test-results/**
 playwright-report/**
 blob-report/**
 playwright/**
+report/**
 **/*.log
 # Demo notes and the workspace-root copy of the icon they resolve to. Only
 # public/icon-punchdown.png ships, as the extension's icon.
@@ -36,6 +37,11 @@ dist/*.mdx
 dist/*.txt
 dist/*.pdf
 icon-punchdown.png
+# Only the demo note and the standalone web build's favicon use these.
+public/architecture.drawio.svg
+public/icon-punchdown.svg
+dist/architecture.drawio.svg
+dist/icon-punchdown.svg
 # The readme loads the screenshot over https, so it need not be packaged.
 public/screenshot-*.png
 dist/screenshot-*.png
@@ -50,6 +56,9 @@ vsc-extension-quickstart.md
 .npmrc
 .mcp.json
 components.json
+lefthook.yml
+.jscpd.json
+CLAUDE.md
 fta.json
 knip.jsonc
 index.html
