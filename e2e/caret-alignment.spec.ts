@@ -74,8 +74,16 @@ const MARKS = [
 	{ name: 'bold', markdown: 'a **bold** z', tolerance: SUBPIXEL },
 	{ name: 'italic', markdown: 'a _italic_ z', tolerance: SUBPIXEL },
 	{ name: 'strikethrough', markdown: 'a ~~struck~~ z', tolerance: SUBPIXEL },
-	{ name: 'inline code', markdown: 'a `coded` z', tolerance: INLINE_CODE_PADDING },
-	{ name: 'link', markdown: 'a [linked](https://example.com) z', tolerance: SUBPIXEL },
+	{
+		name: 'inline code',
+		markdown: 'a `coded` z',
+		tolerance: INLINE_CODE_PADDING,
+	},
+	{
+		name: 'link',
+		markdown: 'a [linked](https://example.com) z',
+		tolerance: SUBPIXEL,
+	},
 ] as const
 
 test.describe('The caret inside a revealed inline mark', () => {
