@@ -66,6 +66,51 @@ describe('task-list', () => {
 	})
 })
 
+describe('bullet-list', () => {
+	it('turns the current block into a bullet list item', () => {
+		const editor = createEditor()
+
+		commandFor('bullet-list').run(editor, { from: 1, to: 1 })
+
+		expect(editor.isActive('bulletList')).toBe(true)
+	})
+})
+
+describe('numbered-list', () => {
+	it('turns the current block into a numbered list item', () => {
+		const editor = createEditor()
+
+		commandFor('numbered-list').run(editor, { from: 1, to: 1 })
+
+		expect(editor.isActive('orderedList')).toBe(true)
+	})
+})
+
+describe('raw insertion', () => {
+	it.each([
+		['mermaid', '```mermaid\ngraph TD\n  A --> B\n```', undefined],
+		['code', '```\n\n```', 4],
+		['task-list', '- [ ] ', undefined],
+		['bullet-list', '- ', undefined],
+		['numbered-list', '1. ', undefined],
+		['note', '> [!NOTE]\n> ', undefined],
+		['tip', '> [!TIP]\n> ', undefined],
+		['important', '> [!IMPORTANT]\n> ', undefined],
+		['warning', '> [!WARNING]\n> ', undefined],
+		['caution', '> [!CAUTION]\n> ', undefined],
+		['table', '|  |  |\n| --- | --- |\n|  |  |', 2],
+	])('%s writes its markdown', (id, text, caretOffset) => {
+		expect(commandFor(id).raw).toEqual({ text, caretOffset })
+	})
+
+	it.each(['image', 'ask'])(
+		'%s is left out, as it needs a flow of its own',
+		(id) => {
+			expect(commandFor(id).raw).toBeUndefined()
+		}
+	)
+})
+
 describe('table', () => {
 	it('inserts a 2x2 table with a header row', () => {
 		const editor = createEditor()

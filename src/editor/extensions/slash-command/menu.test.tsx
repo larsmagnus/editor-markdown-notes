@@ -2,7 +2,7 @@ import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { GitBranch, Table2 } from 'lucide-react'
 import { createRef } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { SlashCommandItem } from '#src/editor/extensions/slash-command/commands'
 import { SlashCommandMenu } from '#src/editor/extensions/slash-command/menu'
@@ -20,6 +20,34 @@ const ITEMS: SlashCommandItem[] = [
 ]
 
 describe('SlashCommandMenu', () => {
+	// happy-dom has no layout engine and so no `scrollIntoView`.
+	beforeEach(() => {
+		Element.prototype.scrollIntoView = vi.fn()
+	})
+
+	it('scrolls the highlighted item into view when arrowing to it', () => {
+		const ref = createRef<SlashCommandMenuHandle>()
+		render(<SlashCommandMenu ref={ref} items={ITEMS} onSelect={vi.fn()} />)
+
+		act(() =>
+			ref.current?.onKeyDown(new KeyboardEvent('keydown', { key: 'ArrowDown' }))
+		)
+
+		expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({
+			block: 'nearest',
+		})
+		expect(
+			vi.mocked(Element.prototype.scrollIntoView).mock.contexts.at(-1)
+		).toBe(screen.getByRole('option', { name: 'Table' }).parentElement)
+	})
+
+	it('leaves the scroll position alone when the mouse moves the highlight', async () => {
+		render(<SlashCommandMenu items={ITEMS} onSelect={vi.fn()} />)
+
+		await userEvent.hover(screen.getByRole('option', { name: 'Table' }))
+
+		expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled()
+	})
 	it('lists every item passed to it', () => {
 		render(<SlashCommandMenu items={ITEMS} onSelect={vi.fn()} />)
 

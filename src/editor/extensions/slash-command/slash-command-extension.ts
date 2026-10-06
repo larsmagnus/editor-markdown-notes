@@ -50,6 +50,9 @@ export const SlashCommand = Extension.create({
 				editor: this.editor,
 				char: '/',
 				startOfLine: true,
+				// Raw mode's text reaches this editor through `setContent` while it is
+				// hidden; a trailing `/` there must not pop a menu over the raw view.
+				allow: ({ editor }) => editor.view.hasFocus(),
 				items: ({ query }) => filterCommands(query),
 				command: ({ editor, range, props }) => props.run(editor, range),
 				render: createSlashCommandRender,

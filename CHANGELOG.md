@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added GitHub-style admonitions: `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]` render as colored callouts with an icon, and the tag reveals as text when the caret reaches it
 - Added the five admonitions to the `/` menu
+- Added the `/` menu to the raw editor, opening on a `/` at the start of a line and offering the same commands as the live editor, except Image and Ask Claude
+- Added bullet and numbered lists to the `/` menu in both editors
+- Changed the `/` menu to keep the highlighted item in view while arrowing, with the list capped in height
+- Fixed the live editor's `/` menu appearing over the raw editor while typing a `/` there
 
 ## [1.0.1] - 2026-10-05
 

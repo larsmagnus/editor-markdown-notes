@@ -2,6 +2,7 @@ import { cn } from 'cn'
 import { useEffect, useRef } from 'react'
 
 import { RawMarkdownHighlight } from '#src/editor/raw-markdown-highlight'
+import { RawSlashMenu } from '#src/editor/raw-slash-menu'
 import type { AnalyzerHandle } from '#src/hooks/use-analyzer'
 import { useRawDraftSync } from '#src/hooks/use-raw-draft-sync'
 import { useRawHeadingReveal } from '#src/hooks/use-raw-heading-reveal'
@@ -53,6 +54,7 @@ export function EditorModeRaw({
 	const { isVSCodeContext } = useSettings()
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 	const overlayRef = useRef<HTMLPreElement>(null)
+	const wrapperRef = useRef<HTMLDivElement>(null)
 
 	const { draft, draftRef, handleChange, handleBlur } = useRawDraftSync({
 		content,
@@ -78,7 +80,7 @@ export function EditorModeRaw({
 		// `absolute inset-0`, and the two must wrap at the identical width or a
 		// click lands on whatever character the textarea's own, differently
 		// wrapped layout puts underneath it, not the one the mirror shows there.
-		<div className={cn('relative', className)}>
+		<div ref={wrapperRef} className={cn('relative', className)}>
 			<RawMarkdownHighlight
 				ref={overlayRef}
 				text={draft}
@@ -109,6 +111,13 @@ export function EditorModeRaw({
 					'relative w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre-wrap text-transparent caret-foreground outline-none field-sizing-content',
 					activeLinkRangeIndex !== null && 'cursor-pointer'
 				)}
+			/>
+			<RawSlashMenu
+				textareaRef={textareaRef}
+				overlayRef={overlayRef}
+				wrapperRef={wrapperRef}
+				draft={draft}
+				active={active}
 			/>
 		</div>
 	)

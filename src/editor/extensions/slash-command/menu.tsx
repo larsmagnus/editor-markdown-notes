@@ -1,5 +1,12 @@
 import { cn } from 'cn'
-import { forwardRef, useImperativeHandle, useState } from 'react'
+import {
+	forwardRef,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from 'react'
+import type { MouseEvent } from 'react'
 
 import type { SlashCommandItem } from '#src/editor/extensions/slash-command/commands'
 
@@ -28,6 +35,17 @@ export const SlashCommandMenu = forwardRef<
 	SlashCommandMenuProps
 >(function SlashCommandMenu({ items, onSelect }, ref) {
 	const [selectedIndex, setSelectedIndex] = useState(0)
+	const listRef = useRef<HTMLUListElement>(null)
+	// Only arrow keys bring the highlight into view: under the mouse it is
+	// already visible, and scrolling there would move the list out from under it.
+	const highlightMovedByKey = useRef(false)
+
+	useEffect(() => {
+		if (!highlightMovedByKey.current) return
+		listRef.current?.children[selectedIndex]?.scrollIntoView({
+			block: 'nearest',
+		})
+	}, [selectedIndex])
 
 	// The list re-filters on every keystroke of the query; the highlight
 	// should not point at whatever index used to be there.
@@ -37,6 +55,15 @@ export const SlashCommandMenu = forwardRef<
 		setSelectedIndex(0)
 	}
 
+	// A click must not move focus off the editor: the live menu closes once the
+	// editor blurs, before the click lands, and the raw menu needs its caret.
+	const keepEditorFocus = (event: MouseEvent) => event.preventDefault()
+
+	const highlightFromMouse = (index: number) => {
+		highlightMovedByKey.current = false
+		setSelectedIndex(index)
+	}
+
 	useImperativeHandle(
 		ref,
 		() => ({
@@ -44,11 +71,13 @@ export const SlashCommandMenu = forwardRef<
 				if (items.length === 0) return false
 
 				if (event.key === 'ArrowDown') {
+					highlightMovedByKey.current = true
 					setSelectedIndex((index) => (index + 1) % items.length)
 					return true
 				}
 
 				if (event.key === 'ArrowUp') {
+					highlightMovedByKey.current = true
 					setSelectedIndex((index) => (index + items.length - 1) % items.length)
 					return true
 				}
@@ -75,7 +104,9 @@ export const SlashCommandMenu = forwardRef<
 
 	return (
 		<ul
-			className="w-56 rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10"
+			ref={listRef}
+			onMouseDown={keepEditorFocus}
+			className="max-h-64 w-56 overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10"
 			role="listbox"
 		>
 			{items.map((item, index) => (
@@ -89,7 +120,7 @@ export const SlashCommandMenu = forwardRef<
 							index === selectedIndex && 'bg-accent text-accent-foreground'
 						)}
 						onClick={() => onSelect(item)}
-						onMouseEnter={() => setSelectedIndex(index)}
+						onMouseEnter={() => highlightFromMouse(index)}
 					>
 						<item.icon className="size-4" />
 						{item.label}
