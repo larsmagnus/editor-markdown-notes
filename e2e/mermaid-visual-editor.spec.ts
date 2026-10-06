@@ -148,7 +148,10 @@ test.describe('Editing a mermaid diagram visually', () => {
 		await replaceOpenLabel(page, canvas, 'Complete')
 		await expect(nodeLabelled(canvas, 'Complete')).toBeVisible()
 
-		await page.getByText('after text', { exact: true }).click()
+		await page
+			.locator('#live-editor')
+			.getByText('after text', { exact: true })
+			.click()
 		await page.keyboard.press('ControlOrMeta+z')
 
 		await expect(nodeLabelled(canvas, 'Finish')).toBeVisible()
