@@ -1,6 +1,6 @@
 import {
 	createSettleLoop,
-	TAKEOVER_EVENTS,
+	settleOnWindowTakeover,
 } from '#src/lib/scroll/scroll-settle'
 import type { SettleOptions } from '#src/lib/scroll/scroll-settle'
 
@@ -32,21 +32,5 @@ export function scrollHoldInView(
 		element()?.scrollIntoView({ block: 'center', inline: 'nearest' })
 	}
 
-	return createSettleLoop(
-		apply,
-		(settle) => {
-			// Captured, so a takeover inside the editor is seen before anything there
-			// can stop it propagating.
-			for (const event of TAKEOVER_EVENTS) {
-				window.addEventListener(event, settle, { passive: true, capture: true })
-			}
-
-			return () => {
-				for (const event of TAKEOVER_EVENTS) {
-					window.removeEventListener(event, settle, true)
-				}
-			}
-		},
-		options
-	)
+	return createSettleLoop(apply, settleOnWindowTakeover, options)
 }

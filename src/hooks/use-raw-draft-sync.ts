@@ -1,13 +1,8 @@
 import type { ChangeEvent, RefObject } from 'react'
-import {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from 'react'
+import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 
 import { useAdoptContentOnBlur } from '#src/hooks/use-adopt-content-on-blur'
+import { useAdoptIncomingContent } from '#src/hooks/use-adopt-incoming-content'
 import { useFlushOnDeactivate } from '#src/hooks/use-flush-on-deactivate'
 import { useNoteSync } from '#src/hooks/use-note-sync'
 
@@ -74,15 +69,15 @@ export function useRawDraftSync({
 	})
 	useFlushOnDeactivate(active, flushQueuedSync)
 
-	// Only while the caret is elsewhere. The host echoes every sync back as an
-	// `update`, and that echo is a debounce behind the keystrokes still arriving
-	// - adopting it mid-edit would reset both the text and the caret.
-	useEffect(() => {
-		if (document.activeElement === textareaRef.current) return
-
-		adoptedRef.current = content
-		setDraft(content)
-	}, [content, textareaRef])
+	useAdoptIncomingContent({
+		content,
+		draft,
+		draftRef,
+		adoptedRef,
+		setDraft,
+		textareaRef,
+		isVSCodeContext,
+	})
 
 	const handleBlur = useAdoptContentOnBlur({
 		content,

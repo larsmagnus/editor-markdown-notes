@@ -1,15 +1,18 @@
 import type { Editor } from '@tiptap/react'
 import { EditorContext } from '@tiptap/react'
-import { useState } from 'react'
+import type { RefObject } from 'react'
+import { useRef, useState } from 'react'
 
 import { AppErrorBoundary } from '#src/components/app-error-boundary'
 import EditorModeLive from '#src/editor/editor-mode-live'
 import { EditorModeRaw } from '#src/editor/editor-mode-raw'
 import { EditorModeSlot } from '#src/editor/editor-mode-slot'
 import { useAnalyzer } from '#src/hooks/use-analyzer'
+import { useModeSwitchAnchor } from '#src/hooks/use-mode-switch-anchor'
 import { RawTextToolsContext } from '#src/hooks/use-raw-text-tools-location'
 import { EMPTY_TEXT_TOOLS_STATE } from '#src/hooks/use-report-live-editor'
 import type { FileKind } from '#src/lib/file-kind'
+import type { RawModeElements } from '#src/lib/mode-switch/raw-mode-view'
 import type { SourcePlacedIssue } from '#src/lib/text-tools/place-source-issues'
 import { TextToolsAside } from '#src/text-tools/text-tools-aside'
 
@@ -20,6 +23,9 @@ interface EditorBodyProps {
 	raw: boolean
 	className?: string
 	fileKind?: FileKind
+	/** The page's one scrolling element, which a mode switch scrolls to keep
+	 *  the reader's place. */
+	scrollContainerRef?: RefObject<HTMLElement | null>
 }
 
 /**
@@ -38,6 +44,7 @@ export function EditorBody({
 	raw,
 	className,
 	fileKind,
+	scrollContainerRef,
 }: EditorBodyProps) {
 	const [textTools, setTextTools] = useState(EMPTY_TEXT_TOOLS_STATE)
 	// Rendered as `EditorModeLive`'s sibling below, outside its own
@@ -51,6 +58,13 @@ export function EditorBody({
 	// ~575kB spelling dictionary and the worker itself for the same note.
 	const analyzer = useAnalyzer()
 	const [rawIssues, setRawIssues] = useState<SourcePlacedIssue[]>([])
+	const rawElementsRef = useRef<RawModeElements | null>(null)
+	const shownRaw = useModeSwitchAnchor({
+		raw,
+		liveEditor,
+		rawElementsRef,
+		scrollContainerRef,
+	})
 
 	return (
 		<EditorContext.Provider value={{ editor: liveEditor }}>
@@ -62,7 +76,7 @@ export function EditorBody({
 				<div className="relative min-w-xs flex-1 self-stretch">
 					{/* Contained rather than fatal, so the toolbar survives and raw mode
 					    stays reachable as the escape hatch for a note that will not parse. */}
-					<EditorModeSlot active={!raw}>
+					<EditorModeSlot active={!shownRaw}>
 						<AppErrorBoundary
 							title="The editor stopped working"
 							resetKeys={[content]}
@@ -70,7 +84,7 @@ export function EditorBody({
 							<EditorModeLive
 								content={content}
 								syncContent={syncContent}
-								active={!raw}
+								active={!shownRaw}
 								includeTypesetClassNames
 								className={className}
 								onAnalysisChange={setTextTools}
@@ -80,19 +94,20 @@ export function EditorBody({
 							/>
 						</AppErrorBoundary>
 					</EditorModeSlot>
-					<EditorModeSlot active={raw}>
+					<EditorModeSlot active={shownRaw}>
 						<EditorModeRaw
 							content={content}
 							syncContent={syncContent}
-							active={raw}
+							active={shownRaw}
 							className={className}
 							analyzer={analyzer}
 							onIssuesChange={setRawIssues}
+							elementsRef={rawElementsRef}
 						/>
 					</EditorModeSlot>
 				</div>
 				<RawTextToolsContext.Provider
-					value={{ active: raw, issues: rawIssues }}
+					value={{ active: shownRaw, issues: rawIssues }}
 				>
 					<TextToolsAside
 						analysis={textTools.analysis}

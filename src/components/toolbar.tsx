@@ -1,4 +1,5 @@
 import { LayoutGrid } from 'lucide-react'
+import type { MouseEvent } from 'react'
 
 import { ButtonCopyPage } from '#src/components/button-copy-page'
 import type { DevFileSelectorProps } from '#src/components/dev-file-selector'
@@ -22,6 +23,15 @@ type ToolbarProps = {
 	setFileName: DevFileSelectorProps['setValue']
 	content: string
 	onOpenIndex: () => void
+}
+
+/**
+ * Leaves focus in the editor when an edit-mode toggle is clicked, so the mode
+ * switched to takes over the caret. A keyboard user reaching the toggle keeps
+ * focus on it, which is where they put it.
+ */
+function keepEditorFocus(event: MouseEvent) {
+	event.preventDefault()
 }
 
 function Toolbar({
@@ -66,6 +76,7 @@ function Toolbar({
 						value={value}
 						aria-label={label}
 						title={label}
+						onMouseDown={keepEditorFocus}
 					>
 						<Icon />
 					</ToggleGroupItem>

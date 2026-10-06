@@ -10,9 +10,15 @@ import { hasSearchReveal } from '#src/lib/search-reveal'
  * Returns the ref to put on the scrolling element. A note not seen yet this
  * session starts at the top, which is why the editor must not autofocus - a
  * caret placed at either end scrolls itself into view over this.
+ *
+ * A switch between live and raw mode (`raw`) lets go of the restore early: the
+ * switch keeps the reader's place itself (`useModeSwitchAnchor`), and an offset
+ * measured in the other mode would only pull them away from it.
  */
-export function useScrollPosition(fileName: string) {
+export function useScrollPosition(fileName: string, raw: boolean) {
 	const containerRef = useRef<HTMLDivElement>(null)
+	const releaseRef = useRef<() => void>(() => {})
+	const releasedForRef = useRef(raw)
 
 	// Asked while rendering, because the editor claims the reveal from an effect
 	// and a child's effects run before this hook's - asked any later, the answer
@@ -62,11 +68,27 @@ export function useScrollPosition(fileName: string) {
 
 		container.addEventListener('scroll', record, { passive: true })
 
+		// Only the restore: a reveal's suppression outlasts a switch, since the
+		// reveal can still be scrolling the page to its match.
+		releaseRef.current = revealPending
+			? () => {}
+			: () => {
+					stopRestoring()
+					restoring = false
+				}
+
 		return () => {
 			stopRestoring()
 			container.removeEventListener('scroll', record)
 		}
 	}, [fileName, revealPending])
+
+	useEffect(() => {
+		if (releasedForRef.current === raw) return
+		releasedForRef.current = raw
+
+		releaseRef.current()
+	}, [raw])
 
 	return containerRef
 }

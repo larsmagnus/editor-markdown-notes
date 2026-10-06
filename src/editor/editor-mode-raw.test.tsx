@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -187,6 +187,137 @@ describe('EditorModeRaw', () => {
 		fireEvent.blur(textarea)
 
 		expect(textarea).toHaveValue('# Backlog')
+	})
+
+	/**
+	 * A switch from live mode focuses this view before live mode's last
+	 * keystrokes have reached it. Holding out for a blur would leave the author
+	 * typing over text that is already out of date.
+	 */
+	it('adopts a change while the caret is in the note if nothing of the author’s is pending, keeping the caret on its text', async () => {
+		const user = userEvent.setup()
+		window.vscode = {
+			postMessage: vi.fn(),
+			getState: vi.fn(),
+			setState: vi.fn(),
+		}
+
+		const { rerender } = render(
+			<SettingsProvider>
+				<EditorModeRaw
+					content={'# Roadmap\n\nShip it.'}
+					syncContent={vi.fn()}
+				/>
+			</SettingsProvider>
+		)
+
+		const textarea = screen.getByLabelText<HTMLTextAreaElement>('Raw markdown')
+		await user.click(textarea)
+		const caret = '# Roadmap\n\nShip'.length
+		textarea.setSelectionRange(caret, caret)
+
+		rerender(
+			<SettingsProvider>
+				<EditorModeRaw
+					content={'# Roadmap 2026\n\nShip it.'}
+					syncContent={vi.fn()}
+				/>
+			</SettingsProvider>
+		)
+
+		expect(textarea).toHaveValue('# Roadmap 2026\n\nShip it.')
+		expect(textarea.selectionStart).toBe('# Roadmap 2026\n\nShip'.length)
+	})
+
+	/**
+	 * In VS Code, unsynced keystrokes prevent adoption: clicking into the
+	 * sidebar leaves keystrokes waiting on the debounce, and adopting would
+	 * discard them.
+	 */
+	it('keeps unsynced keystrokes when an outside change arrives after the caret has left', async () => {
+		const user = userEvent.setup()
+		window.vscode = {
+			postMessage: vi.fn(),
+			getState: vi.fn(),
+			setState: vi.fn(),
+		}
+
+		const { rerender } = render(
+			<SettingsProvider>
+				<EditorModeRaw content={'# Roadmap'} syncContent={vi.fn()} />
+			</SettingsProvider>
+		)
+
+		const textarea = screen.getByLabelText('Raw markdown')
+		await user.type(textarea, ' 2026')
+		act(() => textarea.blur())
+
+		rerender(
+			<SettingsProvider>
+				<EditorModeRaw content={'# Backlog'} syncContent={vi.fn()} />
+			</SettingsProvider>
+		)
+
+		expect(textarea).toHaveValue('# Roadmap 2026')
+	})
+
+	/**
+	 * Standalone there is no host: `content` only ever changes because the file
+	 * selector picked another note, and an edit to the last one has nowhere to
+	 * be kept anyway.
+	 */
+	it('adopts the next note standalone even after the last one was edited', async () => {
+		const user = userEvent.setup()
+
+		const { rerender } = render(
+			<SettingsProvider>
+				<EditorModeRaw content={'# Roadmap'} syncContent={vi.fn()} />
+			</SettingsProvider>
+		)
+
+		const textarea = screen.getByLabelText('Raw markdown')
+		await user.type(textarea, ' 2026')
+		act(() => textarea.blur())
+
+		rerender(
+			<SettingsProvider>
+				<EditorModeRaw content={'# Backlog'} syncContent={vi.fn()} />
+			</SettingsProvider>
+		)
+
+		expect(textarea).toHaveValue('# Backlog')
+	})
+
+	it('keeps typing where the caret is after the host echoes back exactly what is on screen', async () => {
+		const user = userEvent.setup()
+		const syncContent = vi.fn()
+		window.vscode = {
+			postMessage: vi.fn(),
+			getState: vi.fn(),
+			setState: vi.fn(),
+		}
+
+		const { rerender } = render(
+			<SettingsProvider>
+				<EditorModeRaw content={'# Roadmap'} syncContent={syncContent} />
+			</SettingsProvider>
+		)
+
+		const textarea = screen.getByLabelText('Raw markdown')
+		await user.type(textarea, ' 2026')
+		await waitFor(
+			() => expect(syncContent).toHaveBeenLastCalledWith('# Roadmap 2026'),
+			{ timeout: 2000 }
+		)
+
+		rerender(
+			<SettingsProvider>
+				<EditorModeRaw content={'# Roadmap 2026'} syncContent={syncContent} />
+			</SettingsProvider>
+		)
+		await user.keyboard(' Q3')
+
+		expect(textarea).toHaveValue('# Roadmap 2026 Q3')
 	})
 
 	/**

@@ -1,4 +1,5 @@
 import { cn } from 'cn'
+import type { RefObject } from 'react'
 import { useEffect, useRef } from 'react'
 
 import { RawLineGutter } from '#src/editor/raw-line-gutter'
@@ -10,11 +11,13 @@ import { useRawGutterRoom } from '#src/hooks/use-raw-gutter-room'
 import { useRawHeadingReveal } from '#src/hooks/use-raw-heading-reveal'
 import { useRawLinkClick } from '#src/hooks/use-raw-link-click'
 import { useRawLinkHover } from '#src/hooks/use-raw-link-hover'
+import { useRawModeElements } from '#src/hooks/use-raw-mode-elements'
 import { useRawSearchReveal } from '#src/hooks/use-raw-search-reveal'
 import { useRawSyntaxHighlight } from '#src/hooks/use-raw-syntax-highlight'
 import { useRawTextTools } from '#src/hooks/use-raw-text-tools'
 import { useSettings } from '#src/hooks/use-settings'
 import { lineIndexAt } from '#src/lib/line-index-at'
+import type { RawModeElements } from '#src/lib/mode-switch/raw-mode-view'
 import type { SourcePlacedIssue } from '#src/lib/text-tools/place-source-issues'
 
 interface RawMarkdownEditorProps {
@@ -33,6 +36,9 @@ interface RawMarkdownEditorProps {
 	 *  the sidebar (`RawTextToolsContext`) so a click can select inside this
 	 *  textarea while it is the visible mode. */
 	onIssuesChange?: (issues: SourcePlacedIssue[]) => void
+	/** Where `EditorBody` reads this view's caret and its on-screen position
+	 *  from, to carry both across a mode switch. */
+	elementsRef?: RefObject<RawModeElements | null>
 }
 
 /** Where the "Skip to editor" link (`skip-target.ts`) focuses in raw mode. */
@@ -53,6 +59,7 @@ export function EditorModeRaw({
 	className,
 	analyzer,
 	onIssuesChange,
+	elementsRef,
 }: RawMarkdownEditorProps) {
 	const { isVSCodeContext } = useSettings()
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -77,6 +84,7 @@ export function EditorModeRaw({
 	useEffect(() => {
 		onIssuesChange?.(issues)
 	}, [issues, onIssuesChange])
+	useRawModeElements(elementsRef, textareaRef, overlayRef)
 
 	return (
 		// The measure/centering classes (`className`) live on this wrapper, not

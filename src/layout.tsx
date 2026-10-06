@@ -34,7 +34,7 @@ function Layout({ defaultFileName }: LayoutProps) {
 
 	// The one scrolling element on the page, so one offset covers the rich
 	// editor and the raw markdown view alike.
-	const scrollRef = useScrollPosition(fileName)
+	const scrollRef = useScrollPosition(fileName, viewOptions.raw)
 
 	const widthClassName = cn(
 		'h-full',
@@ -83,6 +83,7 @@ function Layout({ defaultFileName }: LayoutProps) {
 					raw={viewOptions.raw}
 					className={widthClassName}
 					fileKind={getFileKind(fileName)}
+					scrollContainerRef={scrollRef}
 				/>
 			</main>
 		</div>

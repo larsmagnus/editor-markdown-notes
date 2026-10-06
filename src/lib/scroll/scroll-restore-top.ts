@@ -1,5 +1,6 @@
 import {
 	createSettleLoop,
+	settleOnForeignScroll,
 	TAKEOVER_EVENTS,
 } from '#src/lib/scroll/scroll-settle'
 import type { SettleOptions } from '#src/lib/scroll/scroll-settle'
@@ -51,30 +52,17 @@ export function scrollRestoreTop(
 	return createSettleLoop(
 		apply,
 		(settle) => {
-			/**
-			 * Lets go of anything scrolling the page that is neither this function nor
-			 * the page growing.
-			 *
-			 * VSCode's find widget is the case that matters: it lives in VSCode's own
-			 * chrome rather than in this document, so scrolling a match into view fires
-			 * none of the takeover events above, and the search result would be pulled
-			 * back off screen. An unchanged height is what tells that apart from the
-			 * scroll anchoring this function exists to undo.
-			 */
-			const onScroll = () => {
-				if (container.scrollTop === appliedTop) return
-				if (container.scrollHeight !== appliedHeight) return
-
-				settle()
-			}
-
-			container.addEventListener('scroll', onScroll, { passive: true })
+			const detachForeignScroll = settleOnForeignScroll(
+				container,
+				() => ({ top: appliedTop, height: appliedHeight }),
+				settle
+			)
 			for (const event of TAKEOVER_EVENTS) {
 				container.addEventListener(event, settle, { passive: true })
 			}
 
 			return () => {
-				container.removeEventListener('scroll', onScroll)
+				detachForeignScroll()
 				for (const event of TAKEOVER_EVENTS) {
 					container.removeEventListener(event, settle)
 				}

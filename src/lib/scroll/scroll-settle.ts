@@ -20,12 +20,9 @@ export type SettleOptions = {
  * Runs `apply` immediately and then on an interval until the reader takes
  * over or `timeoutMs` passes, whichever is first.
  *
- * Shared by `scrollHoldInView` and `scrollRestoreTop`, which differ only in
- * what `apply` does and what counts as a takeover - a plain document listener
- * for one, a container-scoped one plus an external-scroll check for the
- * other. `attachTakeover` receives the loop's own `settle` so a caller's
- * listener can end the loop, and returns its own teardown for `settle` to run
- * once, whichever end of the loop happens first.
+ * `attachTakeover` is handed the loop's own `settle`, so its listeners can end
+ * the loop, and returns the teardown `settle` runs once, whichever end comes
+ * first.
  *
  * Returns `settle` itself, which is what callers use as their own teardown.
  */
@@ -54,4 +51,55 @@ export function createSettleLoop(
 	apply()
 
 	return settle
+}
+
+/**
+ * Ends a loop on a takeover anywhere in the page. Captured, so a takeover
+ * inside the editor is seen before anything there can stop it propagating.
+ */
+export function settleOnWindowTakeover(settle: () => void): () => void {
+	for (const event of TAKEOVER_EVENTS) {
+		window.addEventListener(event, settle, { passive: true, capture: true })
+	}
+
+	return () => {
+		for (const event of TAKEOVER_EVENTS) {
+			window.removeEventListener(event, settle, true)
+		}
+	}
+}
+
+/** The scroll position a loop last put its container at, and the page height
+ *  it was measured against. */
+export type AppliedScroll = {
+	top: number
+	height: number
+}
+
+/**
+ * Ends a loop on anything scrolling `container` that is neither the loop itself
+ * nor the page growing.
+ *
+ * VSCode's find widget is the case that matters: it lives in VSCode's own
+ * chrome rather than in this document, so scrolling a match into view fires
+ * none of the takeover events, and the search result would be pulled back off
+ * screen. An unchanged height is what tells that apart from the scroll
+ * anchoring a loop exists to undo.
+ */
+export function settleOnForeignScroll(
+	container: HTMLElement,
+	applied: () => AppliedScroll,
+	settle: () => void
+): () => void {
+	const onScroll = () => {
+		const { top, height } = applied()
+		if (container.scrollTop === top) return
+		if (container.scrollHeight !== height) return
+
+		settle()
+	}
+
+	container.addEventListener('scroll', onScroll, { passive: true })
+
+	return () => container.removeEventListener('scroll', onScroll)
 }
