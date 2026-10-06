@@ -125,7 +125,7 @@ export function EditorModeRaw({
 				// link's href with the modifier held - the textarea is what actually
 				// receives the pointer, so it is the one CSS can style a cursor on.
 				className={cn(
-					'relative w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre-wrap text-transparent caret-foreground outline-none field-sizing-content',
+					'relative w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre-wrap text-transparent caret-brand outline-none field-sizing-content',
 					activeLinkRangeIndex !== null && 'cursor-pointer'
 				)}
 			/>

@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added the `/` menu to the raw editor, opening on a `/` at the start of a line and offering the same commands as the live editor, except Image and Ask Claude
 - Added bullet and numbered lists to the `/` menu in both editors
 - Added line numbers to the raw editor, switched off with the `punchdown.lineNumbers` setting or the "Toggle line numbers" command
+- Add more splashes of the theme accent color
 - Changed switching between the live and raw editors to carry the caret and selection over, keeping the same text at the same place on screen
 - Changed the `/` menu to keep the highlighted item in view while arrowing, with the list capped in height
 - Fixed the live editor's `/` menu appearing over the raw editor while typing a `/` there

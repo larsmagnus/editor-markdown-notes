@@ -25,6 +25,9 @@ type ToolbarProps = {
 	onOpenIndex: () => void
 }
 
+const BRAND_ON_STATE =
+	'data-[state=on]:bg-brand/10 data-[state=on]:text-brand aria-pressed:bg-brand/10 aria-pressed:text-brand'
+
 /**
  * Leaves focus in the editor when an edit-mode toggle is clicked, so the mode
  * switched to takes over the caret. A keyboard user reaching the toggle keeps
@@ -76,6 +79,7 @@ function Toolbar({
 						value={value}
 						aria-label={label}
 						title={label}
+						className={BRAND_ON_STATE}
 						onMouseDown={keepEditorFocus}
 					>
 						<Icon />
@@ -94,6 +98,7 @@ function Toolbar({
 						value={value}
 						aria-label={label}
 						title={label}
+						className={BRAND_ON_STATE}
 					>
 						<ViewToggleIcon on={viewOptions[key]} OnIcon={on} OffIcon={off} />
 					</ToggleGroupItem>

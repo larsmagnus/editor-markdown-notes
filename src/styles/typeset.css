@@ -114,10 +114,14 @@
 			color: inherit;
 			font-weight: 500;
 			text-decoration-line: underline;
-			text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
+			text-decoration-color: color-mix(
+				in oklab,
+				var(--color-brand, currentColor) 40%,
+				transparent
+			);
 		}
 		&:where(a:hover) {
-			text-decoration-color: currentColor;
+			text-decoration-color: var(--color-brand, currentColor);
 		}
 		&:where(a:focus-visible) {
 			outline: 2px solid var(--color-ring, currentColor);
@@ -224,7 +228,7 @@
 		&:where(li.task-list-item > input[type='checkbox']) {
 			margin-inline-end: 0.5em;
 			vertical-align: -0.1em;
-			accent-color: var(--color-primary, currentColor);
+			accent-color: var(--color-brand, var(--color-primary, currentColor));
 		}
 
 		/* Disclosures. */
@@ -309,7 +313,7 @@
 
 		/* Blockquote. */
 		&:where(blockquote) {
-			border-inline-start: 2px solid var(--typeset-rule);
+			border-inline-start: 2px solid var(--color-brand, var(--typeset-rule));
 			border-radius: var(--radius, 0.5em);
 			padding-block: 0.75em;
 			padding-inline-start: 1em;

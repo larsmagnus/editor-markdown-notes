@@ -25,7 +25,10 @@ export function ButtonToggle({
 			type="button"
 			variant="ghost"
 			size="sm"
-			className={cn(className, active && cn('is-active', activeClassName))}
+			className={cn(
+				className,
+				active && cn('is-active bg-brand/10 text-brand', activeClassName)
+			)}
 			{...rest}
 		/>
 	)
