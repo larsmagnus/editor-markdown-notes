@@ -88,6 +88,11 @@
 					"default": false,
 					"description": "Hide the editor's toolbar. The raw, full width, text tools, theme and spelling language toggles remain available from the command palette."
 				},
+				"punchdown.lineNumbers": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show line numbers in the raw markdown editor."
+				},
 				"punchdown.italicMarker": {
 					"type": "string",
 					"enum": [
@@ -205,6 +210,11 @@
 				"category": "punchdown"
 			},
 			{
+				"command": "punchdown.toggleLineNumbers",
+				"title": "Toggle line numbers",
+				"category": "punchdown"
+			},
+			{
 				"command": "punchdown.showLogs",
 				"title": "Show logs",
 				"category": "punchdown"
@@ -296,6 +306,10 @@
 				},
 				{
 					"command": "punchdown.toggleHideToolbar",
+					"when": "activeCustomEditorId == punchdown.markdownEditor"
+				},
+				{
+					"command": "punchdown.toggleLineNumbers",
 					"when": "activeCustomEditorId == punchdown.markdownEditor"
 				},
 				{

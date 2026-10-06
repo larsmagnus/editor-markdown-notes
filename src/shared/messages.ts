@@ -94,6 +94,7 @@ export const CLAUDE_PROMPT_CONTENT_MAX_LENGTH = 300
 export type ExtensionSettings = {
 	centerContent: boolean
 	hideToolbar: boolean
+	lineNumbers: boolean
 	/**
 	 * Reading age the readability check scores against. A sentence too hard for
 	 * this age reads as "hard"; one still too hard six years later, "very hard"
@@ -154,6 +155,7 @@ export const DEFAULT_VIEW_OPTIONS: ViewOptions = {
 export const DEFAULT_SETTINGS: ExtensionSettings = {
 	centerContent: false,
 	hideToolbar: false,
+	lineNumbers: true,
 	textToolsTargetAge: 16,
 	italicMarker: '_',
 	claudePromptTemplate: 'Read %@ so I can ask you questions about it.',

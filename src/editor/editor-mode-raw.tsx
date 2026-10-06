@@ -1,10 +1,12 @@
 import { cn } from 'cn'
 import { useEffect, useRef } from 'react'
 
+import { RawLineGutter } from '#src/editor/raw-line-gutter'
 import { RawMarkdownHighlight } from '#src/editor/raw-markdown-highlight'
 import { RawSlashMenu } from '#src/editor/raw-slash-menu'
 import type { AnalyzerHandle } from '#src/hooks/use-analyzer'
 import { useRawDraftSync } from '#src/hooks/use-raw-draft-sync'
+import { useRawGutterRoom } from '#src/hooks/use-raw-gutter-room'
 import { useRawHeadingReveal } from '#src/hooks/use-raw-heading-reveal'
 import { useRawLinkClick } from '#src/hooks/use-raw-link-click'
 import { useRawLinkHover } from '#src/hooks/use-raw-link-hover'
@@ -12,6 +14,7 @@ import { useRawSearchReveal } from '#src/hooks/use-raw-search-reveal'
 import { useRawSyntaxHighlight } from '#src/hooks/use-raw-syntax-highlight'
 import { useRawTextTools } from '#src/hooks/use-raw-text-tools'
 import { useSettings } from '#src/hooks/use-settings'
+import { lineIndexAt } from '#src/lib/line-index-at'
 import type { SourcePlacedIssue } from '#src/lib/text-tools/place-source-issues'
 
 interface RawMarkdownEditorProps {
@@ -67,6 +70,7 @@ export function EditorModeRaw({
 	useRawHeadingReveal(textareaRef, draftRef, active)
 	useRawLinkClick(textareaRef, draftRef)
 	const activeLinkRangeIndex = useRawLinkHover(textareaRef, overlayRef)
+	const gutterRoom = useRawGutterRoom(lineIndexAt(draft, draft.length) + 1)
 	const tokens = useRawSyntaxHighlight(draft, active)
 	const issues = useRawTextTools(draft, active, analyzer)
 
@@ -80,7 +84,12 @@ export function EditorModeRaw({
 		// `absolute inset-0`, and the two must wrap at the identical width or a
 		// click lands on whatever character the textarea's own, differently
 		// wrapped layout puts underneath it, not the one the mirror shows there.
-		<div ref={wrapperRef} className={cn('relative', className)}>
+		<div
+			ref={wrapperRef}
+			className={cn('relative', className, gutterRoom.className)}
+			style={gutterRoom.style}
+		>
+			<RawLineGutter text={draft} textareaRef={textareaRef} />
 			<RawMarkdownHighlight
 				ref={overlayRef}
 				text={draft}

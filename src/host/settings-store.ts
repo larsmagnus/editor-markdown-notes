@@ -95,6 +95,10 @@ export class SettingsStore {
 				'hideToolbar',
 				DEFAULT_SETTINGS.hideToolbar
 			),
+			lineNumbers: config.get<boolean>(
+				'lineNumbers',
+				DEFAULT_SETTINGS.lineNumbers
+			),
 			textToolsTargetAge: config.get<number>(
 				'textToolsTargetAge',
 				DEFAULT_SETTINGS.textToolsTargetAge

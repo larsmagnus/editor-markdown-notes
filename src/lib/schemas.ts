@@ -128,6 +128,11 @@ const extensionSettingsSchema = z
 			description:
 				'Hide the toolbar. The toggles remain reachable from the command palette. Maps to `punchdown.hideToolbar`.',
 		}),
+		lineNumbers: z.boolean().catch(DEFAULT_SETTINGS.lineNumbers).meta({
+			title: 'Line numbers',
+			description:
+				'Show line numbers in the raw markdown editor. Maps to `punchdown.lineNumbers`.',
+		}),
 		textToolsTargetAge: z
 			.number()
 			.int()

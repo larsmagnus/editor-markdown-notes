@@ -62,6 +62,7 @@ suite('Activation and contributions', () => {
 
 		assert.strictEqual(config.get('hideToolbar'), false)
 		assert.strictEqual(config.get('centerContent'), false)
+		assert.strictEqual(config.get('lineNumbers'), true)
 		assert.strictEqual(config.get('textToolsTargetAge'), 16)
 	})
 })

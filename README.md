@@ -80,6 +80,7 @@ Available under Settings → Extensions → punchdown (or the cog on the extensi
 | Setting                                | Default                                                                                              | Purpose                                                                                                                     |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `punchdown.hideToolbar`                | `false`                                                                                              | Hide the editor's toolbar                                                                                                   |
+| `punchdown.lineNumbers`                | `true`                                                                                               | Show line numbers in the raw markdown editor                                                                                |
 | `punchdown.centerContent`              | `false`                                                                                              | Center the content horizontally when full width is off                                                                      |
 | `punchdown.italicMarker`               | `_`                                                                                                  | Marker (`_` or `*`) used when italicizing text from the editor                                                              |
 | `punchdown.textToolsTargetAge`         | `16`                                                                                                 | Reading age the text tools score sentences against                                                                          |
@@ -108,6 +109,7 @@ All of them are shared across open tabs and persist between sessions.
 | punchdown: Add words to dictionary  | `punchdown.addDictionaryWords`     | Teach the spelling check custom vocabulary to stop flagging             |
 | punchdown: Open in text editor      | `punchdown.openInTextEditor`       | Reopen the current file with VSCode's built-in text editor              |
 | punchdown: Toggle toolbar           | `punchdown.toggleHideToolbar`      | Show or hide the toolbar                                                |
+| punchdown: Toggle line numbers      | `punchdown.toggleLineNumbers`      | Show or hide the raw editor's line numbers                              |
 | punchdown: Show logs                | `punchdown.showLogs`               | Open the output channel used to debug a blank panel                     |
 | punchdown: Open PDF as markdown     | `punchdown.openPdfAsNotes`         | Extract a PDF's text into a markdown file and open it                   |
 | punchdown: Open index               | `punchdown.openIndex`              | Browse, filter and sort every note in the workspace                     |

@@ -8,6 +8,7 @@ import type { SettingsStore } from '#src/host/settings-store'
 import { pickSpellingLanguage } from '#src/host/spelling-picker'
 import { pickTheme } from '#src/host/theme-picker'
 import { toggleHideToolbar } from '#src/host/toggle-hide-toolbar-command'
+import { toggleLineNumbers } from '#src/host/toggle-line-numbers-command'
 import { EXTENSION_ID } from '#src/shared/constants'
 import type { ViewOptions } from '#src/shared/messages'
 
@@ -45,6 +46,7 @@ export function registerCommands(
 			addDictionaryWords(store, broadcastConfig),
 		[`${EXTENSION_ID}.openInTextEditor`]: openActiveTabInTextEditor,
 		[`${EXTENSION_ID}.toggleHideToolbar`]: toggleHideToolbar,
+		[`${EXTENSION_ID}.toggleLineNumbers`]: toggleLineNumbers,
 		[`${EXTENSION_ID}.showLogs`]: () => log.show(),
 		[`${EXTENSION_ID}.openIndex`]: showNoteIndex,
 		[`${EXTENSION_ID}.claimFormattingShortcut`]: () => {

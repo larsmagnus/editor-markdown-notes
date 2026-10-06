@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SettingsProvider } from '#src/components/settings-provider'
 import { EditorModeRaw } from '#src/editor/editor-mode-raw'
 import { updateNotes } from '#src/lib/update-notes'
+import { DEFAULT_SETTINGS, DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`
 // and the sync effect attaches a rejection handler to what it hands back.
@@ -24,6 +25,7 @@ const NOTE_WITH_FRONTMATTER = [
 afterEach(() => {
 	delete window.vscode
 	delete window.searchReveal
+	delete window.initialConfig
 	localStorage.clear()
 	vi.clearAllMocks()
 })
@@ -401,6 +403,71 @@ describe('EditorModeRaw', () => {
 
 			expect(textarea.selectionStart).toBe(0)
 			expect(textarea.selectionEnd).toBe(0)
+		})
+	})
+})
+
+describe('EditorModeRaw line numbers', () => {
+	function renderRaw(content: string, lineNumbers?: boolean) {
+		if (lineNumbers !== undefined) {
+			window.vscode = {
+				postMessage: vi.fn(),
+				getState: vi.fn(),
+				setState: vi.fn(),
+			}
+			window.initialConfig = {
+				settings: { ...DEFAULT_SETTINGS, lineNumbers },
+				viewOptions: DEFAULT_VIEW_OPTIONS,
+			}
+		}
+		return render(
+			<SettingsProvider>
+				<EditorModeRaw content={content} syncContent={vi.fn()} />
+			</SettingsProvider>
+		)
+	}
+
+	function gutterNumbers() {
+		return Array.from(
+			screen.getByTestId('raw-line-gutter').querySelectorAll('[data-line]')
+		).map((row) => row.getAttribute('data-line'))
+	}
+
+	it('numbers every source line, frontmatter and empty lines included', () => {
+		renderRaw(NOTE_WITH_FRONTMATTER)
+
+		expect(gutterNumbers()).toEqual(['1', '2', '3', '4', '5', '6', '7', '8'])
+	})
+
+	it('widens the gutter once the note passes 999 lines', () => {
+		const { container } = renderRaw('line\n'.repeat(1000))
+
+		expect(
+			(container.firstElementChild as HTMLElement).style.getPropertyValue(
+				'--raw-gutter-width'
+			)
+		).toBe('calc(4ch + 0.75rem)')
+	})
+
+	it('shows no gutter when the setting is off', () => {
+		renderRaw(NOTE_WITH_FRONTMATTER, false)
+
+		expect(screen.queryByTestId('raw-line-gutter')).toBeNull()
+	})
+
+	it('marks the line the caret is on', async () => {
+		renderRaw('one\ntwo\nthree')
+		const textarea = screen.getByLabelText<HTMLTextAreaElement>('Raw markdown')
+
+		textarea.focus()
+		textarea.setSelectionRange(5, 5)
+		fireEvent(document, new Event('selectionchange'))
+
+		await waitFor(() => {
+			const active = screen
+				.getByTestId('raw-line-gutter')
+				.querySelector('[data-active]')
+			expect(active?.getAttribute('data-line')).toBe('2')
 		})
 	})
 })
