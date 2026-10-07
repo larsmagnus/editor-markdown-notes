@@ -93,3 +93,9 @@ export function takeCapturedBlocks(md: MarkdownIt): CapturedBlock[] {
 export function newSourceId(): number {
 	return nextSourceId++
 }
+
+/** What `text` means as markdown, block by block (`describeStructure`). */
+export function structureOf(md: MarkdownIt, text: string): string[] {
+	md.parse(text, {})
+	return takeCapturedBlocks(md).flatMap(({ structure }) => structure)
+}

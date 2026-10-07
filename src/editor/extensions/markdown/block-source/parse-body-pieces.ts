@@ -6,6 +6,7 @@ import type { MarkdownIt } from 'markdown-it'
 import { completeParsedDocument } from '#src/editor/complete-parsed-document'
 import {
 	newSourceId,
+	structureOf,
 	takeCapturedBlocks,
 } from '#src/editor/extensions/markdown/block-source/capture-source-blocks'
 import type { CapturedBlock } from '#src/editor/extensions/markdown/block-source/capture-source-blocks'
@@ -34,9 +35,10 @@ function isFaithful(
 	node: ProseMirrorNode,
 	block: CapturedBlock
 ): boolean {
-	md.parse(serializeBlock(editor, node), {})
-	const reparsed = takeCapturedBlocks(md).flatMap(({ structure }) => structure)
-	return hasSameStructure(block.structure, reparsed)
+	return hasSameStructure(
+		block.structure,
+		structureOf(md, serializeBlock(editor, node))
+	)
 }
 
 /** Each parsed top-level node by the source block it came from. */

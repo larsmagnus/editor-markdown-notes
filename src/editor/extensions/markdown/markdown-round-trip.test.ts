@@ -384,10 +384,14 @@ describe('escaping', () => {
 		)
 	})
 
-	it('escapes a closing bracket immediately followed by an opening paren', () => {
+	it('keeps a closing bracket before an opening paren bare when no link can form', () => {
 		expect(roundTrip('Weird](but not a link) case.')).toBe(
-			'Weird\\](but not a link) case.'
+			'Weird](but not a link) case.'
 		)
+	})
+
+	it('escapes a closing bracket before an opening paren that would close a link', () => {
+		expect(roundTrip('[Weird\\](notes) case.')).toBe('[Weird\\](notes) case.')
 	})
 
 	it('does not escape a lone tilde used as an approximation sign', () => {
@@ -414,8 +418,8 @@ describe('escaping', () => {
 		expect(roundTrip('Rated 5*')).toBe('Rated 5*')
 	})
 
-	it('still escapes a literal backslash', () => {
-		expect(roundTrip('C:\\Users\\name')).toBe('C:\\\\Users\\\\name')
+	it('keeps a literal backslash bare where it escapes nothing', () => {
+		expect(roundTrip('C:\\Users\\name')).toBe('C:\\Users\\name')
 	})
 
 	it('does not escape an intraword underscore that cannot form emphasis', () => {

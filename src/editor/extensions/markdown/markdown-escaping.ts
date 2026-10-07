@@ -12,6 +12,20 @@ import type { TableSerializerState } from '#src/editor/extensions/table/table-ex
 import { isWordChar } from '#src/lib/word-boundary'
 
 let patched = false
+let escaping = true
+
+/**
+ * Runs `serialize` with escaping off, for a caller that checks the result
+ * still reads back the same before using it (`serialize-block.ts`).
+ */
+export function withoutEscaping<T>(serialize: () => T): T {
+	escaping = false
+	try {
+		return serialize()
+	} finally {
+		escaping = true
+	}
+}
 
 /**
  * Patches `prosemirror-markdown`'s `esc()` so it escapes a character only when
@@ -42,7 +56,7 @@ export function patchMarkdownEscaping(): void {
 	): string {
 		// A link's own delimiters are real marked text, and a link cannot use
 		// `escape: false` to protect them (see `link-markdown-spec.ts`).
-		if ((this as LinkSerializerState).inLink) return str
+		if ((this as LinkSerializerState).inLink || !escaping) return str
 
 		const asteriskOffsets = flankingAsteriskOffsets(str)
 		const runs = backtickRuns(str)
