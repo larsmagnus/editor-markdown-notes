@@ -7,6 +7,7 @@ import {
 	SYNTAX_REVEALED_CLASS,
 } from '#src/editor/extensions/syntax-reveal/compute-reveal-decorations'
 import { SyntaxReveal } from '#src/editor/extensions/syntax-reveal/syntax-reveal-extension'
+import { loadNoteContent } from '#src/editor/load-note-content'
 import { createEditor } from '#src/test-utils/editor'
 
 describe('SyntaxReveal', () => {
@@ -94,5 +95,21 @@ describe('SyntaxReveal', () => {
 		})
 
 		expect(editor.view.dom.innerHTML).not.toContain(SYNTAX_HIDDEN_CLASS)
+	})
+})
+
+describe('SyntaxReveal on a freshly loaded note', () => {
+	it('hides a marker the caret is not on', () => {
+		// Built from the note first, then loaded over it, as `useMarkdownEditor`
+		// does. The caret is in the heading both before and after, so the same
+		// markers are hidden - only the nodes holding them are new.
+		const note = 'Above.\n\n---\n\n# Plan'
+		const editor = createEditor(note, { parseOnly: true, mount: true })
+		editor.commands.setTextSelection(editor.state.doc.content.size - 1)
+		loadNoteContent(editor, note, { fileKind: 'markdown', addToHistory: false })
+
+		expect(
+			editor.view.dom.querySelectorAll(`.${SYNTAX_HIDDEN_CLASS}`)
+		).toHaveLength(1)
 	})
 })

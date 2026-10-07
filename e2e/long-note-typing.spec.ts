@@ -17,8 +17,12 @@ function longNote(): string {
 
 const TYPED = 'Ship it today, then review.'
 
-/** Milliseconds per keystroke a long note may take before typing feels slow. */
-const BUDGET_MS = 50
+/**
+ * Milliseconds per keystroke a long note may take, measured from outside the
+ * page and alongside other specs - loose enough for that noise, tight enough
+ * that work growing with the note's length per keystroke fails it.
+ */
+const BUDGET_MS = 80
 
 test.describe('Typing into a five-thousand-line note', () => {
 	test('keeps up in the live editor', async ({ page }) => {

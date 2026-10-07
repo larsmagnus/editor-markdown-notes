@@ -41,11 +41,11 @@ test.describe('A mermaid block showing its source', () => {
 		await page.keyboard.type('d')
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
-		// The trailing newline is the serializer's: a document ending in a code
-		// block gets one the moment it is written back out.
+		// Without the trailing newline the note never had - an edit changes the
+		// block it was made in and nothing after it.
 		await expect(
 			page.getByRole('textbox', { name: 'Raw markdown' })
-		).toHaveValue(`${NOTE}\n`)
+		).toHaveValue(NOTE)
 	})
 
 	test('offers the same copy button every other code block has', async ({

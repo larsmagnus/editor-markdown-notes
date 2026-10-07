@@ -9,6 +9,7 @@ import {
 } from '#src/editor/extensions/syntax-reveal/compute-reveal-decorations'
 import type { RevealProvider } from '#src/editor/extensions/syntax-reveal/reveal-provider'
 import { revealRanges } from '#src/editor/extensions/syntax-reveal/reveal-ranges'
+import { isContentSync } from '#src/editor/extensions/transaction-filters'
 
 /** The decorations in force, and the state they were derived from. */
 type RevealState = { set: DecorationSet; key: string }
@@ -54,6 +55,9 @@ export const SyntaxReveal = Extension.create<{ providers: RevealProvider[] }>({
 				state: {
 					init: (_config, state) => derive(state),
 					apply: (tr, previous, _oldState, newState) => {
+						// A note loaded or patched in replaces whole blocks, whose
+						// decorations no mapping can carry over.
+						if (isContentSync([tr])) return derive(newState)
 						const key = revealKey(
 							revealRanges(newState.doc, newState.selection, providers)
 						)

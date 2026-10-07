@@ -35,7 +35,7 @@ test.describe('Tab in the live editor', () => {
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
 			page.getByRole('textbox', { name: 'Raw markdown' })
-		).toHaveValue('```ts\n  const a = 1\n```\n')
+		).toHaveValue('```ts\n  const a = 1\n```')
 	})
 
 	test('indents the YAML inside a frontmatter block', async ({ page }) => {
@@ -67,7 +67,7 @@ test.describe('Tab in the live editor', () => {
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
 			page.getByRole('textbox', { name: 'Raw markdown' })
-		).toHaveValue('```ts\nconst a = 1\n```\n')
+		).toHaveValue('```ts\nconst a = 1\n```')
 	})
 
 	test('Shift-Tab with nothing to outdent keeps the caret in the editor', async ({

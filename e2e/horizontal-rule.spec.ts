@@ -56,7 +56,7 @@ test.describe('A horizontal rule in the live editor', () => {
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 		await expect(
 			page.getByRole('textbox', { name: 'Raw markdown' })
-		).toHaveValue('Above.\n\n---\n')
+		).toHaveValue('Above.\n\n---')
 	})
 
 	// Matching is anchored to the block's start but stops at the caret, so
