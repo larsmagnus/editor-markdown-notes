@@ -5,6 +5,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import App from '#src/app'
+import { keepUndoInPage } from '#src/lib/keep-undo-in-page'
+
+keepUndoInPage(document)
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
