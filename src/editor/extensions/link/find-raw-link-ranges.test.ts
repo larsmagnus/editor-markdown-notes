@@ -48,3 +48,11 @@ describe('findRawLinkRanges', () => {
 		expect(findRawLinkRanges('[notes not a link')).toEqual([])
 	})
 })
+
+describe('findRawLinkRanges across paragraphs', () => {
+	it('does not close a link left open in one paragraph in the next', () => {
+		expect(
+			findRawLinkRanges('An [unclosed bracket.\n\nThen ](notes.md) text.')
+		).toEqual([])
+	})
+})

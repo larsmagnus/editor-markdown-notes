@@ -53,7 +53,9 @@ export function findRawLinkRanges(source: string): RawLinkRange[] {
 
 /**
  * The unescaped `close` balancing the `open` already consumed just before
- * `from`, or -1 if there is none.
+ * `from`, or -1 if there is none before the paragraph ends. A link cannot
+ * span a blank line, and searching on past one made every unclosed `[` in a
+ * long note scan to its end, on every keystroke.
  */
 function findBalancedClose(
 	source: string,
@@ -67,6 +69,7 @@ function findBalancedClose(
 			i++
 			continue
 		}
+		if (source[i] === '\n' && source[i + 1] === '\n') return -1
 		if (source[i] === open) {
 			depth++
 		} else if (source[i] === close) {
