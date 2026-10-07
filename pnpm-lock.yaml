@@ -137,6 +137,9 @@ importers:
       diff-match-patch:
         specifier: 1.0.5
         version: 1.0.5
+      dompurify:
+        specifier: 3.4.16
+        version: 3.4.16
       lucide-react:
         specifier: 1.51.0
         version: 1.51.0(@types/react@19.3.0)(react@19.3.0)

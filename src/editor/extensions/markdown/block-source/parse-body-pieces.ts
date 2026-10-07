@@ -16,13 +16,19 @@ import { serializeBlock } from '#src/editor/extensions/markdown/block-source/ser
 import { buildSourceLayout } from '#src/editor/extensions/markdown/block-source/source-layout'
 import type { RegisteredPiece } from '#src/editor/extensions/markdown/block-source/source-registry'
 
-/** A block holding `text` exactly as written. */
-function literalBlock(
+/**
+ * A block holding `text` exactly as written: an HTML block for what
+ * markdown-it read as one, a literal block for anything else.
+ */
+function verbatimBlock(
 	schema: Schema,
 	id: number,
-	text: string
+	text: string,
+	type: string | undefined
 ): ProseMirrorNode {
-	return schema.nodes.literalBlock.create(
+	const nodeType =
+		type === 'html_block' ? schema.nodes.htmlBlock : schema.nodes.literalBlock
+	return nodeType.create(
 		{ sourceId: id },
 		text === '' ? null : schema.text(text)
 	)
@@ -54,7 +60,7 @@ function nodesBySourceId(doc: ProseMirrorNode): Map<number, ProseMirrorNode[]> {
 
 /**
  * The body's blocks as nodes, in source order: what markdown-it parsed where
- * that survives a save unchanged, and a literal block holding the source text
+ * that survives a save unchanged, and the source text held verbatim
  * everywhere else - for a block the schema dropped or split, one whose
  * serialization reads back as something different, and lines markdown-it
  * rendered nothing for at all.
@@ -89,7 +95,7 @@ export function parseBodyPieces(
 		return {
 			id: literalId,
 			text,
-			node: literalBlock(editor.schema, literalId, text),
+			node: verbatimBlock(editor.schema, literalId, text, block?.type),
 		}
 	})
 

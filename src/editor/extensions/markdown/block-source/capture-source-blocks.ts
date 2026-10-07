@@ -15,6 +15,8 @@ const WRITTEN_LIST_MARKER = /^[ \t>]*([-+*]|\d{1,9}[.)])/
 
 export type CapturedBlock = {
 	id: number
+	/** markdown-it's token type for the block, `html_block` the one acted on. */
+	type: string
 	map: [number, number]
 	/** What the block means, however it was spelled (`describeStructure`). */
 	structure: string[]
@@ -64,6 +66,7 @@ function captureSourceBlocks(md: MarkdownIt) {
 				const id = nextSourceId++
 				blocks.push({
 					id,
+					type: token.type,
 					map: [token.map[0], token.map[1]],
 					structure: describeStructure(state.tokens.slice(index, end)),
 				})

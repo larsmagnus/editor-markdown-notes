@@ -29,6 +29,7 @@ import { WrapSelectionOnKeypress } from '#src/editor/extensions/formatting/wrap-
 import { HardBreakExtension } from '#src/editor/extensions/hard-break/hard-break-extension'
 import { HeadingExtension } from '#src/editor/extensions/heading/heading-extension'
 import { HorizontalRuleExtension } from '#src/editor/extensions/horizontal-rule/horizontal-rule-extension'
+import { HtmlBlockExtension } from '#src/editor/extensions/html-block/html-block-extension'
 import { createImageSourceRevealProvider } from '#src/editor/extensions/image/create-image-source-reveal-provider'
 import { ImageSource } from '#src/editor/extensions/image/edit-source'
 import { ImageExtension } from '#src/editor/extensions/image/image-extension'
@@ -125,6 +126,7 @@ export const SHARED_TAIL_EXTENSIONS = [
 	// Only created on load, for a block that cannot be represented faithfully -
 	// see `markdown/block-source/`.
 	LiteralBlockExtension,
+	HtmlBlockExtension,
 	HeadingExtension,
 	BlockquoteExtension,
 	Admonition,

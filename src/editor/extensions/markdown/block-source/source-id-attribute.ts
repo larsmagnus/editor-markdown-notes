@@ -15,6 +15,7 @@ const TOP_LEVEL_TYPES = [
 	'table',
 	'frontmatter',
 	'literalBlock',
+	'htmlBlock',
 ]
 
 /** The id markdown-it tagged a block with; a code block carries it on its inner `<code>`. */
