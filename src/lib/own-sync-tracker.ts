@@ -1,9 +1,12 @@
+import { toLf } from '#src/lib/host/line-endings'
+
 const HISTORY_SIZE = 5
 
 /**
  * Undoes exactly what `files.trimTrailingWhitespace` and
- * `files.insertFinalNewline` do to a file on save, so text touched up by
- * either still compares equal to what was synced before them.
+ * `files.insertFinalNewline` do to a file on save, and a CRLF document's line
+ * endings, so text touched up by any of them still compares equal to what was
+ * synced before.
  *
  * `tiptap-markdown`'s `HardBreak` serializer writes a hard break as a
  * trailing `\` rather than the GFM convention of two trailing spaces, so
@@ -11,7 +14,7 @@ const HISTORY_SIZE = 5
  * trim.
  */
 function normalize(text: string): string {
-	const trimmed = text
+	const trimmed = toLf(text)
 		.split('\n')
 		.map((line) => line.replace(/[ \t]+$/, ''))
 		.join('\n')

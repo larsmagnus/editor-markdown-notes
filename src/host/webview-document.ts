@@ -5,6 +5,7 @@ import * as vscode from 'vscode'
 import { getImageBaseUris } from '#src/host/image-base-uris'
 import { readEntryChunk } from '#src/host/read-vite-manifest'
 import { buildContentSecurityPolicy } from '#src/lib/host/content-security-policy'
+import { toLf } from '#src/lib/host/line-endings'
 import { createNonce } from '#src/lib/host/nonce'
 import { WEBVIEW_LOG_BRIDGE } from '#src/lib/host/webview-diagnostics'
 import {
@@ -68,7 +69,7 @@ export function buildWebviewDocument({
 		contentSecurityPolicy: buildContentSecurityPolicy(webview.cspSource, nonce),
 		logBridge: WEBVIEW_LOG_BRIDGE,
 		globals: {
-			initialContent: document.getText(),
+			initialContent: toLf(document.getText()),
 			fileName: path.basename(document.fileName),
 			initialConfig: config,
 			initialScrollTop,

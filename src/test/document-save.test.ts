@@ -108,6 +108,71 @@ suite('Syncing a document', () => {
 	})
 
 	/**
+	 * VS Code fires the change event while `applyEdit` is still pending, so a
+	 * write that only counts as its own once the edit resolves is reported to
+	 * the webview as an outside change - which rebuilds the live editor over
+	 * whatever the author typed during the round trip.
+	 */
+	test('recognises its own write while VS Code is still applying it', async () => {
+		const writer = new DocumentWriter(log)
+		const document = await openTempNote('# Roadmap\n')
+
+		const seenAsOwn: boolean[] = []
+		const subscription = vscode.workspace.onDidChangeTextDocument((event) => {
+			if (event.document.uri.toString() !== document.uri.toString()) return
+			seenAsOwn.push(writer.matchesLastWrite(event.document.getText()))
+		})
+
+		try {
+			await writer.write(document, '# Roadmap 2026\n')
+
+			// One event for the text, another for the dirty flag it raises.
+			assert.ok(seenAsOwn.length > 0)
+			assert.ok(
+				seenAsOwn.every(Boolean),
+				`seen as own: ${seenAsOwn.join(', ')}`
+			)
+		} finally {
+			subscription.dispose()
+		}
+	})
+
+	test('keeps a CRLF note CRLF when the webview syncs plain newlines', async () => {
+		const writer = new DocumentWriter(log)
+		const document = await openTempNote('# Roadmap\r\n\r\nShip it.\r\n')
+
+		await writer.write(document, '# Roadmap\n\nShip it. Today.\n')
+
+		assert.strictEqual(
+			document.getText(),
+			'# Roadmap\r\n\r\nShip it. Today.\r\n'
+		)
+		assert.strictEqual(writer.matchesLastWrite(document.getText()), true)
+	})
+
+	test('edits only the changed span of a CRLF note', async () => {
+		const writer = new DocumentWriter(log)
+		const document = await openTempNote(
+			'# Roadmap\r\n\r\nShip it today.\r\n\r\nDone.\r\n'
+		)
+
+		const changes: vscode.TextDocumentContentChangeEvent[] = []
+		const subscription = vscode.workspace.onDidChangeTextDocument((event) => {
+			if (event.document.uri.toString() !== document.uri.toString()) return
+			changes.push(...event.contentChanges)
+		})
+
+		try {
+			await writer.write(document, '# Roadmap\n\nShip it tomorrow.\n\nDone.\n')
+
+			assert.strictEqual(changes.length, 1)
+			assert.ok(changes[0].rangeLength < 10)
+		} finally {
+			subscription.dispose()
+		}
+	})
+
+	/**
 	 * Pins the minimal-diff decision (`minimal-edit.ts`): once the document
 	 * stays dirty between syncs rather than being saved on every one, a
 	 * full-range replace would turn every keystroke into a new entry on VS

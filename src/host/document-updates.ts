@@ -1,24 +1,9 @@
-import * as path from 'path'
-
 import * as vscode from 'vscode'
 
 import { computeMinimalReplacement } from '#src/host/minimal-edit'
+import { rangeInLfText } from '#src/host/range-in-lf-text'
+import { toLf } from '#src/lib/host/line-endings'
 import type { Logger } from '#src/shared/logger'
-import type { HostToWebview } from '#src/shared/messages'
-
-/** Pushes the document's current text at one panel. */
-export function postDocumentUpdate(
-	panel: vscode.WebviewPanel,
-	document: vscode.TextDocument
-) {
-	const message: HostToWebview = {
-		type: 'update',
-		content: document.getText(),
-		fileName: path.basename(document.fileName),
-	}
-
-	panel.webview.postMessage(message)
-}
 
 /**
  * Applies the webview's markdown to the document, dirtying it - writing to
@@ -33,12 +18,12 @@ export class DocumentWriter {
 		this.log = log
 	}
 
-	/** Whether `text` is exactly what this writer itself last applied -
-	 *  `document-change-subscription.ts` checks this to break the loop
-	 *  applying an edit would otherwise cause, by pushing the text straight
-	 *  back at the webview mid-edit. */
+	/** Whether `text` is exactly what this writer itself last applied, line
+	 *  endings aside - `document-change-subscription.ts` checks this to break
+	 *  the loop applying an edit would otherwise cause, by pushing the text
+	 *  straight back at the webview mid-edit. */
 	public matchesLastWrite(text: string): boolean {
-		return this.lastWritten === text
+		return this.lastWritten === toLf(text)
 	}
 
 	/**
@@ -64,29 +49,34 @@ export class DocumentWriter {
 	 *  rather than the whole document, so a sync does not spam VS Code's own
 	 *  text undo stack, collapse folding, or move the caret in any other
 	 *  editor open on the same file - and skips `applyEdit` entirely when
-	 *  nothing changed. `lastWritten` only updates once `applyEdit` actually
-	 *  reports success, or a rejected edit would still read as applied. */
+	 *  nothing changed.
+	 *
+	 *  `lastWritten` is claimed before `applyEdit`, not after: VS Code fires
+	 *  the change event while the edit is still pending, and the subscription
+	 *  has to recognise it as this write's echo by then. A rejected edit hands
+	 *  the claim back, or it would still read as applied. */
 	private async applyWrite(document: vscode.TextDocument, content: string) {
-		const replacement = computeMinimalReplacement(document.getText(), content)
+		const current = toLf(document.getText())
+		const next = toLf(content)
+		const replacement = computeMinimalReplacement(current, next)
 		if (!replacement) {
-			this.lastWritten = content
+			this.lastWritten = next
 			return
 		}
 
 		const edit = new vscode.WorkspaceEdit()
-
 		edit.replace(
 			document.uri,
-			new vscode.Range(
-				document.positionAt(replacement.start),
-				document.positionAt(replacement.end)
-			),
+			rangeInLfText(current, replacement),
 			replacement.text
 		)
 
+		const previous = this.lastWritten
+		this.lastWritten = next
 		const applied = await vscode.workspace.applyEdit(edit)
-		if (!applied) throw new Error('applyEdit rejected the edit')
+		if (applied) return
 
-		this.lastWritten = content
+		this.lastWritten = previous
+		throw new Error('applyEdit rejected the edit')
 	}
 }
