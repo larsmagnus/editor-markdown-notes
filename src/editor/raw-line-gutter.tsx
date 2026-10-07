@@ -1,7 +1,9 @@
+import { cn } from 'cn'
 import { useMemo } from 'react'
 import type { RefObject } from 'react'
 
 import { RawLineGutterRow } from '#src/editor/raw-line-gutter-row'
+import { RAW_TEXT_LAYOUT } from '#src/editor/raw-text-layout'
 import { useRawCaretLine } from '#src/hooks/use-raw-caret-line'
 import { useSettings } from '#src/hooks/use-settings'
 
@@ -30,7 +32,10 @@ export function RawLineGutter({ text, textareaRef }: RawLineGutterProps) {
 		<pre
 			aria-hidden="true"
 			data-testid="raw-line-gutter"
-			className="pointer-events-none invisible absolute inset-0 m-0 w-full border-none font-mono text-sm whitespace-pre-wrap select-none"
+			className={cn(
+				RAW_TEXT_LAYOUT,
+				'pointer-events-none invisible absolute inset-0 w-full select-none'
+			)}
 		>
 			{lines.map((line, index) => (
 				<RawLineGutterRow

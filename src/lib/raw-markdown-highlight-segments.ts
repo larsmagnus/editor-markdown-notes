@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 
 import type { RawLinkRange } from '#src/editor/extensions/link/find-raw-link-ranges'
 import { findRawAdmonitionTags } from '#src/lib/find-raw-admonition-tags'
+import { narrowestIssueSweep, sweep } from '#src/lib/offset-sweep'
 import { styleObjectFor } from '#src/lib/shiki-token-style'
 import type { RelativeToken } from '#src/lib/syntax-highlight-tokens'
 import { issueClassName } from '#src/lib/text-tools/issue-class-name'
@@ -70,31 +71,26 @@ export function buildHighlightSegments(
 
 	const cuts = [...boundaries].sort((a, b) => a - b)
 	const segments: HighlightSegment[] = []
+	const tokenAt = sweep(tokens, (token) => [
+		token.offset,
+		token.offset + token.length,
+	])
+	const linkAt = sweep(linkRanges, (range) => [
+		range.parensStart,
+		range.parensEnd,
+	])
+	const tagAt = sweep(tags, (tag) => [tag.from, tag.to])
+	const issueAt = narrowestIssueSweep(issues)
 
 	for (let i = 0; i < cuts.length - 1; i++) {
 		const start = cuts[i]
 		const end = cuts[i + 1]
 		if (start === end) continue
 
-		const token = tokens.find(
-			(candidate) =>
-				candidate.offset <= start && start < candidate.offset + candidate.length
-		)
-		const linkRangeIndex = linkRanges.findIndex(
-			(range) => range.parensStart <= start && start < range.parensEnd
-		)
-		const issue = issues
-			.filter((candidate) => candidate.from <= start && start < candidate.to)
-			.reduce<SourcePlacedIssue | undefined>((narrowest, candidate) => {
-				if (!narrowest) return candidate
-				return candidate.to - candidate.from < narrowest.to - narrowest.from
-					? candidate
-					: narrowest
-			}, undefined)
-
-		const tag = tags.find(
-			(candidate) => candidate.from <= start && start < candidate.to
-		)
+		const token = tokenAt(start)
+		const link = linkAt(start)
+		const issue = issueAt(start)
+		const tag = tagAt(start)
 		const tokenStyle = token ? styleObjectFor(token) : undefined
 
 		segments.push({
@@ -102,7 +98,7 @@ export function buildHighlightSegments(
 			style: tag
 				? { ...tokenStyle, color: `var(--admonition-${tag.type})` }
 				: tokenStyle,
-			linkRangeIndex: linkRangeIndex === -1 ? undefined : linkRangeIndex,
+			linkRangeIndex: link ? linkRanges.indexOf(link) : undefined,
 			className: issue ? issueClassName(issue.severity) : undefined,
 			title: issue
 				? issue.expected.length

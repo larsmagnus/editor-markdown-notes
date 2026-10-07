@@ -1,7 +1,9 @@
+import { cn } from 'cn'
 import type { Ref } from 'react'
 import { useMemo } from 'react'
 
 import { findRawLinkRanges } from '#src/editor/extensions/link/find-raw-link-ranges'
+import { RAW_TEXT_LAYOUT } from '#src/editor/raw-text-layout'
 import { buildHighlightSegments } from '#src/lib/raw-markdown-highlight-segments'
 import type { RelativeToken } from '#src/lib/syntax-highlight-tokens'
 import type { SourcePlacedIssue } from '#src/lib/text-tools/place-source-issues'
@@ -17,6 +19,8 @@ interface RawMarkdownHighlightProps {
 	 *  (`use-raw-text-tools.ts`) - the same underline/tooltip the live editor
 	 *  draws as ProseMirror decorations. */
 	issues: SourcePlacedIssue[]
+	/** Off when it no longer lines up with the textarea (`useMirrorAlignment`). */
+	visible?: boolean
 	ref?: Ref<HTMLPreElement>
 }
 
@@ -37,6 +41,7 @@ export function RawMarkdownHighlight({
 	tokens,
 	activeLinkRangeIndex,
 	issues,
+	visible = true,
 	ref,
 }: RawMarkdownHighlightProps) {
 	const linkRanges = useMemo(() => findRawLinkRanges(text), [text])
@@ -49,7 +54,11 @@ export function RawMarkdownHighlight({
 		<pre
 			ref={ref}
 			aria-hidden="true"
-			className="pointer-events-none absolute inset-0 m-0 w-full resize-none overflow-hidden border-none bg-transparent font-mono text-sm whitespace-pre-wrap"
+			className={cn(
+				RAW_TEXT_LAYOUT,
+				'pointer-events-none absolute inset-0 w-full resize-none overflow-hidden bg-transparent',
+				!visible && 'invisible'
+			)}
 		>
 			{segments.map((segment, index) => (
 				<span
@@ -68,6 +77,10 @@ export function RawMarkdownHighlight({
 					{segment.text}
 				</span>
 			))}
+			{/* Marks where the text ends, for `useMirrorAlignment` to count
+			    lines to - and draws the line a final newline opens, which a
+			    textarea shows and a `<pre>` otherwise would not. */}
+			<span data-mirror-end="">{'\u200b'}</span>
 		</pre>
 	)
 }

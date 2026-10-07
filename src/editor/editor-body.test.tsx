@@ -6,8 +6,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SettingsProvider } from '#src/components/settings-provider'
 import { EditorBody } from '#src/editor/editor-body'
 import { LIVE_EDITOR_ID } from '#src/editor/editor-mode-live-surface'
-import { RAW_MARKDOWN_EDITOR_ID } from '#src/editor/editor-mode-raw'
 import { skipToEditor } from '#src/editor/extensions/focus-navigation/skip-target'
+import { RAW_MARKDOWN_EDITOR_ID } from '#src/editor/raw-markdown-textarea'
 import { DEFAULT_VIEW_OPTIONS } from '#src/shared/messages'
 
 // Resolves rather than returning `undefined`: the real `updateNotes` is `async`

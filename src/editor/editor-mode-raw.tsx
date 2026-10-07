@@ -4,8 +4,10 @@ import { useEffect, useRef } from 'react'
 
 import { RawLineGutter } from '#src/editor/raw-line-gutter'
 import { RawMarkdownHighlight } from '#src/editor/raw-markdown-highlight'
+import { RawMarkdownTextarea } from '#src/editor/raw-markdown-textarea'
 import { RawSlashMenu } from '#src/editor/raw-slash-menu'
 import type { AnalyzerHandle } from '#src/hooks/use-analyzer'
+import { useMirrorAlignment } from '#src/hooks/use-mirror-alignment'
 import { useRawDraftSync } from '#src/hooks/use-raw-draft-sync'
 import { useRawGutterRoom } from '#src/hooks/use-raw-gutter-room'
 import { useRawHeadingReveal } from '#src/hooks/use-raw-heading-reveal'
@@ -40,9 +42,6 @@ interface RawMarkdownEditorProps {
 	 *  from, to carry both across a mode switch. */
 	elementsRef?: RefObject<RawModeElements | null>
 }
-
-/** Where the "Skip to editor" link (`skip-target.ts`) focuses in raw mode. */
-export const RAW_MARKDOWN_EDITOR_ID = 'raw-markdown-editor'
 
 /**
  * The note as plain markdown source, editable and autosyncing.
@@ -85,6 +84,7 @@ export function EditorModeRaw({
 		onIssuesChange?.(issues)
 	}, [issues, onIssuesChange])
 	useRawModeElements(elementsRef, textareaRef, overlayRef)
+	const aligned = useMirrorAlignment(textareaRef, overlayRef, draft)
 
 	return (
 		// The measure/centering classes (`className`) live on this wrapper, not
@@ -104,30 +104,15 @@ export function EditorModeRaw({
 				tokens={tokens}
 				activeLinkRangeIndex={activeLinkRangeIndex}
 				issues={issues}
+				visible={aligned}
 			/>
-			<textarea
-				id={RAW_MARKDOWN_EDITOR_ID}
+			<RawMarkdownTextarea
 				ref={textareaRef}
 				value={draft}
 				onChange={handleChange}
 				onBlur={handleBlur}
-				spellCheck={false}
-				aria-label="Raw markdown"
-				// `pre-wrap` rather than `pre`: the source shares the rendered
-				// document's measure, so a line longer than it has to wrap rather
-				// than run off the side of a column it cannot scroll.
-				//
-				// Text itself is transparent - `RawMarkdownHighlight` behind it
-				// carries the actual colored glyphs - but the caret stays the
-				// theme's foreground color so it doesn't vanish along with it.
-				//
-				// `cursor-pointer` while `useRawLinkHover` reports the mouse over a
-				// link's href with the modifier held - the textarea is what actually
-				// receives the pointer, so it is the one CSS can style a cursor on.
-				className={cn(
-					'relative w-full resize-none border-none bg-transparent font-mono text-sm whitespace-pre-wrap text-transparent caret-brand outline-none field-sizing-content',
-					activeLinkRangeIndex !== null && 'cursor-pointer'
-				)}
+				textVisible={!aligned}
+				overLink={activeLinkRangeIndex !== null}
 			/>
 			<RawSlashMenu
 				textareaRef={textareaRef}

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useHostMessage } from '#src/hooks/use-host-message'
 import { documentDirty } from '#src/lib/document-dirty-tracker'
+import { toLf } from '#src/lib/host/line-endings'
 import {
 	documentSavedMessageSchema,
 	updateMessageSchema,
@@ -15,7 +16,11 @@ import { getVSCodeApi, isVSCodeWebview } from '#src/lib/vscode-api'
  * render already has the document rather than an empty editor.
  */
 export function useHostDocument() {
-	const [content, setContent] = useState(() => window.initialContent ?? '')
+	// LF only, whatever arrives: a textarea reports `\r\n` as `\n`, so offsets
+	// into CRLF text drift from the ones the raw view's selection reports.
+	const [content, setContent] = useState(() =>
+		toLf(window.initialContent ?? '')
+	)
 	const [fileName, setFileName] = useState(() => window.fileName ?? '')
 
 	// Those globals are frozen into the page when the note first opens, and a
@@ -38,7 +43,7 @@ export function useHostDocument() {
 	useHostMessage(
 		updateMessageSchema,
 		(message) => {
-			setContent(message.content)
+			setContent(toLf(message.content))
 			setFileName(message.fileName)
 		},
 		isVSCodeWebview()

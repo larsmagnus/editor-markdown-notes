@@ -1,4 +1,4 @@
-import { RAW_MARKDOWN_EDITOR_ID } from '#src/editor/editor-mode-raw'
+import { RAW_MARKDOWN_EDITOR_ID } from '#src/editor/raw-markdown-textarea'
 
 /**
  * Selects a range in the raw textarea and scrolls it into view, the raw
