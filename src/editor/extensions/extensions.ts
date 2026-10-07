@@ -29,6 +29,7 @@ import { fixedDelimiter } from '#src/editor/extensions/formatting/delimiter-spec
 import { inlineCodeDelimiterSpec } from '#src/editor/extensions/formatting/inline-code/inline-code-delimiter-spec'
 import { StrikeExtension } from '#src/editor/extensions/formatting/strike-extension'
 import { WrapSelectionOnKeypress } from '#src/editor/extensions/formatting/wrap-selection-on-keypress-extension'
+import { HardBreakExtension } from '#src/editor/extensions/hard-break/hard-break-extension'
 import { HeadingExtension } from '#src/editor/extensions/heading/heading-extension'
 import { HorizontalRuleExtension } from '#src/editor/extensions/horizontal-rule/horizontal-rule-extension'
 import { createImageSourceRevealProvider } from '#src/editor/extensions/image/create-image-source-reveal-provider'
@@ -109,6 +110,8 @@ export const SHARED_HEAD_EXTENSIONS = [
 		horizontalRule: false,
 		// Replaced below so consecutive blank lines survive serialization.
 		paragraph: false,
+		// Replaced below so a hard-wrapped paragraph keeps its line breaks.
+		hardBreak: false,
 	}),
 ]
 
@@ -118,6 +121,7 @@ export const SHARED_HEAD_EXTENSIONS = [
  */
 export const SHARED_TAIL_EXTENSIONS = [
 	ParagraphExtension,
+	HardBreakExtension,
 	CodeBlockExtension,
 	HorizontalRuleExtension,
 	// Only reachable on `.mdx` files - `restoreMdxBlocksInTransaction` is the

@@ -48,6 +48,6 @@ describe('admonition round trip', () => {
 
 	it('leaves an unknown type as a plain blockquote', () => {
 		const markdown = ['> [!FOO]', '> Body'].join('\n')
-		expect(roundTrip(markdown)).toBe('> [!FOO] Body')
+		expect(roundTrip(markdown)).toBe(markdown)
 	})
 })

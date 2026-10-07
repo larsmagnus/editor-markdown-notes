@@ -418,6 +418,7 @@
 		"@tiptap/extension-code-block": "3.31.4",
 		"@tiptap/extension-color": "3.31.4",
 		"@tiptap/extension-document": "3.31.4",
+		"@tiptap/extension-hard-break": "3.31.4",
 		"@tiptap/extension-heading": "3.31.4",
 		"@tiptap/extension-image": "3.31.4",
 		"@tiptap/extension-italic": "3.31.4",
