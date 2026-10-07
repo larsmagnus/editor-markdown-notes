@@ -28,6 +28,7 @@ export function loadNoteContent(
 			: parseNoteDocument(editor, content, fileKind)
 
 	editor.storage.blockSource.registry = registry
+	editor.storage.blockSource.synced = new WeakMap()
 	editor
 		.chain()
 		.setMeta('addToHistory', addToHistory)

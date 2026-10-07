@@ -66,16 +66,20 @@ describe('useFrontmatterDocument', () => {
 			expect(editor.can().undo()).toBe(false)
 		})
 
-		it('undoes a later rebuild as one step, then the edit before it', async () => {
-			const editor = createEditor('Ship it.', { parseOnly: true })
+		it('undoes a later outside change as one step, then the edit before it', async () => {
+			const editor = createEditor('Ship it.\n\nDone.', { parseOnly: true })
 
 			const { rerender } = renderHook(
 				({ content }) => useFrontmatterDocument(editor, content),
-				{ initialProps: { content: 'Ship it.' } }
+				{ initialProps: { content: 'Ship it.\n\nDone.' } }
 			)
 
-			editor.chain().focus('end').insertContent(' Today.').run()
-			expect(editor.getText()).toBe('Ship it. Today.')
+			editor
+				.chain()
+				.focus(editor.state.doc.child(0).nodeSize - 1)
+				.insertContent(' Today.')
+				.run()
+			expect(editor.getText()).toBe('Ship it. Today.\n\nDone.')
 
 			// A real pause, not a scripting convenience: the edit and the rebuild
 			// need to land in separate `prosemirror-history` groups (grouped by
@@ -84,14 +88,30 @@ describe('useFrontmatterDocument', () => {
 			await new Promise((resolve) => setTimeout(resolve, 600))
 
 			// A change made outside this editor - someone edited the file directly.
-			rerender({ content: 'Ship it. Today. Reviewed by the team.' })
-			expect(editor.getText()).toBe('Ship it. Today. Reviewed by the team.')
+			rerender({ content: 'Ship it.\n\nDone. Reviewed by the team.' })
+			expect(editor.getText()).toBe(
+				'Ship it. Today.\n\nDone. Reviewed by the team.'
+			)
 
 			editor.commands.undo()
+			expect(editor.getText()).toBe('Ship it. Today.\n\nDone.')
+
+			editor.commands.undo()
+			expect(editor.getText()).toBe('Ship it.\n\nDone.')
+		})
+
+		it("keeps the author's unsynced edit when an outside change touches the same block", () => {
+			const editor = createEditor('Ship it.', { parseOnly: true })
+
+			const { rerender } = renderHook(
+				({ content }) => useFrontmatterDocument(editor, content),
+				{ initialProps: { content: 'Ship it.' } }
+			)
+
+			editor.chain().focus('end').insertContent(' Today.').run()
+			rerender({ content: 'Ship it next week.' })
+
 			expect(editor.getText()).toBe('Ship it. Today.')
-
-			editor.commands.undo()
-			expect(editor.getText()).toBe('Ship it.')
 		})
 	})
 

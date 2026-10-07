@@ -1,6 +1,10 @@
 import type { Editor, EditorEvents } from '@tiptap/react'
 import { useCallback, useEffect } from 'react'
 
+import {
+	hasUnsyncedChanges,
+	recordSyncedNote,
+} from '#src/editor/extensions/markdown/block-source/synced-blocks'
 import { CONTENT_SYNC_META } from '#src/editor/extensions/transaction-filters'
 import { useNoteSync } from '#src/hooks/use-note-sync'
 
@@ -40,12 +44,28 @@ export function useMarkdownAutosync({
 		[editor]
 	)
 
+	// What reaches the file is the file's text again - see `recordSyncedNote`.
+	const syncAndRecord = useCallback(
+		(content: string) => {
+			if (editor) recordSyncedNote(editor, content)
+			syncContent(content)
+		},
+		[editor, syncContent]
+	)
+	const recordOwnSyncAndBlocks = useCallback(
+		(content: string) => {
+			if (editor) recordSyncedNote(editor, content)
+			recordOwnSync(content)
+		},
+		[editor, recordOwnSync]
+	)
+
 	const { queueSync, cancelQueuedSync, flushQueuedSync } = useNoteSync({
 		isVSCodeContext,
-		syncContent,
+		syncContent: syncAndRecord,
 		currentFile,
 		active: enabled,
-		recordOwnSync,
+		recordOwnSync: recordOwnSyncAndBlocks,
 	})
 
 	useEffect(() => {
@@ -53,10 +73,15 @@ export function useMarkdownAutosync({
 
 		const queueCurrentDocument = ({ transaction }: EditorEvents['update']) => {
 			// The host's own text, not the author's. Writing it back would replace
-			// the file with this editor's re-serialization of it, and any sync
-			// queued before it is now about a document that no longer exists.
+			// the file with this editor's re-serialization of it - unless the
+			// author's own unsynced edits survived it (`patchNoteContent`), which
+			// still have to reach the file.
 			if (transaction.getMeta(CONTENT_SYNC_META)) {
-				cancelQueuedSync()
+				if (hasUnsyncedChanges(editor)) {
+					queueSync(editor.storage.markdown.getMarkdown())
+				} else {
+					cancelQueuedSync()
+				}
 				return
 			}
 

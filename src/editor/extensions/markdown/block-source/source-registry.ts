@@ -53,3 +53,28 @@ export function buildSourceRegistry(
 		lastId: pieces.at(-1)?.id ?? null,
 	}
 }
+
+/** The source block `node` was parsed from, if any. */
+export function sourceIdOf(node: ProseMirrorNode): number | null {
+	const id: unknown = node.attrs.sourceId
+	return typeof id === 'number' ? id : null
+}
+
+/** The registry entry `node` still matches, if the author has not changed it since. */
+export function untouchedEntry(
+	registry: SourceRegistry,
+	node: ProseMirrorNode
+): SourceEntry | null {
+	const id = sourceIdOf(node)
+	if (id === null) return null
+
+	const entry = registry.entries.get(id)
+	if (!entry) return null
+	// Identity first: an untouched node is the very object that was loaded.
+	// `eq` catches the one an undo rebuilt with the same content.
+	return entry.node === node || entry.node.eq(node) ? entry : null
+}
+
+export function isBlankLine(node: ProseMirrorNode): boolean {
+	return node.type.name === 'paragraph' && node.content.size === 0
+}

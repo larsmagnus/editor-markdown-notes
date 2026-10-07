@@ -2,29 +2,14 @@ import type { Editor } from '@tiptap/core'
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
 import { serializeBlock } from '#src/editor/extensions/markdown/block-source/serialize-block'
+import {
+	isBlankLine,
+	untouchedEntry,
+} from '#src/editor/extensions/markdown/block-source/source-registry'
 import type {
 	SourceEntry,
 	SourceRegistry,
 } from '#src/editor/extensions/markdown/block-source/source-registry'
-
-/** The registry entry `node` still matches, if the author has not changed it since. */
-function untouchedEntry(
-	registry: SourceRegistry,
-	node: ProseMirrorNode
-): SourceEntry | null {
-	const id: unknown = node.attrs.sourceId
-	if (typeof id !== 'number') return null
-
-	const entry = registry.entries.get(id)
-	if (!entry) return null
-	// Identity first: an untouched node is the very object that was loaded.
-	// `eq` catches the one an undo rebuilt with the same content.
-	return entry.node === node || entry.node.eq(node) ? entry : null
-}
-
-function isBlankLine(node: ProseMirrorNode): boolean {
-	return node.type.name === 'paragraph' && node.content.size === 0
-}
 
 /**
  * The text between two written blocks: exactly what the note had there when
@@ -43,6 +28,9 @@ function separator(
 	return `\n\n${'\n'.repeat(blankLines)}`
 }
 
+/** A top-level block, and the text it was written as - empty for a blank line. */
+export type WrittenBlock = { node: ProseMirrorNode; text: string }
+
 /**
  * The whole note as markdown, writing every block the author has not touched
  * exactly as it was read and re-serializing only the rest - so an edit
@@ -52,10 +40,11 @@ function separator(
  * after a closing block, and commands like outdent leave more behind, none of
  * them lines anyone typed.
  */
-export function serializeNote(
+export function writeNote(
 	editor: Editor,
 	registry: SourceRegistry
-): string {
+): { markdown: string; blocks: WrittenBlock[] } {
+	const blocks: WrittenBlock[] = []
 	let out = ''
 	let previous: SourceEntry | null = null
 	let written = false
@@ -66,6 +55,7 @@ export function serializeNote(
 		const node = doc.child(index)
 		if (isBlankLine(node)) {
 			blankLines++
+			blocks.push({ node, text: '' })
 			continue
 		}
 
@@ -79,10 +69,19 @@ export function serializeNote(
 		}
 
 		out += text
+		blocks.push({ node, text })
 		previous = entry
 		written = true
 		blankLines = 0
 	}
 
-	return out + registry.trailingGap
+	return { markdown: out + registry.trailingGap, blocks }
+}
+
+/** The whole note as markdown - see `writeNote`. */
+export function serializeNote(
+	editor: Editor,
+	registry: SourceRegistry
+): string {
+	return writeNote(editor, registry).markdown
 }

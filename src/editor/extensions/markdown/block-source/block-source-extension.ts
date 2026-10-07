@@ -1,4 +1,5 @@
 import { Extension } from '@tiptap/core'
+import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { MarkdownIt } from 'markdown-it'
 
 import { installSourceBlockCapture } from '#src/editor/extensions/markdown/block-source/capture-source-blocks'
@@ -8,6 +9,8 @@ import type { SourceRegistry } from '#src/editor/extensions/markdown/block-sourc
 
 type BlockSourceStorage = {
 	registry: SourceRegistry | null
+	/** Each block the author changed, as last synced (`synced-blocks.ts`). */
+	synced: WeakMap<ProseMirrorNode, string>
 	markdown: { parse: { setup: (md: MarkdownIt) => void } }
 }
 
@@ -33,6 +36,7 @@ export const BlockSource = Extension.create<object, BlockSourceStorage>({
 	addStorage() {
 		return {
 			registry: null,
+			synced: new WeakMap(),
 			markdown: {
 				parse: {
 					setup(md: MarkdownIt) {
