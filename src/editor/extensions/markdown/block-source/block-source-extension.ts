@@ -3,9 +3,11 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { MarkdownIt } from 'markdown-it'
 
 import { installSourceBlockCapture } from '#src/editor/extensions/markdown/block-source/capture-source-blocks'
+import { markdownInternals } from '#src/editor/extensions/markdown/block-source/markdown-internals'
 import { serializeNote } from '#src/editor/extensions/markdown/block-source/serialize-note'
 import { sourceIdAttribute } from '#src/editor/extensions/markdown/block-source/source-id-attribute'
 import type { SourceRegistry } from '#src/editor/extensions/markdown/block-source/source-registry'
+import { installPluginsOnce } from '#src/editor/extensions/markdown/install-plugins-once'
 
 type BlockSourceStorage = {
 	registry: SourceRegistry | null
@@ -48,6 +50,7 @@ export const BlockSource = Extension.create<object, BlockSourceStorage>({
 	},
 
 	onBeforeCreate() {
+		installPluginsOnce(markdownInternals(this.editor).parser.md)
 		const markdown = this.editor.storage.markdown as {
 			getMarkdown: () => string
 		}

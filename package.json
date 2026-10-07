@@ -342,7 +342,7 @@
 		"test": "pnpm test:unit && pnpm test:extension && pnpm test:e2e",
 		"test:unit": "vitest run",
 		"test:watch": "vitest",
-		"test:fuzz": "FUZZ_RUNS=${FUZZ_RUNS:-5000} vitest run --testTimeout=600000",
+		"test:fuzz": "NODE_OPTIONS=--max-old-space-size=8192 FUZZ_RUNS=${FUZZ_RUNS:-5000} vitest run --testTimeout=600000",
 		"test:extension": "vscode-test",
 		"test:e2e": "playwright test",
 		"dev": "vite",
