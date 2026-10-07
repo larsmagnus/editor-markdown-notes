@@ -1,9 +1,7 @@
-import type { CommandProps } from '@tiptap/core'
 import { Color } from '@tiptap/extension-color'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
-import TaskList from '@tiptap/extension-task-list'
 import { TextStyle } from '@tiptap/extension-text-style'
 import type { TextStyleOptions } from '@tiptap/extension-text-style'
 import StarterKit from '@tiptap/starter-kit'
@@ -18,7 +16,6 @@ import { BlockMarkers } from '#src/editor/extensions/block-marker/block-marker-e
 import { createMarkerRevealProvider } from '#src/editor/extensions/block-marker/create-marker-reveal-provider'
 import { MarkerBackspace } from '#src/editor/extensions/block-marker/marker-backspace-extension'
 import { BLOCK_MARKER_SPECS } from '#src/editor/extensions/block-marker/specs'
-import { withMarkerStrip } from '#src/editor/extensions/block-marker/with-marker-strip'
 import { BlockquoteExtension } from '#src/editor/extensions/blockquote/blockquote-extension'
 import { CodeBlockExtension } from '#src/editor/extensions/code-block/code-block-extension'
 import { CodeExtension } from '#src/editor/extensions/code-block/code-extension'
@@ -41,8 +38,11 @@ import { hasLinkScheme } from '#src/editor/extensions/link/has-link-scheme'
 import { linkDelimiterSpec } from '#src/editor/extensions/link/link-delimiter-spec'
 import { LinkExtension } from '#src/editor/extensions/link/link-extension'
 import { StrictLinkify } from '#src/editor/extensions/link/strict-linkify-extension'
+import { BulletListExtension } from '#src/editor/extensions/list/bullet-list-extension'
 import { ListEnter } from '#src/editor/extensions/list/list-enter-extension'
 import { ListItemExtension } from '#src/editor/extensions/list/list-item-extension'
+import { OrderedListExtension } from '#src/editor/extensions/list/ordered-list-extension'
+import { TaskListExtension } from '#src/editor/extensions/list/task-list-extension'
 import { LiteralBlockExtension } from '#src/editor/extensions/literal-block/literal-block-extension'
 import { BlockSource } from '#src/editor/extensions/markdown/block-source/block-source-extension'
 import { MarkdownClipboard } from '#src/editor/extensions/markdown/markdown-clipboard-extension'
@@ -80,14 +80,9 @@ export const SHARED_HEAD_EXTENSIONS = [
 		types: [ListItemExtension.name],
 	} as Partial<TextStyleOptions>),
 	StarterKit.configure({
-		bulletList: {
-			keepMarks: true,
-			keepAttributes: false,
-		},
-		orderedList: {
-			keepMarks: true,
-			keepAttributes: false,
-		},
+		// Replaced below so an edited list saves the markers it shows.
+		bulletList: false,
+		orderedList: false,
 		codeBlock: false,
 		code: false,
 		italic: false,
@@ -137,6 +132,10 @@ export const SHARED_TAIL_EXTENSIONS = [
 	// so renumbering happens after lists are merged - the two plugins run in the
 	// same appendTransaction batch, and this registration order controls their
 	// relative execution.
+	// Before `ListItemExtension`, whose own toggle commands - the ones that
+	// strip a marker on the way out - have to override the stock ones.
+	BulletListExtension,
+	OrderedListExtension,
 	ListItemExtension,
 	// The shared strip pass every block marker's toggle-off relies on.
 	BlockMarkers,
@@ -172,22 +171,7 @@ export const SHARED_TAIL_EXTENSIONS = [
 	// `tiptap-markdown` only adds its `tight` attribute to bulletList and
 	// orderedList, so task lists would otherwise serialize with a blank line
 	// between every item.
-	TaskList.extend({
-		addAttributes: () => ({ tight: { default: true, rendered: false } }),
-		addCommands() {
-			const parent = this.parent?.()
-
-			return {
-				...parent,
-				toggleTaskList: () => (props: CommandProps) =>
-					withMarkerStrip(
-						props,
-						{ toggled: this.name, marker: 'taskItem' },
-						() => Boolean(parent?.toggleTaskList?.()(props))
-					),
-			}
-		},
-	}),
+	TaskListExtension,
 	TaskItemExtension,
 	// After both item types, so its Enter outranks their own `splitListItem`.
 	ListEnter,

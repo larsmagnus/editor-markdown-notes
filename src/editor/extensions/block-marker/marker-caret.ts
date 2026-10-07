@@ -1,4 +1,5 @@
 import type { Editor } from '@tiptap/core'
+import type { ResolvedPos } from '@tiptap/pm/model'
 import { TextSelection } from '@tiptap/pm/state'
 
 import type { MarkerMatch } from '#src/editor/extensions/block-marker/marker-host'
@@ -28,8 +29,11 @@ export type MarkerCaret = {
 export function resolveMarkerCaret(editor: Editor): MarkerCaret | null {
 	const { selection } = editor.state
 	if (!(selection instanceof TextSelection) || !selection.empty) return null
+	return resolveMarkerCaretAt(selection.$from)
+}
 
-	const { $from } = selection
+/** `resolveMarkerCaret`, for a caret at `$from`. */
+function resolveMarkerCaretAt($from: ResolvedPos): MarkerCaret | null {
 	if ($from.depth < 1) return null
 
 	const spec = BLOCK_MARKER_SPECS.find((candidate) =>
@@ -120,4 +124,39 @@ export function markerCaretInMarker(editor: Editor): MarkerCaret | null {
 export function markerCaretAtFirstContentChar(editor: Editor): boolean {
 	const caret = resolveMarkerCaret(editor)
 	return caret !== null && caret.parentOffset === caret.markerLength + 1
+}
+
+const ITEM_TYPES = ['listItem', 'taskItem']
+
+/**
+ * The caret sits before the marker of a top-level list item, or of a
+ * blockquote - where the stock Backspace lifts the construct out and leaves
+ * its marker behind as literal text, saved as `\- item`. Nested list items
+ * are left to it: lifting one a level is the outdent the author expects, and
+ * its marker still reads as a marker where it lands.
+ */
+export function markerCaretBeforeMarker(editor: Editor): MarkerCaret | null {
+	const caret = resolveMarkerCaret(editor)
+	if (!caret?.spec.backspaceRemovesMarker || caret.parentOffset !== 0) {
+		return null
+	}
+	if (caret.nodeTypeName === 'blockquote') return caret
+	if (!ITEM_TYPES.includes(caret.nodeTypeName)) return null
+
+	const { $from } = editor.state.selection
+	return $from.depth - 2 === 1 ? caret : null
+}
+
+/** The marker of the list item whose first line starts the textblock after the caret's, when the caret ends its own. */
+export function nextItemMarker(editor: Editor): MarkerCaret | null {
+	const { selection, doc } = editor.state
+	if (!(selection instanceof TextSelection) || !selection.empty) return null
+	const { $from } = selection
+	if ($from.parentOffset !== $from.parent.content.size) return null
+
+	const next = TextSelection.findFrom(doc.resolve($from.after()), 1, true)
+	if (!next || next.from !== next.$from.start()) return null
+
+	const marker = resolveMarkerCaretAt(next.$from)
+	return marker && ITEM_TYPES.includes(marker.nodeTypeName) ? marker : null
 }

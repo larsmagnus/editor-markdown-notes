@@ -9,7 +9,7 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
  * pattern extends one.
  */
 export type ParsedListMarker =
-	| { kind: 'task'; checked: boolean; markerLength: number }
+	| { kind: 'task'; checked: boolean; bulletChar: string; markerLength: number }
 	| { kind: 'ordered'; number: number; markerLength: number }
 	| { kind: 'bullet'; bulletChar: string; markerLength: number }
 
@@ -25,6 +25,7 @@ export function parseListMarker(text: string): ParsedListMarker | null {
 		return {
 			kind: 'task',
 			checked: task[2].toLowerCase() === 'x',
+			bulletChar: task[1],
 			markerLength: task[0].length,
 		}
 	}
@@ -61,8 +62,8 @@ export function orderedMarkerText(n: number): string {
 }
 
 /** Builds a fresh task marker for the given checked state. */
-export function taskMarkerText(checked: boolean): string {
-	return `- [${checked ? 'x' : ' '}] `
+export function taskMarkerText(checked: boolean, bulletChar = '-'): string {
+	return `${bulletChar} [${checked ? 'x' : ' '}] `
 }
 
 /**
@@ -72,6 +73,18 @@ export function taskMarkerText(checked: boolean): string {
  */
 export function firstParagraphStart(itemPos: number): number {
 	return itemPos + 2
+}
+
+/**
+ * The number an ordered list counts from: its first item's own, so a list
+ * split off another - `3. three` left after the item above it was lifted out
+ * - keeps counting from where it was, not from the original list's start.
+ */
+function firstNumber(list: ProseMirrorNode): number {
+	const parsed = parseListMarker(list.firstChild?.firstChild?.textContent ?? '')
+	return parsed?.kind === 'ordered'
+		? parsed.number
+		: Number(list.attrs.start ?? 1)
 }
 
 /**
@@ -94,7 +107,7 @@ export function resolveListMarker(
 	}
 
 	if (parent?.type.name === 'orderedList') {
-		const expected = (parent.attrs.start ?? 1) + index
+		const expected = firstNumber(parent) + index
 		return parsed?.kind === 'ordered' && parsed.number === expected
 			? text.slice(0, parsed.markerLength)
 			: orderedMarkerText(expected)

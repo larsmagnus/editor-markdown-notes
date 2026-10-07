@@ -8,6 +8,11 @@ export const SOURCE_ID_ATTRIBUTE = 'data-source-id'
 /** A horizontal rule's own line as written, for its node to show rather than a stock `---`. */
 export const RULE_TEXT_ATTRIBUTE = 'data-rule-text'
 
+/** A list item's marker as written - `*`, `+`, `3)` - for its node to show rather than a stock `-` or renumbered one. */
+export const LIST_MARKER_ATTRIBUTE = 'data-list-marker'
+
+const WRITTEN_LIST_MARKER = /^[ \t>]*([-+*]|\d{1,9}[.)])/
+
 export type CapturedBlock = {
 	id: number
 	map: [number, number]
@@ -44,6 +49,10 @@ function captureSourceBlocks(md: MarkdownIt) {
 		for (const token of state.tokens) {
 			if (token.type === 'hr' && token.map) {
 				token.attrSet(RULE_TEXT_ATTRIBUTE, lines[token.map[0]].trim())
+			}
+			if (token.type === 'list_item_open' && token.map) {
+				const written = WRITTEN_LIST_MARKER.exec(lines[token.map[0]])
+				if (written) token.attrSet(LIST_MARKER_ATTRIBUTE, written[1])
 			}
 		}
 

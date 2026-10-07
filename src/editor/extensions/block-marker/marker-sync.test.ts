@@ -53,11 +53,11 @@ describe('createMarkerSyncPlugin', () => {
 	// markdown-it's rendered `<ul>` HTML carries no trace of which bullet
 	// character the source used, so a parsed list always normalizes to `-`
 	// regardless of whether the author wrote `*`/`+`/`-`.
-	it('normalizes every parsed bullet to a dash', () => {
+	it('keeps every parsed bullet as written', () => {
 		const editor = documentFrom('* First\n* Second')
 
-		expect(editor.state.doc.firstChild?.child(0).textContent).toBe('- First')
-		expect(editor.state.doc.firstChild?.child(1).textContent).toBe('- Second')
+		expect(editor.state.doc.firstChild?.child(0).textContent).toBe('* First')
+		expect(editor.state.doc.firstChild?.child(1).textContent).toBe('* Second')
 	})
 })
 

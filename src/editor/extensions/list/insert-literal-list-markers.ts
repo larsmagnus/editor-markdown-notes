@@ -3,9 +3,15 @@ import {
 	orderedMarkerText,
 	taskMarkerText,
 } from '#src/editor/extensions/list/list-marker'
+import { LIST_MARKER_ATTRIBUTE } from '#src/editor/extensions/markdown/block-source/capture-source-blocks'
+
+const BULLET_CHARS = ['-', '+', '*']
+const ORDERED_MARKER = /^\d{1,9}[.)]$/
 
 /**
- * Reinstates literal bullet/ordered marker text into every plain `<li>`
+ * Reinstates literal bullet/ordered marker text - as written in the source
+ * where the parse recorded it (`LIST_MARKER_ATTRIBUTE`), so a `*` list shows
+ * and saves as one - into every plain `<li>`
  * markdown-it rendered - the `updateDOM` hook that runs before the schema's
  * own `parseHTML`, since markdown-it's list HTML carries the marker only in
  * the wrapping `<ul>`/`<ol>` tag (and the `<ol>`'s `start` attribute), never
@@ -23,12 +29,19 @@ export function insertLiteralListMarkers(element: Element): void {
 		// *nested* item's paragraph - which the outer item then prepends its own
 		// marker to as well, giving `- - nested`.
 		const target = item.querySelector(':scope > p') ?? item
+		const written = item.getAttribute(LIST_MARKER_ATTRIBUTE) ?? ''
 		if (parent.tagName === 'OL') {
 			const start = Number(parent.getAttribute('start') ?? '1')
 			const index = Array.from(parent.children).indexOf(item)
-			target.prepend(document.createTextNode(orderedMarkerText(start + index)))
+			const marker = ORDERED_MARKER.test(written)
+				? `${written} `
+				: orderedMarkerText(start + index)
+			target.prepend(document.createTextNode(marker))
 		} else if (parent.tagName === 'UL') {
-			target.prepend(document.createTextNode(bulletMarkerText()))
+			const marker = BULLET_CHARS.includes(written)
+				? bulletMarkerText(written)
+				: bulletMarkerText()
+			target.prepend(document.createTextNode(marker))
 		}
 	})
 }
@@ -54,6 +67,8 @@ export function insertLiteralTaskMarkers(element: Element): void {
 		// *nested* item's paragraph - which the outer item then prepends its own
 		// marker to as well, giving `- - nested`.
 		const target = item.querySelector(':scope > p') ?? item
-		target.prepend(document.createTextNode(taskMarkerText(checked)))
+		const written = item.getAttribute(LIST_MARKER_ATTRIBUTE) ?? ''
+		const bulletChar = BULLET_CHARS.includes(written) ? written : '-'
+		target.prepend(document.createTextNode(taskMarkerText(checked, bulletChar)))
 	})
 }

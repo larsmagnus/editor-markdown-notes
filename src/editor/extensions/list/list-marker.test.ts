@@ -52,6 +52,16 @@ describe('parseListMarker', () => {
 		expect(parseListMarker('- [ ] Item')).toEqual({
 			kind: 'task',
 			checked: false,
+			bulletChar: '-',
+			markerLength: 6,
+		})
+	})
+
+	it('parses a task marker with a star bullet', () => {
+		expect(parseListMarker('* [ ] Item')).toEqual({
+			kind: 'task',
+			checked: false,
+			bulletChar: '*',
 			markerLength: 6,
 		})
 	})
@@ -60,11 +70,13 @@ describe('parseListMarker', () => {
 		expect(parseListMarker('- [x] Item')).toEqual({
 			kind: 'task',
 			checked: true,
+			bulletChar: '-',
 			markerLength: 6,
 		})
 		expect(parseListMarker('- [X] Item')).toEqual({
 			kind: 'task',
 			checked: true,
+			bulletChar: '-',
 			markerLength: 6,
 		})
 	})
