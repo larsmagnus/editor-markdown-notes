@@ -9,6 +9,8 @@ const stockParagraphSerialize = defaultMarkdownSerializer.nodes.paragraph as (
 	node: ProseMirrorNode
 ) => void
 
+type FlushableState = MarkdownSerializerState & { flushClose(): void }
+
 /** Whether a later sibling has real content - a trailing run of empty
  *  paragraphs must stay silent as a whole, not just its last member. */
 function hasLaterContent(parent: ProseMirrorNode, index: number): boolean {
@@ -26,15 +28,16 @@ function hasLaterContent(parent: ProseMirrorNode, index: number): boolean {
  * away, instead of leaving it for `closeBlock` to discard, makes each empty
  * paragraph contribute the blank line it stands for.
  *
- * Scoped to top-level paragraphs with real content still ahead: a list
- * item's or blockquote's empty paragraph is for that container to manage, not
- * an author's deliberate blank line, and a *trailing* run is the "cursor
- * rests here" artifact commands like outdent leave behind - never flushed,
- * so it must stay silent. `parent` is absent for a bare fragment (copying a
- * table selection), which never needs either branch.
+ * Inside a blockquote or list item too - the author typed those blank lines
+ * there as much as anywhere. Only paragraphs with real content still ahead:
+ * a *trailing* run is the "cursor rests here" artifact commands like outdent
+ * leave behind - never flushed, so it must stay silent. `parent` is absent
+ * for a bare fragment (copying a table selection), which never needs either
+ * branch.
  *
- * `state.write()` rather than the internal `flushClose` it wraps - the public
- * API triggers the same default flush.
+ * The internal `flushClose` rather than the public `write()` that wraps it:
+ * `write()` also starts the next line with the container's prefix, which in
+ * a blockquote left a stray `> ` line beside every blank one.
  */
 export function paragraphMarkdownSerialize(
 	state: MarkdownSerializerState,
@@ -44,7 +47,7 @@ export function paragraphMarkdownSerialize(
 ): void {
 	const preserveAsBlankLine =
 		node.content.size === 0 &&
-		parent?.type?.name === 'doc' &&
+		parent !== undefined &&
 		hasLaterContent(parent, index)
 
 	if (!preserveAsBlankLine) {
@@ -52,6 +55,6 @@ export function paragraphMarkdownSerialize(
 		return
 	}
 
-	state.write()
+	;(state as FlushableState).flushClose()
 	state.closeBlock(node)
 }

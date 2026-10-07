@@ -615,3 +615,30 @@ describe('consecutive blank lines', () => {
 		expect(String(editor.storage.markdown.getMarkdown())).toBe('A')
 	})
 })
+
+describe('blank lines typed inside a container', () => {
+	it('keeps one quoted blank line per empty paragraph in a blockquote', () => {
+		const editor = createEditor()
+		editor.commands.setContent({
+			type: 'doc',
+			content: [
+				{
+					type: 'blockquote',
+					content: [
+						{
+							type: 'paragraph',
+							content: [{ type: 'text', text: '> Ship it.' }],
+						},
+						{ type: 'paragraph' },
+						{ type: 'paragraph' },
+						{ type: 'paragraph', content: [{ type: 'text', text: 'Done.' }] },
+					],
+				},
+			],
+		})
+
+		expect(String(editor.storage.markdown.getMarkdown()).trimEnd()).toBe(
+			'> Ship it.\n>\n>\n>\n> Done.'
+		)
+	})
+})
