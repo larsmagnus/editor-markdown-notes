@@ -1,11 +1,11 @@
 /**
- * A heading node's literal leading marker - `#`x1-6, then a single space -
- * the level's only source of truth now that `level` is no longer a node
- * attribute (see `heading-extension.ts`). Anchored so a run of 7+ `#`s (not
- * valid heading syntax) or a bare `#` with no trailing space (still being
- * typed) matches nothing rather than misreading part of the run.
+ * A heading node's literal leading marker - `#`x1-6, then a single space, or
+ * nothing at all in an empty heading - the level's only source of truth now
+ * that `level` is no longer a node attribute (see `heading-extension.ts`).
+ * Anchored so a run of 7+ `#`s (not valid heading syntax) or `#` run straight
+ * into text matches nothing rather than misreading part of the run.
  */
-const HEADING_MARKER = /^(#{1,6}) /
+const HEADING_MARKER = /^(#{1,6})(?: |$)/
 
 /** The heading level a node's text implies, `1` for text with no marker yet. */
 export function parseHeadingLevel(text: string): number {

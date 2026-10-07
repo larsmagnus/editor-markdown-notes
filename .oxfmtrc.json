@@ -25,6 +25,7 @@
 		".playwright-mcp",
 		"playwright-report",
 		"test-results",
-		"pnpm-lock.yaml"
+		"pnpm-lock.yaml",
+		"fixtures"
 	]
 }

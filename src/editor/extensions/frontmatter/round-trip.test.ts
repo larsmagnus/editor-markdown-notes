@@ -61,12 +61,9 @@ describe('frontmatter', () => {
 		expect(roundTripWithFrontmatter(markdown)).toBe(markdown)
 	})
 
-	// A document that legitimately opens with two horizontal rules and content
-	// between them is indistinguishable from typed frontmatter by shape alone -
-	// an accepted false positive, documented here rather than solved.
-	it('promotes a document that opens with two horizontal rules, even without frontmatter intent', () => {
+	it('keeps a note that opens with two horizontal rules exactly as written', () => {
 		const markdown = ['---', '', 'Some text.', '', '---'].join('\n')
 
-		expect(roundTrip(markdown)).toBe('---\nSome text.\n---')
+		expect(roundTrip(markdown)).toBe(markdown)
 	})
 })

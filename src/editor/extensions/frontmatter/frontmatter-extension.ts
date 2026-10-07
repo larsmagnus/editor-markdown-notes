@@ -1,8 +1,7 @@
 import { mergeAttributes, Node } from '@tiptap/core'
-import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
-import { detectFrontmatter } from '#src/editor/extensions/frontmatter/detect'
+import { createDetectFrontmatterPlugin } from '#src/editor/extensions/frontmatter/detect-frontmatter-plugin'
 import { isAtFrontmatterEdge } from '#src/editor/extensions/frontmatter/frontmatter-edge-keymap'
 import { FrontmatterView } from '#src/editor/extensions/frontmatter/frontmatter-view'
 import { serializeVerbatim } from '#src/editor/extensions/markdown/serialize-verbatim'
@@ -51,13 +50,7 @@ export const Frontmatter = Node.create({
 	},
 
 	addProseMirrorPlugins() {
-		return [
-			new Plugin({
-				key: new PluginKey('frontmatterDetect'),
-				appendTransaction: (_transactions, _oldState, newState) =>
-					detectFrontmatter(newState) ?? undefined,
-			}),
-		]
+		return [createDetectFrontmatterPlugin()]
 	},
 
 	addStorage() {

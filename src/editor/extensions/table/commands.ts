@@ -1,4 +1,3 @@
-import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { moveTableColumn, moveTableRow } from '@tiptap/pm/tables'
 import { Extension } from '@tiptap/react'
 
@@ -13,7 +12,7 @@ import {
 	removeCellSelection,
 	selectCellBeside,
 } from '#src/editor/extensions/table/cell-selection'
-import { keepHeaderInFirstRow } from '#src/editor/extensions/table/header'
+import { createKeepHeaderPlugin } from '#src/editor/extensions/table/header'
 
 /**
  * Everything the table needs that `@tiptap/extension-table` does not bind:
@@ -56,13 +55,7 @@ export const TableCommands = Extension.create({
 	},
 
 	addProseMirrorPlugins() {
-		return [
-			new Plugin({
-				key: new PluginKey('tableHeaderRow'),
-				appendTransaction: (_transactions, _oldState, newState) =>
-					keepHeaderInFirstRow(newState) ?? undefined,
-			}),
-		]
+		return [createKeepHeaderPlugin()]
 	},
 
 	addKeyboardShortcuts() {

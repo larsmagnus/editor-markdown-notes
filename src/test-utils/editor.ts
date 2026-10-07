@@ -2,6 +2,7 @@ import type { Content, Extensions } from '@tiptap/core'
 import { Editor } from '@tiptap/core'
 
 import { buildExtensions } from '#src/editor/extensions/build-extensions'
+import { loadNoteContent } from '#src/editor/load-note-content'
 import { createMountPoint } from '#src/test-utils/mount-point'
 
 type EditorOptions = {
@@ -20,11 +21,24 @@ type EditorOptions = {
 }
 
 /**
+ * Whether `content` is a note's markdown for the app's own schema - HTML and
+ * JSON content, and schema-level tests' bare extension lists, load through
+ * `setContent` instead.
+ */
+function isNote(editor: Editor, content: Content): content is string {
+	return (
+		typeof content === 'string' &&
+		!content.trimStart().startsWith('<') &&
+		'blockSource' in editor.storage
+	)
+}
+
+/**
  * An editor holding `content`, loaded the way `editor.tsx` loads a note.
  *
- * Loading through `setContent` is the point: it runs the plugins - marker
- * repair, delimiter sync - that constructing does not, so a test that skips it
- * asserts on a document the app never actually has.
+ * Loading through `loadNoteContent` is the point: it completes the parse the
+ * way the app does - delimiter text, untouched blocks remembered - so a test
+ * that skips it asserts on a document the app never actually has.
  *
  * Nothing here registers teardown. `test-setup.ts` destroys every editor after
  * every test, so a test file needs no `afterEach` of its own.
@@ -42,8 +56,33 @@ export function createEditor(
 		content: parseOnly ? content : '',
 		...(mount && { element: createMountPoint() }),
 	})
-	if (!parseOnly) editor.commands.setContent(content)
+	if (parseOnly) return editor
 
+	if (isNote(editor, content)) {
+		loadNoteContent(editor, content, {
+			fileKind: editor.schema.nodes.frontmatter ? 'markdown' : 'txt',
+			addToHistory: false,
+		})
+	} else {
+		editor.commands.setContent(content)
+	}
+
+	return editor
+}
+
+/**
+ * An editor holding `markdown` loaded exactly as the app loads a note - even
+ * text that starts with `<`, which `createEditor` reads as HTML.
+ */
+export function openNote(markdown: string, { mount = false } = {}): Editor {
+	const editor = new Editor({
+		extensions: buildExtensions('markdown'),
+		...(mount && { element: createMountPoint() }),
+	})
+	loadNoteContent(editor, markdown, {
+		fileKind: 'markdown',
+		addToHistory: false,
+	})
 	return editor
 }
 

@@ -12,7 +12,12 @@ import { findMarkRuns } from '#src/editor/extensions/formatting/find-mark-runs'
 import { uniformOuterMarks } from '#src/editor/extensions/formatting/uniform-outer-marks'
 import { unwrapRun } from '#src/editor/extensions/formatting/unwrap-run'
 import { createDeletionProbe } from '#src/editor/extensions/syntax-repair/authored-deletion'
-import { anyDocChanged } from '#src/editor/extensions/transaction-filters'
+import { touchedTopLevelBlocks } from '#src/editor/extensions/syntax-repair/touched-blocks'
+import {
+	anyDocChanged,
+	isAuthorEdit,
+	isContentSync,
+} from '#src/editor/extensions/transaction-filters'
 
 /**
  * Extends any run of `markType` missing its delimiter text at either end - the
@@ -43,6 +48,7 @@ export function createEnsureDelimitersPlugin(
 	return new Plugin({
 		key: new PluginKey(`ensureDelimiters$${markType.name}`),
 		appendTransaction: (transactions, oldState, newState) => {
+			if (isContentSync(transactions)) return null
 			const docChanged = anyDocChanged(transactions)
 			// Selection changes count too, and only for the empty-pair sweep: the
 			// caret leaving one is the event that makes it rubbish, and no document
@@ -55,7 +61,15 @@ export function createEnsureDelimitersPlugin(
 				spec,
 				createDeletionProbe(transactions)
 			)
-			const runs = findMarkRuns(newState.doc, markType)
+			// A bare selection change sweeps wherever the caret left; an edit
+			// only reaches the blocks it changed.
+			const touched =
+				docChanged && isAuthorEdit(transactions)
+					? touchedTopLevelBlocks(transactions, newState.doc)
+					: () => true
+			const runs = findMarkRuns(newState.doc, markType).filter((run) =>
+				touched(run.from, run.to)
+			)
 			let tr: Transaction | undefined
 
 			for (const run of [...runs].reverse()) {

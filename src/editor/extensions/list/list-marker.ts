@@ -13,9 +13,10 @@ export type ParsedListMarker =
 	| { kind: 'ordered'; number: number; markerLength: number }
 	| { kind: 'bullet'; bulletChar: string; markerLength: number }
 
-const TASK_MARKER = /^([-+*]) \[([ xX])\] /
-const ORDERED_MARKER = /^(\d+)[.)] /
-const BULLET_MARKER = /^([-+*]) /
+// A marker ends at a space, or at the end of an item with nothing after it.
+const TASK_MARKER = /^([-+*]) \[([ xX])\](?: |$)/
+const ORDERED_MARKER = /^(\d+)[.)](?: |$)/
+const BULLET_MARKER = /^([-+*])(?: |$)/
 
 /** Parses a list item's own text into its marker, or `null` if it has none yet. */
 export function parseListMarker(text: string): ParsedListMarker | null {

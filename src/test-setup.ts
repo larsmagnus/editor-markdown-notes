@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { cleanup, configure } from '@testing-library/react'
 import { Editor } from '@tiptap/core'
+import fc from 'fast-check'
 import { afterEach } from 'vitest'
 
 import { MOUNT_SELECTOR } from '#src/test-utils/mount-point'
@@ -10,6 +11,18 @@ import { MOUNT_SELECTOR } from '#src/test-utils/mount-point'
 // `import()` (the draw.io converter) can outlast on a loaded runner. Only a
 // failing assertion pays for the longer wait.
 configure({ asyncUtilTimeout: 5000 })
+
+// A fixed seed keeps the property tests deterministic in the regular suite; a
+// deep run (`FUZZ_RUNS`) explores fresh cases, and a failure's printed seed
+// goes back in through `FUZZ_SEED` to reproduce it.
+const fuzzSeed = Number(import.meta.env.FUZZ_SEED)
+fc.configureGlobal({
+	seed: Number.isInteger(fuzzSeed)
+		? fuzzSeed
+		: import.meta.env.FUZZ_RUNS
+			? Date.now()
+			: 20261007,
+})
 
 const editors = new Set<Editor>()
 

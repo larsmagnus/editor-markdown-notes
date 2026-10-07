@@ -4,6 +4,7 @@ import { forEachMarkerHost } from '#src/editor/extensions/block-marker/marker-ho
 import type { MarkerMatch } from '#src/editor/extensions/block-marker/marker-host'
 import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
 import type { DeletionProbe } from '#src/editor/extensions/syntax-repair/authored-deletion'
+import type { TouchedBlocks } from '#src/editor/extensions/syntax-repair/touched-blocks'
 
 /** One marker to write, and where whatever is currently there begins and ends. */
 export type MarkerFix = {
@@ -56,6 +57,24 @@ function findAuthoredRemovals(
 	return removed
 }
 
+/**
+ * Where every construct that was already in the document now sits. One of
+ * these left with no parseable syntax was made that way by the author - text
+ * typed into a heading's `##`, a marker edited into prose - and reads as prose
+ * now, where a construct that arrived without syntax gets it written.
+ */
+function existingHosts(
+	oldDoc: ProseMirrorNode,
+	specs: BlockMarkerSpec[],
+	probe: DeletionProbe
+): Set<number> {
+	const existing = new Set<number>()
+	forEachMarkerHost(oldDoc, specs, ({ pos }) => {
+		existing.add(probe.forward(pos, 1))
+	})
+	return existing
+}
+
 /** Whether a construct is now missing syntax it had at either end. */
 function missingSyntax(spec: BlockMarkerSpec, text: string): boolean {
 	if (spec.length(text) === 0) return true
@@ -70,13 +89,17 @@ export function findMarkerActions(
 	oldDoc: ProseMirrorNode,
 	newDoc: ProseMirrorNode,
 	specs: BlockMarkerSpec[],
-	probe: DeletionProbe
+	probe: DeletionProbe,
+	touched: TouchedBlocks
 ): MarkerAction[] {
 	const removed = findAuthoredRemovals(oldDoc, specs, probe)
+	const existing = existingHosts(oldDoc, specs, probe)
 	const actions: MarkerAction[] = []
 
 	forEachMarkerHost(newDoc, specs, (match) => {
 		const { spec, host, node, parent, index, pos } = match
+		if (!touched(pos, pos + node.nodeSize)) return
+
 		const text = host.node.textContent
 		const existingLength = spec.length(text)
 
@@ -94,6 +117,10 @@ export function findMarkerActions(
 				: undefined
 
 		if (marker === text.slice(0, existingLength) && trailing === undefined) {
+			return
+		}
+		if (missing && existing.has(pos)) {
+			actions.push({ kind: 'unwrap', spec, match })
 			return
 		}
 

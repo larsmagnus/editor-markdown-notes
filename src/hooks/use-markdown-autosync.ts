@@ -1,7 +1,7 @@
 import type { Editor, EditorEvents } from '@tiptap/react'
 import { useCallback, useEffect } from 'react'
 
-import { CONTENT_SYNC_META } from '#src/hooks/use-frontmatter-document'
+import { CONTENT_SYNC_META } from '#src/editor/extensions/transaction-filters'
 import { useNoteSync } from '#src/hooks/use-note-sync'
 
 type UseMarkdownAutosyncOptions = {

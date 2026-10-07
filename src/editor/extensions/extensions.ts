@@ -42,6 +42,8 @@ import { LinkExtension } from '#src/editor/extensions/link/link-extension'
 import { StrictLinkify } from '#src/editor/extensions/link/strict-linkify-extension'
 import { ListEnter } from '#src/editor/extensions/list/list-enter-extension'
 import { ListItemExtension } from '#src/editor/extensions/list/list-item-extension'
+import { LiteralBlockExtension } from '#src/editor/extensions/literal-block/literal-block-extension'
+import { BlockSource } from '#src/editor/extensions/markdown/block-source/block-source-extension'
 import { MarkdownClipboard } from '#src/editor/extensions/markdown/markdown-clipboard-extension'
 import { patchMarkdownEscaping } from '#src/editor/extensions/markdown/markdown-escaping'
 import { MdxBlockExtension } from '#src/editor/extensions/mdx-block/mdx-block-extension'
@@ -121,6 +123,9 @@ export const SHARED_TAIL_EXTENSIONS = [
 	// Only reachable on `.mdx` files - `restoreMdxBlocksInTransaction` is the
 	// sole place that ever creates one. Harmless to register unconditionally.
 	MdxBlockExtension,
+	// Only created on load, for a block that cannot be represented faithfully -
+	// see `markdown/block-source/`.
+	LiteralBlockExtension,
 	HeadingExtension,
 	BlockquoteExtension,
 	Admonition,
@@ -192,6 +197,8 @@ export const SHARED_TAIL_EXTENSIONS = [
 		linkify: true,
 	}),
 	StrictLinkify,
+	// Saves untouched blocks back exactly as they were read.
+	BlockSource,
 	// Registered after `Markdown`, whose `onBeforeCreate` builds the parser and
 	// serializer this reads off `editor.storage`.
 	MarkdownClipboard,

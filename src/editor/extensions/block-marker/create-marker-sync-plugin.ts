@@ -9,7 +9,11 @@ import type {
 } from '#src/editor/extensions/block-marker/marker-actions'
 import type { BlockMarkerSpec } from '#src/editor/extensions/block-marker/spec'
 import { createDeletionProbe } from '#src/editor/extensions/syntax-repair/authored-deletion'
-import { anyDocChanged } from '#src/editor/extensions/transaction-filters'
+import { touchedTopLevelBlocks } from '#src/editor/extensions/syntax-repair/touched-blocks'
+import {
+	anyDocChanged,
+	isAuthorEdit,
+} from '#src/editor/extensions/transaction-filters'
 
 /**
  * Writes one marker, replacing whatever wrong-length remnant sits there.
@@ -95,13 +99,16 @@ export function createMarkerSyncPlugin(specs: BlockMarkerSpec[]): Plugin {
 	return new Plugin({
 		key: new PluginKey('blockMarkerSync'),
 		appendTransaction: (transactions, oldState, newState: EditorState) => {
-			if (!anyDocChanged(transactions)) return null
+			if (!anyDocChanged(transactions) || !isAuthorEdit(transactions)) {
+				return null
+			}
 
 			const actions = findMarkerActions(
 				oldState.doc,
 				newState.doc,
 				specs,
-				createDeletionProbe(transactions)
+				createDeletionProbe(transactions),
+				touchedTopLevelBlocks(transactions, newState.doc)
 			)
 			if (actions.length === 0) return null
 

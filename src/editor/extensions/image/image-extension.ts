@@ -24,6 +24,20 @@ import { resolveImageSrc } from '#src/lib/host/resolve-image-src'
  */
 export const ImageExtension = Image.configure({ inline: true }).extend({
 	atom: true,
+	// Read verbatim: without its own `parseHTML`, TipTap turns an attribute
+	// that looks numeric into a number, and `![](2)` crashed the serializer.
+	addAttributes() {
+		const verbatim = (name: string) => ({
+			default: null,
+			parseHTML: (element: HTMLElement) => element.getAttribute(name),
+		})
+		return {
+			...this.parent?.(),
+			src: verbatim('src'),
+			alt: verbatim('alt'),
+			title: verbatim('title'),
+		}
+	},
 	// Display only - `src` keeps the author's path, so saving never rewrites
 	// the file with vscode-resource URIs.
 	renderHTML({ HTMLAttributes }) {

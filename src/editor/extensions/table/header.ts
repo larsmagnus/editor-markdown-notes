@@ -1,7 +1,9 @@
 import type { Node as ProseMirrorNode, NodeType } from '@tiptap/pm/model'
+import { Plugin, PluginKey } from '@tiptap/pm/state'
 import type { EditorState, Transaction } from '@tiptap/pm/state'
 
 import { childNodes, isHeaderCell } from '#src/editor/extensions/table/shape'
+import { isAuthorEdit } from '#src/editor/extensions/transaction-filters'
 
 /**
  * Keeps a table's header row at the top, where GFM's delimiter line puts it.
@@ -38,7 +40,7 @@ function retypeRow(
  * Swaps a header row that has drifted below the top back into the first row,
  * or null when every table already has its header where it belongs.
  */
-export function keepHeaderInFirstRow(state: EditorState): Transaction | null {
+function keepHeaderInFirstRow(state: EditorState): Transaction | null {
 	const { tr } = state
 	const header = state.schema.nodes.tableHeader
 	const cell = state.schema.nodes.tableCell
@@ -59,4 +61,15 @@ export function keepHeaderInFirstRow(state: EditorState): Transaction | null {
 	})
 
 	return tr.docChanged ? tr : null
+}
+
+/** Runs `keepHeaderInFirstRow` after every edit of the author's. */
+export function createKeepHeaderPlugin(): Plugin {
+	return new Plugin({
+		key: new PluginKey('tableHeaderRow'),
+		appendTransaction: (transactions, _oldState, newState) =>
+			isAuthorEdit(transactions)
+				? (keepHeaderInFirstRow(newState) ?? undefined)
+				: undefined,
+	})
 }

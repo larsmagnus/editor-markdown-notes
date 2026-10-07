@@ -29,7 +29,10 @@ function isPlainParagraph(node: ProseMirrorNode): boolean {
  * block node by the time this runs. A document that genuinely opens with two
  * rules around plain text is indistinguishable by shape and gets promoted too.
  */
-export function detectFrontmatter(state: EditorState): Transaction | null {
+export function detectFrontmatter(
+	state: EditorState,
+	wasRule: (pos: number) => boolean
+): Transaction | null {
 	const { doc, schema } = state
 	const hr = schema.nodes.horizontalRule
 	const frontmatter = schema.nodes.frontmatter
@@ -54,6 +57,9 @@ export function detectFrontmatter(state: EditorState): Transaction | null {
 
 	// No closing fence yet - still typing.
 	if (closingIndex === -1) return null
+	// A note that already opened with two rules is left alone - only typing a
+	// fence completes the pattern.
+	if (wasRule(0) && wasRule(closingPos)) return null
 
 	// Anything richer than plain paragraphs is far likelier to be real content
 	// sitting above an unrelated horizontal rule than intentional YAML, and

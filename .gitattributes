@@ -1,0 +1,2 @@
+# Adversarial inputs: line endings and trailing whitespace are the test data.
+fixtures/markdown/** -text

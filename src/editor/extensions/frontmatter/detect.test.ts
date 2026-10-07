@@ -2,8 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import { createEditor } from '#src/test-utils/editor'
 
+/**
+ * `markdown` set by an edit rather than loaded as a note - loading never
+ * rewrites what the file says, so detection only ever answers the author.
+ */
 function documentFrom(markdown: string) {
-	const editor = createEditor(markdown)
+	const editor = createEditor()
+	editor.commands.setContent(markdown)
 	return editor
 }
 

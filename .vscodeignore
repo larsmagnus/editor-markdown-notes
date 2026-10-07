@@ -12,6 +12,7 @@ out/mcp/copy-dictionaries.mjs
 .playwright-mcp/**
 .storybook/**
 docs/**
+fixtures/**
 scripts/**
 storybook-static/**
 test-results/**

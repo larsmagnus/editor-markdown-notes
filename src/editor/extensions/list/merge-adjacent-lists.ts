@@ -2,7 +2,10 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { EditorState, Transaction } from '@tiptap/pm/state'
 import { canJoin, Mapping } from '@tiptap/pm/transform'
 
-import { anyDocChanged } from '#src/editor/extensions/transaction-filters'
+import {
+	anyDocChanged,
+	isAuthorEdit,
+} from '#src/editor/extensions/transaction-filters'
 
 const LIST_TYPE_NAMES = new Set(['bulletList', 'orderedList', 'taskList'])
 
@@ -49,7 +52,7 @@ export function mergeAdjacentLists(
 	oldState: EditorState,
 	newState: EditorState
 ): Transaction | null {
-	if (!anyDocChanged(transactions)) return null
+	if (!anyDocChanged(transactions) || !isAuthorEdit(transactions)) return null
 
 	const forwards = new Mapping(
 		transactions.flatMap((transaction) => transaction.mapping.maps)
