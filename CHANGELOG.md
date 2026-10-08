@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+- Added drawing HTML blocks as HTML in the live editor, showing their source once clicked
+- Changed opening a note to leave the file untouched, saving unedited blocks exactly as written
+- Changed an edit to change only the block it was made in
+- Changed markdown the live editor cannot represent faithfully to show as plain text, exactly as written
+- Changed changes made to the file outside the editor to be taken in block by block, keeping the caret in place and unsaved edits intact
+- Changed lists to keep the bullet or number style they were written with, such as `*`, `+` or `1)`
+- Changed typed text to save without backslash escapes unless they are needed
+- Fixed edits being reverted, and blank lines disappearing, a moment after typing
+- Fixed undo also undoing the file in VS Code
+- Fixed notes with Windows (CRLF) line endings losing typing and being rewritten on every save
+- Fixed hard-wrapped paragraphs being joined into one line when edited
+- Fixed HTML, uneven table rows, long code fences and some escaped brackets being lost from the file on the first edit
+- Fixed list items that could not be deleted
+- Fixed deleting into a list item leaving its marker behind as text such as `\- item`
+- Fixed the raw editor selecting and deleting different text than shown below a long unbroken line such as a URL
+- Fixed blank lines typed inside a blockquote or list item not being saved
+- Fixed typing in the raw editor slowing down in long notes
+
 ## [1.1.0] - 2026-10-06
 
 - Added GitHub-style admonitions: `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]` render as colored callouts with an icon, and the tag reveals as text when the caret reaches it
