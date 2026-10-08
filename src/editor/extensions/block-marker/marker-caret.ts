@@ -152,6 +152,9 @@ export function nextItemMarker(editor: Editor): MarkerCaret | null {
 	const { selection, doc } = editor.state
 	if (!(selection instanceof TextSelection) || !selection.empty) return null
 	const { $from } = selection
+	// Only from prose: past a heading, a code block or an HTML block lies a
+	// line ending its syntax, which joining the item into it would not delete.
+	if ($from.parent.type.name !== 'paragraph') return null
 	if ($from.parentOffset !== $from.parent.content.size) return null
 
 	const next = TextSelection.findFrom(doc.resolve($from.after()), 1, true)
