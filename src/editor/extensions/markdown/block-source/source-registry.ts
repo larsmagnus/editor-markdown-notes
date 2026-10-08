@@ -81,6 +81,7 @@ export function untouchedEntry(
 	return entry.node === node || entry.node.eq(node) ? entry : null
 }
 
+/** An empty paragraph - a blank line the author typed, which the file holds as a gap, not a block. */
 export function isBlankLine(node: ProseMirrorNode): boolean {
 	return node.type.name === 'paragraph' && node.content.size === 0
 }

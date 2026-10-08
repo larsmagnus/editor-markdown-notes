@@ -19,9 +19,13 @@ export function completeParsedDocument(
 	content: Fragment,
 	prepare: (tr: Transaction) => void = () => {}
 ): ProseMirrorNode {
+	// Only the plugins that write anything: the rest would build decorations
+	// and state over the whole note just to throw them away.
 	const state = EditorState.create({
 		schema: editor.schema,
-		plugins: editor.state.plugins,
+		plugins: editor.state.plugins.filter(
+			(plugin) => plugin.spec.appendTransaction
+		),
 	})
 	const tr = state.tr
 		.replaceWith(0, state.doc.content.size, content)

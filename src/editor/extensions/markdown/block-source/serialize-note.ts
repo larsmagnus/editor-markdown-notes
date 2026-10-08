@@ -29,7 +29,19 @@ function separator(
 }
 
 /** A top-level block, and the text it was written as - empty for a blank line. */
-export type WrittenBlock = { node: ProseMirrorNode; text: string }
+type WrittenBlock = { node: ProseMirrorNode; text: string }
+
+type WrittenNote = { markdown: string; blocks: WrittenBlock[] }
+
+/**
+ * The note as last written, per document: a sync asks for the markdown it is
+ * about to send and then for the blocks it was written from, and serializing
+ * twice cost a second pass of every changed block's escape checks.
+ */
+const lastWritten = new WeakMap<
+	ProseMirrorNode,
+	{ registry: SourceRegistry; note: WrittenNote }
+>()
 
 /**
  * The whole note as markdown, writing every block the author has not touched
@@ -43,7 +55,21 @@ export type WrittenBlock = { node: ProseMirrorNode; text: string }
 export function writeNote(
 	editor: Editor,
 	registry: SourceRegistry
-): { markdown: string; blocks: WrittenBlock[] } {
+): WrittenNote {
+	const { doc } = editor.state
+	const remembered = lastWritten.get(doc)
+	if (remembered?.registry === registry) return remembered.note
+
+	const note = writeNoteAfresh(editor, registry)
+	lastWritten.set(doc, { registry, note })
+	return note
+}
+
+/** `writeNote`, without looking for a result to reuse. */
+function writeNoteAfresh(
+	editor: Editor,
+	registry: SourceRegistry
+): WrittenNote {
 	const blocks: WrittenBlock[] = []
 	let out = ''
 	let previous: SourceEntry | null = null

@@ -1,5 +1,5 @@
 import type { RefObject } from 'react'
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * How many lines each layer lays the text out over, or `null` where nothing
@@ -39,12 +39,19 @@ export function useMirrorAlignment(
 ): boolean {
 	const [aligned, setAligned] = useState(true)
 
-	useLayoutEffect(() => {
+	const measureRef = useRef<() => void>(() => {})
+
+	// Set up once: the observer catches a resize, and every text change asks
+	// for one measurement after the frame it lands in rather than forcing a
+	// layout of its own before paint.
+	useEffect(() => {
 		const textarea = textareaRef.current
 		const overlay = overlayRef.current
 		if (!textarea || !overlay) return
 
-		const measure = () => {
+		let frame = 0
+		const measureNow = () => {
+			frame = 0
 			const counts = lineCounts(textarea, overlay)
 			const next = !counts || counts.textarea === counts.mirror
 			setAligned((previous) => {
@@ -56,13 +63,23 @@ export function useMirrorAlignment(
 				return next
 			})
 		}
+		measureRef.current = () => {
+			if (frame === 0) frame = requestAnimationFrame(measureNow)
+		}
 
-		measure()
+		measureNow()
 		if (typeof ResizeObserver === 'undefined') return
-		const observer = new ResizeObserver(measure)
+		const observer = new ResizeObserver(measureRef.current)
 		observer.observe(textarea)
-		return () => observer.disconnect()
-	}, [textareaRef, overlayRef, text])
+		return () => {
+			observer.disconnect()
+			cancelAnimationFrame(frame)
+		}
+	}, [textareaRef, overlayRef])
+
+	useEffect(() => {
+		measureRef.current()
+	}, [text])
 
 	return aligned
 }

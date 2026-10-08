@@ -29,10 +29,10 @@ export const ListItemExtension = ListItem.extend({
 	},
 
 	/**
-	 * `bulletList`/`orderedList` own these commands, but neither ships as its
-	 * own package here - both come through StarterKit. Redefining them on the
-	 * item (registered later, so it wins the merge) over core's `toggleList`
-	 * reproduces the stock body exactly, which is all the wrapper needs.
+	 * `bulletList`/`orderedList` own these commands. Redefining them on the
+	 * item (registered after both, so it wins the merge) over core's
+	 * `toggleList` reproduces the stock body exactly, which is all the wrapper
+	 * needs.
 	 */
 	addCommands() {
 		const toggle = (listName: string) => () => (props: CommandProps) =>
