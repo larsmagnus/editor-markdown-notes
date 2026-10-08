@@ -28,7 +28,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🎭 Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps --only-shell chromium
 
       # The checks run again here rather than trusting main's green run:
       # releases are rare, and the tagged tree is what actually ships.

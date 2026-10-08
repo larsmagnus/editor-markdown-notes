@@ -32,7 +32,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🎭 Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps --only-shell chromium
 
       - name: ✨ Run typecheck, lint and format checks
         run: pnpm lint:check
