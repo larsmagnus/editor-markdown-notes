@@ -46,6 +46,9 @@ async function openNote(page: Page) {
 const rawTextarea = (page: Page) =>
 	page.getByRole('textbox', { name: 'Raw markdown' })
 
+// A switch lands its scroll a frame or two after the click that asked for it
+// resolves, so where it lands is polled for rather than read once - and read
+// again a second later where staying put is part of what is asserted.
 test.describe('Mode switch position', () => {
 	test('carries a caret on screen into raw mode, at the same height', async ({
 		page,
@@ -62,9 +65,9 @@ test.describe('Mode switch position', () => {
 			'selectionStart',
 			NOTE.indexOf('cat sat on the mat')
 		)
-		expect(Math.abs((await rawCaretTop(page)) - before)).toBeLessThan(
-			LINE_TOLERANCE_PX
-		)
+		await expect
+			.poll(async () => Math.abs((await rawCaretTop(page)) - before))
+			.toBeLessThan(LINE_TOLERANCE_PX)
 
 		// Diagrams, images and highlighting above the caret settle late.
 		await page.waitForTimeout(1000)
@@ -106,9 +109,9 @@ test.describe('Mode switch position', () => {
 		expect(await page.evaluate(() => document.getSelection()?.toString())).toBe(
 			selected
 		)
-		expect(Math.abs((await liveCaretTop(page)) - before)).toBeLessThan(
-			LINE_TOLERANCE_PX
-		)
+		await expect
+			.poll(async () => Math.abs((await liveCaretTop(page)) - before))
+			.toBeLessThan(LINE_TOLERANCE_PX)
 	})
 
 	test('keeps the text at the top of the screen in place when the caret is off screen', async ({
@@ -128,8 +131,13 @@ test.describe('Mode switch position', () => {
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
 
-		const after = await rawOffsetTop(page, NOTE.indexOf(`## ${heading}`))
-		expect(Math.abs(after - before)).toBeLessThan(LINE_TOLERANCE_PX)
+		await expect
+			.poll(async () =>
+				Math.abs(
+					(await rawOffsetTop(page, NOTE.indexOf(`## ${heading}`))) - before
+				)
+			)
+			.toBeLessThan(LINE_TOLERANCE_PX)
 	})
 
 	test('comes back to the same selection and scroll position after a round trip', async ({
@@ -153,11 +161,16 @@ test.describe('Mode switch position', () => {
 		expect(await page.evaluate(() => document.getSelection()?.toString())).toBe(
 			selected
 		)
-		const after = await page
-			.locator('.overflow-auto')
-			.first()
-			.evaluate((element) => element.scrollTop)
-		expect(Math.abs(after - scrollTop)).toBeLessThan(LINE_TOLERANCE_PX)
+		await expect
+			.poll(async () =>
+				Math.abs(
+					(await page
+						.locator('.overflow-auto')
+						.first()
+						.evaluate((element) => element.scrollTop)) - scrollTop
+				)
+			)
+			.toBeLessThan(LINE_TOLERANCE_PX)
 	})
 
 	test('keeps keystrokes typed just before switching, with the caret after them', async ({
@@ -202,10 +215,19 @@ test.describe('Mode switch position', () => {
 			window.initialScrollTop = 600
 		})
 		await openNote(page)
+		// A reader's scroll starts with the wheel, which is what tells the
+		// remembered-position restore to let go - dispatched in the same task as
+		// the scroll, since Playwright's own wheel lands a few milliseconds after
+		// it resolves. A scroll from script alone only counts as the reader's
+		// once the page has stopped changing height, so the restore could take
+		// it for its own and pull the page back to 600.
 		await page
 			.locator('#live-editor > *', { hasText: heading })
 			.first()
-			.evaluate((element) => element.scrollIntoView({ block: 'start' }))
+			.evaluate((element) => {
+				element.dispatchEvent(new WheelEvent('wheel', { bubbles: true }))
+				element.scrollIntoView({ block: 'start' })
+			})
 		const before = await liveBlockTop(page, heading)
 
 		// What `punchdown.toggleRaw` broadcasts: nothing in the page is touched.
@@ -275,11 +297,17 @@ test.describe('Mode switch position', () => {
 		const bandTop = await toolbarBottom(page)
 		const blankLine = NOTE.indexOf(`\n\n## ${heading}`) + 1
 		const top = await rawOffsetTop(page, blankLine - 1)
+		// The wheel first, in the same task, as a reader's scroll begins: it
+		// lets go of the hold the switch keeps on the caret's place, which would
+		// otherwise pull a scroll from script straight back.
 		await page
 			.locator('.overflow-auto')
 			.first()
 			.evaluate(
-				(container, delta) => container.scrollBy(0, delta),
+				(container, delta) => {
+					container.dispatchEvent(new WheelEvent('wheel', { bubbles: true }))
+					container.scrollBy(0, delta)
+				},
 				top - bandTop + 22
 			)
 

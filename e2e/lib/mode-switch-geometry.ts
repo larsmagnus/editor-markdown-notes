@@ -45,6 +45,10 @@ export async function selectInRaw(page: Page, start: number, end = start) {
 	const top = await rawOffsetTop(page, start)
 	await page.evaluate((top) => {
 		const container = document.querySelector('.overflow-auto')
+		// A wheel first, as a reader's scroll begins: it is what lets go of
+		// the hold a mode switch keeps on the caret's place, which would
+		// otherwise pull a scroll from script straight back.
+		container?.dispatchEvent(new WheelEvent('wheel', { bubbles: true }))
 		container?.scrollBy(0, top - window.innerHeight / 2)
 	}, top)
 }
