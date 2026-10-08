@@ -13,6 +13,20 @@ import { isWordChar } from '#src/lib/word-boundary'
 
 let patched = false
 let escaping = true
+let everyBracket = false
+
+/**
+ * Runs `serialize` escaping every `[` and `]` in text, for a block whose bare
+ * brackets would meet one of the note's link reference definitions.
+ */
+export function withEveryBracketEscaped<T>(serialize: () => T): T {
+	everyBracket = true
+	try {
+		return serialize()
+	} finally {
+		everyBracket = false
+	}
+}
 
 /**
  * Runs `serialize` with escaping off, for a caller that checks the result
@@ -75,10 +89,12 @@ export function patchMarkdownEscaping(): void {
 							? match
 							: '\\' + match
 					case '[':
+						if (everyBracket) return '\\' + match
 						return startOfLine && offset === 0 && /^\[[^\]]+\]:\s*\S/.test(str)
 							? '\\' + match
 							: match
 					case ']':
+						if (everyBracket) return '\\' + match
 						return str[offset + 1] === '(' || str[offset + 1] === '['
 							? '\\' + match
 							: match

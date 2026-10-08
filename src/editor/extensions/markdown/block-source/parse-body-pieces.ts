@@ -5,11 +5,15 @@ import type { MarkdownIt } from 'markdown-it'
 
 import { completeParsedDocument } from '#src/editor/complete-parsed-document'
 import {
+	capturedReferencesOf,
 	newSourceId,
 	structureOf,
 	takeCapturedBlocks,
 } from '#src/editor/extensions/markdown/block-source/capture-source-blocks'
-import type { CapturedBlock } from '#src/editor/extensions/markdown/block-source/capture-source-blocks'
+import type {
+	CapturedBlock,
+	References,
+} from '#src/editor/extensions/markdown/block-source/capture-source-blocks'
 import { markdownInternals } from '#src/editor/extensions/markdown/block-source/markdown-internals'
 import { hasSameStructure } from '#src/editor/extensions/markdown/block-source/same-structure'
 import { serializeBlock } from '#src/editor/extensions/markdown/block-source/serialize-block'
@@ -39,11 +43,12 @@ function isFaithful(
 	editor: Editor,
 	md: MarkdownIt,
 	node: ProseMirrorNode,
-	block: CapturedBlock
+	block: CapturedBlock,
+	references: References
 ): boolean {
 	return hasSameStructure(
 		block.structure,
-		structureOf(md, serializeBlock(editor, node))
+		structureOf(md, serializeBlock(editor, node, references), references)
 	)
 }
 
@@ -68,10 +73,11 @@ function nodesBySourceId(doc: ProseMirrorNode): Map<number, ProseMirrorNode[]> {
 export function parseBodyPieces(
 	editor: Editor,
 	body: string
-): { pieces: RegisteredPiece[]; gaps: string[] } {
+): { pieces: RegisteredPiece[]; gaps: string[]; references: References } {
 	const { parser } = markdownInternals(editor)
 	const html = parser.parse(body)
 	const captured = takeCapturedBlocks(parser.md)
+	const references = capturedReferencesOf(parser.md)
 	const parsed = nodesBySourceId(
 		completeParsedDocument(editor, createDocument(html, editor.schema).content)
 	)
@@ -86,7 +92,7 @@ export function parseBodyPieces(
 			id !== null &&
 			block &&
 			node &&
-			isFaithful(editor, parser.md, node, block)
+			isFaithful(editor, parser.md, node, block, references)
 		) {
 			return { id, text, node }
 		}
@@ -99,5 +105,5 @@ export function parseBodyPieces(
 		}
 	})
 
-	return { pieces, gaps: layout.gaps }
+	return { pieces, gaps: layout.gaps, references }
 }

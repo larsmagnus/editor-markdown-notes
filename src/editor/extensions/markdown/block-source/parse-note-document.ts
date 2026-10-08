@@ -43,7 +43,7 @@ export function parseNoteDocument(
 	fileKind: Exclude<FileKind, 'mdx'>
 ): { doc: ProseMirrorNode; registry: SourceRegistry } {
 	const { frontmatter, body } = prepareParseableContent(content, fileKind)
-	const { pieces, gaps } = parseBodyPieces(editor, body)
+	const { pieces, gaps, references } = parseBodyPieces(editor, body)
 
 	if (frontmatter !== null) {
 		const { piece, gapAfter } = frontmatterPiece(
@@ -63,5 +63,5 @@ export function parseNoteDocument(
 		nodes.length > 0 ? nodes : editor.schema.nodes.paragraph.create()
 	)
 
-	return { doc, registry: buildSourceRegistry(pieces, gaps) }
+	return { doc, registry: buildSourceRegistry(pieces, gaps, references) }
 }

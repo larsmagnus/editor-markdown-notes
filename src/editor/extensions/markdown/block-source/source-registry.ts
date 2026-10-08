@@ -1,5 +1,7 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
+import type { References } from '#src/editor/extensions/markdown/block-source/capture-source-blocks'
+
 /** One top-level block as the note last held it. */
 export type SourceEntry = {
 	node: ProseMirrorNode
@@ -21,6 +23,8 @@ export type SourceRegistry = {
 	firstId: number | null
 	trailingGap: string
 	lastId: number | null
+	/** The note's link reference definitions, for reading one block back in context. */
+	references: References
 }
 
 /** A top-level block, with the node it parsed to. */
@@ -33,7 +37,8 @@ export type RegisteredPiece = {
 /** The registry recording `pieces` and the gaps around them. */
 export function buildSourceRegistry(
 	pieces: RegisteredPiece[],
-	gaps: string[]
+	gaps: string[],
+	references: References
 ): SourceRegistry {
 	const entries: SourceRegistry['entries'] = new Map()
 	pieces.forEach((piece, index) => {
@@ -51,6 +56,7 @@ export function buildSourceRegistry(
 		firstId: pieces[0]?.id ?? null,
 		trailingGap: gaps.at(-1) ?? '',
 		lastId: pieces.at(-1)?.id ?? null,
+		references,
 	}
 }
 

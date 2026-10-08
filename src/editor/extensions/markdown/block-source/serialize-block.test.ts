@@ -32,3 +32,15 @@ describe('saving an edited block', () => {
 		expect(editor.storage.markdown.getMarkdown()).toBe('\\- not a list')
 	})
 })
+
+describe('saving an edited block in a note with link references', () => {
+	it('keeps brackets escaped where the note defines a matching reference', () => {
+		const editor = createEditor('Intro\n\n[docs]: https://example.com')
+		editor.commands.setTextSelection(editor.state.doc.child(0).nodeSize - 1)
+		editor.view.dispatch(editor.state.tr.insertText(' see [docs]'))
+
+		expect(editor.storage.markdown.getMarkdown()).toBe(
+			'Intro see \\[docs\\]\n\n[docs]: https://example.com'
+		)
+	})
+})

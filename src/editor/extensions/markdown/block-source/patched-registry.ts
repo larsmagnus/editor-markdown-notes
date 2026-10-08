@@ -55,5 +55,6 @@ export function patchedRegistry(
 		firstId: first ? sourceIdOf(first.node) : null,
 		trailingGap: incoming.trailingGap,
 		lastId: last ? sourceIdOf(last.node) : null,
+		references: incoming.references,
 	}
 }

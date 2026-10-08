@@ -1,4 +1,4 @@
-import type { MarkdownIt, StateCore, Token } from 'markdown-it'
+import type { Env, MarkdownIt, StateCore, Token } from 'markdown-it'
 
 import { describeStructure } from '#src/editor/extensions/markdown/block-source/same-structure'
 
@@ -22,7 +22,11 @@ export type CapturedBlock = {
 	structure: string[]
 }
 
+/** Link reference definitions by label, as markdown-it collects them while parsing a note. */
+export type References = NonNullable<Env['references']>
+
 const captures = new WeakMap<MarkdownIt, CapturedBlock[]>()
+const capturedReferences = new WeakMap<MarkdownIt, References>()
 const installed = new WeakSet<MarkdownIt>()
 let nextSourceId = 1
 
@@ -75,6 +79,8 @@ function captureSourceBlocks(md: MarkdownIt) {
 			index = end
 		}
 		captures.set(md, blocks)
+		const env: Env = state.env
+		capturedReferences.set(md, { ...env.references })
 	}
 }
 
@@ -97,8 +103,21 @@ export function newSourceId(): number {
 	return nextSourceId++
 }
 
-/** What `text` means as markdown, block by block (`describeStructure`). */
-export function structureOf(md: MarkdownIt, text: string): string[] {
-	md.parse(text, {})
+/** The link reference definitions of the last note `md` parsed. */
+export function capturedReferencesOf(md: MarkdownIt): References {
+	return capturedReferences.get(md) ?? {}
+}
+
+/**
+ * What `text` means as markdown, block by block (`describeStructure`) -
+ * resolving `[label]`s against `references`, the note's own definitions, which
+ * a block parsed alone would not see.
+ */
+export function structureOf(
+	md: MarkdownIt,
+	text: string,
+	references: References = {}
+): string[] {
+	md.parse(text, { references: { ...references } })
 	return takeCapturedBlocks(md).flatMap(({ structure }) => structure)
 }
