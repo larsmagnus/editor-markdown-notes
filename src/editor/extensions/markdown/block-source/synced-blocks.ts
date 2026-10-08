@@ -47,8 +47,13 @@ export function blocksBeforeTrailingBlanks(
 	return blocks
 }
 
-/** Whether the note holds anything of the author's the file has not seen. */
+/**
+ * Whether the note holds anything of the author's the file has not seen.
+ * Never, for a note loaded without the registry (MDX): replacing it loads the
+ * outside change whole, leaving nothing of the author's to tell apart.
+ */
 export function hasUnsyncedChanges(editor: Editor): boolean {
+	if (!editor.storage.blockSource.registry) return false
 	return blocksBeforeTrailingBlanks(editor.state.doc).some(
 		(node) => fileTextOf(editor, node) === null
 	)

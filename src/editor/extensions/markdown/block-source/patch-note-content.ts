@@ -41,7 +41,7 @@ export function patchNoteContent(
 	const alignment = alignBlocks(current.texts, incomingTexts)
 	if (!alignment) return false
 
-	const blocks = patchedBlocks(alignment, current, incoming)
+	const blocks = patchedBlocks(alignment, current, incoming, incomingTexts)
 	editor.storage.blockSource.registry = patchedRegistry(
 		blocks,
 		previous,

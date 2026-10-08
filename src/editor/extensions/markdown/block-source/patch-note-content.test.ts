@@ -79,6 +79,21 @@ describe('patchNoteContent', () => {
 		)
 	})
 
+	it('takes in a block inserted next to one the author is editing', () => {
+		const editor = openNote('Intro.\n\nShip it.\n\nDone.\n')
+		typeAtEndOf(editor, 1, ' Today')
+
+		patchNoteContent(
+			editor,
+			'Intro.\n\nShip it.\n\nReviewed by the team.\n\nDone.\n',
+			'markdown'
+		)
+
+		expect(editor.storage.markdown.getMarkdown()).toBe(
+			'Intro.\n\nShip it. Today\n\nReviewed by the team.\n\nDone.\n'
+		)
+	})
+
 	it('takes an outside change to a block once the author has synced their edit to it', () => {
 		const editor = openNote('# Roadmap\n\nShip it.\n\nDone.\n')
 		typeAtEndOf(editor, 1, ' Today')

@@ -1,7 +1,10 @@
 import type { Editor } from '@tiptap/core'
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-import { isBlankLine } from '#src/editor/extensions/markdown/block-source/source-registry'
+import {
+	isBlankLine,
+	sourceIdOf,
+} from '#src/editor/extensions/markdown/block-source/source-registry'
 import {
 	blocksBeforeTrailingBlanks,
 	fileTextOf,
@@ -15,14 +18,19 @@ import {
 export type CurrentBlocks = {
 	nodes: ProseMirrorNode[]
 	texts: Array<string | null>
+	/** What a block the author changed held when it was loaded, to find it among the incoming ones. */
+	originals: Array<string | null>
 	blanksAfter: ProseMirrorNode[][]
 	leadingBlanks: ProseMirrorNode[]
 }
 
+/** The note's current blocks, ready to line up against an incoming version of it. */
 export function currentBlocks(editor: Editor): CurrentBlocks {
+	const { registry } = editor.storage.blockSource
 	const current: CurrentBlocks = {
 		nodes: [],
 		texts: [],
+		originals: [],
 		blanksAfter: [],
 		leadingBlanks: [],
 	}
@@ -33,6 +41,10 @@ export function currentBlocks(editor: Editor): CurrentBlocks {
 		}
 		current.nodes.push(node)
 		current.texts.push(fileTextOf(editor, node))
+		const id = sourceIdOf(node)
+		current.originals.push(
+			id === null ? null : (registry?.entries.get(id)?.text ?? null)
+		)
 		current.blanksAfter.push([])
 	}
 	return current
