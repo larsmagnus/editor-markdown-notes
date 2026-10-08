@@ -119,14 +119,16 @@ test.describe('Mode switch position', () => {
 	}) => {
 		const heading = 'Long-form text: weak words and hedging test'
 		await openNote(page)
+		// The wheel first, in the same task, as a reader's scroll begins - see
+		// the command palette test below.
 		await page
 			.locator('#live-editor > *', { hasText: heading })
 			.first()
-			.evaluate((element) => element.scrollIntoView({ block: 'start' }))
-		await page
-			.locator('.overflow-auto')
-			.first()
-			.evaluate((element) => element.scrollBy(0, -40))
+			.evaluate((element) => {
+				element.dispatchEvent(new WheelEvent('wheel', { bubbles: true }))
+				element.scrollIntoView({ block: 'start' })
+				document.querySelector('.overflow-auto')?.scrollBy(0, -40)
+			})
 		const before = await liveBlockTop(page, heading)
 
 		await page.getByRole('button', { name: 'Raw editor' }).click()
