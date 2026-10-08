@@ -1,6 +1,8 @@
 import { readdirSync, readFileSync } from 'fs'
 import { join } from 'path'
 
+import type { Page } from '@playwright/test'
+
 import { expect, test } from '#e2e/lib/fixtures'
 import { openInVSCode } from '#e2e/lib/vscode-host'
 
@@ -17,12 +19,41 @@ function longNote(): string {
 
 const TYPED = 'Ship it today, then review.'
 
+/** Milliseconds the page may spend handling one keystroke before typing feels slow. */
+const BUDGET_MS = 50
+
 /**
- * Milliseconds per keystroke a long note may take, measured from outside the
- * page and alongside other specs - loose enough for that noise, tight enough
- * that work growing with the note's length per keystroke fails it.
+ * Starts recording how long the page spends handling each keystroke - the
+ * Event Timing API's processing time, which leaves out the test runner's own
+ * round trips and so holds steady when other specs share the machine.
  */
-const BUDGET_MS = 80
+async function recordKeystrokes(page: Page) {
+	await page.evaluate(() => {
+		const durations: number[] = []
+		Object.assign(window, { keystrokeDurations: durations })
+		new PerformanceObserver((list) => {
+			for (const entry of list.getEntries() as PerformanceEventTiming[]) {
+				if (entry.name === 'keydown' || entry.name === 'input') {
+					durations.push(entry.processingEnd - entry.processingStart)
+				}
+			}
+		}).observe({
+			type: 'event',
+			durationThreshold: 16,
+		} as PerformanceObserverInit)
+	})
+}
+
+/** The slowest keystroke but one - a single stall is not what makes typing feel slow. */
+async function typicalSlowKeystroke(page: Page): Promise<number> {
+	const durations = await page.evaluate(() =>
+		[
+			...(window as unknown as { keystrokeDurations: number[] })
+				.keystrokeDurations,
+		].sort((a, b) => b - a)
+	)
+	return durations[1] ?? durations[0] ?? 0
+}
 
 test.describe('Typing into a five-thousand-line note', () => {
 	test('keeps up in the live editor', async ({ page }) => {
@@ -30,13 +61,12 @@ test.describe('Typing into a five-thousand-line note', () => {
 		const content = page.getByRole('textbox').first()
 		await content.getByText('Type here.').click()
 		await page.keyboard.press('End')
+		await recordKeystrokes(page)
 
-		const started = Date.now()
 		await page.keyboard.type(TYPED)
 		await expect(content).toContainText(`Type here.${TYPED}`)
-		const perKey = (Date.now() - started) / TYPED.length
 
-		expect(perKey).toBeLessThan(BUDGET_MS)
+		expect(await typicalSlowKeystroke(page)).toBeLessThan(BUDGET_MS)
 	})
 
 	test('keeps up in the raw editor', async ({ page }) => {
@@ -48,12 +78,11 @@ test.describe('Typing into a five-thousand-line note', () => {
 			element.focus()
 			element.setSelectionRange(end, end)
 		})
+		await recordKeystrokes(page)
 
-		const started = Date.now()
 		await page.keyboard.type(TYPED)
 		await expect(raw).toHaveValue(new RegExp(`Type here\\.${TYPED}`))
-		const perKey = (Date.now() - started) / TYPED.length
 
-		expect(perKey).toBeLessThan(BUDGET_MS)
+		expect(await typicalSlowKeystroke(page)).toBeLessThan(BUDGET_MS)
 	})
 })
