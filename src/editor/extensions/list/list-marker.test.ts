@@ -36,6 +36,7 @@ describe('parseListMarker', () => {
 		expect(parseListMarker('12. Item')).toEqual({
 			kind: 'ordered',
 			number: 12,
+			delimiter: '.',
 			markerLength: 4,
 		})
 	})
@@ -44,6 +45,7 @@ describe('parseListMarker', () => {
 		expect(parseListMarker('3) Item')).toEqual({
 			kind: 'ordered',
 			number: 3,
+			delimiter: ')',
 			markerLength: 3,
 		})
 	})

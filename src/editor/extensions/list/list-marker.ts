@@ -10,12 +10,12 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
  */
 export type ParsedListMarker =
 	| { kind: 'task'; checked: boolean; bulletChar: string; markerLength: number }
-	| { kind: 'ordered'; number: number; markerLength: number }
+	| { kind: 'ordered'; number: number; delimiter: string; markerLength: number }
 	| { kind: 'bullet'; bulletChar: string; markerLength: number }
 
 // A marker ends at a space, or at the end of an item with nothing after it.
 const TASK_MARKER = /^([-+*]) \[([ xX])\](?: |$)/
-const ORDERED_MARKER = /^(\d+)[.)](?: |$)/
+const ORDERED_MARKER = /^(\d+)([.)])(?: |$)/
 const BULLET_MARKER = /^([-+*])(?: |$)/
 
 /** Parses a list item's own text into its marker, or `null` if it has none yet. */
@@ -35,6 +35,7 @@ export function parseListMarker(text: string): ParsedListMarker | null {
 		return {
 			kind: 'ordered',
 			number: Number(ordered[1]),
+			delimiter: ordered[2],
 			markerLength: ordered[0].length,
 		}
 	}
@@ -57,8 +58,8 @@ export function bulletMarkerText(bulletChar = '-'): string {
 }
 
 /** Builds a fresh ordered marker for the given number. */
-export function orderedMarkerText(n: number): string {
-	return `${n}. `
+export function orderedMarkerText(n: number, delimiter = '.'): string {
+	return `${n}${delimiter} `
 }
 
 /** Builds a fresh task marker for the given checked state. */
@@ -88,6 +89,21 @@ function firstNumber(list: ProseMirrorNode): number {
 }
 
 /**
+ * The marker style a new item in `list` takes on - its neighbour's bullet or
+ * delimiter, since a list that changes either partway reads back as two.
+ */
+function neighbourMarker(
+	list: ProseMirrorNode,
+	index: number
+): ParsedListMarker | null {
+	const neighbour = (offset: number) =>
+		parseListMarker(
+			list.maybeChild(index + offset)?.firstChild?.textContent ?? ''
+		)
+	return neighbour(-1) ?? neighbour(1)
+}
+
+/**
  * A list item's marker, corrected against its own node type and its parent
  * list rather than re-read from `text` - see `listMarkerSpec`'s doc comment
  * on why kind and numbering, not style, are the only things ever corrected.
@@ -99,23 +115,29 @@ export function resolveListMarker(
 	text: string
 ): string {
 	const parsed = parseListMarker(text)
+	const style = parent ? neighbourMarker(parent, index) : null
+	const bullet =
+		style?.kind === 'bullet' || style?.kind === 'task' ? style.bulletChar : '-'
 
 	if (node.type.name === 'taskItem') {
 		return parsed?.kind === 'task'
 			? text.slice(0, parsed.markerLength)
-			: taskMarkerText(Boolean(node.attrs.checked))
+			: taskMarkerText(Boolean(node.attrs.checked), bullet)
 	}
 
 	if (parent?.type.name === 'orderedList') {
 		const expected = firstNumber(parent) + index
-		return parsed?.kind === 'ordered' && parsed.number === expected
-			? text.slice(0, parsed.markerLength)
-			: orderedMarkerText(expected)
+		if (parsed?.kind === 'ordered' && parsed.number === expected) {
+			return text.slice(0, parsed.markerLength)
+		}
+		const ownDelimiter = parsed?.kind === 'ordered' ? parsed.delimiter : null
+		const neighbourDelimiter = style?.kind === 'ordered' ? style.delimiter : '.'
+		return orderedMarkerText(expected, ownDelimiter ?? neighbourDelimiter)
 	}
 
 	// A task-shaped marker survives on a bullet item: it is the author typing
 	// `- [ ] `, which the task input rule converts once the typed text is in.
 	return parsed?.kind === 'bullet' || parsed?.kind === 'task'
 		? text.slice(0, parsed.markerLength)
-		: bulletMarkerText()
+		: bulletMarkerText(bullet)
 }
