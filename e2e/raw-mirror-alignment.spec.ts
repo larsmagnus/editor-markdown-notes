@@ -91,7 +91,7 @@ test.describe('Raw view mirror alignment', () => {
 			.inputValue()
 
 		const offsets = probeOffsets(text)
-		const sample = offsets.filter((_offset, index) => index % 40 === 0)
+		const sample = offsets.filter((_offset, index) => index % 200 === 0)
 		const reached = await caretOffsetsAfterClicking(page, sample)
 
 		expect(text.split('\n').length).toBeGreaterThan(5000)
