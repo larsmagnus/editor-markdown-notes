@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-09
+
 - Added drawing HTML blocks as HTML in the live editor, showing their source once clicked
 - Changed opening a note to leave the file untouched, saving unedited blocks exactly as written
 - Changed an edit to change only the block it was made in
