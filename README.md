@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/larsmagnus/punchdown/main/public/icon-punchdown.svg" alt="punchdown logo" width="64" height="64" />
+  <img src="https://raw.githubusercontent.com/larsmagnus/punchdown/main/public/icon-punchdown.png" alt="punchdown logo" width="64" height="64" />
   <h1>punchdown_</h1>
   <p>An integrated live markdown editor for VS Code, built for the AI-first era</p>
 </div>
